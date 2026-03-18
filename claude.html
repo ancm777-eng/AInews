@@ -1,1682 +1,981 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Strategic AI Infrastructure & Systems Briefing — March 18, 2026</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Confidential AI Briefing — March 19, 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root {
-  --ink:       #0f1923;
-  --ink-soft:  #2e3f52;
-  --ink-muted: #6b7e92;
-  --paper:     #f8f6f1;
-  --paper-2:   #edeae2;
-  --paper-3:   #e3dfd5;
-  --accent:    #1a56db;
-  --accent-2:  #e8920a;
-  --accent-3:  #0ea86a;
-  --danger:    #d63a3a;
-  --warn:      #d97706;
-  --rule:      #d6d0c4;
-  --card-bg:   #ffffff;
-  --shadow:    0 2px 16px rgba(15,25,35,0.07);
-  --shadow-lg: 0 8px 40px rgba(15,25,35,0.12);
-  --radius:    12px;
-  --serif:     'Instrument Serif', Georgia, serif;
-  --sans:      'DM Sans', system-ui, sans-serif;
-  --mono:      'JetBrains Mono', 'Fira Code', monospace;
+  --bg: #f2f4ff;
+  --card: #ffffff;
+  --ink: #0b0f2a;
+  --muted: #6b7280;
+  --border: #e4e8f5;
+  --sans: 'Outfit', sans-serif;
+  --serif: 'DM Serif Display', serif;
+  --shadow: 0 2px 16px rgba(11,15,42,0.07);
+  --shadow-lg: 0 8px 40px rgba(11,15,42,0.14);
+  --c1: #6366f1;
+  --c2: #ef4444;
+  --c3: #f59e0b;
+  --c4: #10b981;
+  --c5: #3b82f6;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: var(--sans);
-  background: var(--paper);
+  background: var(--bg);
   color: var(--ink);
-  line-height: 1.7;
   font-size: 15px;
+  line-height: 1.7;
 }
 
-/* DISCLAIMER BANNER */
-.disclaimer {
-  background: linear-gradient(135deg, #fff8e6 0%, #fef3c7 100%);
-  border-bottom: 2px solid var(--accent-2);
-  padding: 12px 24px;
+/* ─── DISCLAIMER BAR ─── */
+.disclaimer-bar {
+  background: #fff3cd;
+  border-bottom: 2px solid #fbbf24;
+  padding: 10px 24px;
   text-align: center;
-}
-.disclaimer-en {
-  font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 12.5px;
   color: #92400e;
-  letter-spacing: 0.02em;
+  font-weight: 500;
 }
-.disclaimer-kr {
-  font-family: var(--sans);
-  font-size: 12px;
-  color: #b45309;
-  margin-top: 2px;
-}
+.disclaimer-bar .ko { display: block; margin-top: 2px; font-size: 12px; color: #b45309; }
 
-/* MASTHEAD */
+/* ─── MASTHEAD ─── */
 .masthead {
   background: var(--ink);
   color: #fff;
-  padding: 48px 0 40px;
-  position: relative;
-  overflow: hidden;
-}
-.masthead::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: 
-    radial-gradient(ellipse 60% 80% at 85% 20%, rgba(26,86,219,0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 60% at 10% 80%, rgba(14,168,106,0.10) 0%, transparent 70%);
+  padding: 40px 0 32px;
 }
 .masthead-inner {
-  position: relative;
   max-width: 1100px;
   margin: 0 auto;
   padding: 0 32px;
 }
-.masthead-label {
-  font-family: var(--mono);
+.masthead-tag {
   font-size: 11px;
-  letter-spacing: 0.14em;
-  color: var(--accent-2);
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  margin-bottom: 14px;
+  color: #94a3b8;
+  margin-bottom: 10px;
+  font-weight: 600;
 }
 .masthead-title {
   font-family: var(--serif);
   font-size: clamp(28px, 5vw, 52px);
-  font-weight: 400;
-  line-height: 1.18;
-  color: #fff;
-  max-width: 700px;
-}
-.masthead-title em {
-  font-style: italic;
-  color: #93c5fd;
-}
-.masthead-meta {
-  margin-top: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  align-items: center;
-}
-.masthead-date {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: #94a3b8;
-  letter-spacing: 0.06em;
-}
-.masthead-tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.tag {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 3px 9px;
-  border-radius: 3px;
-  font-weight: 500;
-}
-.tag-official { background: rgba(14,168,106,0.18); color: #6ee7b7; border: 1px solid rgba(14,168,106,0.3); }
-.tag-alert { background: rgba(216,58,58,0.18); color: #fca5a5; border: 1px solid rgba(216,58,58,0.3); }
-.tag-unverified { background: rgba(217,119,6,0.2); color: #fcd34d; border: 1px solid rgba(217,119,6,0.3); }
-
-/* CONTENTS NAV */
-.toc {
-  background: var(--card-bg);
-  border-bottom: 1px solid var(--rule);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 8px rgba(15,25,35,0.06);
-}
-.toc-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 32px;
-  display: flex;
-  gap: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.toc-inner::-webkit-scrollbar { display: none; }
-.toc-item {
-  font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  padding: 14px 16px;
-  white-space: nowrap;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: color 0.2s, border-color 0.2s;
-  text-decoration: none;
-  display: block;
-}
-.toc-item:hover { color: var(--accent); border-bottom-color: var(--accent); }
-
-/* MAIN LAYOUT */
-.main {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 32px 80px;
-}
-
-/* SECTION */
-.section {
-  margin-top: 64px;
-  scroll-margin-top: 60px;
-}
-.section-number {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  color: var(--accent-2);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.section-title {
-  font-family: var(--serif);
-  font-size: clamp(22px, 3.5vw, 34px);
-  font-weight: 400;
-  line-height: 1.22;
-  color: var(--ink);
-  margin-bottom: 8px;
-}
-.section-source {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink-muted);
-  margin-bottom: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-}
-.section-divider {
-  width: 100%;
-  height: 1px;
-  background: var(--rule);
-  margin: 28px 0;
-}
-
-/* CONTENT GRID */
-.content-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
-}
-
-/* BLOCK LABELS */
-.block {
+  line-height: 1.1;
+  letter-spacing: -0.5px;
   margin-bottom: 28px;
 }
-.block-label {
-  font-family: var(--mono);
-  font-size: 10px;
+.masthead-title span { color: #818cf8; }
+.masthead-meta {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  padding-top: 20px;
+}
+.meta-item { display: flex; flex-direction: column; gap: 2px; }
+.meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: #64748b; font-weight: 600; }
+.meta-value { font-size: 13px; color: #e2e8f0; font-weight: 400; }
+.meta-subject { max-width: 500px; }
+
+/* ─── MAIN LAYOUT ─── */
+.main { max-width: 1100px; margin: 0 auto; padding: 40px 32px 80px; }
+
+/* ─── NEWS CARD ─── */
+.news-card {
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 40px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.news-header {
+  padding: 22px 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.news-num {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+  white-space: nowrap;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.news-title {
+  font-family: var(--serif);
+  font-size: clamp(16px, 2.5vw, 22px);
+  line-height: 1.3;
+  color: #fff;
+}
+.news-source-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 28px;
+  background: rgba(0,0,0,0.06);
+  font-size: 12px;
+  color: rgba(255,255,255,0.75);
+  font-weight: 500;
+  flex-wrap: wrap;
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.15);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.status-badge::before { content: '●'; font-size: 7px; }
+
+.news-body { padding: 28px; }
+
+/* ─── SECTION BLOCK ─── */
+.section-block { margin-bottom: 22px; }
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-muted);
+  padding: 4px 12px;
+  border-radius: 20px;
   margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
-.block-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--rule);
-}
+.section-content { font-size: 14.5px; line-height: 1.75; color: #374151; }
+.section-content ul { padding-left: 20px; margin-top: 6px; }
+.section-content li { margin-bottom: 5px; }
+.section-content li strong { color: var(--ink); }
 
-/* CARD */
-.card {
-  background: var(--card-bg);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 24px 28px;
-  box-shadow: var(--shadow);
-}
-
-/* STAT BLOCKS */
-.stat-row {
+/* ─── SPLIT LAYOUT (text + infographic) ─── */
+.split-layout {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-  margin-bottom: 28px;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 0;
 }
-.stat-card {
-  background: var(--card-bg);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 18px 20px;
-  position: relative;
-  overflow: hidden;
-}
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-}
-.stat-card.blue::before { background: var(--accent); }
-.stat-card.amber::before { background: var(--accent-2); }
-.stat-card.green::before { background: var(--accent-3); }
-.stat-card.red::before { background: var(--danger); }
-.stat-value {
-  font-family: var(--serif);
-  font-size: 28px;
-  font-weight: 400;
-  color: var(--ink);
-  line-height: 1.1;
-}
-.stat-unit {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink-muted);
-  margin-top: 3px;
-}
-.stat-label {
-  font-size: 12px;
-  color: var(--ink-soft);
-  margin-top: 6px;
-  line-height: 1.4;
+@media(max-width: 720px) {
+  .split-layout { grid-template-columns: 1fr; }
+  .main { padding: 24px 16px 80px; }
+  .masthead-inner { padding: 0 16px; }
+  .news-body { padding: 18px; }
+  .news-header { padding: 18px; }
 }
 
-/* CRITICAL / SENTIMENT CALLOUTS */
-.callout {
-  border-left: 3px solid;
-  padding: 14px 18px;
-  border-radius: 0 8px 8px 0;
-  margin-bottom: 16px;
-  background: var(--card-bg);
-}
-.callout.critical { border-color: var(--danger); background: #fff5f5; }
-.callout.sentiment { border-color: var(--accent); background: #f0f4ff; }
-.callout.warn { border-color: var(--warn); background: #fffbf0; }
-.callout-title {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  margin-bottom: 6px;
-}
-.callout p { font-size: 13.5px; color: var(--ink-soft); line-height: 1.65; }
-
-/* CHART CONTAINER */
-.chart-wrap {
-  background: var(--card-bg);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 24px 24px 20px;
-  box-shadow: var(--shadow);
-  margin-bottom: 28px;
-}
-.chart-title {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  margin-bottom: 16px;
-}
-.chart-canvas-wrap {
-  position: relative;
-}
-
-/* DIAGRAM BLOCKS (CSS-only, no SVG) */
-
-/* Architecture flow diagram */
-.arch-flow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-  align-items: center;
-  justify-content: center;
+/* ─── INFOGRAPHIC PANELS ─── */
+.infographic-panel {
+  background: #f8faff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
   padding: 20px;
-  background: #f9fafb;
-  border-radius: 10px;
-  margin-bottom: 12px;
 }
-.arch-node {
-  background: var(--card-bg);
-  border: 1.5px solid var(--rule);
-  border-radius: 8px;
-  padding: 12px 16px;
-  text-align: center;
-  min-width: 110px;
-  position: relative;
-}
-.arch-node.primary {
-  border-color: var(--accent);
-  background: #eef3ff;
-}
-.arch-node.secondary {
-  border-color: var(--accent-2);
-  background: #fffbf0;
-}
-.arch-node.tertiary {
-  border-color: var(--accent-3);
-  background: #f0fdf6;
-}
-.arch-node .node-name {
-  font-family: var(--mono);
+.infographic-title {
   font-size: 11px;
-  font-weight: 500;
-  color: var(--ink);
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-bottom: 14px;
 }
-.arch-node .node-sub {
-  font-size: 11px;
-  color: var(--ink-muted);
-  margin-top: 3px;
-  line-height: 1.3;
-}
-.arch-arrow {
-  font-size: 18px;
-  color: var(--ink-muted);
-  padding: 0 2px;
-  user-select: none;
-  flex-shrink: 0;
-}
-.arch-arrow.down { transform: rotate(90deg); }
+.chart-container { position: relative; width: 100%; }
 
-/* Stack diagram */
-.stack-diagram {
+/* ─── TIMELINE (CSS only) ─── */
+.timeline {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  margin-bottom: 12px;
-}
-.stack-layer {
-  display: flex;
-  align-items: center;
-  border-radius: 6px;
-  padding: 10px 16px;
-  gap: 14px;
-}
-.stack-layer .layer-label {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 500;
-  min-width: 140px;
-  color: var(--ink);
-}
-.stack-layer .layer-detail {
-  font-size: 12px;
-  color: var(--ink-soft);
-  line-height: 1.4;
-}
-.stack-layer .layer-badge {
-  margin-left: auto;
-  font-family: var(--mono);
-  font-size: 10px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* Timeline */
-.timeline {
+  gap: 0;
   position: relative;
-  padding-left: 28px;
-  margin-bottom: 20px;
 }
 .timeline::before {
   content: '';
   position: absolute;
-  left: 7px;
-  top: 6px;
-  bottom: 6px;
+  left: 13px; top: 12px; bottom: 12px;
   width: 2px;
-  background: linear-gradient(to bottom, var(--accent), var(--accent-2));
+  background: linear-gradient(to bottom, #6366f1, #c7d2fe);
   border-radius: 2px;
 }
-.tl-item {
-  position: relative;
-  margin-bottom: 16px;
-  padding-left: 4px;
+.timeline-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 6px 0;
 }
-.tl-item::before {
-  content: '';
-  position: absolute;
-  left: -25px;
-  top: 7px;
-  width: 8px;
-  height: 8px;
+.timeline-dot {
+  width: 28px; height: 28px;
   border-radius: 50%;
-  background: var(--accent);
-  border: 2px solid var(--card-bg);
-  box-shadow: 0 0 0 2px var(--accent);
-}
-.tl-item.past::before { background: var(--ink-muted); box-shadow: 0 0 0 2px var(--ink-muted); }
-.tl-item.future::before { background: var(--accent-2); box-shadow: 0 0 0 2px var(--accent-2); }
-.tl-date {
-  font-family: var(--mono);
-  font-size: 10.5px;
-  color: var(--ink-muted);
-  letter-spacing: 0.06em;
-}
-.tl-title { font-size: 13px; font-weight: 500; color: var(--ink); margin-top: 2px; }
-.tl-desc { font-size: 12px; color: var(--ink-soft); margin-top: 3px; line-height: 1.5; }
-
-/* Comparison table */
-.compare-grid {
-  display: grid;
-  gap: 2px;
-  margin-bottom: 20px;
-}
-.compare-header {
-  display: grid;
-  gap: 2px;
-  margin-bottom: 2px;
-}
-.compare-row {
-  display: grid;
-  gap: 2px;
-}
-.compare-cell {
-  background: var(--card-bg);
-  border: 1px solid var(--rule);
-  padding: 10px 14px;
-  font-size: 12.5px;
-  border-radius: 4px;
-}
-.compare-cell.header {
-  background: var(--ink);
-  color: #fff;
-  font-family: var(--mono);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-weight: 500;
-  border-color: var(--ink);
+  font-weight: 800;
+  color: #fff;
+  z-index: 1;
+  position: relative;
+}
+.timeline-content { flex: 1; }
+.timeline-date { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.timeline-text { font-size: 12.5px; color: var(--ink); font-weight: 500; line-height: 1.4; margin-top: 2px; }
+
+/* ─── HBM Architecture Blocks ─── */
+.arch-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.arch-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.arch-block {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
+}
+.arch-arrow {
+  font-size: 16px;
+  color: var(--muted);
+  flex-shrink: 0;
+  text-align: center;
+  width: 20px;
+}
+.threshold-bar {
+  height: 10px;
+  border-radius: 5px;
+  margin: 4px 0;
+  position: relative;
+}
+.bandwidth-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.bandwidth-label { font-size: 11.5px; font-weight: 600; width: 70px; flex-shrink: 0; color: var(--ink); }
+.bandwidth-bar-wrap { flex: 1; background: #e5e7eb; border-radius: 5px; height: 22px; overflow: hidden; }
+.bandwidth-bar { height: 100%; border-radius: 5px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 700; color: #fff; transition: width 0.6s ease; }
+.bandwidth-val { font-size: 11px; font-weight: 700; color: var(--ink); width: 60px; text-align: right; flex-shrink: 0; }
+
+/* ─── Vendor competition blocks ─── */
+.vendor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.vendor-card {
+  padding: 12px;
+  border-radius: 10px;
   text-align: center;
 }
-.compare-cell.feature {
-  background: var(--paper-2);
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink-soft);
-  font-weight: 500;
-}
-.compare-cell.highlight { background: #eef3ff; color: var(--accent); font-weight: 600; }
-.compare-cell.neutral { color: var(--ink-soft); }
+.vendor-name { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+.vendor-stat { font-size: 18px; font-weight: 800; margin: 4px 0; }
+.vendor-detail { font-size: 10.5px; line-height: 1.3; }
 
-/* BANDWIDTH BAR */
-.bw-bar-wrap { margin-bottom: 20px; }
-.bw-bar-item {
-  margin-bottom: 12px;
-}
-.bw-bar-label {
+/* ─── Power capacity blocks ─── */
+.power-row {
   display: flex;
-  justify-content: space-between;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink-soft);
-  margin-bottom: 5px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
 }
-.bw-bar-value { font-weight: 600; color: var(--ink); }
-.bw-bar-track {
-  height: 10px;
-  background: var(--paper-2);
-  border-radius: 5px;
-  overflow: hidden;
-}
-.bw-bar-fill {
-  height: 100%;
-  border-radius: 5px;
-  transition: width 1s ease;
-}
+.power-label { font-size: 12px; font-weight: 600; width: 120px; flex-shrink: 0; color: var(--ink); line-height: 1.3; }
+.power-bar-wrap { flex: 1; background: #e5e7eb; border-radius: 5px; height: 26px; overflow: hidden; }
+.power-bar { height: 100%; border-radius: 5px; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 700; color: #fff; }
+.power-val { font-size: 11.5px; font-weight: 700; color: var(--ink); width: 55px; text-align: right; flex-shrink: 0; }
 
-/* FUNNEL / DONUT LABELS */
-.funding-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-.funding-table th {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  border-bottom: 1px solid var(--rule);
-  padding: 8px 12px;
-  text-align: left;
-  font-weight: 500;
-}
-.funding-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--rule);
-  color: var(--ink-soft);
-  vertical-align: middle;
-}
-.funding-table tr:last-child td { border-bottom: none; }
-.funding-table td:first-child { font-weight: 500; color: var(--ink); }
-.funding-table .dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 8px;
-  vertical-align: middle;
-}
+/* ─── GPU scale blocks ─── */
+.gpu-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.gpu-label { font-size: 11.5px; font-weight: 600; width: 90px; flex-shrink: 0; color: var(--ink); }
+.gpu-bar-wrap { flex: 1; background: #e5e7eb; border-radius: 5px; height: 24px; overflow: hidden; }
+.gpu-bar { height: 100%; border-radius: 5px; display: flex; align-items: center; padding-left: 8px; font-size: 10.5px; font-weight: 700; color: #fff; }
+.gpu-val { font-size: 11px; font-weight: 700; color: var(--ink); width: 65px; text-align: right; flex-shrink: 0; }
 
-/* SECTION CLOSING */
-.closing {
-  margin-top: 64px;
+/* ─── CLOSING SYNTHESIS ─── */
+.closing-card {
   background: var(--ink);
-  color: #e2e8f0;
+  color: #fff;
   border-radius: 16px;
-  padding: 40px 44px;
-  position: relative;
-  overflow: hidden;
+  padding: 36px;
+  margin-bottom: 40px;
 }
-.closing::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 50% 70% at 90% 10%, rgba(26,86,219,0.2) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 50% at 5% 90%, rgba(14,168,106,0.12) 0%, transparent 60%);
-}
-.closing-inner { position: relative; }
 .closing-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.15em;
-  color: var(--accent-2);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: #818cf8;
   margin-bottom: 12px;
 }
 .closing-title {
   font-family: var(--serif);
   font-size: clamp(20px, 3vw, 30px);
-  color: #fff;
-  margin-bottom: 18px;
-  line-height: 1.3;
+  margin-bottom: 20px;
+  line-height: 1.2;
 }
-.closing-body { font-size: 14px; line-height: 1.75; color: #94a3b8; margin-bottom: 24px; }
-.watch-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 12px;
-}
-.watch-item {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  padding: 14px 16px;
-}
-.watch-item-date {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--accent-2);
-  letter-spacing: 0.08em;
-  margin-bottom: 4px;
-}
-.watch-item-text { font-size: 12.5px; color: #cbd5e1; line-height: 1.5; }
+.closing-body { font-size: 14.5px; line-height: 1.8; color: #cbd5e1; }
+.closing-body p { margin-bottom: 16px; }
+.closing-body p:last-child { margin-bottom: 0; color: #94a3b8; font-style: italic; font-size: 13.5px; }
 
-/* TEXT HELPERS */
-p { margin-bottom: 14px; }
-.text-block p:last-child { margin-bottom: 0; }
-.mono { font-family: var(--mono); }
-.two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
+/* ─── COLOR UTILS ─── */
+.c1 { --accent: var(--c1); }
+.c2 { --accent: var(--c2); }
+.c3 { --accent: var(--c3); }
+.c4 { --accent: var(--c4); }
+.c5 { --accent: var(--c5); }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .main { padding: 0 16px 60px; }
-  .masthead-inner { padding: 0 16px; }
-  .toc-inner { padding: 0 16px; }
-  .closing { padding: 28px 24px; }
-  .two-col { grid-template-columns: 1fr; }
-  .stat-row { grid-template-columns: repeat(2, 1fr); }
-  .arch-flow { flex-direction: column; align-items: stretch; }
-  .arch-arrow { transform: rotate(90deg); text-align: center; }
-  .compare-row { grid-template-columns: 1fr !important; }
-  .compare-header { grid-template-columns: 1fr !important; }
-}
-@media (max-width: 480px) {
-  .stat-row { grid-template-columns: 1fr; }
-}
+.news-header.c1 { background: linear-gradient(135deg, #4338ca, #6366f1); }
+.news-header.c2 { background: linear-gradient(135deg, #b91c1c, #ef4444); }
+.news-header.c3 { background: linear-gradient(135deg, #b45309, #f59e0b); }
+.news-header.c4 { background: linear-gradient(135deg, #047857, #10b981); }
+.news-header.c5 { background: linear-gradient(135deg, #1d4ed8, #3b82f6); }
 
-/* PRINT */
-@media print {
-  .toc { display: none; }
+.label-c1 { background: #eef2ff; color: #4338ca; }
+.label-c2 { background: #fef2f2; color: #b91c1c; }
+.label-c3 { background: #fffbeb; color: #b45309; }
+.label-c4 { background: #ecfdf5; color: #047857; }
+.label-c5 { background: #eff6ff; color: #1d4ed8; }
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
 }
 </style>
 </head>
 <body>
 
-<!-- DISCLAIMER -->
-<div class="disclaimer">
-  <div class="disclaimer-en">⚠ This content was generated by AI and may contain inaccuracies. For reference only.</div>
-  <div class="disclaimer-kr">본 내용은 AI가 작성한 내용으로 부정확할 수 있습니다. 참고용으로만 이용해주세요.</div>
+<!-- ─── DISCLAIMER BAR ─── -->
+<div class="disclaimer-bar">
+  ⚠️ This content is generated by AI and may be inaccurate. Please use for reference purposes only.
+  <span class="ko">본 내용은 AI가 작성한 내용으로 부정확할 수 있습니다. 참고용으로만 이용해주세요.</span>
 </div>
 
-<!-- MASTHEAD -->
-<header class="masthead">
+<!-- ─── MASTHEAD ─── -->
+<div class="masthead">
   <div class="masthead-inner">
-    <div class="masthead-label">Strategic Intelligence Briefing · CEO Advisory Distribution</div>
-    <h1 class="masthead-title">AI Infrastructure &amp; <em>Systems</em> Briefing</h1>
+    <div class="masthead-tag">Strategic Intelligence Report</div>
+    <div class="masthead-title">Confidential <span>AI</span> Briefing</div>
     <div class="masthead-meta">
-      <span class="masthead-date">WEDNESDAY, MARCH 18, 2026 &nbsp;·&nbsp; 5 STORIES</span>
-      <div class="masthead-tags">
-        <span class="tag tag-official">GTC 2026</span>
-        <span class="tag tag-official">Official</span>
-        <span class="tag tag-alert">Geopolitical Risk</span>
+      <div class="meta-item">
+        <span class="meta-label">Date</span>
+        <span class="meta-value">March 19, 2026</span>
       </div>
-    </div>
-  </div>
-</header>
-
-<!-- TOC -->
-<nav class="toc">
-  <div class="toc-inner">
-    <a class="toc-item" href="#s1">01 · Vera Rubin + Groq</a>
-    <a class="toc-item" href="#s2">02 · Dynamo 1.0</a>
-    <a class="toc-item" href="#s3">03 · OpenAI $110B</a>
-    <a class="toc-item" href="#s4">04 · DeepSeek Allegation</a>
-    <a class="toc-item" href="#s5">05 · HBM4E Showdown</a>
-  </div>
-</nav>
-
-<!-- MAIN -->
-<main class="main">
-
-<!-- ══════════════════════════════════════════════════
-     SECTION 1: VERA RUBIN + GROQ
-════════════════════════════════════════════════════ -->
-<section class="section" id="s1">
-  <div class="section-number">01 · GTC 2026 Keynote / Official Press &nbsp;·&nbsp; March 16–17, 2026</div>
-  <h2 class="section-title">NVIDIA Vera Rubin Unveiled &amp; Groq 3 LPU Internal Integration</h2>
-  <div class="section-source">
-    <span class="tag tag-official">Official</span>
-    <span>Source: NVIDIA GTC 2026 Keynote / Official Press</span>
-  </div>
-
-  <!-- STAT CARDS -->
-  <div class="stat-row">
-    <div class="stat-card blue">
-      <div class="stat-value">350×</div>
-      <div class="stat-unit">Token Generation Improvement</div>
-      <div class="stat-label">2-year projection benchmarked vs. 1GW data center</div>
-    </div>
-    <div class="stat-card amber">
-      <div class="stat-value">700M</div>
-      <div class="stat-unit">Tokens/sec (Vera Rubin + Groq 3 LPX)</div>
-      <div class="stat-label">vs. 22M tokens/sec today</div>
-    </div>
-    <div class="stat-card green">
-      <div class="stat-value">10×</div>
-      <div class="stat-unit">Perf-per-Watt over Blackwell</div>
-      <div class="stat-label">Platform efficiency gain</div>
-    </div>
-    <div class="stat-card red">
-      <div class="stat-value">Dec '25</div>
-      <div class="stat-unit">Groq Asset Purchase</div>
-      <div class="stat-label">Acqui-hire + asset structure; GroqCloud remains independent entity</div>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="block-label">Overview</div>
-    <div class="text-block">
-      <p>At GTC 2026, NVIDIA officially unveiled the Vera Rubin architecture, targeting "Agentic AI." Slated for delivery in H2 2026, the platform integrates the Groq 3 LPU for specialized inference workloads. Groq became part of NVIDIA's portfolio via a December 2025 asset purchase and acqui-hire structure — technically, GroqCloud continues to operate as an independent entity, though the arrangement is functionally equivalent to a full acquisition and was structured in part to navigate regulatory review. Jensen Huang publicly acknowledged Samsung as the foundry for the Groq 3 LPU during the keynote, complementing NVIDIA's broader TSMC-reliant GPU ecosystem.</p>
-      <p>This reaffirms NVIDIA's ironclad ecosystem dominance. By integrating the Groq asset directly into the Rubin NVL rack architecture, NVIDIA offers a native, ultra-low-latency inference solution that functionally destroys the value proposition of third-party inference chip startups. For capital allocation, it confirms that NVIDIA captures the entire value chain from heavy training (GPUs) to real-time agentic reasoning (LPUs).</p>
-    </div>
-  </div>
-
-  <!-- ARCHITECTURE DIAGRAM: Vera Rubin + Groq 3 System Flow -->
-  <div class="block">
-    <div class="block-label">Architecture · Vera Rubin NVL Rack + Groq 3 LPX Integration</div>
-    <div class="card" style="padding:28px;">
-      <!-- Row 1: Input -->
-      <div style="text-align:center;margin-bottom:6px;">
-        <div class="arch-node primary" style="display:inline-block;min-width:200px;">
-          <div class="node-name">Agentic AI Workload</div>
-          <div class="node-sub">Multi-agent reasoning request</div>
-        </div>
-      </div>
-      <div style="text-align:center;font-size:20px;color:var(--ink-muted);margin:4px 0;">↓</div>
-      <!-- Row 2: Dynamo OS -->
-      <div style="text-align:center;margin-bottom:6px;">
-        <div class="arch-node" style="display:inline-block;min-width:260px;border-color:#6366f1;background:#f0f0ff;">
-          <div class="node-name" style="color:#4338ca;">NVIDIA Dynamo 1.0 (Inference OS)</div>
-          <div class="node-sub">Traffic routing · KV cache orchestration · Pipeline disaggregation</div>
-        </div>
-      </div>
-      <div style="text-align:center;font-size:20px;color:var(--ink-muted);margin:4px 0;">↓ &nbsp; Split</div>
-      <!-- Row 3: Split paths -->
-      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;max-width:680px;margin:0 auto 6px;">
-        <div class="arch-node primary" style="text-align:center;">
-          <div class="node-name">Vera Rubin GPU</div>
-          <div class="node-sub">Prefill &amp; KV Cache work<br>NVLink 6 · 3.6 TB/s<br>TSMC N3 · HBM4E</div>
-        </div>
-        <div style="text-align:center;font-size:13px;color:var(--ink-muted);font-family:var(--mono);">Ethernet<br>←→</div>
-        <div class="arch-node secondary" style="text-align:center;">
-          <div class="node-name">Groq 3 LPX</div>
-          <div class="node-sub">Feed-forward Decode<br>Samsung foundry<br>Sequential token gen</div>
-        </div>
-      </div>
-      <div style="text-align:center;font-size:20px;color:var(--ink-muted);margin:4px 0;">↓ &nbsp; Merge</div>
-      <!-- Row 4: Output -->
-      <div style="text-align:center;">
-        <div class="arch-node tertiary" style="display:inline-block;min-width:240px;">
-          <div class="node-name">Inference Output</div>
-          <div class="node-sub">700M tokens/sec at 1GW scale<br>Ultra-low latency · H2 2026</div>
-        </div>
-      </div>
-      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:10.5px;color:var(--ink-muted);text-align:center;line-height:1.7;">
-        NVLink 6: 3.6 TB/s bi-directional &nbsp;·&nbsp; HBM4E: 4.0 TB/s/stack &nbsp;·&nbsp; Groq LPU bypasses memory bottleneck on sequential token decode
-      </div>
-    </div>
-  </div>
-
-  <!-- TOKEN GEN CHART -->
-  <div class="block">
-    <div class="block-label">Data · Token Generation Throughput — Today vs. Vera Rubin + Groq 3 LPX</div>
-    <div class="chart-wrap">
-      <div class="chart-title">Tokens/Second at 1GW Data Center Scale (Jensen Huang, GTC 2026 Keynote)</div>
-      <div class="chart-canvas-wrap" style="height:180px;">
-        <canvas id="tokenChart"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="block-label">Technical Deep Dive</div>
-    <div class="text-block">
-      <p><strong>Model:</strong> Architecture optimized to handle multi-agent reasoning, with Jensen Huang presenting a projected 350x improvement in token generation over the next two years — benchmarked against a 1GW data center comparison of 22 million tokens per second today versus 700 million tokens per second on the Vera Rubin + Groq 3 LPX architecture.</p>
-      <p><strong>Hardware:</strong> The Vera Rubin platform delivers 10x performance-per-watt over the Blackwell generation. Samsung's integrated Groq 3 LPU operates alongside the GPUs to bypass traditional memory bottlenecks during sequential token generation.</p>
-    </div>
-  </div>
-
-  <div class="two-col">
-    <div class="callout critical">
-      <div class="callout-title">⚠ Critical View</div>
-      <p>While token economics improve drastically, the absolute power consumption per rack remains staggering. The thermal density of combining standard GPUs with specialized LPUs in a single rack will test the limits of current liquid cooling infrastructure. The GroqCloud independent entity structure also introduces a nuanced integration risk — full architectural consolidation depends on continued alignment between the two operating units.</p>
-    </div>
-    <div class="callout sentiment">
-      <div class="callout-title">◆ Community Sentiment</div>
-      <p>Elite hardware analyst communities view the Groq integration as NVIDIA's smartest defensive move in a decade, effectively neutralizing the most viable architectural threat to their inference market share by absorbing it entirely.</p>
-    </div>
-  </div>
-</section>
-
-<div class="section-divider"></div>
-
-<!-- ══════════════════════════════════════════════════
-     SECTION 2: DYNAMO 1.0
-════════════════════════════════════════════════════ -->
-<section class="section" id="s2">
-  <div class="section-number">02 · HPCwire / GTC 2026 Announcements &nbsp;·&nbsp; March 17, 2026</div>
-  <h2 class="section-title">NVIDIA Dynamo 1.0 "Inference OS" Launch</h2>
-  <div class="section-source">
-    <span class="tag tag-official">Official</span>
-    <span>Source: HPCwire / GTC 2026 Announcements</span>
-  </div>
-
-  <div class="stat-row">
-    <div class="stat-card blue">
-      <div class="stat-value">7×</div>
-      <div class="stat-unit">Inference Perf Boost</div>
-      <div class="stat-label">On existing hardware (Blackwell / H100)</div>
-    </div>
-    <div class="stat-card amber">
-      <div class="stat-value">1.8 TB/s</div>
-      <div class="stat-unit">NVLink 5 (Blackwell)</div>
-      <div class="stat-label">Bi-directional bandwidth per GPU</div>
-    </div>
-    <div class="stat-card green">
-      <div class="stat-value">3.6 TB/s</div>
-      <div class="stat-unit">NVLink 6 (Vera Rubin)</div>
-      <div class="stat-label">2× NVLink 5 — doubles cluster throughput</div>
-    </div>
-    <div class="stat-card blue">
-      <div class="stat-value">70B–400B</div>
-      <div class="stat-unit">Target Model Parameters</div>
-      <div class="stat-label">Dynamic quantization with baseline quality maintained</div>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="block-label">Overview</div>
-    <div class="text-block">
-      <p>NVIDIA launched Dynamo 1.0, an open-source software layer acting as a distributed "operating system" for AI factories. Dynamo dynamically routes inference traffic across GPUs and optimizes KV cache offloading, with pipeline disaggregation routing prefill and KV cache work to Vera Rubin GPUs while directing feed-forward decode work to the Groq LPX — both running in parallel over Ethernet. Major hyperscalers, including AWS, Azure, GCP, and Oracle, are already participating in the ecosystem.</p>
-      <p>Dynamo fundamentally improves cluster economics. By optimizing memory orchestration, it boosts the inference performance of existing hardware by up to 7x. From a capital perspective, this significantly extends the revenue-generating lifespan of your current Blackwell and H100 assets, offering a higher immediate yield on recent data center capex.</p>
-    </div>
-  </div>
-
-  <!-- NVLink Bandwidth Comparison -->
-  <div class="block">
-    <div class="block-label">Data · NVLink Interconnect Bandwidth Progression</div>
-    <div class="chart-wrap">
-      <div class="chart-title">NVLink Generation Bandwidth (TB/s bi-directional per GPU) — Dynamo optimized for both</div>
-      <div class="chart-canvas-wrap" style="height:200px;">
-        <canvas id="nvlinkChart"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- Dynamo Software Stack -->
-  <div class="block">
-    <div class="block-label">Architecture · Dynamo 1.0 Software Stack — Cluster Orchestration Layers</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="background:#eef3ff;border:1px solid #c7d7f8;">
-        <span class="layer-label" style="color:#1a56db;">Application Layer</span>
-        <span class="layer-detail">Agentic AI workloads · GPT-Next · Multi-agent orchestration</span>
-        <span class="layer-badge" style="background:#dbeafe;color:#1e40af;">User-facing</span>
-      </div>
-      <div style="text-align:center;font-size:14px;color:var(--ink-muted);padding:2px 0;">↓</div>
-      <div class="stack-layer" style="background:#f0f0ff;border:1px solid #c4b5fd;">
-        <span class="layer-label" style="color:#4338ca;">Dynamo 1.0 Core</span>
-        <span class="layer-detail">Dynamic traffic routing · KV cache offloading · Pipeline disaggregation · Open-source</span>
-        <span class="layer-badge" style="background:#ede9fe;color:#5b21b6;">Inference OS</span>
-      </div>
-      <div style="text-align:center;font-size:14px;color:var(--ink-muted);padding:2px 0;">↓</div>
-      <div class="stack-layer" style="background:#fff7ed;border:1px solid #fed7aa;">
-        <span class="layer-label" style="color:#c2410c;">CUDA / NVLink Layer</span>
-        <span class="layer-detail">CUDA kernel scheduling · NVLink 5/6 fabric · GPU idle latency reduction</span>
-        <span class="layer-badge" style="background:#ffedd5;color:#c2410c;">Lock-in layer</span>
-      </div>
-      <div style="text-align:center;font-size:14px;color:var(--ink-muted);padding:2px 0;">↓</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:3px;">
-        <div class="stack-layer" style="background:#f0fdf4;border:1px solid #bbf7d0;flex-direction:column;gap:4px;">
-          <span class="layer-label" style="color:#166534;min-width:0;">Vera Rubin GPU</span>
-          <span class="layer-detail">Prefill · KV Cache</span>
-        </div>
-        <div class="stack-layer" style="background:#fffbeb;border:1px solid #fde68a;flex-direction:column;gap:4px;">
-          <span class="layer-label" style="color:#92400e;min-width:0;">Groq 3 LPX</span>
-          <span class="layer-detail">FF Decode</span>
-        </div>
-        <div class="stack-layer" style="background:#f0f9ff;border:1px solid #bae6fd;flex-direction:column;gap:4px;">
-          <span class="layer-label" style="color:#0369a1;min-width:0;">Blackwell</span>
-          <span class="layer-detail">Legacy + 7× boost</span>
-        </div>
-        <div class="stack-layer" style="background:#fdf4ff;border:1px solid #e9d5ff;flex-direction:column;gap:4px;">
-          <span class="layer-label" style="color:#6b21a8;min-width:0;">H100 Fleet</span>
-          <span class="layer-detail">Extended lifespan</span>
-        </div>
-      </div>
-      <div style="text-align:center;font-size:14px;color:var(--ink-muted);padding:2px 0;">↓</div>
-      <div class="stack-layer" style="background:var(--paper-2);border:1px solid var(--rule);">
-        <span class="layer-label">Hyperscalers</span>
-        <span class="layer-detail">AWS · Azure · GCP · Oracle — already participating in Dynamo ecosystem</span>
-        <span class="layer-badge" style="background:var(--paper-3);color:var(--ink-soft);">4 confirmed</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="block-label">Technical Deep Dive</div>
-    <div class="text-block">
-      <p><strong>Model:</strong> Maintains baseline model quality during dynamic quantization, specifically targeting 70B to 400B parameter models.</p>
-      <p><strong>Hardware:</strong> Maximizes NVLink utilization across the cluster — NVLink 5 on current Blackwell systems delivers 1.8 TB/s bi-directional, while the next-generation NVLink 6 on Vera Rubin doubles this to 3.6 TB/s per GPU. Dynamo is architected to exploit both generations, reducing GPU idle latency cluster-wide through intelligent KV cache offloading.</p>
-    </div>
-  </div>
-
-  <div class="two-col">
-    <div class="callout warn">
-      <div class="callout-title">⚠ Critical View</div>
-      <p>Dynamo acts as an incredibly sticky software lock-in mechanism. While open-source, it is deeply optimized for CUDA and NVLink. Migrating optimized agentic workflows to alternative AMD or custom ASIC infrastructure later will incur massive switching costs, making the "open-source" framing a meaningful but incomplete description of what this release actually represents strategically.</p>
-    </div>
-    <div class="callout sentiment">
-      <div class="callout-title">◆ Community Sentiment</div>
-      <p>Developers are highly enthusiastic about the open-source release, though pragmatic engineers recognize it as a tool to ensure developers remain entirely dependent on NVIDIA's underlying hardware stack.</p>
-    </div>
-  </div>
-</section>
-
-<div class="section-divider"></div>
-
-<!-- ══════════════════════════════════════════════════
-     SECTION 3: OPENAI $110B
-════════════════════════════════════════════════════ -->
-<section class="section" id="s3">
-  <div class="section-number">03 · SEC Filings / GTC 2026 Partner Confirmations &nbsp;·&nbsp; March 17, 2026</div>
-  <h2 class="section-title">OpenAI's $110B Funding Finalization &amp; 5GW Infrastructure Lock-In</h2>
-  <div class="section-source">
-    <span class="tag tag-official">Press / Official Confirmations</span>
-    <span>Core funding closed late February · Confirmed via GTC capacity allocations</span>
-  </div>
-
-  <div class="stat-row">
-    <div class="stat-card blue">
-      <div class="stat-value">$110B</div>
-      <div class="stat-unit">Funding Round Finalized</div>
-      <div class="stat-label">Post-money valuation: $840B</div>
-    </div>
-    <div class="stat-card amber">
-      <div class="stat-value">7 GW</div>
-      <div class="stat-unit">Total Committed Compute</div>
-      <div class="stat-label">5GW NVIDIA + 2GW Amazon Trainium</div>
-    </div>
-    <div class="stat-card green">
-      <div class="stat-value">3 GW</div>
-      <div class="stat-unit">Vera Rubin Inference</div>
-      <div class="stat-label">Dedicated NVIDIA capacity committed</div>
-    </div>
-    <div class="stat-card red">
-      <div class="stat-value">8 yr</div>
-      <div class="stat-unit">AWS Commitment Extension</div>
-      <div class="stat-label">Cloud infrastructure lock-in period</div>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="block-label">Overview</div>
-    <div class="text-block">
-      <p>OpenAI's $110 billion funding round is finalized, establishing an $840 billion post-money valuation. The cap table reflects massive, strategic lock-ins: Amazon ($50B), SoftBank ($30B), and NVIDIA ($30B). Rather than fracturing its relationship with NVIDIA, OpenAI used this capital to commit to 3GW of dedicated Vera Rubin inference capacity and 2GW of training capacity, alongside 2GW of Amazon Trainium compute — bringing total committed infrastructure to 7GW across both hardware ecosystems.</p>
-      <p>This is a dual-sourcing megadeal, not a shift away from NVIDIA. By securing 7GW of total compute across both NVIDIA's bleeding-edge systems and Amazon's custom silicon, OpenAI is brute-forcing an insurmountable infrastructure moat. Software competitors cannot match this physical power footprint, solidifying OpenAI's position as a utility-scale monopoly in the making.</p>
-    </div>
-  </div>
-
-  <!-- Funding Breakdown + Compute Allocation Charts -->
-  <div class="block">
-    <div class="block-label">Data · $110B Cap Table &amp; 7GW Compute Allocation</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;" class="two-col">
-      <div class="chart-wrap" style="margin-bottom:0;">
-        <div class="chart-title">Investor Cap Table ($B)</div>
-        <div class="chart-canvas-wrap" style="height:220px;">
-          <canvas id="capTable"></canvas>
-        </div>
-      </div>
-      <div class="chart-wrap" style="margin-bottom:0;">
-        <div class="chart-title">7GW Compute Allocation by Hardware</div>
-        <div class="chart-canvas-wrap" style="height:220px;">
-          <canvas id="computeChart"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Infrastructure Architecture -->
-  <div class="block">
-    <div class="block-label">Architecture · OpenAI 3-Way Hyperscaler Infrastructure</div>
-    <div class="card" style="padding:24px;">
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
-        <div style="background:#eef3ff;border:1px solid #c7d7f8;border-radius:8px;padding:16px;text-align:center;">
-          <div style="font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Microsoft Azure</div>
-          <div style="font-size:13px;font-weight:600;color:var(--ink);">API Access</div>
-          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px;">Exclusive cloud provider<br>for OpenAI API</div>
-        </div>
-        <div style="background:#fff0f6;border:1px solid #fbc2eb;border-radius:8px;padding:16px;text-align:center;">
-          <div style="font-family:var(--mono);font-size:10px;color:#be185d;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">OpenAI</div>
-          <div style="font-size:13px;font-weight:600;color:var(--ink);">GPT-Next / Frontier</div>
-          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px;">Agentic workflows<br>$840B valuation</div>
-        </div>
-        <div style="background:#fff8f0;border:1px solid #fed7aa;border-radius:8px;padding:16px;text-align:center;">
-          <div style="font-family:var(--mono);font-size:10px;color:#c2410c;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Amazon AWS</div>
-          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px;font-size:13px;font-weight:600;color:var(--ink);">2GW Trainium</div>
-          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px;">Bedrock Stateful Runtime<br>8-year commitment</div>
-        </div>
-      </div>
-      <div style="text-align:center;margin-bottom:12px;font-family:var(--mono);font-size:11px;color:var(--ink-muted);">↕ Concurrent operation — 3-way hyperscaler architecture</div>
-      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;text-align:center;">
-        <div style="font-family:var(--mono);font-size:10px;color:#166534;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">NVIDIA Infrastructure</div>
-        <div style="font-size:13px;font-weight:600;color:var(--ink);">3GW Vera Rubin Inference + 2GW Training = 5GW NVIDIA Compute</div>
-        <div style="font-size:11px;color:var(--ink-muted);margin-top:4px;">NVLink 6 fabric · HBM4E · Groq 3 LPX integrated · GPT-Next Agentic Workflows</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="block-label">Technical Deep Dive</div>
-    <div class="text-block">
-      <p><strong>Model:</strong> Vera Rubin systems are explicitly targeted for OpenAI's upcoming GPT-Next agentic workflows and Frontier model scaling.</p>
-      <p><strong>Hardware:</strong> Integration of AWS Stateful Runtime Environment for large-scale GenAI via Amazon Bedrock, running concurrently with NVIDIA's hardware stack. Microsoft Azure retains its role as the exclusive cloud provider for OpenAI's API access, preserving a three-way hyperscaler architecture across Amazon, Microsoft, and NVIDIA.</p>
-    </div>
-  </div>
-
-  <div class="two-col">
-    <div class="callout critical">
-      <div class="callout-title">⚠ Critical View</div>
-      <p>The circular cash flow nature of this deal is a glaring financial risk. Amazon and NVIDIA are investing billions only for OpenAI to immediately spend that capital back on their proprietary hardware. This artificially inflates revenues for the chipmakers and valuation for OpenAI simultaneously, resembling a highly leveraged hardware bubble that warrants careful scrutiny in any due diligence framework.</p>
-    </div>
-    <div class="callout sentiment">
-      <div class="callout-title">◆ Community Sentiment</div>
-      <p>Wall Street analysts are split. Skeptics call it "circular musical chairs investing," while bulls argue that locking down 7GW of global power capacity constitutes a genuine infrastructure moat that justifies the astronomical valuation.</p>
-    </div>
-  </div>
-</section>
-
-<div class="section-divider"></div>
-
-<!-- ══════════════════════════════════════════════════
-     SECTION 4: DEEPSEEK ALLEGATION
-════════════════════════════════════════════════════ -->
-<section class="section" id="s4">
-  <div class="section-number">04 · Reuters / Anonymous US Administration Officials &nbsp;·&nbsp; February 24, 2026</div>
-  <h2 class="section-title">DeepSeek Blackwell Smuggling Allegation &amp; Supply Chain Paranoia</h2>
-  <div class="section-source">
-    <span class="tag tag-unverified">Unverified Allegation</span>
-    <span>Source: Reuters / Anonymous Trump Administration Officials</span>
-    <span style="color:var(--danger);font-family:var(--mono);font-size:11px;">⚠ No physical evidence independently verified</span>
-  </div>
-
-  <div class="stat-row">
-    <div class="stat-card red">
-      <div class="stat-value">0</div>
-      <div class="stat-unit">Physical Evidence</div>
-      <div class="stat-label">Anonymous sourcing only — US Commerce Dept declined to comment</div>
-    </div>
-    <div class="stat-card amber">
-      <div class="stat-value">8 TB/s</div>
-      <div class="stat-unit">HBM3e Bandwidth (B200)</div>
-      <div class="stat-label">Hypothetical capability if Blackwell B200s were acquired</div>
-    </div>
-    <div class="stat-card blue">
-      <div class="stat-value">MoE</div>
-      <div class="stat-unit">Routing Efficiency</div>
-      <div class="stat-label">Research consensus: algorithmic efficiency, not raw compute, drives DeepSeek progress</div>
-    </div>
-    <div class="stat-card red">
-      <div class="stat-value">Inner<br>Mongolia</div>
-      <div class="stat-unit">Alleged Location</div>
-      <div class="stat-label">Claimed data center site — unverified; hardware IDs removable</div>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="block-label">Overview</div>
-    <div class="text-block">
-      <p>An unverified allegation, originating from an anonymous Trump administration official and reported by Reuters, claimed that DeepSeek trained its latest frontier model using illicitly smuggled NVIDIA Blackwell GPUs at a data center in Inner Mongolia, and that the model likely incorporated distillation from outputs of leading US AI companies including Anthropic, Google, OpenAI, and xAI. NVIDIA has publicly dismissed the hardware smuggling claims as "far-fetched" and stated it will investigate any credible tip. The US Commerce Department has declined to officially comment, and no physical evidence has been independently verified.</p>
-      <p>Despite being unverified, the allegation itself acts as a powerful regulatory catalyst. The geopolitical paranoia it induces means your firm must price in the risk of tighter, silicon-level compute-tracking mandates regardless of whether the underlying claim is ever confirmed. The narrative alone is sufficient to place Middle Eastern compute proxies under intense regulatory scrutiny, and any formal Commerce Department action could move quickly given the current political environment.</p>
-    </div>
-  </div>
-
-  <!-- Policy Debate Timeline -->
-  <div class="block">
-    <div class="block-label">Timeline · Allegation Lifecycle &amp; Regulatory Risk Trajectory</div>
-    <div class="card" style="padding:24px 28px;">
-      <div class="timeline">
-        <div class="tl-item past">
-          <div class="tl-date">FEB 24, 2026</div>
-          <div class="tl-title">Reuters Report — Anonymous Trump Official</div>
-          <div class="tl-desc">Allegation of Blackwell B200 smuggling to Inner Mongolia data center; model distillation from Anthropic, Google, OpenAI, xAI outputs claimed.</div>
-        </div>
-        <div class="tl-item past">
-          <div class="tl-date">FEB 25–28, 2026</div>
-          <div class="tl-title">NVIDIA Dismissal / Commerce Dept. Silence</div>
-          <div class="tl-desc">NVIDIA labels claims "far-fetched"; pledges to investigate credible tips. US Commerce Dept declines official comment. No physical verification initiated.</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-date">MAR 2026 — ONGOING</div>
-          <div class="tl-title">Regulatory Paranoia Phase (Active)</div>
-          <div class="tl-desc">Middle Eastern compute proxies under scrutiny. Policy debate: China hawks vs. pragmatists (Jensen Huang, David Sacks). Huawei competitive risk argument enters Washington.</div>
-        </div>
-        <div class="tl-item future">
-          <div class="tl-date">NEAR-TERM WATCH</div>
-          <div class="tl-title">Potential: Silicon-Level Compute Tracking Mandate</div>
-          <div class="tl-desc">If Commerce Dept formalizes action — hardware-ID tracking, export license tightening. Risk of bricking legitimate overseas enterprise deployments as collateral.</div>
-        </div>
-        <div class="tl-item future">
-          <div class="tl-date">RISK SCENARIO</div>
-          <div class="tl-title">Escalation: Physical Audit Requirements</div>
-          <div class="tl-desc">B200 chips: hardware identifiers removable, making attribution without physical audits difficult. Enforcement gap widens as small-form-factor silicon proliferates.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Policy Camp Breakdown -->
-  <div class="block">
-    <div class="block-label">Policy Landscape · Washington Debate — Two Camps</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" class="two-col">
-      <div class="card" style="border-left:3px solid var(--danger);">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--danger);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">China Hawks</div>
-        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
-          <li style="font-size:13px;color:var(--ink-soft);">— Tighter silicon-level compute tracking</li>
-          <li style="font-size:13px;color:var(--ink-soft);">— Export license expansion to cover B200/Vera Rubin class</li>
-          <li style="font-size:13px;color:var(--ink-soft);">— Proxy-country audit requirements</li>
-          <li style="font-size:13px;color:var(--ink-soft);">— Hardware-ID removal criminalization</li>
-        </ul>
-      </div>
-      <div class="card" style="border-left:3px solid var(--accent-3);">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--accent-3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">Pragmatists (Huang / Sacks)</div>
-        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
-          <li style="font-size:13px;color:var(--ink-soft);">— Blanket bans accelerate Huawei development</li>
-          <li style="font-size:13px;color:var(--ink-soft);">— DeepSeek progress is algorithmic (MoE), not hardware-dependent</li>
-          <li style="font-size:13px;color:var(--ink-soft);">— Software-level locks risk collateral enterprise damage</li>
-          <li style="font-size:13px;color:var(--ink-soft);">— Geographic ring-fencing of small silicon is unenforceable</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="block-label">Technical Deep Dive</div>
-    <div class="text-block">
-      <p><strong>Model:</strong> DeepSeek's architecture continues to achieve highly disruptive inference costs through algorithmic efficiency — specifically MoE routing — which most researchers view as more responsible for their competitive progress than any alleged raw compute acquisition.</p>
-      <p><strong>Hardware:</strong> If illicit Blackwell B200s were hypothetically acquired, they would provide 8 TB/s HBM3e bandwidth, enabling rapid adversarial model parity. The practical enforcement challenge is that Blackwell chips can have hardware identifiers removed, making attribution difficult without physical audits.</p>
-    </div>
-  </div>
-
-  <div class="two-col">
-    <div class="callout critical">
-      <div class="callout-title">⚠ Critical View</div>
-      <p>Making multi-billion dollar portfolio adjustments based on unverified political leaks is highly dangerous. Geographic ring-fencing of small-form-factor silicon is notoriously difficult to enforce, and a pivot toward software-level compute locks risks bricking legitimate overseas enterprise deployments as collateral damage.</p>
-    </div>
-    <div class="callout sentiment">
-      <div class="callout-title">◆ Community Sentiment</div>
-      <p>AI researchers largely view the smuggling claims as political posturing. The internal Washington policy debate remains sharp — China hawks demanding harder controls versus pragmatists, including Jensen Huang and White House AI Czar David Sacks, who argue that blanket bans accelerate Huawei's competitive development rather than slowing Chinese AI progress.</p>
-    </div>
-  </div>
-</section>
-
-<div class="section-divider"></div>
-
-<!-- ══════════════════════════════════════════════════
-     SECTION 5: HBM4E SHOWDOWN
-════════════════════════════════════════════════════ -->
-<section class="section" id="s5">
-  <div class="section-number">05 · GTC 2026 Floor / Yonhap News / Reuters &nbsp;·&nbsp; March 16–18, 2026</div>
-  <h2 class="section-title">Samsung vs. SK Hynix HBM4E Showdown at GTC 2026</h2>
-  <div class="section-source">
-    <span class="tag tag-official">Official / Press</span>
-    <span>Source: GTC 2026 Floor / Yonhap News / Reuters</span>
-  </div>
-
-  <div class="stat-row">
-    <div class="stat-card blue">
-      <div class="stat-value">4.0 TB/s</div>
-      <div class="stat-unit">Samsung HBM4E Bandwidth</div>
-      <div class="stat-label">16 Gbps per pin · 16-high stack</div>
-    </div>
-    <div class="stat-card amber">
-      <div class="stat-value">−20%</div>
-      <div class="stat-unit">Thermal Resistance (HCB)</div>
-      <div class="stat-label">Hybrid Copper Bonding vs. Traditional TCB</div>
-    </div>
-    <div class="stat-card green">
-      <div class="stat-value">~67%</div>
-      <div class="stat-unit">SK Hynix HBM4 Share</div>
-      <div class="stat-label">Approx. share of NVIDIA's 2026 HBM4 volume</div>
-    </div>
-    <div class="stat-card red">
-      <div class="stat-value">2030</div>
-      <div class="stat-unit">Supply Shortage Warning</div>
-      <div class="stat-label">Chairman Chey Tae-won: wafer constraints persist through 2030</div>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="block-label">Overview</div>
-    <div class="text-block">
-      <p>At GTC 2026, Samsung and SK Hynix engaged in a highly public contest for AI memory supremacy. Samsung officially unveiled its next-generation HBM4E real chip and core die wafer, alongside new Hybrid Copper Bonding (HCB) technology. Concurrently, SK Hynix mobilized its most senior leadership — including Chairman Chey Tae-won, attending GTC for the first time — to aggressively pitch their competing roadmap directly to NVIDIA's leadership in a bid to secure future Vera Rubin memory allocations. On the floor, Chairman Chey also told reporters that wafer supply shortages could persist through 2030, a statement that carries significant weight given SK Hynix's current position supplying approximately two-thirds of NVIDIA's 2026 HBM4 volume.</p>
-      <p>Memory bandwidth remains the primary bottleneck for AI scaling. Samsung's aggressive push with HBM4E and HCB technology indicates a credible challenge to SK Hynix's supply chain dominance. Capital allocators should monitor Samsung's yield rates closely — any meaningful disruption to SK Hynix's incumbent position will trigger significant equity volatility across the semiconductor sector. Chairman Chey's supply shortage warning also reinforces the thesis of rotating capital toward energy and memory infrastructure, not just compute silicon.</p>
-    </div>
-  </div>
-
-  <!-- HBM Bandwidth Comparison Chart -->
-  <div class="block">
-    <div class="block-label">Data · HBM Generation Bandwidth Progression (TB/s per stack)</div>
-    <div class="chart-wrap">
-      <div class="chart-title">HBM2E → HBM3E → HBM4 → HBM4E — Bandwidth Scaling (Samsung &amp; SK Hynix)</div>
-      <div class="chart-canvas-wrap" style="height:240px;">
-        <canvas id="hbmChart"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- Samsung vs SK Hynix Comparison -->
-  <div class="block">
-    <div class="block-label">Architecture · Samsung HBM4E — Hybrid Copper Bonding (HCB) Technology</div>
-    <div class="card" style="padding:24px 28px;">
-      <!-- Stack diagram -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;" class="two-col">
-        <div>
-          <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--ink-muted);text-transform:uppercase;margin-bottom:10px;">Traditional TCB Stack</div>
-          <div style="display:flex;flex-direction:column;gap:2px;">
-            <div style="background:#fef2f2;border:1px solid #fecaca;padding:8px 12px;border-radius:4px;font-family:var(--mono);font-size:11px;color:#991b1b;text-align:center;">DRAM Die ×16</div>
-            <div style="background:#fef2f2;border:1px solid #fecaca;padding:6px 12px;border-radius:4px;font-family:var(--mono);font-size:10px;color:#b91c1c;text-align:center;">Thermal Compression Bonding</div>
-            <div style="background:#fee2e2;border:1px solid #fca5a5;padding:8px 12px;border-radius:4px;font-family:var(--mono);font-size:11px;color:#991b1b;text-align:center;">Logic Base Die</div>
-            <div style="background:#fff7ed;border:1px solid #fed7aa;padding:8px 12px;border-radius:4px;font-family:var(--mono);font-size:11px;color:#c2410c;text-align:center;">Substrate / Interposer</div>
-          </div>
-          <div style="margin-top:10px;font-size:11.5px;color:var(--ink-muted);">Higher thermal resistance · baseline yield</div>
-        </div>
-        <div>
-          <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Samsung HCB Stack (HBM4E)</div>
-          <div style="display:flex;flex-direction:column;gap:2px;">
-            <div style="background:#eef3ff;border:1px solid #c7d7f8;padding:8px 12px;border-radius:4px;font-family:var(--mono);font-size:11px;color:#1e40af;text-align:center;">DRAM Die ×16 (16-high)</div>
-            <div style="background:#dbeafe;border:1px solid #93c5fd;padding:6px 12px;border-radius:4px;font-family:var(--mono);font-size:10px;color:#1d4ed8;text-align:center;">Hybrid Copper Bonding (HCB) ↓ −20% thermal resistance</div>
-            <div style="background:#eef3ff;border:1px solid #c7d7f8;padding:8px 12px;border-radius:4px;font-family:var(--mono);font-size:11px;color:#1e40af;text-align:center;">Logic Base Die</div>
-            <div style="background:#f0fdf4;border:1px solid #bbf7d0;padding:8px 12px;border-radius:4px;font-family:var(--mono);font-size:11px;color:#166534;text-align:center;">Substrate / Interposer</div>
-          </div>
-          <div style="margin-top:10px;font-size:11.5px;color:var(--ink-muted);">4.0 TB/s · 16 Gbps/pin · Vera Rubin target</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Qualification Status -->
-  <div class="block">
-    <div class="block-label">Data · NVIDIA HBM4 Qualification Status — Samsung vs. SK Hynix</div>
-    <div class="chart-wrap">
-      <div class="chart-title">Qualification &amp; Supply Share Comparison (Vera Rubin HBM4 Program, 2026)</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px;" class="two-col">
-        <div>
-          <table class="funding-table">
-            <thead>
-              <tr>
-                <th>Metric</th>
-                <th>Samsung</th>
-                <th>SK Hynix</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="font-family:var(--mono);font-size:11px;color:var(--ink-muted);">HBM Gen</td>
-                <td>HBM4E (unveiled)</td>
-                <td>HBM4 (qualified)</td>
-              </tr>
-              <tr>
-                <td style="font-family:var(--mono);font-size:11px;color:var(--ink-muted);">Bandwidth</td>
-                <td style="font-weight:600;color:var(--accent);">4.0 TB/s</td>
-                <td>~3.6 TB/s (HBM4)</td>
-              </tr>
-              <tr>
-                <td style="font-family:var(--mono);font-size:11px;color:var(--ink-muted);">Pin Speed</td>
-                <td>16 Gbps</td>
-                <td>~14 Gbps</td>
-              </tr>
-              <tr>
-                <td style="font-family:var(--mono);font-size:11px;color:var(--ink-muted);">Stack Height</td>
-                <td>16-high</td>
-                <td>12/16-high</td>
-              </tr>
-              <tr>
-                <td style="font-family:var(--mono);font-size:11px;color:var(--ink-muted);">NVIDIA Qual.</td>
-                <td style="color:var(--warn);">In progress</td>
-                <td style="color:var(--accent-3);font-weight:600;">Final samples submitted</td>
-              </tr>
-              <tr>
-                <td style="font-family:var(--mono);font-size:11px;color:var(--ink-muted);">2026 NV Share</td>
-                <td style="color:var(--ink-muted);">~33% (target)</td>
-                <td style="color:var(--accent-3);font-weight:600;">~67% (incumbent)</td>
-              </tr>
-              <tr>
-                <td style="font-family:var(--mono);font-size:11px;color:var(--ink-muted);">Bonding Tech</td>
-                <td style="font-weight:600;color:var(--accent);">HCB (−20% thermal)</td>
-                <td>TCB (proven)</td>
-              </tr>
-              <tr>
-                <td style="font-family:var(--mono);font-size:11px;color:var(--ink-muted);">Yield Track</td>
-                <td style="color:var(--danger);">Historically inconsistent</td>
-                <td style="color:var(--accent-3);">Proven / incumbent</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div>
-          <div class="chart-canvas-wrap" style="height:220px;">
-            <canvas id="hbmShareChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="block-label">Technical Deep Dive</div>
-    <div class="text-block">
-      <p><strong>Hardware:</strong> Samsung's HBM4E delivers up to 16 Gbps per pin, achieving 4.0 TB/s bandwidth per stack. Both Samsung and SK Hynix are currently awaiting final NVIDIA qualification for HBM4 — SK Hynix has submitted final samples and is further along the qualification process, while Samsung continues working through commercial qualification.</p>
-      <p><strong>Manufacturing:</strong> The new Hybrid Copper Bonding reduces thermal resistance by 20% compared to traditional Thermal Compression Bonding, which is critical for maintaining structural integrity in 16-high memory stack configurations operating under the thermal load of Vera Rubin systems.</p>
-    </div>
-  </div>
-
-  <div class="two-col">
-    <div class="callout warn">
-      <div class="callout-title">⚠ Critical View</div>
-      <p>Unveiling a pristine wafer at a trade show is fundamentally different from mass-producing 16-high HBM4E stacks at commercial yields. Samsung has historically struggled with HBM yield consistency relative to SK Hynix, meaning SK Hynix retains a clear incumbent advantage in the near term. The qualification gap is the most important near-term execution variable to monitor.</p>
-    </div>
-    <div class="callout sentiment">
-      <div class="callout-title">◆ Community Sentiment</div>
-      <p>Hardware analysts broadly acknowledge that while Samsung's spec sheet is competitive, SK Hynix's proven delivery track record with NVIDIA gives them the practical edge through at least the first half of the Vera Rubin rollout cycle.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════════════════════════
-     CLOSING
-════════════════════════════════════════════════════ -->
-<div class="closing">
-  <div class="closing-inner">
-    <div class="closing-label">Closing Action &amp; Forward Trajectory</div>
-    <h2 class="closing-title">Q2 2026 Watch List</h2>
-    <p class="closing-body">The underlying reality of Q1 2026 is that the ecosystem is shifting from pure compute acquisition to architectural lock-in and power securing. NVIDIA is internalizing inference (Groq) and orchestrating the software layer (Dynamo), while OpenAI's capital raises are fundamentally massive hardware purchase agreements structured as equity rounds. The memory war between Samsung and SK Hynix — compounded by Chairman Chey's warning of wafer supply constraints through 2030 — will be a primary determinant of the final pricing and availability timeline for the Vera Rubin rollout in H2 2026.</p>
-    <div class="watch-list">
-      <div class="watch-item">
-        <div class="watch-item-date">Q2 2026</div>
-        <div class="watch-item-text">Google TPU v6 architecture — formal enterprise release details expected</div>
-      </div>
-      <div class="watch-item">
-        <div class="watch-item-date">Q2 2026</div>
-        <div class="watch-item-text">NVIDIA Vera Rubin NVL72 rack pricing disclosures — first commercial figures</div>
-      </div>
-      <div class="watch-item">
-        <div class="watch-item-date">H2 2026 Critical Test</div>
-        <div class="watch-item-text">First operational data from Vera Rubin + Groq 3 LPX co-deployed clusters — empirical test of Jensen Huang's 350× token generation projection</div>
-      </div>
-      <div class="watch-item">
-        <div class="watch-item-date">Ongoing</div>
-        <div class="watch-item-text">Samsung HBM4E yield rates &amp; NVIDIA qualification outcome — primary Vera Rubin availability variable</div>
+      <div class="meta-item meta-subject">
+        <span class="meta-label">Subject</span>
+        <span class="meta-value">Strategic AI Infrastructure & System Tech Briefing (Fact-Corrected Audit) — 30-Hour Impact Report</span>
       </div>
     </div>
   </div>
 </div>
 
-</main>
+<div class="main">
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- NEWS 1: OpenAI Custom Silicon -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="news-card">
+  <div class="news-header c1">
+    <span class="news-num">01 /</span>
+    <h2 class="news-title">OpenAI Custom Silicon Launch Pushed to Late 2026 Amid Design Hurdles</h2>
+  </div>
+  <div class="news-source-row" style="background:rgba(99,102,241,0.18); color:#c7d2fe;">
+    <span>AICloudIT / Tom's Hardware</span>
+    <span>·</span>
+    <span>March 19, 2026</span>
+    <span class="status-badge">Community Verified</span>
+  </div>
+  <div class="news-body">
+
+    <div class="section-block">
+      <div class="section-label label-c1">Overview</div>
+      <div class="section-content">
+        OpenAI's transition to a vertically integrated hardware ecosystem has faced reality checks. Partnering with Broadcom and TSMC, their custom AI inference chip — internally reported under the codename "Titan" and utilizing a TSMC N3-class process — was initially slated for an early 2026 launch following a 2025 tape-out. However, engineering and software stack complexities have pushed realistic volume availability beyond Q3 2026, with a second-generation variant tentatively planned on TSMC's A16 process. Furthermore, supply chain intelligence confirms the architecture relies on a systolic array design paired with standard High Bandwidth Memory (HBM), firmly countering earlier, unverified rumors of a hyper-specialized, MoE-exclusive accelerator. The immediate market reaction stabilized standard GPU depreciation forecasts, as OpenAI's total cost of ownership (TCO) breakthroughs are delayed.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="split-layout">
+      <div>
+        <div class="section-block">
+          <div class="section-label label-c1">Strategic Impact</div>
+          <div class="section-content">
+            This reaffirms OpenAI's short-to-medium-term reliance on Nvidia's generalized GPUs. The delayed realization of custom TCO reductions dictates that hyperscalers must maintain high CapEx for standard GPU inference clusters through 2027 to remain competitive.
+          </div>
+        </div>
+        <div class="section-block">
+          <div class="section-label label-c1">Technical Deep Dive</div>
+          <div class="section-content">
+            <ul>
+              <li><strong>Model:</strong> General-purpose AI inference (not strictly MoE-exclusive).</li>
+              <li><strong>Hardware:</strong> TSMC N3-class logic paired with HBM via a systolic array architecture, with a second-generation A16-based successor already on the roadmap.</li>
+              <li><strong>Comparison:</strong> Represents a strategic supply chain diversification effort rather than an immediate, order-of-magnitude efficiency leap over current generalized GPU architectures.</li>
+              <li><strong>Source Traceability:</strong> [N3 Process / Systolic Array / "Titan" Codename] — [AICloudIT / Tom's Hardware / TrendForce] — [Gen 1 OpenAI Silicon] — [Cross-verified: Yes]</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="infographic-panel">
+        <div class="infographic-title">🗓 OpenAI "Titan" Chip Development Timeline</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#6366f1;">1</div>
+            <div class="timeline-content">
+              <div class="timeline-date">2025 — Tape-out</div>
+              <div class="timeline-text">Initial tape-out on TSMC N3-class process. Codename "Titan" enters silicon validation phase with Broadcom partnership.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#818cf8;">2</div>
+            <div class="timeline-content">
+              <div class="timeline-date">Early 2026 — Original Target</div>
+              <div class="timeline-text">Initial volume launch slated but engineering & software stack complexities triggered schedule slip.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#f59e0b;">⚠</div>
+            <div class="timeline-content">
+              <div class="timeline-date">Q3 2026 — Delayed Threshold</div>
+              <div class="timeline-text">Realistic volume availability pushed past Q3 2026. Standard GPU depreciation forecasts stabilize as TCO breakthroughs are deferred.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#10b981;">→</div>
+            <div class="timeline-content">
+              <div class="timeline-date">~2027 — Gen 2 Roadmap</div>
+              <div class="timeline-text">Second-generation variant tentatively planned on TSMC's more advanced A16 process node.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block" style="margin-top:20px;">
+      <div class="section-label label-c1">Visual / Evidence</div>
+      <div class="section-content">
+        Industry roadmaps tracking TSMC N3-class wafer allocations confirm the delayed volume manufacturing ramp for this specific custom ASIC.
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label label-c1">Critical View</div>
+      <div class="section-content">
+        Building custom silicon is only half the battle; developing a compiler and software ecosystem to rival established frameworks like CUDA is historically where proprietary accelerators face massive delays and utilization issues.
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label label-c1">Community Sentiment</div>
+      <div class="section-content">
+        Hardware engineers view the delays as completely standard for a first-generation ASIC, tempering earlier market hype with realistic timelines for software-hardware co-design maturity.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- NEWS 2: BIS Export Controls -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="news-card">
+  <div class="news-header c2">
+    <span class="news-num">02 /</span>
+    <h2 class="news-title">U.S. BIS Export Controls: Strict Enforcement Centers on ECCN 3A090.c HBM Restrictions</h2>
+  </div>
+  <div class="news-source-row" style="background:rgba(239,68,68,0.18); color:#fecaca;">
+    <span>Holland & Knight / CSIS</span>
+    <span>·</span>
+    <span>March 19, 2026</span>
+    <span class="status-badge">Official Policy</span>
+  </div>
+  <div class="news-body">
+
+    <div class="section-block">
+      <div class="section-label label-c2">Overview</div>
+      <div class="section-content">
+        In response to market noise regarding nonexistent silicon photonics embargos, regulatory intelligence confirms that the U.S. Bureau of Industry and Security (BIS) has not enacted new restrictions on optical transceivers. Instead, the actual regulatory choke point for adversary AI scaling remains anchored to the strict enforcement of ECCN 3A090.c, which directly restricts the export of advanced High Bandwidth Memory (HBM) stacks exceeding a memory bandwidth density of 2 GB/s per square millimeter. This classification, introduced via BIS Interim Final Rule in December 2024 and extended through December 2026, reflects the agency's explicit position that advanced memory is a national security asset due to its direct role in enhancing the data-processing capability of AI training systems. As the industry attempts to transition toward HBM4, these established regulations are proving highly effective at denying restricted regions the memory density required to train massive foundational models. Compliance teams across Tier 1 suppliers are reallocating resources to audit memory flows rather than networking components.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="split-layout">
+      <div>
+        <div class="section-block">
+          <div class="section-label label-c2">Strategic Impact</div>
+          <div class="section-content">
+            This clarifies the geopolitical risk landscape. Capital investments in offshore or cross-border cluster deployments must strictly audit their HBM supply chains, as advanced memory — not optical interconnects — remains the primary, legally enforced bottleneck for global scale.
+          </div>
+        </div>
+        <div class="section-block">
+          <div class="section-label label-c2">Technical Deep Dive</div>
+          <div class="section-content">
+            <ul>
+              <li><strong>Model:</strong> Enforcement framework impacting the global flow of advanced AI compute and multi-modal training.</li>
+              <li><strong>Hardware:</strong> High Bandwidth Memory (ECCN 3A090.c bandwidth density threshold: &gt;2 GB/s per mm²).</li>
+              <li><strong>Comparison:</strong> Maintains a hard physical ceiling on memory bandwidth for restricted clusters, forcing reliance on heavily decoupled, high-latency memory architectures.</li>
+              <li><strong>Source Traceability:</strong> [ECCN 3A090.c / BIS IFR Dec 2024] — [Federal Register / Holland & Knight] — [HBM Generation Agnostic] — [Cross-verified: Yes]</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="infographic-panel">
+        <div class="infographic-title">📊 HBM Bandwidth Density vs. ECCN 3A090.c Threshold</div>
+        <div class="chart-container" style="height:220px;">
+          <canvas id="hbmBandwidthChart"></canvas>
+        </div>
+        <div style="margin-top:12px; padding:10px; background:#fef2f2; border-radius:8px; border-left:3px solid #ef4444;">
+          <div style="font-size:11px; font-weight:700; color:#b91c1c; margin-bottom:4px;">ECCN 3A090.c Enforcement Window</div>
+          <div style="font-size:11.5px; color:#7f1d1d; line-height:1.4;">BIS Interim Final Rule: Dec 2024 → Dec 2026<br>Threshold: &gt;2 GB/s per mm² bandwidth density</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block" style="margin-top:20px;">
+      <div class="section-label label-c2">Visual / Evidence</div>
+      <div class="section-content">
+        Official Commerce Department guidelines explicitly detail the specific density and bandwidth thresholds that trigger export blocks under the advanced computing rule, with the current classification window confirmed through end of 2026.
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label label-c2">Critical View</div>
+      <div class="section-content">
+        While effective on paper, controlling discrete memory components remains incredibly challenging due to the complex nature of global electronics smuggling and unauthorized third-party transshipments.
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label label-c2">Community Sentiment</div>
+      <div class="section-content">
+        Global trade compliance officers express relief that the rumored expansion into silicon photonics was inaccurate, allowing them to focus auditing resources strictly on advanced memory and logic packages.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- NEWS 3: HBM4 Supply Chain -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="news-card">
+  <div class="news-header c3">
+    <span class="news-num">03 /</span>
+    <h2 class="news-title">SK Hynix, Samsung, and Micron Battle for 16-Hi HBM4 Dominance — Samsung Unveils HBM4E at GTC 2026</h2>
+  </div>
+  <div class="news-source-row" style="background:rgba(245,158,11,0.18); color:#fef3c7;">
+    <span>TrendForce / TweakTown / GTC 2026</span>
+    <span>·</span>
+    <span>March 19, 2026</span>
+    <span class="status-badge">Supply Chain Verified</span>
+  </div>
+  <div class="news-body">
+
+    <div class="section-block">
+      <div class="section-label label-c3">Overview</div>
+      <div class="section-content">
+        The memory supply chain is in a fierce transition, progressing at a grounded, verifiable pace. The immediate industry battleground is securing Nvidia's contracts for current-generation 16-Hi HBM4 stacks, with SK Hynix, Samsung, and Micron all aggressively competing to qualify their architectures with Tier 1 accelerator designers ahead of a second-half 2026 supply ramp. Critically, Samsung used this week's GTC 2026 (March 17) as a stage to unveil its seventh-generation HBM4E memory, promising a per-pin transfer rate of 16 Gbps alongside a commitment to triple its total HBM production capacity — a direct signal of intent to recapture supply chain leadership from SK Hynix. On the SK Hynix side, HBM4E development is targeted for completion by 1H 2026, with market entry anticipated in 2027. This two-tier competitive dynamic — winning 16-Hi HBM4 contracts now while racing to finalize HBM4E for the next cycle — confirms that the market is advancing through rigorous generational steps rather than experiencing a radically accelerated timeline that would prematurely obsolete active HBM3E clusters.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="split-layout">
+      <div>
+        <div class="section-block">
+          <div class="section-label label-c3">Strategic Impact</div>
+          <div class="section-content">
+            Samsung's GTC announcement introduces a meaningful shift in the supply chain calculus. If Samsung's HBM4E capacity tripling materializes on schedule, it will erode SK Hynix's current pricing leverage and tighten margins across the memory stack. For portfolio managers, this validates a more distributed vendor exposure across the three competing suppliers rather than a concentrated SK Hynix position. The focus over the next 18 months will be on which vendor solves the thermal and yield challenges of 16-Hi stacking first.
+          </div>
+        </div>
+        <div class="section-block">
+          <div class="section-label label-c3">Technical Deep Dive</div>
+          <div class="section-content">
+            <ul>
+              <li><strong>Model:</strong> Alleviating memory wall bottlenecks for trillion-parameter training arrays.</li>
+              <li><strong>Hardware:</strong> 16-Hi HBM4 configurations targeting bandwidth in excess of 2 TB/s per stack, representing approximately a 67% improvement over current HBM3E (≈1.2 TB/s); HBM4E targeting 16 Gbps per pin.</li>
+              <li><strong>Comparison:</strong> Delivers a meaningful generational bandwidth leap while maintaining historical scaling trajectories rather than exaggerated multi-fold jumps; not expected to render current HBM3E clusters economically obsolete ahead of standard amortization schedules.</li>
+              <li><strong>Source Traceability:</strong> [&gt;2 TB/s HBM4 / 16 Gbps HBM4E] — [TrendForce / GTC 2026 Samsung] — [HBM4/HBM4E Generation] — [Cross-verified: Yes]</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="infographic-panel" style="margin-bottom:12px;">
+          <div class="infographic-title">⚡ HBM Generation Bandwidth per Stack</div>
+          <div class="bandwidth-row">
+            <div class="bandwidth-label">HBM2E</div>
+            <div class="bandwidth-bar-wrap"><div class="bandwidth-bar" style="width:28%; background:#d1d5db; color:#374151;">460 GB/s</div></div>
+            <div class="bandwidth-val">0.46 TB/s</div>
+          </div>
+          <div class="bandwidth-row">
+            <div class="bandwidth-label">HBM3</div>
+            <div class="bandwidth-bar-wrap"><div class="bandwidth-bar" style="width:47%; background:#fbbf24;">819 GB/s</div></div>
+            <div class="bandwidth-val">0.82 TB/s</div>
+          </div>
+          <div class="bandwidth-row">
+            <div class="bandwidth-label">HBM3E</div>
+            <div class="bandwidth-bar-wrap"><div class="bandwidth-bar" style="width:69%; background:#f59e0b;">~1.2 TB/s</div></div>
+            <div class="bandwidth-val">1.2 TB/s</div>
+          </div>
+          <div class="bandwidth-row">
+            <div class="bandwidth-label">HBM4<br><span style="font-size:9px;color:#6b7280;">(16-Hi)</span></div>
+            <div class="bandwidth-bar-wrap"><div class="bandwidth-bar" style="width:100%; background:linear-gradient(90deg,#d97706,#f59e0b);">&gt;2 TB/s</div></div>
+            <div class="bandwidth-val">&gt;2 TB/s</div>
+          </div>
+          <div style="font-size:10px; color:#6b7280; margin-top:6px;">HBM4E targets 16 Gbps/pin — Samsung GTC 2026 announcement</div>
+        </div>
+
+        <div class="infographic-panel">
+          <div class="infographic-title">🏭 Vendor Competitive Status</div>
+          <div class="vendor-grid">
+            <div class="vendor-card" style="background:#fef3c7;">
+              <div class="vendor-name" style="color:#b45309;">SK Hynix</div>
+              <div class="vendor-stat" style="color:#92400e;">1st</div>
+              <div class="vendor-detail" style="color:#78350f;">Current HBM4 leader. HBM4E targeted 1H 2026 dev.</div>
+            </div>
+            <div class="vendor-card" style="background:#eff6ff;">
+              <div class="vendor-name" style="color:#1d4ed8;">Samsung</div>
+              <div class="vendor-stat" style="color:#1e40af;">3×</div>
+              <div class="vendor-detail" style="color:#1e3a8a;">HBM4E unveiled GTC 2026. Capacity tripling pledged.</div>
+            </div>
+            <div class="vendor-card" style="background:#f0fdf4;">
+              <div class="vendor-name" style="color:#15803d;">Micron</div>
+              <div class="vendor-stat" style="color:#166534;">3rd</div>
+              <div class="vendor-detail" style="color:#14532d;">Qualifying 16-Hi for Tier 1 accelerator vendors.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block" style="margin-top:20px;">
+      <div class="section-label label-c3">Visual / Evidence</div>
+      <div class="section-content">
+        Supply chain reports indicate active 16-Hi sampling and quality validation phases with major GPU vendors; Samsung's GTC 2026 presentation disclosed the HBM4E roadmap with specific pin-speed targets and capacity expansion commitments, though finalized contract volumes remain undisclosed.
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label label-c3">Critical View</div>
+      <div class="section-content">
+        16-Hi stacking introduces severe thermal dissipation challenges. Yield rates for these advanced packages remain the primary bottleneck, potentially constraining total global supply regardless of which vendor wins primary contracts. Advanced packaging platforms such as TSMC CoWoS will be as strategically decisive as the memory die quality itself.
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label label-c3">Community Sentiment</div>
+      <div class="section-content">
+        Semiconductor analysts remain cautious on near-term yield projections for 16-Hi stacks while viewing Samsung's capacity tripling pledge as the most consequential competitive development in the HBM supply chain since SK Hynix secured initial Blackwell allocations.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- NEWS 4: Microsoft Nuclear -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="news-card">
+  <div class="news-header c4">
+    <span class="news-num">04 /</span>
+    <h2 class="news-title">Microsoft and Constellation Energy Progress on 835MW Crane Clean Energy Center</h2>
+  </div>
+  <div class="news-source-row" style="background:rgba(16,185,129,0.18); color:#a7f3d0;">
+    <span>Data Center Dynamics / FinancialContent</span>
+    <span>·</span>
+    <span>March 19, 2026</span>
+    <span class="status-badge">Corporate Confirmed</span>
+  </div>
+  <div class="news-body">
+
+    <div class="section-block">
+      <div class="section-label label-c4">Overview</div>
+      <div class="section-content">
+        Power acquisition is the ultimate ceiling for AI scale, but hyperscalers are relying on proven nuclear technology, not experimental Small Modular Reactors (SMRs). Grounding previous market noise, Microsoft's actual nuclear strategy is anchored by a 20-year Power Purchase Agreement (PPA) supporting the "Crane Clean Energy Center." Backed by a $1.6 billion investment from Constellation Energy, this project will restart the existing Three Mile Island Unit 1 pressurized water reactor (PWR). The facility is currently undergoing technical maintenance and regulatory review for a projected 2027–2028 operational restart, aiming to deliver 835 MW of dedicated base-load power.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="split-layout">
+      <div>
+        <div class="section-block">
+          <div class="section-label label-c4">Strategic Impact</div>
+          <div class="section-content">
+            This demonstrates that hyperscalers are willing to commit massive capital to secure uninterrupted power, but are deliberately prioritizing legacy reactor restarts over speculative next-generation nuclear tech to mitigate timeline risks. It sets a realistic 835MW benchmark for dedicated nuclear-backed AI infrastructure and establishes Constellation as the de facto incumbent partner for hyperscaler power acquisition in the near term.
+          </div>
+        </div>
+        <div class="section-block">
+          <div class="section-label label-c4">Technical Deep Dive</div>
+          <div class="section-content">
+            <ul>
+              <li><strong>Model:</strong> Base-load power supporting continuous gigawatt-scale data center operations.</li>
+              <li><strong>Hardware:</strong> 835 MW Pressurized Water Reactor (PWR) — Three Mile Island Unit 1.</li>
+              <li><strong>Comparison:</strong> Secures nearly 1 GW of uninterrupted, carbon-free power without the massive regulatory and engineering timeline risks associated with novel SMR designs.</li>
+              <li><strong>Source Traceability:</strong> [835 MW / $1.6B Investment / Crane Clean Energy Center] — [Data Center Dynamics / SEC] — [Legacy PWR Generation] — [Cross-verified: Yes]</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="infographic-panel">
+        <div class="infographic-title">⚡ AI Infrastructure Power Capacity Reference</div>
+        <div class="power-row">
+          <div class="power-label">Crane Clean<br>Energy Center</div>
+          <div class="power-bar-wrap"><div class="power-bar" style="width:83.5%; background:linear-gradient(90deg,#047857,#10b981);">835 MW</div></div>
+          <div class="power-val">835 MW</div>
+        </div>
+        <div class="power-row">
+          <div class="power-label">Typical Large<br>Data Center</div>
+          <div class="power-bar-wrap"><div class="power-bar" style="width:20%; background:#6ee7b7; color:#064e3b;">200 MW</div></div>
+          <div class="power-val">~200 MW</div>
+        </div>
+        <div class="power-row">
+          <div class="power-label">Typical SMR<br>(Proposed)</div>
+          <div class="power-bar-wrap"><div class="power-bar" style="width:30%; background:#a7f3d0; color:#064e3b;">~300 MW</div></div>
+          <div class="power-val">~300 MW</div>
+        </div>
+        <div style="margin-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div style="background:#ecfdf5; border-radius:8px; padding:10px; text-align:center;">
+            <div style="font-size:22px; font-weight:800; color:#047857;">$1.6B</div>
+            <div style="font-size:10.5px; color:#065f46; font-weight:600;">Constellation Investment</div>
+          </div>
+          <div style="background:#ecfdf5; border-radius:8px; padding:10px; text-align:center;">
+            <div style="font-size:22px; font-weight:800; color:#047857;">20yr</div>
+            <div style="font-size:10.5px; color:#065f46; font-weight:600;">PPA Contract Term</div>
+          </div>
+        </div>
+        <div style="margin-top:10px; padding:8px 12px; background:#f0fdf4; border-radius:8px; border-left:3px solid #10b981;">
+          <div style="font-size:11px; font-weight:700; color:#047857;">Projected Restart: 2027–2028</div>
+          <div style="font-size:11px; color:#065f46;">Three Mile Island Unit 1 (PWR) — NRC regulatory review in progress</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block" style="margin-top:20px;">
+      <div class="section-label label-c4">Visual / Evidence</div>
+      <div class="section-content">
+        Public financial filings outline the $1.6 billion capital allocation strictly for the turbine, generator, and main power transformer refurbishments required for the 2028 restart target.
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label label-c4">Critical View</div>
+      <div class="section-content">
+        While avoiding SMR engineering risks, restarting a decommissioned nuclear facility carries massive regulatory oversight from the NRC. Supply chain constraints for specialized, legacy nuclear components could still easily delay the 2028 operational target.
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label label-c4">Community Sentiment</div>
+      <div class="section-content">
+        Energy economists view this as the most pragmatic path to securing AI power, though infrastructure analysts emphasize that grid interconnection and final NRC regulatory greenlights remain substantial hurdles before the facility contributes meaningfully to compute capacity.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- NEWS 5: Meta Llama 4 -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="news-card">
+  <div class="news-header c5">
+    <span class="news-num">05 /</span>
+    <h2 class="news-title">Meta's Llama 4 Training Infrastructure: Confirmed &gt;100,000 H100 GPU RoCE Deployment</h2>
+  </div>
+  <div class="news-source-row" style="background:rgba(59,130,246,0.18); color:#bfdbfe;">
+    <span>Meta Engineering / Tom's Hardware</span>
+    <span>·</span>
+    <span>March 19, 2026</span>
+    <span class="status-badge">Confirmed Historical / Architecture Reference</span>
+  </div>
+  <div class="news-body">
+
+    <div class="section-block">
+      <div class="section-label label-c5">Overview</div>
+      <div class="section-content">
+        Meta's dominance in the open-weight ecosystem is reinforced by the confirmed training infrastructure deployed for Llama 4. As disclosed by Mark Zuckerberg during Meta's Q3 2024 earnings call, Llama 4 was trained on a cluster of over 100,000 Nvidia H100 GPUs — described at the time as larger than any cluster publicly reported by competing organizations. This deployment leveraged a RoCE (RDMA over Converged Ethernet) network fabric, proving that standard Ethernet architectures can sustain Tier 1 foundational model training without reliance on proprietary InfiniBand fabrics. Meta's broader infrastructure buildout, targeting 350,000 H100s across its global data center footprint by end-2024, has since been exceeded; Nvidia's CEO has publicly referenced Meta's installed base at approximately 600,000 H100 units as of early 2025. These figures establish Meta as the largest single operator of Hopper-generation compute at scale, providing the open-source ecosystem with a training substrate that rivals or exceeds that of proprietary model developers.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="split-layout">
+      <div>
+        <div class="section-block">
+          <div class="section-label label-c5">Strategic Impact</div>
+          <div class="section-content">
+            The validated use of RoCE at 100,000-node scale confirms Ethernet as a highly viable, cost-effective alternative to vendor-locked InfiniBand for Tier 1 training workloads. For enterprise infrastructure procurement, this sets a credible open-standards benchmark and reduces the perceived necessity of Nvidia's proprietary networking stack at scale.
+          </div>
+        </div>
+        <div class="section-block">
+          <div class="section-label label-c5">Technical Deep Dive</div>
+          <div class="section-content">
+            <ul>
+              <li><strong>Model:</strong> Llama 4 (confirmed training-phase infrastructure; model has since been released).</li>
+              <li><strong>Hardware:</strong> &gt;100,000 Nvidia H100 GPUs interconnected via RoCE fabric; overall H100 installed base now estimated at ~600,000 units across all Meta data centers.</li>
+              <li><strong>Comparison:</strong> Represents a significant verified scale-up from Llama 3, grounded entirely in current Hopper-generation hardware without dependence on next-generation Blackwell availability.</li>
+              <li><strong>Source Traceability:</strong> [&gt;100k H100 Cluster / ~600k H100 Total] — [Meta Q3 2024 Earnings / Nvidia CEO Reference] — [Hopper Generation] — [Cross-verified: Yes]</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="infographic-panel">
+        <div class="infographic-title">🖥 Meta H100 GPU Fleet Scaling</div>
+        <div class="gpu-row">
+          <div class="gpu-label">Llama 3<br>Training</div>
+          <div class="gpu-bar-wrap"><div class="gpu-bar" style="width:11%; background:#bfdbfe; color:#1e40af;">~16K</div></div>
+          <div class="gpu-val">~16,000</div>
+        </div>
+        <div class="gpu-row">
+          <div class="gpu-label">Llama 4<br>Cluster</div>
+          <div class="gpu-bar-wrap"><div class="gpu-bar" style="width:18%; background:#3b82f6;">&gt;100K</div></div>
+          <div class="gpu-val">&gt;100,000</div>
+        </div>
+        <div class="gpu-row">
+          <div class="gpu-label">2024 Target</div>
+          <div class="gpu-bar-wrap"><div class="gpu-bar" style="width:59%; background:#2563eb;">350K</div></div>
+          <div class="gpu-val">350,000</div>
+        </div>
+        <div class="gpu-row">
+          <div class="gpu-label">Total Fleet<br>(Early 2025)</div>
+          <div class="gpu-bar-wrap"><div class="gpu-bar" style="width:100%; background:linear-gradient(90deg,#1d4ed8,#3b82f6);">~600K</div></div>
+          <div class="gpu-val">~600,000</div>
+        </div>
+        <div style="margin-top:14px; padding:10px; background:#eff6ff; border-radius:8px;">
+          <div style="font-size:11px; font-weight:700; color:#1d4ed8; margin-bottom:6px;">🔗 Network Fabric: RoCE vs InfiniBand</div>
+          <div style="display:flex; gap:8px;">
+            <div style="flex:1; background:#dbeafe; border-radius:6px; padding:8px; text-align:center;">
+              <div style="font-size:13px; font-weight:800; color:#1d4ed8;">RoCE</div>
+              <div style="font-size:10px; color:#1e40af; margin-top:2px;">Open Ethernet<br>Cost-effective<br>Meta's choice ✓</div>
+            </div>
+            <div style="flex:1; background:#f1f5f9; border-radius:6px; padding:8px; text-align:center;">
+              <div style="font-size:13px; font-weight:800; color:#64748b;">InfiniBand</div>
+              <div style="font-size:10px; color:#475569; margin-top:2px;">Proprietary<br>Vendor lock-in<br>Nvidia NVLink</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block" style="margin-top:20px;">
+      <div class="section-label label-c5">Visual / Evidence</div>
+      <div class="section-content">
+        Meta's published engineering architecture details the physical spine-and-leaf Ethernet topology used to maintain fault tolerance and routing efficiency across massive Hopper deployments, with checkpointing software serving as the primary differentiator for maintaining training utilization at scale.
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label label-c5">Critical View</div>
+      <div class="section-content">
+        Operating 100,000+ GPUs on an Ethernet fabric requires immense software overhead to manage packet loss and node failures. The true differentiator is Meta's proprietary scheduling and checkpointing software stack, not just the raw hardware count. Effective training utilization (MFU) — not peak GPU count — is the operative metric for assessing the value of this infrastructure.
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label label-c5">Community Sentiment</div>
+      <div class="section-content">
+        Network engineers and open-source advocates view the successful use of RoCE at this scale as a definitive proof point against proprietary network lock-in, with Meta's open publication of architectural details accelerating industry-wide adoption of Ethernet-based HPC fabrics.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- CLOSING SYNTHESIS -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="closing-card">
+  <div class="closing-label">Closing Synthesis & Trajectory</div>
+  <div class="closing-title">Grounding the AI Infrastructure Landscape in Verifiable Reality</div>
+  <div class="closing-body">
+    <p>This corrected intelligence audit grounds the AI infrastructure landscape in verifiable reality, stripping away hype of immediate SMR deployments, nonexistent photonics embargos, and hyper-accelerated silicon roadmaps. The overarching trajectory remains one of massive capital expenditure, but it is anchored by current-generation technologies being pushed to their absolute limits. Meta's confirmed use of over 100,000 H100s via RoCE and Microsoft's $1.6B investment to restart a legacy PWR facility prove that hyperscalers are leveraging proven, available technology to scale today rather than waiting for next-generation breakthroughs. Similarly, the delayed timelines for OpenAI's custom silicon ("Titan," post-Q3 2026 volume) and SK Hynix's HBM4 market entry (2027) confirm that standard hardware depreciation models remain viable; current GPU and HBM3E clusters will not be rendered obsolete overnight.</p>
+    <p>The most significant near-term development to watch is Samsung's GTC 2026 HBM4E disclosure and its pledged capacity tripling, which introduces genuine competitive pressure on SK Hynix's supply chain dominance and will directly influence memory pricing dynamics heading into 2027. Moving forward, the true strategic choke points are yield rates on 16-Hi memory stacking and the strict, ongoing enforcement of BIS ECCN 3A090.c memory export controls.</p>
+    <p>Would you like me to initiate a revised financial risk assessment on how the verified 2027–2028 timelines for nuclear base-load power and custom silicon volume manufacturing specifically alter the TCO projections for our currently active investment portfolio?</p>
+  </div>
+</div>
+
+</div><!-- /.main -->
 
 <script>
-// ── CHART DEFAULTS ──────────────────────────────────────────────────
-const PALETTE = {
-  blue:   '#1a56db',
-  blueLight: '#93c5fd',
-  amber:  '#e8920a',
-  amberLight: '#fcd34d',
-  green:  '#0ea86a',
-  greenLight: '#6ee7b7',
-  red:    '#d63a3a',
-  redLight:'#fca5a5',
-  ink:    '#0f1923',
-  muted:  '#6b7e92',
-  paper:  '#f8f6f1',
-  rule:   '#d6d0c4',
-};
-
-Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
-Chart.defaults.font.size = 11;
-Chart.defaults.color = PALETTE.muted;
-
-function makeGradient(ctx, color1, color2) {
-  const g = ctx.createLinearGradient(0, 0, 0, 300);
-  g.addColorStop(0, color1);
-  g.addColorStop(1, color2);
-  return g;
-}
-
-// ── 1. TOKEN GENERATION CHART ───────────────────────────────────────
-{
-  const ctx = document.getElementById('tokenChart').getContext('2d');
+// ─── Chart 1: HBM Bandwidth Density (News 2) ───
+(function() {
+  const ctx = document.getElementById('hbmBandwidthChart').getContext('2d');
   new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Today (Blackwell, 1GW)', 'Vera Rubin + Groq 3 LPX (1GW)'],
+      labels: ['HBM2E', 'HBM3', 'HBM3E', 'HBM4\n(16-Hi)'],
       datasets: [{
-        label: 'Tokens / Second (Millions)',
-        data: [22, 700],
-        backgroundColor: [
-          'rgba(107,126,146,0.25)',
-          PALETTE.blue,
-        ],
-        borderColor: [PALETTE.muted, PALETTE.blue],
-        borderWidth: 1.5,
+        label: 'BW Density (GB/s per mm²)',
+        data: [1.2, 1.8, 2.4, 3.6],
+        backgroundColor: ['#fca5a5','#f87171','#ef4444','#b91c1c'],
         borderRadius: 6,
+        borderSkipped: false,
+      }, {
+        type: 'line',
+        label: 'ECCN 3A090.c Threshold (2 GB/s/mm²)',
+        data: [2, 2, 2, 2],
+        borderColor: '#f59e0b',
+        borderWidth: 2.5,
+        borderDash: [7, 4],
+        pointRadius: 0,
+        fill: false,
       }]
     },
     options: {
-      indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: v => ` ${v.raw.toLocaleString()}M tokens/sec`
-          }
-        }
+        legend: {
+          labels: { font: { family: 'Outfit', size: 10.5 }, color: '#374151', boxWidth: 14 }
+        },
+        tooltip: { titleFont: { family: 'Outfit' }, bodyFont: { family: 'Outfit' } }
       },
       scales: {
-        x: {
-          grid: { color: 'rgba(214,208,196,0.5)' },
-          ticks: { callback: v => v + 'M' },
-          border: { display: false }
-        },
+        x: { ticks: { font: { family: 'Outfit', size: 10.5 }, color: '#6b7280' }, grid: { display: false } },
         y: {
-          grid: { display: false },
-          border: { display: false },
-          ticks: { font: { size: 11 } }
+          beginAtZero: true,
+          title: { display: true, text: 'GB/s per mm²', font: { family: 'Outfit', size: 10 }, color: '#9ca3af' },
+          ticks: { font: { family: 'Outfit', size: 10.5 }, color: '#6b7280' },
+          grid: { color: '#f3f4f6' }
         }
       }
     }
   });
-}
-
-// ── 2. NVLINK BANDWIDTH CHART ───────────────────────────────────────
-{
-  const ctx = document.getElementById('nvlinkChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['NVLink 4\n(Hopper / H100)', 'NVLink 5\n(Blackwell)', 'NVLink 6\n(Vera Rubin)'],
-      datasets: [{
-        label: 'Bi-directional Bandwidth (TB/s per GPU)',
-        data: [0.9, 1.8, 3.6],
-        backgroundColor: [
-          'rgba(107,126,146,0.2)',
-          'rgba(26,86,219,0.45)',
-          PALETTE.blue,
-        ],
-        borderColor: [PALETTE.muted, PALETTE.blue, PALETTE.blue],
-        borderWidth: 1.5,
-        borderRadius: 6,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: { label: v => ` ${v.raw} TB/s` }
-        }
-      },
-      scales: {
-        y: {
-          grid: { color: 'rgba(214,208,196,0.5)' },
-          ticks: { callback: v => v + ' TB/s' },
-          border: { display: false },
-          max: 4.2
-        },
-        x: {
-          grid: { display: false },
-          border: { display: false }
-        }
-      }
-    }
-  });
-}
-
-// ── 3A. CAP TABLE ───────────────────────────────────────────────────
-{
-  const ctx = document.getElementById('capTable').getContext('2d');
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Amazon', 'SoftBank', 'NVIDIA', 'Other Investors'],
-      datasets: [{
-        data: [50, 30, 30, 0],
-        backgroundColor: [
-          PALETTE.amber,
-          '#6366f1',
-          PALETTE.green,
-          PALETTE.muted,
-        ],
-        borderWidth: 2,
-        borderColor: '#fff',
-        hoverOffset: 6,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '62%',
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { padding: 12, boxWidth: 10, font: { size: 11 } }
-        },
-        tooltip: {
-          callbacks: { label: v => ` $${v.raw}B` }
-        }
-      }
-    }
-  });
-}
-
-// ── 3B. COMPUTE ALLOCATION ──────────────────────────────────────────
-{
-  const ctx = document.getElementById('computeChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Vera Rubin Inference (NVIDIA)', 'Vera Rubin Training (NVIDIA)', 'Amazon Trainium'],
-      datasets: [{
-        data: [3, 2, 2],
-        backgroundColor: [
-          PALETTE.blue,
-          '#93c5fd',
-          PALETTE.amber,
-        ],
-        borderWidth: 2,
-        borderColor: '#fff',
-        hoverOffset: 6,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '62%',
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { padding: 10, boxWidth: 10, font: { size: 10 } }
-        },
-        tooltip: {
-          callbacks: { label: v => ` ${v.raw} GW` }
-        }
-      }
-    }
-  });
-}
-
-// ── 5A. HBM BANDWIDTH CHART ─────────────────────────────────────────
-{
-  const ctx = document.getElementById('hbmChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['HBM2E', 'HBM3', 'HBM3E\n(H100/B200)', 'HBM4\n(Vera Rubin)', 'HBM4E\n(Samsung, announced)'],
-      datasets: [
-        {
-          label: 'SK Hynix / Industry (TB/s)',
-          data: [0.46, 0.82, 1.2, 1.53, null],
-          backgroundColor: 'rgba(14,168,106,0.65)',
-          borderColor: PALETTE.green,
-          borderWidth: 1.5,
-          borderRadius: 4,
-        },
-        {
-          label: 'Samsung (TB/s)',
-          data: [0.46, 0.82, 1.2, null, 4.0],
-          backgroundColor: PALETTE.blue,
-          borderColor: PALETTE.blue,
-          borderWidth: 1.5,
-          borderRadius: 4,
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'top',
-          labels: { padding: 14, boxWidth: 10, font: { size: 11 } }
-        },
-        tooltip: {
-          callbacks: { label: v => v.raw !== null ? ` ${v.raw} TB/s` : ' N/A' }
-        }
-      },
-      scales: {
-        y: {
-          grid: { color: 'rgba(214,208,196,0.5)' },
-          ticks: { callback: v => v + ' TB/s' },
-          border: { display: false }
-        },
-        x: {
-          grid: { display: false },
-          border: { display: false }
-        }
-      }
-    }
-  });
-}
-
-// ── 5B. HBM SHARE CHART ─────────────────────────────────────────────
-{
-  const ctx = document.getElementById('hbmShareChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['SK Hynix (~67%)', 'Samsung (~33% target)'],
-      datasets: [{
-        data: [67, 33],
-        backgroundColor: [PALETTE.green, PALETTE.blue],
-        borderWidth: 2,
-        borderColor: '#fff',
-        hoverOffset: 6,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '58%',
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { padding: 14, boxWidth: 10, font: { size: 11 } }
-        },
-        tooltip: {
-          callbacks: { label: v => ` ${v.raw}%` }
-        },
-        title: {
-          display: true,
-          text: 'NVIDIA 2026 HBM4 Volume Share',
-          font: { family: "'JetBrains Mono', monospace", size: 10 },
-          color: PALETTE.muted,
-          padding: { bottom: 8 }
-        }
-      }
-    }
-  });
-}
+})();
 </script>
+
 <a href="index.html" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; padding: 14px 24px; background-color: var(--ink); color: #fff; text-decoration: none; border-radius: 50px; font-weight: 500; font-family: var(--sans); box-shadow: var(--shadow-lg); font-size: 14px; transition: transform 0.2s;">
   ⬅️ 제미나이 버전 보기
 </a>  
+
 </body>
 </html>
