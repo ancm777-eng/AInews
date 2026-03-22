@@ -3,999 +3,1494 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AI Infrastructure Briefing — March 20, 2026</title>
+<title>Strategic AI Infrastructure Briefing — March 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=Instrument+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#F5F4F0;--surface:#FFFFFF;--ink:#181614;--ink-2:#3C3830;--ink-3:#7C7568;
-  --border:#E6E3DA;--border-2:#CCC9BE;
-  --c1:#D97706;--c1-l:#FFFBEB;--c1-b:#FDE68A;
-  --c2:#DC2626;--c2-l:#FEF2F2;--c2-b:#FECACA;
-  --c3:#1D4ED8;--c3-l:#EFF6FF;--c3-b:#BFDBFE;
-  --c4:#059669;--c4-l:#ECFDF5;--c4-b:#A7F3D0;
-  --c5:#7C3AED;--c5-l:#F5F3FF;--c5-b:#DDD6FE;
-  --sans:'DM Sans',sans-serif;--serif:'DM Serif Display',serif;--mono:'JetBrains Mono',monospace;
-  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
-  --shadow-lg:0 8px 40px rgba(0,0,0,.12);
-  --r:12px;--r-sm:6px;
+  --bg:#F5F3EE;
+  --surface:#FFFFFF;
+  --ink:#1A1714;
+  --ink-2:#3C3830;
+  --ink-3:#7A736A;
+  --border:#E4E0D8;
+  --border-2:#CEC9BE;
+
+  --c1:#D97706;   /* Tesla/Terafab — Amber */
+  --c1-l:#FEF3C7;
+  --c2:#1D4ED8;   /* White House Policy — Blue */
+  --c2-l:#EFF6FF;
+  --c3:#DC2626;   /* DOJ Supermicro — Red */
+  --c3-l:#FEF2F2;
+  --c4:#0F766E;   /* SoftBank AEP — Teal */
+  --c4-l:#F0FDFA;
+  --c5:#7C3AED;   /* NVIDIA Vera Rubin — Violet */
+  --c5-l:#F5F3FF;
+
+  --sans:'Instrument Sans',sans-serif;
+  --serif:'Fraunces',serif;
+  --mono:'Fira Code',monospace;
+  --radius:14px;
+  --radius-sm:7px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 20px rgba(0,0,0,.05);
+  --shadow-lg:0 8px 40px rgba(0,0,0,.13);
 }
-body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.65;font-size:15px}
 
-/* ── Disclaimer ── */
-.disc{background:#FFFBEB;border-bottom:2px solid #FCD34D;padding:11px 20px;text-align:center;font-size:11.5px;font-weight:600;color:#92400E;line-height:1.6}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.65;font-size:15px;-webkit-font-smoothing:antialiased}
 
-/* ── Header ── */
-.hdr{background:var(--ink);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.25)}
-.hdr-in{max-width:1320px;margin:0 auto;padding:15px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.hdr-brand{display:flex;align-items:center;gap:12px}
-.hdr-logo{width:38px;height:38px;background:linear-gradient(135deg,#F59E0B,#DC2626 40%,#7C3AED);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:19px;color:#fff;flex-shrink:0}
-.hdr-title{font-family:var(--serif);font-size:20px;letter-spacing:-.02em;line-height:1.2}
-.hdr-meta{font-size:10.5px;color:rgba(255,255,255,.45);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
-.hdr-nav{display:flex;gap:6px;flex-wrap:wrap}
-.nav-chip{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:5px 11px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.65);transition:all .2s}
-.nav-chip:hover{background:rgba(255,255,255,.1);color:#fff}
+/* Disclaimer */
+.disclaimer{
+  background:#FEFCE8;border-bottom:2px solid #FCD34D;
+  padding:11px 20px;text-align:center;
+  font-size:12px;font-weight:600;color:#78350F;line-height:1.55;
+  letter-spacing:.01em;
+}
 
-/* ── Layout ── */
-.layout{max-width:1320px;margin:0 auto;padding:40px 24px 80px;display:grid;grid-template-columns:224px 1fr;gap:44px;align-items:start}
+/* Header */
+.site-header{
+  background:var(--ink);color:#fff;
+  position:sticky;top:0;z-index:200;
+  box-shadow:0 2px 20px rgba(0,0,0,.25);
+}
+.header-inner{
+  max-width:1300px;margin:0 auto;
+  padding:15px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.header-brand{display:flex;align-items:center;gap:14px}
+.header-logo{
+  width:38px;height:38px;border-radius:9px;
+  background:linear-gradient(135deg,#F59E0B,#7C3AED);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:20px;color:#fff;font-style:italic;
+}
+.header-title{font-family:var(--serif);font-size:19px;letter-spacing:-.02em;font-weight:600}
+.header-meta{font-size:11px;color:rgba(255,255,255,.45);font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.header-nav{display:flex;gap:7px;flex-wrap:wrap}
+.nav-chip{
+  font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  padding:5px 11px;border-radius:20px;text-decoration:none;
+  border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.65);
+  transition:all .18s;
+}
+.nav-chip:hover{background:rgba(255,255,255,.12);color:#fff}
+
+/* Layout */
+.layout{
+  max-width:1300px;margin:0 auto;
+  padding:40px 28px 80px;
+  display:grid;
+  grid-template-columns:210px 1fr;
+  gap:44px;align-items:start;
+}
 .sidebar{position:sticky;top:72px}
-.sb-nav{list-style:none;display:flex;flex-direction:column;gap:4px}
-.sb-nav a{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;color:var(--ink-2);transition:all .15s;border:1px solid transparent}
-.sb-nav a:hover{background:var(--surface);border-color:var(--border)}
-.sb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.sb-lbl{line-height:1.3}
-.main{min-width:0}
-
-/* ── Intro Hero ── */
-.intro-hero{background:var(--ink);color:#fff;border-radius:var(--r);padding:36px 40px;margin-bottom:36px;overflow:hidden;position:relative}
-.intro-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:radial-gradient(circle,rgba(245,158,11,.15),transparent 70%);pointer-events:none}
-.intro-hero::after{content:'';position:absolute;bottom:-80px;left:-40px;width:250px;height:250px;background:radial-gradient(circle,rgba(124,58,237,.12),transparent 70%);pointer-events:none}
-.intro-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}
-.intro-title{font-family:var(--serif);font-size:30px;line-height:1.2;letter-spacing:-.02em;margin-bottom:16px}
-.intro-body{font-size:13.5px;line-height:1.75;color:rgba(255,255,255,.72);max-width:600px;margin-bottom:20px}
-.intro-pills{display:flex;gap:8px;flex-wrap:wrap}
-.intro-pill{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7)}
-
-/* ── Article ── */
-.article{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:32px;overflow:hidden;border:1px solid var(--border)}
-.art-hdr{padding:24px 28px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
-.art-num{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin-bottom:6px}
-.art-title{font-family:var(--serif);font-size:22px;line-height:1.25;letter-spacing:-.01em}
-.art-badge{flex-shrink:0;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:20px;white-space:nowrap}
-.art-meta{display:flex;align-items:center;gap:14px;padding:0 28px 16px;flex-wrap:wrap}
-.meta-i{font-size:11px;color:var(--ink-3);font-weight:500;display:flex;align-items:center;gap:4px}
-.meta-dot{width:3px;height:3px;border-radius:50%;background:var(--border-2)}
-.conf-badge{font-size:9.5px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:4px;text-transform:uppercase}
-.art-body{padding:0 28px 28px}
-
-/* ── Subsection ── */
-.sub{margin-bottom:28px}
-.sub-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.sub-icon{font-size:13px}
-.sub-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-.sub-tag{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:3px;margin-left:auto}
-
-p.lead{font-size:14px;font-weight:600;line-height:1.75;color:var(--ink);margin-bottom:10px}
-p.body{font-size:14px;line-height:1.78;color:var(--ink-2);margin-bottom:10px}
-p.body:last-child{margin-bottom:0}
-
-/* ── Impact box ── */
-.impact{border-radius:var(--r-sm);padding:16px 20px;margin-top:8px;border-left:4px solid}
-.impact p{font-size:13.5px;line-height:1.72}
-
-/* ── Quote ── */
-.qblock{border-left:3px solid var(--border-2);padding:12px 16px;margin:12px 0;background:var(--bg);border-radius:0 6px 6px 0}
-.qblock p{font-size:13px;font-style:italic;color:var(--ink-2);line-height:1.72}
-.qattr{font-size:11px;font-weight:700;color:var(--ink-3);margin-top:6px;font-style:normal}
-
-/* ── Tables ── */
-.tbl{width:100%;border-collapse:collapse;font-size:12px;margin:12px 0}
-.tbl th{background:var(--bg);padding:9px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);border-bottom:2px solid var(--border-2)}
-.tbl td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5;color:var(--ink-2)}
-.tbl tr:last-child td{border-bottom:none}
-.tbl td:first-child{font-weight:600;color:var(--ink)}
-.tbl tr:hover td{background:var(--bg)}
-
-/* ── Metric cards ── */
-.mrow{display:grid;gap:12px;margin:16px 0}
-.m2{grid-template-columns:repeat(2,1fr)}.m3{grid-template-columns:repeat(3,1fr)}.m4{grid-template-columns:repeat(4,1fr)}
-.mcard{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;text-align:center}
-.mval{font-size:22px;font-weight:700;font-family:var(--mono);line-height:1.1;margin-bottom:4px}
-.mlbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
-.msub{font-size:11px;color:var(--ink-3);margin-top:3px}
-
-/* ── Sentiment grid ── */
-.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
-.scard{border-radius:var(--r-sm);padding:14px;border:1px solid var(--border);text-align:center}
-.semoji{font-size:22px;margin-bottom:6px}
-.slbl{font-size:11px;font-weight:700;margin-bottom:4px}
-.sdesc{font-size:10.5px;color:var(--ink-3);line-height:1.45}
-
-/* ── Warn ── */
-.warn{background:#FEF3C7;border:1px solid #FDE68A;border-radius:var(--r-sm);padding:11px 16px;font-size:11.5px;font-weight:600;color:#92400E;margin-top:12px;text-align:center}
-
-/* ── Spec bars ── */
-.spec-compare{display:flex;flex-direction:column;gap:10px;margin:12px 0}
-.spec-row{display:flex;align-items:center;gap:10px}
-.spec-lbl{font-size:11px;font-weight:600;width:140px;flex-shrink:0;color:var(--ink-2)}
-.spec-bw{flex:1;background:var(--border);border-radius:4px;height:10px;overflow:hidden}
-.spec-b{height:100%;border-radius:4px;transition:width .8s ease}
-.spec-v{font-size:11px;font-weight:700;font-family:var(--mono);width:80px;text-align:right;flex-shrink:0}
-
-/* ── Diagram blocks ── */
-.diag-flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:14px 0}
-.diag-node{border-radius:8px;padding:12px 16px;text-align:center;flex:1;min-width:110px;border:1px solid var(--border)}
-.diag-node-title{font-size:11px;font-weight:700;margin-bottom:4px}
-.diag-node-sub{font-size:10px;color:var(--ink-3);line-height:1.4}
-.diag-arrow{font-size:22px;color:var(--ink-3);flex-shrink:0}
-
-.roadmap{display:flex;gap:2px;overflow-x:auto;padding-bottom:4px}
-.rphase{flex:1;min-width:180px;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border)}
-.rphase-hdr{padding:12px 14px;font-size:12px;font-weight:700;color:#fff;text-align:center}
-.rphase-body{padding:12px 14px;background:var(--bg)}
-.rchip{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:10px;font-weight:600;margin:2px;color:var(--ink-2)}
-
-.tline{position:relative;padding-left:24px}
-.tline::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--border-2)}
-.titem{position:relative;margin-bottom:16px}
-.titem::before{content:'';position:absolute;left:-21px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--surface);border:2px solid var(--border-2)}
-.tdate{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
-.ttxt{font-size:12.5px;color:var(--ink-2);line-height:1.5}
-
-/* ── Chart wrapper ── */
-.chart-w{position:relative;margin:16px 0}
-.chart-w canvas{max-height:280px}
-
-/* ── Synthesis ── */
-.synth{background:var(--ink);color:#fff;border-radius:var(--r);padding:36px 40px;margin-bottom:32px;box-shadow:var(--shadow-lg)}
-.synth-title{font-family:var(--serif);font-size:32px;letter-spacing:-.02em;margin-bottom:6px;line-height:1.15}
-.synth-sub{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:28px}
-.synth-block{margin-bottom:22px;display:flex;gap:20px}
-.synth-num{font-family:var(--serif);font-size:48px;line-height:1;color:rgba(255,255,255,.08);flex-shrink:0;width:48px}
-.synth-hdg{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px}
-.synth-txt{font-size:13.5px;line-height:1.78;color:rgba(255,255,255,.76)}
-.outlook{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-sm);padding:20px 24px;margin-top:24px}
-.out-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:14px}
-.out-item{display:flex;gap:12px;margin-bottom:12px}
-.out-badge{font-size:9px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:3px;height:fit-content;flex-shrink:0;text-transform:uppercase;white-space:nowrap}
-.out-txt{font-size:12.5px;color:rgba(255,255,255,.62);line-height:1.65}
-
-/* ── Divider ── */
-.div{height:1px;background:var(--border);margin:20px 0}
-
-/* ── Color utilities ── */
-.c1{color:var(--c1)}.bg-c1{background:var(--c1)}.l-c1{background:var(--c1-l);border-color:var(--c1-b)!important}
-.c2{color:var(--c2)}.bg-c2{background:var(--c2)}.l-c2{background:var(--c2-l);border-color:var(--c2-b)!important}
-.c3{color:var(--c3)}.bg-c3{background:var(--c3)}.l-c3{background:var(--c3-l);border-color:var(--c3-b)!important}
-.c4{color:var(--c4)}.bg-c4{background:var(--c4)}.l-c4{background:var(--c4-l);border-color:var(--c4-b)!important}
-.c5{color:var(--c5)}.bg-c5{background:var(--c5)}.l-c5{background:var(--c5-l);border-color:var(--c5-b)!important}
-
-/* ── Responsive ── */
-@media(max-width:960px){
-  .layout{grid-template-columns:1fr;gap:20px;padding:20px 16px 60px}
-  .sidebar{position:static}
-  .sb-nav{flex-direction:row;flex-wrap:wrap;gap:6px}
-  .sb-nav a{font-size:11px;padding:6px 10px}
-  .hdr-nav{display:none}
-  .art-hdr{flex-direction:column;gap:10px;padding:18px 18px 12px}
-  .art-body{padding:0 16px 20px}
-  .art-meta{padding:0 16px 12px}
-  .m4{grid-template-columns:repeat(2,1fr)}
-  .m3{grid-template-columns:repeat(2,1fr)}
-  .sgrid{grid-template-columns:1fr}
-  .synth{padding:24px 20px}
-  .synth-title{font-size:24px}
-  .synth-block{gap:12px}
-  .synth-num{font-size:36px;width:36px}
-  .roadmap{flex-direction:column}
-  .spec-lbl{width:100px}
-  .tbl th,.tbl td{padding:7px 8px}
-  .intro-hero{padding:24px 20px}
-  .intro-title{font-size:22px}
+.sidebar-section-label{
+  font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:8px;padding:0 4px;
 }
-@media(max-width:480px){
-  .m2{grid-template-columns:1fr}
-  .m3{grid-template-columns:1fr}
-  .art-title{font-size:19px}
-  .diag-flow{flex-direction:column}
-  .diag-arrow{transform:rotate(90deg)}
+.sidebar-nav{list-style:none;display:flex;flex-direction:column;gap:3px;margin-bottom:20px}
+.sidebar-nav a{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 10px;border-radius:8px;
+  font-size:12px;font-weight:500;
+  text-decoration:none;color:var(--ink-2);
+  transition:all .15s;border:1px solid transparent;
+}
+.sidebar-nav a:hover{background:var(--surface);border-color:var(--border)}
+.s-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.s-label{line-height:1.3}
+
+.main-content{min-width:0}
+
+/* Article Card */
+.article{
+  background:var(--surface);border-radius:var(--radius);
+  box-shadow:var(--shadow);margin-bottom:36px;
+  overflow:hidden;border:1px solid var(--border);
+}
+.article-header{
+  padding:26px 30px 18px;
+  border-bottom:3px solid;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+}
+.art-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin-bottom:6px}
+.art-title{font-family:var(--serif);font-size:22px;line-height:1.25;letter-spacing:-.01em;font-weight:600}
+.art-badge{
+  flex-shrink:0;font-size:9px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;padding:5px 11px;border-radius:20px;
+  white-space:nowrap;color:#fff;
+}
+.article-meta{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:10px 30px 4px;
+}
+.meta-item{font-size:11px;color:var(--ink-3);font-weight:500;display:flex;align-items:center;gap:4px}
+.meta-sep{width:3px;height:3px;border-radius:50%;background:var(--border-2)}
+.conf-badge{
+  font-size:10px;font-weight:700;letter-spacing:.05em;
+  padding:3px 8px;border-radius:4px;text-transform:uppercase;
+}
+
+.article-body{padding:4px 30px 30px}
+
+/* Subsection */
+.subsec{margin-bottom:26px}
+.subsec-head{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:11px;padding-bottom:8px;
+  border-bottom:1px solid var(--border);
+}
+.subsec-icon{font-size:14px}
+.subsec-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.subsec-tag{
+  font-size:9px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  padding:2px 8px;border-radius:3px;margin-left:auto;
+}
+
+p.body-text{font-size:14px;line-height:1.78;color:var(--ink-2);margin-bottom:10px}
+p.body-text:last-child{margin-bottom:0}
+p.lead-text{font-size:14px;font-weight:600;line-height:1.72;color:var(--ink);margin-bottom:10px}
+
+/* Impact box */
+.impact-box{border-radius:var(--radius-sm);padding:16px 20px;border-left:4px solid}
+.impact-box p{font-size:13.5px;line-height:1.75}
+
+/* Quote block */
+.quote-block{
+  border-left:3px solid var(--border-2);
+  padding:12px 16px;margin:12px 0;
+  background:var(--bg);border-radius:0 7px 7px 0;
+}
+.quote-block p{font-size:13px;font-style:italic;color:var(--ink-2);line-height:1.72}
+.quote-attr{font-size:11px;font-weight:600;color:var(--ink-3);margin-top:6px;font-style:normal}
+
+/* Warn box */
+.warn-box{
+  background:#FEF3C7;border:1px solid #FDE68A;
+  border-radius:var(--radius-sm);padding:11px 16px;
+  font-size:12px;font-weight:600;color:#92400E;
+  margin-top:12px;text-align:center;
+}
+
+/* Metric cards */
+.metric-row{display:grid;gap:10px;margin:14px 0}
+.metric-row-2{grid-template-columns:repeat(2,1fr)}
+.metric-row-3{grid-template-columns:repeat(3,1fr)}
+.metric-row-4{grid-template-columns:repeat(4,1fr)}
+.metric-card{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:14px 16px;text-align:center;
+}
+.metric-val{font-size:24px;font-weight:700;font-family:var(--mono);line-height:1.1;margin-bottom:4px}
+.metric-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+.metric-sub{font-size:11px;color:var(--ink-3);margin-top:3px}
+
+/* Table */
+.info-table{width:100%;border-collapse:collapse;font-size:12.5px;margin:10px 0}
+.info-table th{
+  background:var(--bg);padding:9px 12px;
+  text-align:left;font-size:10px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+  border-bottom:2px solid var(--border-2);
+}
+.info-table td{
+  padding:10px 12px;border-bottom:1px solid var(--border);
+  vertical-align:top;line-height:1.5;color:var(--ink-2);
+}
+.info-table tr:last-child td{border-bottom:none}
+.info-table td:first-child{font-weight:600;color:var(--ink)}
+.info-table tr:hover td{background:var(--bg)}
+
+/* Timeline */
+.timeline{position:relative;padding-left:24px}
+.timeline::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--border-2)}
+.tl-item{position:relative;margin-bottom:16px}
+.tl-dot{
+  position:absolute;left:-21px;top:5px;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--surface);border:2.5px solid;
+}
+.tl-date{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px}
+.tl-text{font-size:12.5px;color:var(--ink-2);line-height:1.55}
+
+/* Flow diagram */
+.flow-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:14px 0}
+.flow-node{
+  flex:1;min-width:130px;border-radius:var(--radius-sm);
+  padding:12px 14px;text-align:center;border:1px solid var(--border);
+  background:var(--bg);
+}
+.flow-node-label{font-size:11px;font-weight:700;margin-bottom:4px}
+.flow-node-sub{font-size:10px;color:var(--ink-3);line-height:1.4}
+.flow-arrow{font-size:20px;flex-shrink:0;opacity:.5}
+
+/* Sentiment grid */
+.sentiment-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.sentiment-card{
+  border-radius:var(--radius-sm);padding:14px;
+  border:1px solid var(--border);text-align:center;
+}
+.sent-emoji{font-size:22px;margin-bottom:7px}
+.sent-label{font-size:11px;font-weight:700;margin-bottom:4px}
+.sent-desc{font-size:10.5px;color:var(--ink-3);line-height:1.42}
+
+/* Spec bar */
+.spec-compare{display:flex;flex-direction:column;gap:9px;margin:12px 0}
+.spec-row{display:flex;align-items:center;gap:10px}
+.spec-label{font-size:11px;font-weight:600;width:140px;flex-shrink:0;color:var(--ink-2)}
+.spec-bar-wrap{flex:1;background:var(--border);border-radius:4px;height:10px;overflow:hidden}
+.spec-bar{height:100%;border-radius:4px}
+.spec-val{font-size:11px;font-weight:700;font-family:var(--mono);width:80px;text-align:right;flex-shrink:0}
+
+/* Chip/badge row */
+.chip-row{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+.chip{
+  display:inline-block;background:var(--surface);border:1px solid var(--border);
+  border-radius:4px;padding:3px 8px;font-size:10px;font-weight:600;color:var(--ink-2);
+  font-family:var(--mono);
+}
+
+/* Power breakdown bars */
+.power-bar-row{display:flex;align-items:center;gap:10px;margin:6px 0}
+.power-label{font-size:11px;font-weight:600;width:180px;flex-shrink:0;color:var(--ink-2)}
+.power-bar-wrap{flex:1;background:var(--border);border-radius:4px;height:16px;overflow:hidden;position:relative}
+.power-bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px}
+.power-bar-val{font-size:10px;font-weight:700;color:#fff;font-family:var(--mono)}
+
+/* Chart wrap */
+.chart-wrap{position:relative;margin:14px 0}
+.chart-wrap canvas{max-height:280px}
+
+/* Section divider */
+.sec-div{height:1px;background:var(--border);margin:22px 0}
+
+/* Closing Synthesis */
+.synthesis{
+  background:var(--ink);color:#fff;
+  border-radius:var(--radius);padding:40px 44px;
+  margin-bottom:32px;box-shadow:var(--shadow-lg);
+}
+.syn-eyebrow{font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px}
+.syn-title{font-family:var(--serif);font-size:34px;letter-spacing:-.025em;line-height:1.15;margin-bottom:30px;font-style:italic}
+.syn-block{display:flex;gap:20px;margin-bottom:24px}
+.syn-num{font-family:var(--serif);font-size:52px;line-height:1;color:rgba(255,255,255,.08);flex-shrink:0;width:52px;font-style:italic}
+.syn-heading{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:6px}
+.syn-text{font-size:13.5px;line-height:1.8;color:rgba(255,255,255,.75)}
+
+.outlook-box{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:var(--radius-sm);padding:22px 26px;margin-top:28px;
+}
+.outlook-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:16px}
+.outlook-item{display:flex;gap:12px;margin-bottom:14px}
+.outlook-badge{
+  font-size:9px;font-weight:700;letter-spacing:.05em;
+  padding:3px 8px;border-radius:3px;height:fit-content;flex-shrink:0;
+  text-transform:uppercase;white-space:nowrap;
+}
+.outlook-text{font-size:13px;color:rgba(255,255,255,.65);line-height:1.65}
+
+/* Color utilities */
+.c1{color:var(--c1)} .bg-c1{background:var(--c1)} .bc-c1{border-color:var(--c1)} .lc1{background:var(--c1-l)}
+.c2{color:var(--c2)} .bg-c2{background:var(--c2)} .bc-c2{border-color:var(--c2)} .lc2{background:var(--c2-l)}
+.c3{color:var(--c3)} .bg-c3{background:var(--c3)} .bc-c3{border-color:var(--c3)} .lc3{background:var(--c3-l)}
+.c4{color:var(--c4)} .bg-c4{background:var(--c4)} .bc-c4{border-color:var(--c4)} .lc4{background:var(--c4-l)}
+.c5{color:var(--c5)} .bg-c5{background:var(--c5)} .bc-c5{border-color:var(--c5)} .lc5{background:var(--c5-l)}
+
+/* Responsive */
+@media(max-width:960px){
+  .layout{grid-template-columns:1fr;gap:20px;padding:24px 16px 60px}
+  .sidebar{position:static}
+  .sidebar-nav{flex-direction:row;flex-wrap:wrap;gap:6px}
+  .sidebar-nav a{font-size:11px;padding:6px 10px}
+  .header-nav{display:none}
+  .article-header{flex-direction:column;gap:10px;padding:18px 18px 14px}
+  .article-body{padding:4px 18px 22px}
+  .article-meta{padding:8px 18px 4px}
+  .metric-row-4{grid-template-columns:repeat(2,1fr)}
+  .metric-row-3{grid-template-columns:repeat(2,1fr)}
+  .sentiment-grid{grid-template-columns:repeat(2,1fr)}
+  .synthesis{padding:24px 22px}
+  .syn-title{font-size:26px}
+  .syn-block{gap:12px}
+  .syn-num{font-size:38px;width:38px}
+  .info-table{font-size:11.5px}
+  .info-table th,.info-table td{padding:8px 9px}
+  .spec-label{width:110px}
+  .flow-row{flex-direction:column}
+  .flow-arrow{transform:rotate(90deg)}
+}
+@media(max-width:520px){
+  .metric-row-2,.metric-row-3,.metric-row-4{grid-template-columns:1fr}
+  .sentiment-grid{grid-template-columns:1fr}
+  .art-title{font-size:18px}
 }
 </style>
 </head>
 <body>
 
 <!-- Disclaimer -->
-<div class="disc">
-  ⚠️ This content was generated by AI and may contain inaccuracies. For reference purposes only. &nbsp;|&nbsp; 본 내용은 AI가 작성한 내용으로 부정확할 수 있습니다. 참고용으로만 이용해주세요.
+<div class="disclaimer">
+  ⚠ This content was generated by AI and may contain inaccuracies. For reference purposes only. &nbsp;|&nbsp; 본 내용은 AI가 작성한 내용으로 부정확할 수 있습니다. 참고용으로만 이용해주세요.
 </div>
 
 <!-- Header -->
-<header class="hdr">
-  <div class="hdr-in">
-    <div class="hdr-brand">
-      <div class="hdr-logo">B</div>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-logo">S</div>
       <div>
-        <div class="hdr-title">AI Infrastructure Briefing</div>
-        <div class="hdr-meta">March 20, 2026 &nbsp;·&nbsp; 5 Critical Developments &nbsp;·&nbsp; Capital &amp; Risk Intelligence</div>
+        <div class="header-title">Strategic AI Infrastructure Briefing</div>
+        <div class="header-meta">March 2026 &nbsp;·&nbsp; 5 Critical Developments &nbsp;·&nbsp; Capital Intelligence</div>
       </div>
     </div>
-    <nav class="hdr-nav">
-      <a class="nav-chip" href="#ohio">Ohio 10GW</a>
-      <a class="nav-chip" href="#smci">Supermicro</a>
-      <a class="nav-chip" href="#whitehouse">White House AI</a>
-      <a class="nav-chip" href="#nvidia">NVIDIA Rubin</a>
-      <a class="nav-chip" href="#tesla">Tesla AI6</a>
+    <nav class="header-nav">
+      <a class="nav-chip" href="#terafab">Terafab</a>
+      <a class="nav-chip" href="#policy">AI Policy</a>
+      <a class="nav-chip" href="#supermicro">Supermicro</a>
+      <a class="nav-chip" href="#softbank">SoftBank</a>
+      <a class="nav-chip" href="#nvidia">NVIDIA</a>
       <a class="nav-chip" href="#synthesis">Synthesis</a>
     </nav>
   </div>
 </header>
 
 <div class="layout">
+
   <!-- Sidebar -->
   <aside class="sidebar">
-    <ul class="sb-nav">
-      <li><a href="#ohio"><span class="sb-dot bg-c1"></span><span class="sb-lbl">Ohio 10GW Energy Hub</span></a></li>
-      <li><a href="#smci"><span class="sb-dot bg-c2"></span><span class="sb-lbl">Supermicro Indictment</span></a></li>
-      <li><a href="#whitehouse"><span class="sb-dot bg-c3"></span><span class="sb-lbl">White House AI Framework</span></a></li>
-      <li><a href="#nvidia"><span class="sb-dot bg-c4"></span><span class="sb-lbl">NVIDIA Vera Rubin</span></a></li>
-      <li><a href="#tesla"><span class="sb-dot bg-c5"></span><span class="sb-lbl">Tesla AI6 + Samsung 2nm</span></a></li>
-      <li><a href="#synthesis"><span class="sb-dot" style="background:var(--ink)"></span><span class="sb-lbl">Closing Synthesis</span></a></li>
+    <div class="sidebar-section-label">Contents</div>
+    <ul class="sidebar-nav">
+      <li><a href="#terafab"><span class="s-dot" style="background:var(--c1)"></span><span class="s-label">Tesla/SpaceX Terafab</span></a></li>
+      <li><a href="#policy"><span class="s-dot" style="background:var(--c2)"></span><span class="s-label">White House AI Policy</span></a></li>
+      <li><a href="#supermicro"><span class="s-dot" style="background:var(--c3)"></span><span class="s-label">DOJ Supermicro Indictment</span></a></li>
+      <li><a href="#softbank"><span class="s-dot" style="background:var(--c4)"></span><span class="s-label">SoftBank &amp; AEP Ohio 10GW</span></a></li>
+      <li><a href="#nvidia"><span class="s-dot" style="background:var(--c5)"></span><span class="s-label">NVIDIA Vera Rubin Launch</span></a></li>
+      <li><a href="#synthesis"><span class="s-dot" style="background:var(--ink)"></span><span class="s-label">Closing Synthesis</span></a></li>
+    </ul>
+    <div class="sidebar-section-label" style="margin-top:16px">Categories</div>
+    <ul class="sidebar-nav">
+      <li><a href="#terafab"><span class="s-dot bg-c1"></span><span class="s-label c1">Semiconductor Mfg.</span></a></li>
+      <li><a href="#policy"><span class="s-dot bg-c2"></span><span class="s-label c2">Policy &amp; Regulation</span></a></li>
+      <li><a href="#supermicro"><span class="s-dot bg-c3"></span><span class="s-label c3">Supply Chain &amp; Legal</span></a></li>
+      <li><a href="#softbank"><span class="s-dot bg-c4"></span><span class="s-label c4">Infrastructure Finance</span></a></li>
+      <li><a href="#nvidia"><span class="s-dot bg-c5"></span><span class="s-label c5">Hardware Roadmap</span></a></li>
     </ul>
   </aside>
 
-  <main class="main">
+  <!-- Main -->
+  <main class="main-content">
 
-    <!-- INTRO HERO -->
-    <div class="intro-hero">
-      <div class="intro-label">Strategic AI Infrastructure &amp; System Architecture — Capital Allocation &amp; Risk Intelligence Briefing</div>
-      <h1 class="intro-title">5가지 핵심 AI 인프라 동향<br/>March 20, 2026</h1>
-      <p class="intro-body">이 브리핑은 글로벌 AI 인프라 및 반도체 생태계에서 지난 24~72시간 내 발생한 가장 중대한 5가지 사건을 분석합니다. 전력 주권, 공급망 법적 리스크, 규제 환경, 차세대 하드웨어 아키텍처가 동시에 격변하고 있습니다.</p>
-      <div class="intro-pills">
-        <span class="intro-pill" style="border-color:rgba(217,119,6,.4);color:rgba(245,158,11,.9)">⚡ 10GW Ohio Power Deal</span>
-        <span class="intro-pill" style="border-color:rgba(220,38,38,.4);color:rgba(252,165,165,.9)">⚖️ DOJ $2.5B Indictment</span>
-        <span class="intro-pill" style="border-color:rgba(29,78,216,.4);color:rgba(147,197,253,.9)">🏛️ White House AI Policy</span>
-        <span class="intro-pill" style="border-color:rgba(5,150,105,.4);color:rgba(110,231,183,.9)">🟢 NVIDIA Vera Rubin</span>
-        <span class="intro-pill" style="border-color:rgba(124,58,237,.4);color:rgba(196,181,253,.9)">🔮 Tesla AI6 / Samsung 2nm</span>
-      </div>
-    </div>
-
-    <!-- ═══════════════════════════════════
-         ARTICLE 1 · Ohio 10GW
-    ════════════════════════════════════ -->
-    <article class="article" id="ohio">
-      <div class="art-hdr" style="border-bottom:3px solid var(--c1)">
+    <!-- ══════════════════════════════════════════
+         ARTICLE 1 — TESLA/SPACEX TERAFAB
+    ═══════════════════════════════════════════ -->
+    <article class="article" id="terafab">
+      <div class="article-header bc-c1" style="border-bottom-color:var(--c1)">
         <div>
-          <div class="art-num c1">01 / Energy &amp; Power Infrastructure</div>
-          <h2 class="art-title">Transformative 10-Gigawatt AI Data Center and Natural Gas Power Partnership in Southern Ohio</h2>
+          <div class="art-num c1">01 / Semiconductor Manufacturing</div>
+          <h2 class="art-title">Tesla and SpaceX "Terafab" Joint Semiconductor Manufacturing Project</h2>
         </div>
-        <span class="art-badge bg-c1" style="color:#fff">LANDMARK</span>
+        <span class="art-badge bg-c1">HIGH IMPACT</span>
       </div>
-      <div class="art-meta">
-        <span class="meta-i">📅 March 20, 2026</span>
-        <span class="meta-dot"></span>
-        <span class="meta-i">Source: U.S. Department of Energy</span>
-        <span class="meta-dot"></span>
-        <span class="conf-badge l-c4 c4">⬤ HIGH Confidence</span>
+      <div class="article-meta">
+        <span class="meta-item">📅 March 21, 2026</span>
+        <span class="meta-sep"></span>
+        <span class="meta-item">Source: MLQ.ai / Electrek</span>
+        <span class="meta-sep"></span>
+        <span class="conf-badge lc1 c1">⬤ HIGH Confidence</span>
+        <span class="conf-badge" style="background:#FEF3C7;color:#92400E;margin-left:4px;">7-Day Exception</span>
       </div>
-      <div class="art-body">
+
+      <div class="article-body">
 
         <!-- Overview -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">🔭</span>
-            <span class="sub-lbl c1">Overview</span>
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">🔭</span>
+            <span class="subsec-label c1">Overview</span>
           </div>
-          <p class="lead">The global artificial intelligence infrastructure sector is currently constrained by an acute, systemic shortage of base-load power generation, creating a critical physical bottleneck that threatens to cap long-term capacity expansion for frontier model training and dynamic agentic inference.</p>
-          <p class="body">Addressing this precise limitation, the United States Department of Energy and the Department of Commerce have formally established a massive public-private partnership with SoftBank Group's SB Energy unit and American Electric Power (AEP) Ohio. The core breakthrough of this initiative is the development of a 10-gigawatt artificial intelligence data center at the Portsmouth Site—a former uranium enrichment facility in Pike County, Ohio—powered predominantly by a newly constructed 9.2-gigawatt natural gas generation fleet. This facility represents an unprecedented scale of co-located energy and compute infrastructure, funded largely by a $33.3 billion capital injection from Japanese stakeholders under the U.S.-Japan Strategic Trade and Investment Agreement, alongside an additional $4.2 billion from SoftBank for local transmission upgrades.</p>
-          <p class="body">The immediate reaction across the energy and technology ecosystems has been one of fundamental recalibration, as sovereign wealth and international capital increasingly move to fund dedicated, grid-connected fossil fuel assets co-located with compute campuses. This bold maneuver guarantees power availability for hyperscale workloads without transferring immense capital expenditure burdens to local residential ratepayers, setting a new precedent for infrastructure financing.</p>
-        </div>
-
-        <!-- Infographic: Power + Capital -->
-        <div class="mrow m4">
-          <div class="mcard"><div class="mval c1">10 GW</div><div class="mlbl">Total Power Capacity</div><div class="msub">New Infrastructure</div></div>
-          <div class="mcard"><div class="mval c1">9.2 GW</div><div class="mlbl">Natural Gas Fleet</div><div class="msub">~9× standard nuclear reactors</div></div>
-          <div class="mcard"><div class="mval c1">$33.3B</div><div class="mlbl">Japanese Capital</div><div class="msub">SoftBank / U.S.-Japan STA</div></div>
-          <div class="mcard"><div class="mval c1">$4.2B</div><div class="mlbl">Transmission Upgrade</div><div class="msub">AEP Ohio — ratepayer protected</div></div>
+          <p class="lead-text">The global semiconductor supply chain has operated for decades under a highly concentrated foundry model, creating a severe geopolitical and architectural bottleneck wherein virtually all frontier artificial intelligence logic chips originate from a select few fabrication facilities in Taiwan and South Korea.</p>
+          <p class="body-text">This vendor concentration presents an existential ceiling for technology conglomerates pursuing hardware-intensive artificial intelligence roadmaps, as external capacity allocations are mathematically insufficient to meet projected end-of-decade inference demands. The decisive strategic shift bypassing this limitation occurred when Elon Musk officially unveiled the "Terafab" project at the Seaholm Power Plant in Austin, Texas on the night of March 21—with reporting consolidated on March 22—representing an unprecedented vertical integration maneuver that fundamentally disrupts traditional silicon procurement strategies.</p>
+          <p class="body-text">This twenty-billion-dollar joint venture between Tesla, SpaceX, and xAI aims to establish a domestic mega-foundry capable of producing advanced two-nanometer logic chips, memory arrays, and integrated packaging under a single roof, targeting an output of one hundred thousand wafer starts per month. The most disruptive element of the announcement is the facility's design mandate, which dedicates eighty percent of its future computational output to space-based orbital artificial intelligence satellites, leveraging the vacuum of space for thermal management and capturing continuous solar irradiance for localized power generation, with solar irradiance in orbit approximately five times greater than at the Earth's surface.</p>
+          <p class="body-text">The immediate market reaction has been characterized by profound structural skepticism regarding the feasibility of establishing a tier-one foundry from scratch, simultaneously mixed with a sobering realization that traditional foundry capacity projections are fundamentally misaligned with the exponential compute requirements of autonomous robotics and spatial artificial intelligence. Competitors and financial analysts are rapidly reassessing the capital expenditure requirements necessary to maintain compute parity in the latter half of the decade, recognizing that sovereign-scale vertical integration may become a baseline prerequisite for frontier model deployment.</p>
         </div>
 
         <!-- Strategic Impact -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">⚡</span>
-            <span class="sub-lbl c1">Strategic Impact</span>
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">⚡</span>
+            <span class="subsec-label c1">Strategic Impact</span>
           </div>
-          <div class="impact l-c1" style="border-left-color:var(--c1)">
-            <p class="body" style="color:var(--ink)">This development fundamentally validates the thesis that future artificial intelligence dominance is inextricably linked to raw power generation sovereignty and sovereign-level infrastructure capital. For institutional investors and hyperscale operators, this 10-gigawatt project signals a definitive paradigm shift away from incremental grid tapping toward hyper-scale, vertically integrated energy-and-compute campuses. The scale of the $33.3 billion allocation solely for 9.2 gigawatts of natural gas turbines demonstrates that the capital requirements for frontier AI have escalated beyond standard venture and corporate balance sheets, now requiring explicit nation-state level commitments and bilateral diplomatic trade agreements.</p>
+          <div class="metric-row metric-row-4">
+            <div class="metric-card">
+              <div class="metric-val c1">$20B</div>
+              <div class="metric-label">Initial Commitment</div>
+              <div class="metric-sub">Joint venture capital</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val c1">$40B</div>
+              <div class="metric-label">Total Build-Out Est.</div>
+              <div class="metric-sub">Speculative upper bound</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val c1">2nm</div>
+              <div class="metric-label">Process Node</div>
+              <div class="metric-sub">Advanced EUV logic</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val c1">80%</div>
+              <div class="metric-label">Output Dedicated</div>
+              <div class="metric-sub">To orbital AI satellites</div>
+            </div>
           </div>
-          <p class="body" style="margin-top:10px">Furthermore, this partnership actively de-risks the capital expenditure associated with utility upgrades by adhering to the "Ratepayer Protection Pledge," ensuring that SoftBank and its partners absorb the entirety of the $4.2 billion transmission upgrade costs. This financial modeling establishes a rigorous new baseline requirement for any cloud service provider seeking to deploy gigawatt-scale data centers: they must now internalize the cost of their own power generation and regional grid reinforcement to avoid regulatory friction. From a risk assessment perspective, this heavy reliance on natural gas—equivalent to the combined electrical output of approximately nine standard nuclear reactors—highlights the industry's pragmatic pivot toward immediate, reliable fossil-fuel base-load power. This pivot deliberately circumvents the decade-long development timelines, regulatory hurdles, and unproven commercial viability of next-generation small modular reactor (SMR) deployments. Existing cluster investments located in heavily constrained grid interconnection queues, such as those within the PJM Interconnection territory in Northern Virginia, face potential long-term devaluation and severe operational delays if equivalent co-located power resources cannot be secured.</p>
+          <div class="impact-box lc1" style="border-left:4px solid var(--c1);margin-top:8px">
+            <p style="font-size:13.5px;line-height:1.75;color:var(--ink)">The establishment of the Terafab facility presents a direct challenge to the prevailing logic of outsourced semiconductor manufacturing, validating the thesis that extreme vertical integration is necessary to secure sovereign control over frontier artificial intelligence supply chains. If successful, this project will severely devalue the strategic leverage currently held by incumbent foundries, shifting the geopolitical center of gravity for advanced silicon production back toward the United States. For global investment portfolios, this introduces massive near-term capital expenditure liabilities for Tesla and its associated entities, with analysts projecting the total build-out cost could reach forty billion dollars by the end of the decade against an initial committed investment of twenty billion dollars. Simultaneously, this venture insulates the conglomerate from the catastrophic supply chain risks associated with South China Sea geopolitical tensions. Furthermore, the pivot toward orbital data centers introduces an entirely new vector for artificial intelligence infrastructure investments. By situating data centers in low Earth orbit, SpaceX and Tesla aim to circumvent the terrestrial power grid constraints that currently plague traditional hyperscale deployments. This effectively merges the aerospace and semiconductor industries into a single unified infrastructure stack.</p>
+          </div>
         </div>
 
         <!-- Technical Deep Dive -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">🔬</span>
-            <span class="sub-lbl c1">Technical Deep Dive</span>
-            <span class="sub-tag l-c1 c1">Hardware Specs</span>
-          </div>
-          <p class="body" style="margin-bottom:12px">The technical deployment scales regional capacity from a baseline of zero at the decommissioned site to an unprecedented 10 gigawatts, representing a foundational shift in how power provisioning is structured for artificial intelligence campuses.</p>
-          <div style="overflow-x:auto">
-            <table class="tbl">
-              <thead><tr><th>Metric</th><th>Value &amp; Generation Tag</th><th>Notes</th></tr></thead>
-              <tbody>
-                <tr><td>Total Power Generation Capacity</td><td style="font-family:var(--mono);font-weight:700;color:var(--c1)">10 GW (New Infrastructure)</td><td>Planning to build 10 gigawatts of new power generation</td></tr>
-                <tr><td>Natural Gas Generation Component</td><td style="font-family:var(--mono);font-weight:700;color:var(--c1)">9.2 GW (Turbine Fleet)</td><td>Including 9.2 GW of natural gas generation</td></tr>
-                <tr><td>Transmission Infrastructure Investment</td><td style="font-family:var(--mono);font-weight:700">$4.2 Billion</td><td>Investing $4.2B specifically with AEP Ohio for transmission</td></tr>
-                <tr><td>Data Center Capacity Target</td><td style="font-family:var(--mono);font-weight:700">10 GW (Compute Load)</td><td>Development of a massive 10 GW data center complex</td></tr>
-                <tr><td>Japanese Capital Injection</td><td style="font-family:var(--mono);font-weight:700;color:var(--c1)">$33.3 Billion (Generation Funding)</td><td>Includes $33.3B in Japanese funding specifically for generation assets</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <!-- Partnership flow diagram -->
-          <p class="body" style="margin:14px 0 10px;font-weight:600">Partnership Structure &amp; Capital Flow</p>
-          <div class="diag-flow">
-            <div class="diag-node l-c1"><div class="diag-node-title c1">🇯🇵 SoftBank / SB Energy</div><div class="diag-node-sub">$33.3B Japanese Capital<br/>U.S.-Japan STA</div></div>
-            <div class="diag-arrow">→</div>
-            <div class="diag-node" style="background:var(--c1);border-color:var(--c1);"><div class="diag-node-title" style="color:#fff;font-size:12px">Portsmouth Site<br/>Pike County, Ohio</div><div class="diag-node-sub" style="color:rgba(255,255,255,.75)">Former Uranium Enrichment<br/>10 GW Data Center</div></div>
-            <div class="diag-arrow">→</div>
-            <div class="diag-node l-c1"><div class="diag-node-title c1">🏭 AEP Ohio</div><div class="diag-node-sub">$4.2B Transmission<br/>Ratepayer Protected</div></div>
-            <div class="diag-arrow">→</div>
-            <div class="diag-node l-c1"><div class="diag-node-title c1">☁️ Hyperscalers</div><div class="diag-node-sub">Guaranteed Base-Load<br/>Compute Power</div></div>
-          </div>
-          <div class="chart-w">
-            <canvas id="ohioChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Visual / Evidence -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">📋</span>
-            <span class="sub-lbl c1">Visual / Evidence</span>
-          </div>
-          <p class="body" style="margin-bottom:8px">No official visual found. Source traceability: <strong>10 GW Power Generation — U.S. Department of Energy — Facility Infrastructure.</strong> Primary URL verified. Cross-verified via AP News.</p>
-          <div class="qblock">
-            <p>"The project leverages federal assets to add power generation and jobs, ensuring U.S. leadership in the AI race while keeping consumer costs down."</p>
-            <div class="qattr">— Chris Wright, U.S. Energy Secretary, U.S. Department of Energy</div>
-          </div>
-        </div>
-
-        <!-- Critical View -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">⚠️</span>
-            <span class="sub-lbl c1">Critical View</span>
-          </div>
-          <p class="body">While the sheer scale of a 10-gigawatt data center elegantly resolves immediate power constraints on paper, the project faces profound physical implementation and regulatory execution risks. The explicit reliance on 9.2 gigawatts of natural gas turbines introduces severe long-term carbon emission liabilities, which directly conflicts with the aggressive net-zero and carbon-negative sustainability commitments historically championed by major cloud service providers and hyperscalers. Furthermore, distributing 9.2 gigawatts of natural gas generation across the region, coupled with the absolute necessity of upgrading transmission lines through AEP Ohio, subjects the project to environmental impact assessments, right-of-way acquisitions, and the broader interconnection queue dynamics of the PJM territory. Local opposition to massive data center water and power consumption is already mounting globally, presenting a substantial risk of litigation or ballot initiatives aimed at halting mega-facilities. Investors must price in the probability of multi-year construction delays, recognizing that securing capital and turbines is merely the initial phase of a highly complex logistical deployment.</p>
-        </div>
-
-        <!-- Community Sentiment -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">💬</span>
-            <span class="sub-lbl c1">Community Sentiment</span>
-          </div>
-          <div class="sgrid">
-            <div class="scard l-c4"><div class="semoji">🏛️</div><div class="slbl c4">U.S. Government: Committed</div><div class="sdesc">DOE + Commerce formal partnership signals sovereign-level prioritization of AI power infrastructure</div></div>
-            <div class="scard l-c2"><div class="semoji">🌿</div><div class="slbl c2">Environmental Groups: Critical</div><div class="sdesc">9.2 GW fossil fuel reliance conflicts with net-zero pledges; litigation and ballot initiatives anticipated</div></div>
-            <div class="scard l-c1"><div class="semoji">📈</div><div class="slbl c1">Hyperscalers: Fundamentally Recalibrating</div><div class="sdesc">Sovereign-backed power guarantee sets unprecedented new baseline for hyperscale infrastructure capital models</div></div>
-          </div>
-        </div>
-
-      </div>
-    </article>
-
-    <!-- ═══════════════════════════════════
-         ARTICLE 2 · Supermicro Indictment
-    ════════════════════════════════════ -->
-    <article class="article" id="smci">
-      <div class="art-hdr" style="border-bottom:3px solid var(--c2)">
-        <div>
-          <div class="art-num c2">02 / Supply Chain &amp; Legal</div>
-          <h2 class="art-title">Federal Indictment of Supermicro Executives for Multibillion-Dollar AI Hardware Export Diversion</h2>
-        </div>
-        <span class="art-badge bg-c2" style="color:#fff">HIGH RISK</span>
-      </div>
-      <div class="art-meta">
-        <span class="meta-i">📅 March 19, 2026</span>
-        <span class="meta-dot"></span>
-        <span class="meta-i">Source: U.S. Department of Justice</span>
-        <span class="meta-dot"></span>
-        <span class="conf-badge l-c4 c4">⬤ HIGH Confidence</span>
-        <span class="conf-badge" style="background:#FEF3C7;color:#92400E;margin-left:4px">7-Day Exception Applied</span>
-      </div>
-      <div class="art-body">
-
-        <!-- Overview -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">🔭</span>
-            <span class="sub-lbl c2">Overview</span>
-          </div>
-          <p class="lead">The global proliferation of frontier artificial intelligence hardware has been tightly constrained by United States export controls, creating a highly lucrative black market for advanced accelerators and dense compute server racks.</p>
-          <p class="body">The core structural breach in this geopolitical containment framework was exposed through the unsealing of a federal indictment against Yih-Shyan "Wally" Liaw, a co-founder, board member, and Senior Vice President of an entity identified by media reports as Super Micro Computer, Inc. (Supermicro), alongside two other associates. The Department of Justice charges them with conspiring to unlawfully divert sophisticated U.S. artificial intelligence technology to China. This systemic transshipment scheme allegedly utilized front companies in Southeast Asia, deeply falsified end-user documentation, sophisticated repackaging logistics, and thousands of non-functional "dummy" servers to deceive federal auditors and internal compliance teams. Through these evasion tactics, the conspirators successfully diverted approximately 2.5 billion dollars worth of servers integrating restricted graphics processing units between 2024 and 2025.</p>
-          <p class="body">The immediate market and industry reaction has been severe and deeply destabilizing; the implicated manufacturer's equity valuation cratered by roughly 28 percent within hours of the announcement, prompting widespread supply chain anxieties as hyperscale clients and enterprise customers urgently reassess their reliance on the original equipment manufacturer amid fears of intensified governmental oversight.</p>
-        </div>
-
-        <!-- Metric cards -->
-        <div class="mrow m4">
-          <div class="mcard"><div class="mval c2">$2.5B</div><div class="mlbl">Total Server Value</div><div class="msub">2024–2025 diversion scheme</div></div>
-          <div class="mcard"><div class="mval c2">$510M</div><div class="mlbl">6-Week Window</div><div class="msub">April–May 2025 confirmed</div></div>
-          <div class="mcard"><div class="mval c2">−28%</div><div class="mlbl">Equity Collapse</div><div class="msub">Within hours of announcement</div></div>
-          <div class="mcard"><div class="mval" style="color:var(--ink);font-size:16px">20 Years</div><div class="mlbl">Max Sentence</div><div class="msub">Export Controls Reform Act</div></div>
-        </div>
-
-        <!-- Strategic Impact -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">⚡</span>
-            <span class="sub-lbl c2">Strategic Impact</span>
-          </div>
-          <div class="impact l-c2" style="border-left-color:var(--c2)">
-            <p class="body" style="color:var(--ink)">The unsealed indictment introduces catastrophic regulatory and supply chain risks that threaten to severely devalue current infrastructure dependencies on Supermicro. Although the company itself was not named as a direct defendant in the criminal proceedings, the deep involvement of a co-founder and sitting board member implicates the highest levels of corporate governance, validating long-standing external concerns regarding the firm's internal compliance controls. For capital allocators and enterprise chief technology officers, this event fundamentally alters the risk premium assigned to Supermicro-integrated clusters.</p>
-          </div>
-          <p class="body" style="margin-top:10px">Hyperscale providers and sovereign entities must now anticipate that federal agencies, specifically the Bureau of Industry and Security (BIS), will mandate exceedingly stringent compliance monitors, friction-heavy supply chain audits, and prolonged licensing reviews for all future hardware procurements originating from Supermicro. This introduces a high probability of delivery delays for critical, time-sensitive liquid-cooled AI racks. Consequently, competing Tier 1 original equipment manufacturers such as Dell Technologies, Hewlett Packard Enterprise, and Lenovo are structurally positioned to capture massive market share as enterprises actively migrate their procurement pipelines to de-risk their infrastructure build-outs. Furthermore, the sheer scale of the diversion—highlighted by a specific $510 million window between April and May 2025—exposes the profound vulnerabilities in global export control enforcement. This increases the likelihood that the U.S. Commerce Department will implement draconian, hardware-level cryptographic locking mechanisms or continuous remote telemetry mandates on all future exported silicon to definitively halt secondary market transshipment.</p>
-        </div>
-
-        <!-- Technical Deep Dive -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">🔬</span>
-            <span class="sub-lbl c2">Technical Deep Dive</span>
-            <span class="sub-tag l-c2 c2">Indictment Metrics</span>
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">🔬</span>
+            <span class="subsec-label c1">Technical Deep Dive</span>
+            <span class="subsec-tag lc1 c1">Hardware Specifications</span>
           </div>
           <div style="overflow-x:auto">
-            <table class="tbl">
-              <thead><tr><th>Metric</th><th>Value / Detail</th><th>Strategic Implication</th></tr></thead>
+            <table class="info-table">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>Specification</th>
+                  <th>Generation Context</th>
+                  <th>Verified</th>
+                </tr>
+              </thead>
               <tbody>
-                <tr><td>Total Value of Diverted AI Servers</td><td style="font-family:var(--mono);font-weight:700;color:var(--c2)">$2.5 Billion (2024–2025)</td><td>Total purchase volume within the scheme; not all confirmed diverted</td></tr>
-                <tr><td>Specific Window Diversion Value</td><td style="font-family:var(--mono);font-weight:700;color:var(--c2)">$510M (Apr–May 2025)</td><td>At least $510M worth of servers successfully diverted to China in this window</td></tr>
-                <tr><td>Evasion Hardware Tactics</td><td style="font-family:var(--mono);font-weight:700">Thousands of "Dummy" Servers</td><td>Non-working physical replicas staged for compliance auditors</td></tr>
-                <tr><td>Criminal Conspiracy Charges</td><td style="font-family:var(--mono);font-weight:700">Max 20 Years Imprisonment</td><td>Conspiring to violate Export Controls Reform Act</td></tr>
+                <tr>
+                  <td>Process Node</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c1)">Advanced 2nm AI chips</td>
+                  <td>Facility Process Node</td>
+                  <td>✓ Yes</td>
+                </tr>
+                <tr>
+                  <td>Monthly Wafer Output</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c1)">100,000 wafer starts/mo</td>
+                  <td>Facility Target Output</td>
+                  <td>✓ Yes</td>
+                </tr>
+                <tr>
+                  <td>Annual Chip Volume</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c1)">100–200 billion chips/yr</td>
+                  <td>Facility Target Output</td>
+                  <td>✓ Yes</td>
+                </tr>
+                <tr>
+                  <td>Annual Power Output</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c1)">1 Terawatt/year</td>
+                  <td>Facility Output</td>
+                  <td>✓ Yes</td>
+                </tr>
+                <tr>
+                  <td>AI5 Compute vs AI4</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:#78350F">40x–50x more compute</td>
+                  <td>AI5 vs AI4 — mlq.ai</td>
+                  <td>⚠ Single-source unverified</td>
+                </tr>
+                <tr>
+                  <td>AI5 Memory vs AI4</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:#78350F">9x more memory</td>
+                  <td>AI5 vs AI4 — mlq.ai</td>
+                  <td>⚠ Single-source unverified</td>
+                </tr>
+                <tr>
+                  <td>AI6 Single Chip Throughput</td>
+                  <td style="font-family:var(--mono);font-weight:700">Match dual SoC AI5</td>
+                  <td>AI6 vs AI5 — teslarati.com</td>
+                  <td>✓ Yes</td>
+                </tr>
               </tbody>
             </table>
           </div>
-          <!-- Evasion methodology cards -->
-          <p class="body" style="margin:14px 0 10px;font-weight:600">Alleged Evasion Methodology</p>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0">
-            <div style="background:var(--c2-l);border:1px solid var(--c2-b);border-radius:8px;padding:14px">
-              <div style="font-size:22px;margin-bottom:8px">🖥️</div>
-              <div style="font-size:12px;font-weight:700;color:var(--c2);margin-bottom:4px">Dummy Servers</div>
-              <div style="font-size:11.5px;color:var(--ink-2);line-height:1.5">Thousands of non-working physical replicas staged for internal compliance auditors to inspect</div>
-            </div>
-            <div style="background:var(--c2-l);border:1px solid var(--c2-b);border-radius:8px;padding:14px">
-              <div style="font-size:22px;margin-bottom:8px">📦</div>
-              <div style="font-size:12px;font-weight:700;color:var(--c2);margin-bottom:4px">Repackaging Logistics</div>
-              <div style="font-size:11.5px;color:var(--ink-2);line-height:1.5">Sophisticated repackaging with falsified end-user documentation to obscure true China destination</div>
-            </div>
-            <div style="background:var(--c2-l);border:1px solid var(--c2-b);border-radius:8px;padding:14px">
-              <div style="font-size:22px;margin-bottom:8px">🏭</div>
-              <div style="font-size:12px;font-weight:700;color:var(--c2);margin-bottom:4px">SE Asia Front Companies</div>
-              <div style="font-size:11.5px;color:var(--ink-2);line-height:1.5">Front companies in Southeast Asia utilized to route hardware before final diversion to end-users in China</div>
-            </div>
-          </div>
-          <div class="chart-w">
-            <canvas id="smciChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Visual / Evidence -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">📋</span>
-            <span class="sub-lbl c2">Visual / Evidence</span>
-          </div>
-          <p class="body" style="margin-bottom:8px">No official visual found. Source: U.S. Department of Justice — Primary URL verified. Cross-verified via Supermicro Investor Relations statement.</p>
-          <div class="qblock">
-            <p>"The defendants participated in a systematic scheme to divert massive quantities of U.S. artificial intelligence technology to customers in China through a tangled web of lies, obfuscation, and concealment."</p>
-            <div class="qattr">— Jay Clayton, U.S. Attorney for the Southern District of New York, U.S. Attorney's Office (SDNY)</div>
-          </div>
-        </div>
-
-        <!-- Critical View -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">⚠️</span>
-            <span class="sub-lbl c2">Critical View</span>
-          </div>
-          <p class="body">This indictment exposes the fragile, easily manipulated reality of geographic containment strategies in the artificial intelligence sector. From a critical standpoint, the fact that thousands of dummy servers and simple hair dryers used to swap serial number stickers could successfully defeat U.S. Department of Commerce physical inspections demonstrates an alarming lack of technical sophistication and rigor in current regulatory audit protocols. The long-term consequence of this enforcement failure will likely be a massive overcorrection by regulatory bodies, potentially resulting in the deployment of restrictive blanket export limits that inadvertently penalize compliant enterprises operating in allied nations. For investors, the immediate litigation risk to Supermicro is immense; shareholder class-action lawsuits are inevitable, and the potential for severe monetary fines or temporary export license revocations by the U.S. government remains a non-zero probability that could entirely paralyze the company's global production pipelines.</p>
-        </div>
-
-        <!-- Community Sentiment -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">💬</span>
-            <span class="sub-lbl c2">Community Sentiment</span>
-          </div>
-          <div class="sgrid">
-            <div class="scard l-c2"><div class="semoji">📉</div><div class="slbl c2">Equity Markets: Shock</div><div class="sdesc">~28% market cap collapse within hours; systemic repricing of OEM counterparty risk across sector</div></div>
-            <div class="scard" style="background:#FEF3C7;border-color:#FDE68A"><div class="semoji">🏛️</div><div class="slbl" style="color:#92400E">DOJ/BIS: Aggressive Posture</div><div class="sdesc">Clear signal of willingness to pierce corporate veil and target C-suite executives directly for export violations</div></div>
-            <div class="scard l-c3"><div class="semoji">🔄</div><div class="slbl c3">Dell / HPE / Lenovo: Opportunity</div><div class="sdesc">Tier-1 OEMs structurally positioned to capture massive market share as enterprises migrate procurement pipelines</div></div>
-          </div>
-        </div>
-
-      </div>
-    </article>
-
-    <!-- ═══════════════════════════════════
-         ARTICLE 3 · White House AI Framework
-    ════════════════════════════════════ -->
-    <article class="article" id="whitehouse">
-      <div class="art-hdr" style="border-bottom:3px solid var(--c3)">
-        <div>
-          <div class="art-num c3">03 / Policy &amp; Regulation</div>
-          <h2 class="art-title">White House Releases National AI Legislative Framework Prioritizing State Preemption and Infrastructure</h2>
-        </div>
-        <span class="art-badge bg-c3" style="color:#fff">NON-BINDING</span>
-      </div>
-      <div class="art-meta">
-        <span class="meta-i">📅 March 20, 2026</span>
-        <span class="meta-dot"></span>
-        <span class="meta-i">Source: The White House</span>
-        <span class="meta-dot"></span>
-        <span class="conf-badge l-c4 c4">⬤ HIGH Confidence</span>
-        <span class="conf-badge l-c3 c3" style="margin-left:4px">Legislative Framework — Not Binding</span>
-      </div>
-      <div class="art-body">
-
-        <!-- Overview -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">🔭</span>
-            <span class="sub-lbl c3">Overview</span>
-          </div>
-          <p class="lead">The proliferation of discordant state-level artificial intelligence regulations has threatened to fragment the domestic market and stifle rapid infrastructure scaling.</p>
-          <p class="body">In response, the White House has released a comprehensive National Policy Framework for Artificial Intelligence, providing a legislative blueprint for Congress. The framework addresses six key policy areas—protecting children and empowering parents, safeguarding American communities, respecting intellectual property rights, preventing censorship, enabling innovation and ensuring AI dominance, and supporting American workers—as outlined in the administration's official release. The core strategic element is the administration's explicit recommendation that Congress preempt state-level artificial intelligence laws that impose undue burdens on innovation or infrastructure deployment, seeking to establish a singular, predictable national standard. White House AI and Crypto Czar David Sacks characterized the proposal as a direct response to a growing patchwork of fifty different state regulatory regimes that threaten to stifle innovation and jeopardize America's lead in the AI race.</p>
-          <p class="body">Furthermore, the framework directly addresses the physical constraints of the sector by urging Congress to streamline the federal permitting process specifically for data centers and co-located power generation facilities. The immediate reaction from the technology sector and federal lawmakers has been polarized; while House leadership swiftly endorsed the framework's deregulatory and pro-innovation posture, coalition groups of state lawmakers and congressional opponents have already begun mobilizing counter-legislation to protect state regulatory autonomy.</p>
-        </div>
-
-        <!-- Strategic Impact -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">⚡</span>
-            <span class="sub-lbl c3">Strategic Impact</span>
-          </div>
-          <div class="impact l-c3" style="border-left-color:var(--c3)">
-            <p class="body" style="color:var(--ink)">This legislative framework proposes a highly favorable environment for capital allocators by seeking to eliminate the compliance friction of fifty separate state regulatory regimes. If passed, the preemption of state laws would drastically lower the legal risk premium associated with deploying agentic artificial intelligence systems domestically. Furthermore, the specific emphasis on streamlining data center permitting signals strong federal backing for the massive capital expenditure cycles currently underway by cloud service providers.</p>
-          </div>
-          <p class="body" style="margin-top:10px">However, because this is merely a legislative recommendation, investors must recognize that these protections are not binding now and face a highly contested, protracted legislative battle before any statutory certainty is achieved. It is worth noting that Congress has already declined to include similar federal preemption provisions on two prior occasions—within the One Big Beautiful Bill Act and the FY26 National Defense Authorization Act—signaling that the path to passage faces substantial structural resistance independent of partisan dynamics.</p>
-        </div>
-
-        <!-- Technical Deep Dive -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">🔬</span>
-            <span class="sub-lbl c3">Technical Deep Dive</span>
-            <span class="sub-tag l-c3 c3">Regulatory Comparison</span>
-          </div>
-          <p class="body" style="margin-bottom:12px">Not Disclosed in Source (This is a macroeconomic policy framework, not a hardware release). Key regulatory contrast between current fragmented landscape and proposed federal approach:</p>
-          <div style="overflow-x:auto">
-            <table class="tbl">
-              <thead><tr><th>Policy Domain</th><th>Current (State-Level)</th><th>Proposed (Federal Framework)</th></tr></thead>
-              <tbody>
-                <tr><td>Jurisdiction</td><td>Fragmented across 50 states (CO, CA, TX, UT, etc.)</td><td>Singular national standard — seeks to preempt all state AI laws</td></tr>
-                <tr><td>Data Center Permitting</td><td>Subject to local zoning, environmental reviews</td><td>Streamlined federal permitting specifically for AI data centers</td></tr>
-                <tr><td>Copyright / Training Data</td><td>Varying restrictions, emerging legislative threats</td><td>Defers to judicial processes; preserves current LLM training paradigms</td></tr>
-                <tr><td>Innovation Regulatory Risk</td><td>50 separate compliance regimes</td><td>Regulatory sandboxes; light-touch innovation-first approach</td></tr>
-                <tr><td>Legal Certainty Status</td><td>Active and enforceable</td><td>Non-binding framework — requires congressional passage</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="chart-w">
-            <canvas id="policyChart"></canvas>
-          </div>
-          <!-- Legislative risk timeline -->
-          <p class="body" style="margin:14px 0 10px;font-weight:600">Legislative Risk Timeline</p>
-          <div class="tline">
-            <div class="titem" style="--dot-c:var(--c3)">
-              <div class="tdate c3">March 20, 2026</div>
-              <div class="ttxt">White House National AI Legislative Framework released — non-binding, sent to Congress as blueprint</div>
-            </div>
-            <div class="titem">
-              <div class="tdate c3">Near-Term (2026)</div>
-              <div class="ttxt">House Democrats introduce GUARDIANS Act to prohibit federal preemption; Colorado SB 24-205 enforcement (June 30, 2026) remains active</div>
-            </div>
-            <div class="titem">
-              <div class="tdate c3">Q3–Q4 2026 (Projected)</div>
-              <div class="ttxt">Congressional floor debate required; Commerce Clause litigation anticipated from CO, CA state attorneys general</div>
-            </div>
-            <div class="titem">
-              <div class="tdate c3">12–18 Month Horizon</div>
-              <div class="ttxt">Minimum modeled timeline before framework materializes into enforceable law; current state regulations remain fully active</div>
-            </div>
-          </div>
-          <div class="warn">⚠ Prior congressional rejection of analogous preemption provisions in two prior legislative vehicles this session signals exceptionally high execution risk</div>
-        </div>
-
-        <!-- Visual / Evidence -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">📋</span>
-            <span class="sub-lbl c3">Visual / Evidence</span>
-          </div>
-          <p class="body" style="margin-bottom:8px">No official visual found. Source: The White House — Primary URL verified. Cross-verified via Sullivan &amp; Cromwell LLP legislative memo.</p>
-          <div class="qblock">
-            <p>"This was in response to a growing patchwork of 50 different state regulatory regimes that threaten to stifle innovation and jeopardize America's lead in the AI race."</p>
-            <div class="qattr">— David Sacks, White House AI and Crypto Czar, The White House</div>
-          </div>
-        </div>
-
-        <!-- Critical View -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">⚠️</span>
-            <span class="sub-lbl c3">Critical View</span>
-          </div>
-          <p class="body">The framework's reliance on congressional action renders its immediate practical impact severely limited. The explicit call to preempt state laws has already triggered fierce political resistance, notably culminating in the introduction of the Guaranteeing and Upholding Americans' Right to Decide Responsible AI Laws and Standards Act by House Democrats, which specifically seeks to prohibit federal preemptive action on state-level AI laws. Investors must price in the reality of a deadlocked Congress; the probability of passing sweeping, preemptive federal legislation in a highly polarized political environment is exceptionally low, a risk compounded by the fact that two prior legislative vehicles in the current session have already shed analogous preemption provisions under negotiation pressure. The current patchwork of state regulations will therefore likely persist in the near to medium term regardless of this framework's policy ambitions.</p>
-        </div>
-
-        <!-- Community Sentiment -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">💬</span>
-            <span class="sub-lbl c3">Community Sentiment</span>
-          </div>
-          <div class="sgrid">
-            <div class="scard l-c4"><div class="semoji">🏭</div><div class="slbl c4">Tech Industry / CTA / ITI: Supportive</div><div class="sdesc">Publicly lauded as critical for U.S. competitiveness and CapEx certainty for multi-billion dollar build-out cycles</div></div>
-            <div class="scard l-c2"><div class="semoji">⚖️</div><div class="slbl c2">State Lawmakers: Resistant</div><div class="sdesc">CO, CA AGs likely to challenge preemption; GUARDIANS Act introduced specifically to block federal override</div></div>
-            <div class="scard l-c3"><div class="semoji">📊</div><div class="slbl c3">Institutional Investors: Wait &amp; See</div><div class="sdesc">Positive regulatory signal but non-binding status and prior congressional rejection delays material reallocation 12–18 months</div></div>
-          </div>
-        </div>
-
-      </div>
-    </article>
-
-    <!-- ═══════════════════════════════════
-         ARTICLE 4 · NVIDIA Vera Rubin
-    ════════════════════════════════════ -->
-    <article class="article" id="nvidia">
-      <div class="art-hdr" style="border-bottom:3px solid var(--c4)">
-        <div>
-          <div class="art-num c4">04 / Hardware Roadmap</div>
-          <h2 class="art-title">NVIDIA Unveils Vera Rubin Platform Advancing Agentic AI Infrastructure</h2>
-        </div>
-        <span class="art-badge bg-c4" style="color:#fff">GTC 2026</span>
-      </div>
-      <div class="art-meta">
-        <span class="meta-i">📅 March 16, 2026</span>
-        <span class="meta-dot"></span>
-        <span class="meta-i">Source: NVIDIA</span>
-        <span class="meta-dot"></span>
-        <span class="conf-badge l-c4 c4">⬤ HIGH Confidence</span>
-        <span class="conf-badge" style="background:#FEF3C7;color:#92400E;margin-left:4px">7-Day Exception Applied</span>
-      </div>
-      <div class="art-body">
-
-        <!-- Overview -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">🔭</span>
-            <span class="sub-lbl c4">Overview</span>
-          </div>
-          <p class="lead">The artificial intelligence industry's rapid transition from static generative large language models to dynamic, multi-step agentic reasoning architectures has critically overwhelmed the memory bandwidth and inference latency capabilities of the current Blackwell generation.</p>
-          <p class="body">Addressing this severe infrastructural bottleneck, NVIDIA officially unveiled the Vera Rubin platform at the GTC 2026 conference, representing an unprecedented generational leap comprised of seven newly integrated, purpose-built chips engineered to operate as a singular AI supercomputer. The decisive technical shift relies on the massive deployment of next-generation HBM4 memory on the Rubin GPU, the introduction of the Vera custom-Arm CPU optimized specifically for deterministic reasoning, and the critical integration of Groq 3 LPX inference accelerators to radically enhance token-generation speeds. This co-engineered architecture drastically lowers the cost per token while fundamentally altering data center thermodynamics by mandating extreme-density liquid cooling topologies.</p>
-          <p class="body">The immediate reaction from tier-one hardware integrators and global hyperscalers has been a rapid architectural realignment, as the platform's unparalleled efficiency and scale-up capacity establish an uncompromising new baseline for all future capital-intensive AI factory build-outs.</p>
-        </div>
-
-        <!-- Metric cards -->
-        <div class="mrow m4">
-          <div class="mcard"><div class="mval c4">50 PFLOPS</div><div class="mlbl">Rubin GPU FP4</div><div class="msub">5× faster than Blackwell</div></div>
-          <div class="mcard"><div class="mval c4">288 GB</div><div class="mlbl">HBM4 per GPU</div><div class="msub">22 TB/s bandwidth</div></div>
-          <div class="mcard"><div class="mval c4">260 TB/s</div><div class="mlbl">NVL72 Interconnect</div><div class="msub">NVLink 6, 3.6 TB/s per GPU</div></div>
-          <div class="mcard"><div class="mval c4">1/10×</div><div class="mlbl">Cost per Token</div><div class="msub">vs Blackwell baseline</div></div>
-        </div>
-
-        <!-- Strategic Impact -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">⚡</span>
-            <span class="sub-lbl c4">Strategic Impact</span>
-          </div>
-          <div class="impact l-c4" style="border-left-color:var(--c4)">
-            <p class="body" style="color:var(--ink)">The commercial introduction of the Vera Rubin platform structurally accelerates the depreciation timeline of existing Hopper and Blackwell clusters. By delivering an order-of-magnitude reduction in inference costs—specifically one-tenth the cost per million tokens compared to Blackwell—NVIDIA effectively forces cloud service providers to aggressively upgrade their fleets to remain economically competitive in the high-margin agentic AI hosting market. For capital allocators, this platform deployment signals the definitive end of modular, air-cooled, incremental rack upgrades; the Vera Rubin NVL72 architecture demands holistic, liquid-cooled, multi-megawatt data center overhauls.</p>
-          </div>
-          <p class="body" style="margin-top:10px">Strategically, the deep integration of the Vera CPU represents NVIDIA's most aggressive encroachment into the traditional x86 server market to date. By providing a unified, high-bandwidth memory space between CPU and GPU, NVIDIA directly threatens the long-term data center orchestration dominance of Intel and AMD. Furthermore, the inclusion of the Groq 3 LPX within the official NVIDIA platform architecture neutralizes a major competitive threat in the ultra-low-latency inference sector, ensuring NVIDIA captures and monetizes the entirety of the value chain for agentic AI workloads. However, the extreme physical power density of these systems introduces severe deployment friction, directly tying the financial success of the platform to the industry's collective ability to secure gigawatt-scale utility agreements and resilient advanced liquid-cooling supply chains.</p>
-        </div>
-
-        <!-- Technical Deep Dive -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">🔬</span>
-            <span class="sub-lbl c4">Technical Deep Dive</span>
-            <span class="sub-tag l-c4 c4">7-Chip Architecture</span>
-          </div>
-          <!-- 7-chip architecture diagram -->
-          <p class="body" style="margin-bottom:12px;font-weight:600">Vera Rubin Platform — 7-Chip Integrated Architecture</p>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:12px 0">
-            <div style="background:var(--c4);border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;font-weight:700;color:#fff">Vera CPU</div><div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:3px">88 custom-Arm cores<br/>Unified HBM4 memory space</div></div>
-            <div style="background:var(--c4);border-radius:8px;padding:12px;text-align:center;opacity:.9"><div style="font-size:11px;font-weight:700;color:#fff">Rubin GPU</div><div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:3px">288GB HBM4 / 22TB/s<br/>50 PFLOPS FP4</div></div>
-            <div style="background:#047857;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;font-weight:700;color:#fff">Groq 3 LPX</div><div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:3px">128GB SRAM/rack<br/>640 TB/s scale-up</div></div>
-            <div style="background:var(--c4-l);border:1px solid var(--c4-b);border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;font-weight:700;color:var(--c4)">NVLink Switch 6</div><div style="font-size:10px;color:var(--ink-3);margin-top:3px">3.6 TB/s per GPU<br/>260 TB/s rack</div></div>
-            <div style="background:var(--c4-l);border:1px solid var(--c4-b);border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;font-weight:700;color:var(--c4)">ConnectX-9 SuperNIC</div><div style="font-size:10px;color:var(--ink-3);margin-top:3px">Scale-out<br/>fabric interconnect</div></div>
-            <div style="background:var(--c4-l);border:1px solid var(--c4-b);border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;font-weight:700;color:var(--c4)">BlueField-4 DPU</div><div style="font-size:10px;color:var(--ink-3);margin-top:3px">Data-plane processing<br/>security offload</div></div>
-            <div style="background:var(--c4-l);border:1px solid var(--c4-b);border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;font-weight:700;color:var(--c4)">NVLink-C2C</div><div style="font-size:10px;color:var(--ink-3);margin-top:3px">Chip-to-chip<br/>die integration</div></div>
-          </div>
-          <div style="overflow-x:auto;margin-top:16px">
-            <table class="tbl">
-              <thead><tr><th>Metric</th><th>Value</th><th>Comparison vs Blackwell</th></tr></thead>
-              <tbody>
-                <tr><td>GPU Compute (FP4)</td><td style="font-family:var(--mono);font-weight:700;color:var(--c4)">50 PFLOPS</td><td>5× faster FP4 inference</td></tr>
-                <tr><td>Rack Compute (NVL72 FP32)</td><td style="font-family:var(--mono);font-weight:700">28,800 TFLOPS</td><td>Uses ¼ the GPUs for MoE training</td></tr>
-                <tr><td>GPU Memory / Bandwidth</td><td style="font-family:var(--mono);font-weight:700">288GB HBM4 / 22 TB/s</td><td>Massive leap in bandwidth density</td></tr>
-                <tr><td>Rack Memory (NVL72)</td><td style="font-family:var(--mono);font-weight:700">20.7 TB HBM4 / 1,580 TB/s</td><td>Full memory coherence across 72 GPUs</td></tr>
-                <tr><td>GPU Interconnect (NVLink 6)</td><td style="font-family:var(--mono);font-weight:700">3.6 TB/s per GPU</td><td>260 TB/s rack-level scaleup</td></tr>
-                <tr><td>Groq 3 LPX (per rack)</td><td style="font-family:var(--mono);font-weight:700">128GB SRAM / 640 TB/s</td><td>Native co-integration into Rubin rack</td></tr>
-                <tr><td>Vera CPU Cores</td><td style="font-family:var(--mono);font-weight:700">88 custom-Arm cores</td><td>Replaces x86 CPU orchestration layer</td></tr>
-                <tr><td>Inference Cost per Token</td><td style="font-family:var(--mono);font-weight:700">1/10× vs Blackwell</td><td>10× higher inference throughput per watt</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="chart-w">
-            <canvas id="nvidiaChart"></canvas>
-          </div>
-          <!-- Spec bars -->
-          <div class="spec-compare" style="margin-top:16px">
-            <div class="spec-row"><span class="spec-lbl">GPU FP4 (PFLOPS)</span><div class="spec-bw"><div class="spec-b bg-c4" style="width:100%"></div></div><span class="spec-v c4">50 PF</span></div>
-            <div class="spec-row"><span class="spec-lbl">HBM4 Bandwidth</span><div class="spec-bw"><div class="spec-b bg-c4" style="width:88%"></div></div><span class="spec-v c4">22 TB/s</span></div>
-            <div class="spec-row"><span class="spec-lbl">NVL72 Interconnect</span><div class="spec-bw"><div class="spec-b bg-c4" style="width:80%"></div></div><span class="spec-v c4">260 TB/s</span></div>
-            <div class="spec-row"><span class="spec-lbl">Groq Scale-Up BW</span><div class="spec-bw"><div class="spec-b" style="width:95%;background:#047857"></div></div><span class="spec-v c4">640 TB/s</span></div>
-            <div class="spec-row"><span class="spec-lbl">Cost vs Blackwell</span><div class="spec-bw"><div class="spec-b" style="width:70%;background:#065f46"></div></div><span class="spec-v c4">1/10×</span></div>
-          </div>
-        </div>
-
-        <!-- Visual / Evidence -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">📋</span>
-            <span class="sub-lbl c4">Visual / Evidence</span>
-          </div>
-          <p class="body" style="margin-bottom:8px">No official visual found. Source: NVIDIA — Primary URL verified. Specs including 50 PFLOPS, 288GB HBM4, 22 TB/s bandwidth, and 88-core Vera CPU derived from secondary NVIDIA Developer blog URL.</p>
-          <div class="qblock">
-            <p>"Vera Rubin is a generational leap built to power every phase of AI, kicking off the greatest infrastructure buildout in history."</p>
-            <div class="qattr">— Jensen Huang, Founder and CEO, NVIDIA</div>
-          </div>
-          <div class="qblock">
-            <p>"With the NVIDIA Vera Rubin platform, HPE is building the next generation of secure, AI-native infrastructure, turning data into intelligence."</p>
-            <div class="qattr">— Antonio Neri, President and CEO, HPE (HPE Press Release, March 2026)</div>
-          </div>
-        </div>
-
-        <!-- Critical View -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">⚠️</span>
-            <span class="sub-lbl c4">Critical View</span>
-          </div>
-          <p class="body">While the on-paper computational specifications of the Vera Rubin platform are historically unprecedented, executing this architecture introduces monumental supply chain and physics-based bottlenecks. The extreme reliance on next-generation HBM4 memory places the entirety of NVIDIA's delivery schedule at the mercy of TSMC's CoWoS advanced packaging capacity constraints and the unproven memory yield curves of suppliers like SK Hynix and Micron. Furthermore, the thermodynamic reality of the NVL72 rack—generating immense heat densities estimated upwards of 1.8kW per GPU—dictates that the total addressable market for immediate deployment is constrained exclusively to operators possessing state-of-the-art liquid-cooling infrastructure. Any systemic delays in the broader commercialization of direct-to-chip cooling loops, manifold systems, or heavy-duty power delivery units (PDUs) will trap these high-value chips in warehouses. This threatens to delay the realization of return on investment for hyperscalers and could shift NVIDIA's near-term revenue recognition projections into much later fiscal quarters.</p>
-        </div>
-
-        <!-- Community Sentiment -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">💬</span>
-            <span class="sub-lbl c4">Community Sentiment</span>
-          </div>
-          <div class="sgrid">
-            <div class="scard l-c4"><div class="semoji">🔄</div><div class="slbl c4">Hyperscalers: Forced Upgrade Cycle</div><div class="sdesc">1/10× token cost forces aggressive fleet upgrades; legacy air-cooled Hopper/Blackwell clusters face structural economic obsolescence</div></div>
-            <div class="scard l-c2"><div class="semoji">🖥️</div><div class="slbl c2">Intel / AMD: Threatened</div><div class="sdesc">Vera CPU with unified HBM4 memory space represents NVIDIA's most aggressive encroachment into the x86 orchestration market</div></div>
-            <div class="scard l-c1"><div class="semoji">🌊</div><div class="slbl c1">Cooling Vendors: Critical Path</div><div class="sdesc">Direct-to-chip liquid cooling is now the physical gating factor for the entire Vera Rubin deployment—CoWoS packaging and HBM4 yield remain key risks</div></div>
-          </div>
-        </div>
-
-      </div>
-    </article>
-
-    <!-- ═══════════════════════════════════
-         ARTICLE 5 · Tesla AI6 + Samsung 2nm
-    ════════════════════════════════════ -->
-    <article class="article" id="tesla">
-      <div class="art-hdr" style="border-bottom:3px solid var(--c5)">
-        <div>
-          <div class="art-num c5">05 / Semiconductor Manufacturing</div>
-          <h2 class="art-title">Tesla AI6 Chip Production Roadmap Accelerates Amid Samsung 2nm Expansion Requests</h2>
-        </div>
-        <span class="art-badge bg-c5" style="color:#fff">MEDIUM CONF.</span>
-      </div>
-      <div class="art-meta">
-        <span class="meta-i">📅 March 19–21, 2026</span>
-        <span class="meta-dot"></span>
-        <span class="meta-i">Source: Teslarati</span>
-        <span class="meta-dot"></span>
-        <span class="conf-badge" style="background:#FEF3C7;color:#92400E">⬤ MEDIUM Confidence</span>
-        <span class="conf-badge" style="background:#FEF3C7;color:#92400E;margin-left:4px">7-Day Exception Applied</span>
-      </div>
-      <div class="art-body">
-
-        <!-- Overview -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">🔭</span>
-            <span class="sub-lbl c5">Overview</span>
-          </div>
-          <p class="lead">To achieve absolute sovereignty over its artificial intelligence hardware stack and reduce its critical financial and operational reliance on merchant silicon providers, Tesla is aggressively compressing the development lifecycle of its bespoke neural network accelerators.</p>
-          <p class="body">Outlining the company's strategic hardware roadmap, CEO Elon Musk optimistically suggested a possible target for a finalized design tape-out by December 2026, explicitly caveating that this timeline depends on having "some luck and acceleration using AI." It bears emphasis that AI6 remains two generations away from current production; the predecessor AI5 hardware must achieve volume production first before AI6 development can advance to volume manufacturing. The defining technical breakthrough of this ambitious program is the goal to match the advanced inference and training capabilities of a dual-SoC AI5 setup utilizing only a single AI6 processor, engineered on the exact same process node and half reticle footprint.</p>
-          <p class="body">To support the massive computational volume requirements for its Full Self-Driving (FSD) fleet, Optimus humanoid robots, and dedicated centralized data center clusters, Tesla has initiated high-level negotiations with Samsung Electronics. The immediate industry reaction centers on Tesla's reported push to radically expand its 2-nanometer foundry capacity, requesting a total output of 40,000 wafers per month from Samsung's Taylor, Texas fabrication facility. This move actively cements a vertically integrated silicon pipeline decoupled from traditional GPU supply chains, signaling a profound shift in how automotive and robotics entities procure compute.</p>
-          <div class="warn">⚠ UNVERIFIED: The 40,000 wafers/month target and $17 billion foundry agreement value are reported by a single secondary source and are not independently confirmed. Caution advised before capital action.</div>
-        </div>
-
-        <!-- Strategic Impact -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">⚡</span>
-            <span class="sub-lbl c5">Strategic Impact</span>
-          </div>
-          <div class="impact l-c5" style="border-left-color:var(--c5)">
-            <p class="body" style="color:var(--ink)">Tesla's accelerated pivot toward proprietary silicon for both edge inference and centralized data center training validates the long-term strategic necessity of hardware-software co-design for enterprise scale. For capital markets, this signals a massive diversion of potential capital expenditure away from merchant vendors such as NVIDIA and AMD, establishing a closed-loop ecosystem where Tesla rigorously controls the total cost of ownership. The ability to theoretically match a dual AI5 configuration with a single AI6 chip dramatically lowers the hardware bill of materials for future autonomous platforms, preserving automotive gross margins while drastically scaling compute capabilities per watt.</p>
-          </div>
-          <p class="body" style="margin-top:10px">Simultaneously, the aggressive reliance on Samsung's nascent 2-nanometer Gate-All-Around (GAA) process introduces profound execution risk. By anchoring a reported $17 billion foundry agreement through 2033 exclusively to Samsung's Taylor, Texas facility, Tesla is betting heavily on Samsung's ability to achieve stable commercial yield rates on an unproven leading-edge node. Should Samsung successfully execute the delivery of 40,000 wafers per month, it will definitively legitimize the Taylor foundry as a premier, high-volume alternative to TSMC. This potential success could structurally shift the geopolitical balance of advanced semiconductor manufacturing back toward North American shores, significantly alleviating deep-seated supply chain anxieties for U.S.-based technology conglomerates.</p>
-        </div>
-
-        <!-- Technical Deep Dive -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">🔬</span>
-            <span class="sub-lbl c5">Technical Deep Dive</span>
-            <span class="sub-tag l-c5 c5">AI4 → AI5 → AI6 Roadmap</span>
-          </div>
-          <div style="overflow-x:auto">
-            <table class="tbl">
-              <thead><tr><th>Metric</th><th>Target Specification</th><th>Confidence / Notes</th></tr></thead>
-              <tbody>
-                <tr><td>Design Tape-out Target</td><td style="font-family:var(--mono);font-weight:700;color:var(--c5)">December 2026 (Conditional)</td><td>CEO Musk: "With some luck and acceleration using AI"</td></tr>
-                <tr><td>Fabrication Node</td><td style="font-family:var(--mono);font-weight:700">2-nanometer (Samsung GAA)</td><td>AI6 chip set to use Samsung's 2nm GAA process</td></tr>
-                <tr><td>Development Cycle Target</td><td style="font-family:var(--mono);font-weight:700">9 Months (Iterative)</td><td>Tesla targeting ambitious nine-month development cycles</td></tr>
-                <tr><td>Wafer Production Request</td><td style="font-family:var(--mono);font-weight:700;color:var(--c5)">40,000 wafers/month</td><td>⚠ Unverified — single secondary source (The Elec / Teslarati)</td></tr>
-                <tr><td>Foundry Agreement Value</td><td style="font-family:var(--mono);font-weight:700">$17 Billion (~2033)</td><td>⚠ Unverified — reported as ~22.8T KRW (~$16–17B)</td></tr>
-                <tr><td>AI6 vs Dual AI5 Target</td><td style="font-family:var(--mono);font-weight:700">1 AI6 = 2× AI5 SoC</td><td>Same process node and half reticle footprint</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <!-- Chip roadmap diagram -->
-          <p class="body" style="margin:14px 0 10px;font-weight:600">Tesla Chip Generational Roadmap</p>
-          <div class="roadmap">
-            <div class="rphase">
-              <div class="rphase-hdr" style="background:#6B7280">AI4 (Current Production)</div>
-              <div class="rphase-body">
-                <span class="rchip">Current FSD SoC</span>
-                <span class="rchip">Baseline Performance</span>
-                <span class="rchip">TSMC Node</span>
-                <span class="rchip">Baseline Memory</span>
-              </div>
-            </div>
-            <div class="rphase">
-              <div class="rphase-hdr" style="background:#5B21B6">AI5 (Volume Production First)</div>
-              <div class="rphase-body">
-                <span class="rchip">Must reach volume first</span>
-                <span class="rchip">FSD / Optimus</span>
-                <span class="rchip">Data Center Clusters</span>
-                <span class="rchip">Dual-SoC baseline</span>
-              </div>
-            </div>
-            <div class="rphase">
-              <div class="rphase-hdr bg-c5">AI6 (Target: Dec 2026 Tape-out)</div>
-              <div class="rphase-body">
-                <span class="rchip">2nm GAA Samsung</span>
-                <span class="rchip">1 chip = 2× AI5 SoC</span>
-                <span class="rchip">Half reticle footprint</span>
-                <span class="rchip">40K wafers/mo (unverified)</span>
-                <span class="rchip">Taylor, TX fab</span>
-              </div>
-            </div>
-          </div>
-          <div class="chart-w">
+          <!-- AI5 vs AI4 Chart -->
+          <div class="chart-wrap" style="margin-top:16px">
             <canvas id="teslaChart"></canvas>
           </div>
         </div>
 
         <!-- Visual / Evidence -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">📋</span>
-            <span class="sub-lbl c5">Visual / Evidence</span>
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">📋</span>
+            <span class="subsec-label c1">Visual / Evidence</span>
+            <span class="subsec-tag lc1 c1">Vertical Integration Map</span>
           </div>
-          <p class="body" style="margin-bottom:8px">No official visual found. Source: Teslarati (Primary) and SammyFans (Secondary). Wafer capacity and foundry agreement value remain unverified single-secondary-source figures.</p>
-          <div class="qblock">
-            <p>"With some luck and acceleration using AI, we might be able to tape out AI6 in December."</p>
-            <div class="qattr">— Elon Musk, CEO, Tesla</div>
+          <!-- Vertical integration stack -->
+          <p class="body-text" style="margin-bottom:12px">Terafab represents an unprecedented vertical integration of the full silicon-to-space stack:</p>
+          <div style="display:flex;flex-direction:column;gap:6px;margin:12px 0">
+            <div style="display:flex;align-items:stretch;gap:10px">
+              <div style="background:var(--c1);color:#fff;border-radius:7px;padding:10px 16px;font-size:11px;font-weight:700;min-width:190px;text-align:center;display:flex;align-items:center;justify-content:center">SILICON DESIGN (AI5/AI6)</div>
+              <div style="font-size:11px;color:var(--ink-3);display:flex;align-items:center">In-house architecture — 40–50x compute, 9x memory vs AI4 · Match dual SoC AI5 with AI6</div>
+            </div>
+            <div style="width:4px;height:18px;background:var(--c1);margin-left:93px;opacity:.35"></div>
+            <div style="display:flex;align-items:stretch;gap:10px">
+              <div style="background:var(--c1);color:#fff;border-radius:7px;padding:10px 16px;font-size:11px;font-weight:700;min-width:190px;text-align:center;display:flex;align-items:center;justify-content:center">TERAFAB (2nm EUV)</div>
+              <div style="font-size:11px;color:var(--ink-3);display:flex;align-items:center">Austin, TX — Seaholm site · 100,000 wafer starts/mo · 100–200B chips/yr · $20–40B CapEx</div>
+            </div>
+            <div style="width:4px;height:18px;background:var(--c1);margin-left:93px;opacity:.35"></div>
+            <div style="display:flex;align-items:stretch;gap:10px">
+              <div style="background:var(--c1);color:#fff;border-radius:7px;padding:10px 16px;font-size:11px;font-weight:700;min-width:190px;text-align:center;display:flex;align-items:center;justify-content:center">TERRESTRIAL PLATFORMS</div>
+              <div style="font-size:11px;color:var(--ink-3);display:flex;align-items:center">FSD · Cybercab Robotaxi · Optimus Humanoid · xAI Colossus clusters</div>
+            </div>
+            <div style="width:4px;height:18px;background:var(--c1);margin-left:93px;opacity:.35"></div>
+            <div style="display:flex;align-items:stretch;gap:10px">
+              <div style="background:linear-gradient(135deg,var(--c1),#78350F);color:#fff;border-radius:7px;padding:10px 16px;font-size:11px;font-weight:700;min-width:190px;text-align:center;display:flex;align-items:center;justify-content:center">ORBITAL AI SATELLITES ✦</div>
+              <div style="font-size:11px;color:var(--ink-3);display:flex;align-items:center">80% of total output · Vacuum thermal mgmt · 5× solar irradiance vs Earth surface · SpaceX LEO</div>
+            </div>
+          </div>
+          <div class="warn-box">⚠ No official visual found at time of publication. Architecture diagram derived from verified source data.</div>
+          <div class="quote-block" style="margin-top:14px">
+            <p>The fabrication facility could demand up to forty billion dollars in total investment against an initial twenty-billion-dollar commitment, with production starting around 2028, driven by the need to support a roughly fifty-fold multiplication of current chip consumption.</p>
+            <div class="quote-attr">— mexc.com (Single lower-confidence source; treat as speculative upper bound)</div>
           </div>
         </div>
 
         <!-- Critical View -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">⚠️</span>
-            <span class="sub-lbl c5">Critical View</span>
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">⚠️</span>
+            <span class="subsec-label c1">Critical View</span>
           </div>
-          <p class="body">While the architectural ambitions for the AI6 chip demonstrate Tesla's fierce commitment to vertical integration, the delivery schedule is highly speculative and structurally vulnerable to harsh fabrication realities. Samsung's 2-nanometer production line has historically exhibited severe delays and depressed yield rates; recent industry reports indicate that prototype multi-project wafer (MPW) runs for other clients have been pushed back by up to six months. If the 2nm GAA node fails to mature rapidly, Tesla's conditional December 2026 tape-out target will invariably translate into delayed volume manufacturing, which threatens to paralyze the deployment schedules for the next generation of Full Self-Driving capabilities and Optimus platforms. Furthermore, the strategic decision to effectively bypass TSMC for the critical AI6 generation places the entirety of Tesla's future computational roadmap on a single point of failure in Texas. Investors must view the projected performance parity—specifically, one AI6 equating to two AI5s on the same node—with heavy technical skepticism until physical engineering samples are rigorously benchmarked against thermal constraints and power draw in real-world edge environments.</p>
+          <p class="body-text">The Terafab initiative faces monumental execution risks that cannot be overstated by mere capital expenditure projections. Establishing a mature two-nanometer fabrication process requires highly specialized extreme ultraviolet lithography equipment, which is entirely monopolized by ASML and subject to multi-year procurement backlogs. Without priority access to these highly constrained optical systems, Terafab's production targets are mathematically impossible to achieve by 2028.</p>
+          <p class="body-text">Furthermore, the power and water requirements for a facility targeting one hundred thousand wafer starts per month will severely strain the Texas electrical grid, which has historically struggled with resilience during extreme weather events. The reliance on unproven orbital data center economics adds a highly speculative element to the return on investment calculus; while thermal rejection in a vacuum is possible, the radiation hardening required for two-nanometer silicon in low Earth orbit drastically degrades yield and performance.</p>
+          <p class="body-text">Finally, the aggressive timeline projected by executive leadership contradicts the established industry reality that bringing cutting-edge semiconductor facilities online typically requires half a decade of meticulous calibration and defect density optimization.</p>
         </div>
 
         <!-- Community Sentiment -->
-        <div class="sub">
-          <div class="sub-hdr">
-            <span class="sub-icon">💬</span>
-            <span class="sub-lbl c5">Community Sentiment</span>
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">💬</span>
+            <span class="subsec-label c1">Community Sentiment</span>
           </div>
-          <div class="sgrid">
-            <div class="scard l-c5"><div class="semoji">🤖</div><div class="slbl c5">Robotics / FSD Sector: Watching</div><div class="sdesc">If AI6 succeeds, Optimus and FSD gain proprietary silicon moat—vertical integration competitors cannot easily replicate</div></div>
-            <div class="scard" style="background:#FEF3C7;border-color:#FDE68A"><div class="semoji">⚠️</div><div class="slbl" style="color:#92400E">Skeptics: Execution Risk</div><div class="sdesc">2nm GAA yield mastery is unproven at volume; Samsung MPW runs for other clients reportedly delayed by up to 6 months</div></div>
-            <div class="scard l-c3"><div class="semoji">🏗️</div><div class="slbl c3">Samsung Taylor Fab: Legitimization</div><div class="sdesc">40K wafers/month success would definitively establish Taylor as a premier TSMC-alternative and shift North American semiconductor balance</div></div>
+          <div class="sentiment-grid">
+            <div class="sentiment-card lc1">
+              <div class="sent-emoji">🏭</div>
+              <div class="sent-label c1">Market: Structural Skepticism</div>
+              <div class="sent-desc">Profound doubt about feasibility of establishing tier-one foundry from scratch within stated timeline</div>
+            </div>
+            <div class="sentiment-card" style="background:#FEF9C3;border-color:#FDE68A">
+              <div class="sent-emoji">📊</div>
+              <div class="sent-label" style="color:#92400E">Analysts: Reassessing CapEx</div>
+              <div class="sent-desc">Competitors rapidly repricing compute parity costs — sovereign vertical integration now modeled as baseline prerequisite</div>
+            </div>
+            <div class="sentiment-card lc4">
+              <div class="sent-emoji">🛸</div>
+              <div class="sent-label c4">Aerospace: Paradigm Shift</div>
+              <div class="sent-desc">Merging aerospace and semiconductor industries into a single unified infrastructure stack — no historical precedent</div>
+            </div>
           </div>
         </div>
 
       </div>
     </article>
 
-    <!-- ═══════════════════════════════════
+    <!-- ══════════════════════════════════════════
+         ARTICLE 2 — WHITE HOUSE AI POLICY
+    ═══════════════════════════════════════════ -->
+    <article class="article" id="policy">
+      <div class="article-header" style="border-bottom:3px solid var(--c2)">
+        <div>
+          <div class="art-num c2">02 / Policy &amp; Regulation</div>
+          <h2 class="art-title">White House National Artificial Intelligence Policy Framework</h2>
+        </div>
+        <span class="art-badge bg-c2">Legislative</span>
+      </div>
+      <div class="article-meta">
+        <span class="meta-item">📅 March 20, 2026</span>
+        <span class="meta-sep"></span>
+        <span class="meta-item">Source: The White House (Official Portal)</span>
+        <span class="meta-sep"></span>
+        <span class="conf-badge lc2 c2">⬤ HIGH Confidence</span>
+        <span class="conf-badge" style="background:#FEF3C7;color:#92400E;margin-left:4px">Non-Binding</span>
+      </div>
+
+      <div class="article-body">
+
+        <!-- Overview -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">🔭</span>
+            <span class="subsec-label c2">Overview</span>
+          </div>
+          <p class="lead-text">Enterprise technology firms and venture capital pools have increasingly cited the fragmented regulatory landscape as a primary bottleneck for domestic artificial intelligence deployment, with individual states advancing contradictory compliance parameters regarding data provenance, synthetic media, and algorithmic transparency.</p>
+          <p class="body-text">This localized friction introduces massive legal overhead for foundational model developers attempting to deploy consumer and enterprise agents uniformly. The decisive strategic shift is the formal release of a comprehensive legislative blueprint by the executive branch, which proposes a unified federal governance structure intended to explicitly preempt what it views as cumbersome state-level artificial intelligence laws.</p>
+          <p class="body-text">The framework outlines guiding principles focused on protecting minors from synthetic exploitation, deferring questions of creator copyright protection in the context of AI training data to judicial determination rather than prescribing direct statutory remedies, and critically, expediting the federal permitting processes for the energy infrastructure required to sustain hyperscale artificial intelligence data centers. This targeted focus on energy deployment recognizes that localized zoning boards and utility commissions currently present a greater threat to domestic artificial intelligence supremacy than algorithmic bottlenecks.</p>
+          <p class="body-text">The immediate reaction across the sector has been highly polarized; while enterprise compliance officers and infrastructure developers strongly support the push for a singular, predictable national standard that strips away regulatory friction, state attorneys general and consumer advocacy groups are rapidly mobilizing to oppose what they view as a centralized overreach that seeks to neutralize localized algorithmic accountability measures.</p>
+        </div>
+
+        <!-- Strategic Impact -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">⚡</span>
+            <span class="subsec-label c2">Strategic Impact</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="policyChart"></canvas>
+          </div>
+          <div class="impact-box lc2" style="border-left:4px solid var(--c2);margin-top:10px">
+            <p style="font-size:13.5px;line-height:1.75;color:var(--ink)">If passed by Congress, this federal proposal seeks to fundamentally restructure the compliance obligations of artificial intelligence developers, effectively replacing the complex patchwork of localized state regulations with a singular operational standard. The initiative proposes to significantly reduce deployment friction for foundational model developers by instituting a lighter-touch federal umbrella, which would validate the technology sector's aggressive lobbying efforts for streamlined oversight. However, the proposal introduces substantial legislative uncertainty, as it relies on congressional approval in a heavily divided political environment—a body that has already rejected analogous federal preemption provisions in prior legislative cycles. For infrastructure investors, the framework seeks to mitigate the single largest risk to data center expansion—power grid constraints—by proposing streamlined energy permitting protocols. This legislative push aims to accelerate the deployment of massive natural gas and nuclear generation facilities required for gigawatt-class clusters, potentially unlocking billions in stalled capital expenditure projects currently trapped in municipal zoning disputes.</p>
+          </div>
+        </div>
+
+        <!-- Technical Deep Dive -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">🔬</span>
+            <span class="subsec-label c2">Technical Deep Dive</span>
+            <span class="subsec-tag lc2 c2">Regulatory Comparison</span>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="info-table">
+              <thead>
+                <tr>
+                  <th>Domain</th>
+                  <th>Current State-Level</th>
+                  <th>Proposed Federal Framework</th>
+                  <th>Strategic Implication</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Data Compliance</td>
+                  <td>50-state patchwork — CO, CA, TX contradictory standards</td>
+                  <td>Unified federal standard seeking to preempt all state laws</td>
+                  <td>Lowers compliance overhead; enables uniform agent deployment</td>
+                </tr>
+                <tr>
+                  <td>Infrastructure Permitting</td>
+                  <td>Local zoning boards &amp; utility commissions causing multi-year delays</td>
+                  <td>Streamlined federal energy permitting for AI data centers</td>
+                  <td>Unlocks stalled gigawatt-class cluster capital expenditure</td>
+                </tr>
+                <tr>
+                  <td>Copyright &amp; Training Data</td>
+                  <td>Varying judicial interpretations; emerging statutory restrictions</td>
+                  <td>Deferred to judicial determination rather than new legislation</td>
+                  <td>Preserves viability of current LLM training paradigms</td>
+                </tr>
+                <tr>
+                  <td>Minor Protection / Synthetic Media</td>
+                  <td>Fragmented state laws with inconsistent enforcement</td>
+                  <td>Federal guardrails protecting minors from synthetic exploitation</td>
+                  <td>Provides baseline compliance floor; reduces class-action exposure</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Legislative timeline -->
+          <div style="margin-top:16px">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px">Legislative Risk Timeline</div>
+            <div class="timeline">
+              <div class="tl-item">
+                <div class="tl-dot bc-c2"></div>
+                <div class="tl-date c2">March 20, 2026 — NOW</div>
+                <div class="tl-text">White House National AI Policy Framework released — non-binding legislative proposal; active industry lobbying begins</div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot bc-c2"></div>
+                <div class="tl-date c2">Q2–Q3 2026 (Projected)</div>
+                <div class="tl-text">Congressional debate commences; state AGs (CO, CA) begin mobilizing Commerce Clause litigation strategy</div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot bc-c2"></div>
+                <div class="tl-date c2">12–18 Month Minimum Horizon</div>
+                <div class="tl-text">Institutional investor timeline for any legislative proposal to materialize into enforceable law — state regulations remain fully active until then</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual / Evidence -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">📋</span>
+            <span class="subsec-label c2">Visual / Evidence</span>
+          </div>
+          <div class="warn-box">⚠ No official visual found at time of publication. Hardware specs: N/A (policy document).</div>
+          <div class="quote-block" style="margin-top:14px">
+            <p>The administration's framework underscores the urgency of advancing domestic leadership, warning that an overly restrictive approach not properly calibrated for risk will invite legal challenge and forfeit American competitiveness.</p>
+            <div class="quote-attr">— Computer &amp; Communications Industry Association (CCIA) — ccianet.org</div>
+          </div>
+        </div>
+
+        <!-- Critical View -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">⚠️</span>
+            <span class="subsec-label c2">Critical View</span>
+          </div>
+          <p class="body-text">The primary critical vulnerability of this framework is its current lack of binding authority. As a legislative proposal, it requires passage through both chambers of Congress, where it will face severe partisan friction, particularly regarding the provisions that seek to preempt state legislative authority—provisions that Congress has previously declined to advance in earlier legislative sessions.</p>
+          <p class="body-text">Furthermore, the framework's focus on expediting energy permitting for data centers directly conflicts with mounting environmental litigation and community pushback against the localized ecological impact of hyperscale facilities. Until the framework is translated into codified law, corporations must continue to navigate the existing state-by-state regulatory minefield, and premature optimization of compliance systems based on this non-binding blueprint carries significant legal exposure.</p>
+          <p class="body-text">Any potential use of federal broadband funding as a coercive lever against states resisting preemption would likely trigger immediate constitutional litigation, stalling the very deployment the framework seeks to accelerate. Additionally, the framework's silence on highly specific national security issues, such as detailed updates to the export controls governing sub-four-nanometer silicon, leaves a critical gap in the comprehensive defense posture required to protect next-generation architectures.</p>
+        </div>
+
+        <!-- Community Sentiment -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">💬</span>
+            <span class="subsec-label c2">Community Sentiment</span>
+          </div>
+          <div class="sentiment-grid">
+            <div class="sentiment-card lc4">
+              <div class="sent-emoji">🏭</div>
+              <div class="sent-label c4">Industry: Strongly Supportive</div>
+              <div class="sent-desc">Enterprise compliance officers and infrastructure developers back singular national standard to strip regulatory friction</div>
+            </div>
+            <div class="sentiment-card lc3">
+              <div class="sent-emoji">⚖️</div>
+              <div class="sent-label c3">State AGs: Mobilizing Opposition</div>
+              <div class="sent-desc">CO &amp; CA attorneys general rapidly organizing to oppose perceived centralized overreach; Commerce Clause litigation anticipated</div>
+            </div>
+            <div class="sentiment-card lc2">
+              <div class="sent-emoji">📈</div>
+              <div class="sent-label c2">Investors: Wait &amp; See</div>
+              <div class="sent-desc">Powerful market signal but 12–18 month runway before enforcement — premature capital reallocation carries legal exposure</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </article>
+
+    <!-- ══════════════════════════════════════════
+         ARTICLE 3 — DOJ SUPERMICRO INDICTMENT
+    ═══════════════════════════════════════════ -->
+    <article class="article" id="supermicro">
+      <div class="article-header" style="border-bottom:3px solid var(--c3)">
+        <div>
+          <div class="art-num c3">03 / Supply Chain &amp; Legal</div>
+          <h2 class="art-title">Department of Justice Indictment of Supermicro Co-Founder for GPU Smuggling</h2>
+        </div>
+        <span class="art-badge bg-c3">ENFORCEMENT</span>
+      </div>
+      <div class="article-meta">
+        <span class="meta-item">📅 March 19–20, 2026</span>
+        <span class="meta-sep"></span>
+        <span class="meta-item">Source: U.S. Department of Justice</span>
+        <span class="meta-sep"></span>
+        <span class="conf-badge lc4 c4">⬤ HIGH Confidence</span>
+      </div>
+
+      <div class="article-body">
+
+        <!-- Overview -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">🔭</span>
+            <span class="subsec-label c3">Overview</span>
+          </div>
+          <p class="lead-text">A persistent and highly documented vulnerability within the global artificial intelligence supply chain has been the inability of hardware vendors and federal regulatory bodies to cryptographically or physically trace the final deployment destination of advanced accelerator silicon.</p>
+          <p class="body-text">This systemic failure has led to rampant secondary market circumvention of export controls, allowing restricted nation-states to amass vast clusters of restricted graphics processing units. The decisive shift in regulatory enforcement materialized with the unsealing of a federal indictment against Yih-Shyan "Wally" Liaw, a co-founder and Senior Vice President of Business Development at Supermicro, alongside co-defendants Ruei-Tsang "Steven" Chang and Ting-Wei "Willy" Sun, for orchestrating a massive and highly coordinated smuggling operation.</p>
+          <p class="body-text">The operatives allegedly utilized convoluted transshipment schemes through Southeast Asian front companies, encrypted communications networks, and shocking physical deception protocols—including staging thousands of non-operational replica dummy servers equipped with counterfeit serial number stickers applied with heat guns—to divert billions of dollars of restricted server hardware directly into China.</p>
+          <p class="body-text">The immediate market reaction has resulted in severe stock volatility for the involved manufacturer, the immediate administrative suspension and resignation of the indicted executives, and a sector-wide panic as systems integrators realize that standard paper-based supply chain compliance audits are no longer sufficient to shield corporations from severe criminal liability.</p>
+        </div>
+
+        <!-- Strategic Impact -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">⚡</span>
+            <span class="subsec-label c3">Strategic Impact</span>
+          </div>
+          <div class="metric-row metric-row-4">
+            <div class="metric-card">
+              <div class="metric-val c3">$2.5B</div>
+              <div class="metric-label">Total Server Purchases</div>
+              <div class="metric-sub">Alleged smuggling value</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val c3">$510M</div>
+              <div class="metric-label">Confirmed Diverted</div>
+              <div class="metric-sub">Verified to China</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val c3">3</div>
+              <div class="metric-label">Individuals Charged</div>
+              <div class="metric-sub">Co-founder + 2 associates</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val c3">20 yrs</div>
+              <div class="metric-label">Max Prison Term</div>
+              <div class="metric-sub">Per statutory charge</div>
+            </div>
+          </div>
+          <div class="impact-box lc3" style="border-left:4px solid var(--c3);margin-top:10px">
+            <p style="font-size:13.5px;line-height:1.75;color:var(--ink)">This unprecedented enforcement action validates the geopolitical thesis that the federal government will ruthlessly pursue C-suite executives who facilitate the leakage of strategic artificial intelligence infrastructure to restricted geopolitical adversaries. The revelation that rudimentary physical deception allowed billions in advanced silicon to bypass modern compliance checks introduces massive, immediate supply chain risk for every tier-one hardware integrator operating globally. This event immediately devalues the trust mechanisms inherent in current international distribution networks and will highly likely force the industry to rapidly adopt hardware-level geofencing, continuous cryptographic network attestation, and remote bricking capabilities for all advanced graphical processing units to ensure absolute, verifiable compliance. For infrastructure investors, any hardware vendor relying on unverified third-party distribution channels must now be modeled with a significantly higher legal risk premium.</p>
+          </div>
+        </div>
+
+        <!-- Technical Deep Dive -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">🔬</span>
+            <span class="subsec-label c3">Technical Deep Dive</span>
+            <span class="subsec-tag lc3 c3">Evasion Architecture &amp; Financial Impact</span>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="info-table">
+              <thead>
+                <tr>
+                  <th>Financial Metric</th>
+                  <th>Value / Detail</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Total Server Purchases (alleged)</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c3)">$2.5 Billion</td>
+                  <td>Justice.gov (primary)</td>
+                </tr>
+                <tr>
+                  <td>Value Confirmed Diverted to China</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c3)">$510 Million</td>
+                  <td>Justice.gov (primary)</td>
+                </tr>
+                <tr>
+                  <td>Maximum Statutory Prison Term</td>
+                  <td style="font-family:var(--mono);font-weight:700">20 years per charge</td>
+                  <td>Justice.gov (primary)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="chart-wrap" style="margin-top:16px">
+            <canvas id="supermicroChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Visual / Evidence -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">📋</span>
+            <span class="subsec-label c3">Visual / Evidence</span>
+            <span class="subsec-tag lc3 c3">Evasion Methodology</span>
+          </div>
+          <p class="body-text" style="margin-bottom:12px">The defendants allegedly employed a multi-layered physical and digital deception strategy to bypass export controls:</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px">
+            <div style="background:var(--c3-l);border:1px solid #FECACA;border-radius:8px;padding:14px">
+              <div style="font-size:22px;margin-bottom:8px">🖥️</div>
+              <div style="font-size:12px;font-weight:700;color:var(--c3);margin-bottom:4px">Non-Functional Dummy Servers</div>
+              <div style="font-size:11.5px;color:var(--ink-2);line-height:1.5">Thousands of non-operational replica chassis staged for internal compliance auditors; actual restricted hardware diverted separately</div>
+            </div>
+            <div style="background:var(--c3-l);border:1px solid #FECACA;border-radius:8px;padding:14px">
+              <div style="font-size:22px;margin-bottom:8px">🔖</div>
+              <div style="font-size:12px;font-weight:700;color:var(--c3);margin-bottom:4px">Counterfeit Serial Stickers</div>
+              <div style="font-size:11.5px;color:var(--ink-2);line-height:1.5">Heat-gun-applied counterfeit serial number stickers on dummy servers to spoof audit records and DOC inspector checks</div>
+            </div>
+            <div style="background:var(--c3-l);border:1px solid #FECACA;border-radius:8px;padding:14px">
+              <div style="font-size:22px;margin-bottom:8px">🔐</div>
+              <div style="font-size:12px;font-weight:700;color:var(--c3);margin-bottom:4px">Encrypted Communications</div>
+              <div style="font-size:11.5px;color:var(--ink-2);line-height:1.5">Encrypted networks used to coordinate with Southeast Asian front companies and Chinese end-users</div>
+            </div>
+            <div style="background:var(--c3-l);border:1px solid #FECACA;border-radius:8px;padding:14px">
+              <div style="font-size:22px;margin-bottom:8px">🔄</div>
+              <div style="font-size:12px;font-weight:700;color:var(--c3);margin-bottom:4px">Convoluted Transshipment</div>
+              <div style="font-size:11.5px;color:var(--ink-2);line-height:1.5">Multi-hop routing through Southeast Asian jurisdictions to obfuscate final destination as China</div>
+            </div>
+          </div>
+          <div class="quote-block">
+            <p>The indictment details alleged efforts to evade export laws through false documents, non-functional dummy servers fitted with heat-gun-applied counterfeit serial number stickers, and convoluted transshipment schemes to obfuscate the true destination of restricted artificial intelligence technology.</p>
+            <div class="quote-attr">— U.S. Department of Justice, justice.gov</div>
+          </div>
+          <div class="quote-block">
+            <p>The investigation revealed that the defendants allegedly conspired to sell billions of dollars' worth of servers integrating sensitive, controlled graphics processing units to buyers in China, in violation of export control laws.</p>
+            <div class="quote-attr">— U.S. Department of Justice, justice.gov</div>
+          </div>
+        </div>
+
+        <!-- Critical View -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">⚠️</span>
+            <span class="subsec-label c3">Critical View</span>
+          </div>
+          <p class="body-text">The indictment exposes catastrophic, systemic flaws in the current methodology used to audit high-performance computing supply chains. The fact that a tier-one hardware manufacturer's internal compliance teams and federal Department of Commerce inspectors were temporarily deceived by non-functional dummy chassis and heat-gun-applied serial stickers highlights a primitive level of physical security governing the world's most strategically vital technology.</p>
+          <p class="body-text">This case introduces severe litigation and reputational risks for original equipment manufacturers who fail to implement zero-trust, silicon-level tracking. Furthermore, the sheer scale of the diversion—totaling two and a half billion dollars in purchases with at least five hundred ten million dollars confirmed redirected—indicates that restricted nations have successfully acquired sufficient hardware to train and deploy advanced foundational models despite the most aggressive export controls in history.</p>
+          <p class="body-text">This realization raises critical questions regarding the overall efficacy of the current regulatory containment strategy; if physical interdiction is this easily bypassed, the only remaining vector for technological containment is to out-innovate adversaries rather than attempting to starve them of prior-generation compute.</p>
+        </div>
+
+        <!-- Community Sentiment -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">💬</span>
+            <span class="subsec-label c3">Community Sentiment</span>
+          </div>
+          <div class="sentiment-grid">
+            <div class="sentiment-card lc3">
+              <div class="sent-emoji">📉</div>
+              <div class="sent-label c3">Equity Markets: Severe Shock</div>
+              <div class="sent-desc">Stock volatility and immediate administrative suspension of indicted executives — sector-wide counterparty risk repricing</div>
+            </div>
+            <div class="sentiment-card" style="background:#FEF3C7;border-color:#FDE68A">
+              <div class="sent-emoji">🏛️</div>
+              <div class="sent-label" style="color:#92400E">DOJ/DOC: Aggressive Posture</div>
+              <div class="sent-desc">Clear federal willingness to pierce corporate veil and target co-founders directly — zero tolerance enforcement signal</div>
+            </div>
+            <div class="sentiment-card lc2">
+              <div class="sent-emoji">🔒</div>
+              <div class="sent-label c2">Integrators: Compliance Panic</div>
+              <div class="sent-desc">Paper-based audit regimes now structurally insufficient — cryptographic hardware attestation becoming mandatory</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </article>
+
+    <!-- ══════════════════════════════════════════
+         ARTICLE 4 — SOFTBANK & AEP OHIO 10GW
+    ═══════════════════════════════════════════ -->
+    <article class="article" id="softbank">
+      <div class="article-header" style="border-bottom:3px solid var(--c4)">
+        <div>
+          <div class="art-num c4">04 / Infrastructure Finance</div>
+          <h2 class="art-title">SoftBank and AEP Ohio 10-Gigawatt Data Center and Power Generation Partnership</h2>
+        </div>
+        <span class="art-badge bg-c4">CONFIRMED</span>
+      </div>
+      <div class="article-meta">
+        <span class="meta-item">📅 March 20, 2026</span>
+        <span class="meta-sep"></span>
+        <span class="meta-item">Source: U.S. Department of Energy</span>
+        <span class="meta-sep"></span>
+        <span class="conf-badge lc4 c4">⬤ HIGH Confidence</span>
+      </div>
+
+      <div class="article-body">
+
+        <!-- Overview -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">🔭</span>
+            <span class="subsec-label c4">Overview</span>
+          </div>
+          <p class="lead-text">The most intractable physical barrier preventing the scaling of artificial intelligence from discrete hundred-megawatt clusters to true sovereign-class supercomputers has been the chronic scarcity of high-voltage grid interconnection capacity, exacerbated by multi-year queue delays at regional transmission organizations.</p>
+          <p class="body-text">The decisive strategic shift bypassing this bottleneck is an unprecedented public-private partnership coordinated by the U.S. Department of Energy, SoftBank Group, and American Electric Power (AEP) to construct a ten-gigawatt data center collocated with its own dedicated power generation infrastructure. Sited at the former Portsmouth Gaseous Diffusion Plant in Ohio—a decommissioned Cold War uranium enrichment facility currently undergoing ongoing environmental remediation—the project actively deploys 9.2 gigawatts of massive natural gas turbines directly on-site, financed by a monumental $33.3 billion Japanese capital injection under a strategic trade agreement.</p>
+          <p class="body-text">By generating nearly all requisite power locally and funding billions in transmission upgrades autonomously, the project entirely circumvents standard public utility limitations while promising no rate hikes for local residents. The immediate reaction from regional transmission organizations and energy analysts is one of profound shock regarding the sheer scale—which rivals the electrical output of nine standard nuclear reactors—while local residents and environmental advocacy groups have initiated aggressive constitutional petition drives in Ohio to ban hyperscale facilities over severe emissions and water consumption concerns.</p>
+        </div>
+
+        <!-- Strategic Impact -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">⚡</span>
+            <span class="subsec-label c4">Strategic Impact</span>
+          </div>
+          <div class="metric-row metric-row-4">
+            <div class="metric-card">
+              <div class="metric-val c4">10 GW</div>
+              <div class="metric-label">Data Center Capacity</div>
+              <div class="metric-sub">Total power envelope</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val c4">$33.3B</div>
+              <div class="metric-label">Japanese Capital</div>
+              <div class="metric-sub">SoftBank commitment</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val c4">$4.2B</div>
+              <div class="metric-label">Transmission Upgrades</div>
+              <div class="metric-sub">765kV autonomous investment</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val c4">9.2 GW</div>
+              <div class="metric-label">Natural Gas On-Site</div>
+              <div class="metric-sub">92% locally generated</div>
+            </div>
+          </div>
+          <div class="impact-box lc4" style="border-left:4px solid var(--c4);margin-top:10px">
+            <p style="font-size:13.5px;line-height:1.75;color:var(--ink)">This agreement fundamentally validates the thesis that the next era of artificial intelligence infrastructure will necessitate private, hyper-localized power generation, effectively turning technology consortia into sovereign utility providers. By funding $4.2 billion in autonomous transmission upgrades, SoftBank guarantees priority energy access without exposing residential ratepayers to utility hikes, setting a new and exceedingly expensive standard for hyperscale data center construction. This dynamic isolates smaller artificial intelligence developers who cannot afford to build their own dedicated power plants, reinforcing a deep oligopoly in frontier model training where only trillion-dollar market cap entities can compete. Furthermore, the geopolitical alignment of Japanese capital to construct critical digital infrastructure on a former U.S. strategic nuclear site represents a massive consolidation of allied technological supply chains, designed explicitly to outpace adversarial advancements while reducing reliance on globalized components.</p>
+          </div>
+        </div>
+
+        <!-- Technical Deep Dive -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">🔬</span>
+            <span class="subsec-label c4">Technical Deep Dive</span>
+            <span class="subsec-tag lc4 c4">Power &amp; Capital Breakdown</span>
+          </div>
+          <!-- Power breakdown visual -->
+          <div style="margin:12px 0 16px">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px">Power Generation Breakdown (10 GW Total)</div>
+            <div class="power-bar-row">
+              <div class="power-label">Natural Gas On-Site</div>
+              <div class="power-bar-wrap">
+                <div class="power-bar-fill" style="width:92%;background:var(--c4)"><span class="power-bar-val">9.2 GW (92%)</span></div>
+              </div>
+            </div>
+            <div class="power-bar-row">
+              <div class="power-label">Supplementary / Grid</div>
+              <div class="power-bar-wrap">
+                <div class="power-bar-fill" style="width:8%;background:#CBD5E1"><span class="power-bar-val" style="color:var(--ink-3)">0.8 GW</span></div>
+              </div>
+            </div>
+            <div class="power-bar-row">
+              <div class="power-label">Grid Transmission Upgrades</div>
+              <div class="power-bar-wrap">
+                <div class="power-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--c4),#0d9488aa);"><span class="power-bar-val">$4.2B autonomous investment at 765kV</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="info-table">
+              <thead>
+                <tr>
+                  <th>Infrastructure Metric</th>
+                  <th>Specification</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Data Center Power Capacity</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c4)">10 Gigawatts</td>
+                  <td>Energy.gov (primary)</td>
+                </tr>
+                <tr>
+                  <td>Natural Gas Generation Fraction</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c4)">9.2 Gigawatts</td>
+                  <td>Energy.gov (primary)</td>
+                </tr>
+                <tr>
+                  <td>Japanese Capital Commitment</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c4)">$33.3 Billion</td>
+                  <td>Energy.gov (primary)</td>
+                </tr>
+                <tr>
+                  <td>Transmission Infrastructure</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c4)">$4.2 Billion / 765kV HV</td>
+                  <td>Energy.gov (fact sheet)</td>
+                </tr>
+                <tr>
+                  <td>Site Location</td>
+                  <td style="font-family:var(--mono);font-weight:700">Portsmouth Gaseous Diffusion Plant, OH</td>
+                  <td>Energy.gov (primary)</td>
+                </tr>
+                <tr>
+                  <td>Construction Start Target</td>
+                  <td style="font-family:var(--mono);font-weight:700">2026</td>
+                  <td>Energy.gov (primary)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="chart-wrap" style="margin-top:14px">
+            <canvas id="softbankChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Visual / Evidence -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">📋</span>
+            <span class="subsec-label c4">Visual / Evidence</span>
+            <span class="subsec-tag lc4 c4">Partnership Flow</span>
+          </div>
+          <div class="flow-row">
+            <div class="flow-node" style="background:var(--c4-l);border-color:#5EEAD4">
+              <div class="flow-node-label c4">SoftBank Group (Japan)</div>
+              <div class="flow-node-sub">$33.3B capital injection<br/>Strategic trade agreement</div>
+            </div>
+            <div class="flow-arrow c4">→</div>
+            <div class="flow-node" style="background:var(--c4-l);border:2px solid var(--c4)">
+              <div class="flow-node-label c4">Portsmouth, Ohio Campus</div>
+              <div class="flow-node-sub">10 GW data center + 9.2 GW nat. gas<br/>Former Cold War uranium enrichment site</div>
+            </div>
+            <div class="flow-arrow c4">←</div>
+            <div class="flow-node" style="background:var(--c4-l);border-color:#5EEAD4">
+              <div class="flow-node-label c4">AEP Ohio + DOE</div>
+              <div class="flow-node-sub">$4.2B 765kV transmission<br/>No residential rate hikes</div>
+            </div>
+          </div>
+          <div class="warn-box">⚠ No official visual found at time of publication. Infrastructure diagram derived from verified DOE source data.</div>
+          <div class="quote-block" style="margin-top:14px">
+            <p>The U.S. government is leveraging federal lands to add power generation and upgrade existing infrastructure to support the artificial intelligence boom while ensuring the United States wins the race without raising costs for the American people.</p>
+            <div class="quote-attr">— U.S. Department of Energy — energy.gov</div>
+          </div>
+          <div class="quote-block">
+            <p>This is a size bigger than any power plant in the world, and we are delivering a multi-billion dollar investment in one campus rather than spreading it across many locations over many years.</p>
+            <div class="quote-attr">— SoftBank / Hurriyet Daily News — hurriyetdailynews.com</div>
+          </div>
+        </div>
+
+        <!-- Critical View -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">⚠️</span>
+            <span class="subsec-label c4">Critical View</span>
+          </div>
+          <p class="body-text">While theoretically robust in addressing the energy bottleneck, the execution of this megaproject faces profound regulatory, environmental, and logistical hazards. Relying on 9.2 gigawatts of natural gas generation introduces massive, long-term carbon emissions that directly contradict the aggressive net-zero climate pledges previously established by the broader technology industry. Regional grid operators have flagged deep operational concerns regarding the rapid integration of such unprecedented baseload generation into the existing network, noting that standard interconnection queues and stability studies can take years to process accurately.</p>
+          <p class="body-text">Additionally, the project faces severe litigation risk from grassroots coalitions actively pushing for state constitutional amendments to ban large-scale data centers outright, and the ongoing environmental remediation status of the Portsmouth site introduces additional regulatory complexity not present at greenfield locations. This highlights an unavoidable, systemic friction between hyper-industrial digital expansion and local community resource preservation, suggesting that future artificial intelligence clusters will increasingly be forced into geographically isolated, politically friendly jurisdictions, further straining transmission logistics.</p>
+        </div>
+
+        <!-- Community Sentiment -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">💬</span>
+            <span class="subsec-label c4">Community Sentiment</span>
+          </div>
+          <div class="sentiment-grid">
+            <div class="sentiment-card lc4">
+              <div class="sent-emoji">😱</div>
+              <div class="sent-label c4">RTO/Analysts: Profound Shock</div>
+              <div class="sent-desc">Sheer scale rivals output of nine nuclear reactors — grid integration concerns flagged by regional transmission organizations</div>
+            </div>
+            <div class="sentiment-card lc3">
+              <div class="sent-emoji">🏡</div>
+              <div class="sent-label c3">Local Communities: Active Resistance</div>
+              <div class="sent-desc">Constitutional petition drives launched in Ohio to ban hyperscale facilities over emissions and water consumption concerns</div>
+            </div>
+            <div class="sentiment-card" style="background:#FEF3C7;border-color:#FDE68A">
+              <div class="sent-emoji">🌐</div>
+              <div class="sent-label" style="color:#92400E">Geopolitics: Allied Consolidation</div>
+              <div class="sent-desc">Japanese capital on former U.S. nuclear site signals massive allied tech supply chain consolidation against adversarial compute parity</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </article>
+
+    <!-- ══════════════════════════════════════════
+         ARTICLE 5 — NVIDIA VERA RUBIN
+    ═══════════════════════════════════════════ -->
+    <article class="article" id="nvidia">
+      <div class="article-header" style="border-bottom:3px solid var(--c5)">
+        <div>
+          <div class="art-num c5">05 / Hardware Roadmap</div>
+          <h2 class="art-title">NVIDIA Vera Rubin Agentic AI Supercomputer Platform Launch</h2>
+        </div>
+        <span class="art-badge bg-c5">GTC 2026</span>
+      </div>
+      <div class="article-meta">
+        <span class="meta-item">📅 March 16, 2026</span>
+        <span class="meta-sep"></span>
+        <span class="meta-item">Source: NVIDIA Official Newsroom / Hashrate Index</span>
+        <span class="meta-sep"></span>
+        <span class="conf-badge lc4 c4">⬤ HIGH Confidence</span>
+      </div>
+
+      <div class="article-body">
+
+        <!-- Overview -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">🔭</span>
+            <span class="subsec-label c5">Overview</span>
+          </div>
+          <p class="lead-text">The exponential rise of agentic artificial intelligence—systems capable of independent, multi-step reasoning, tool use, and digital execution—has exposed severe bandwidth and latency limitations within traditional graphical processing unit architectures. Specifically, the token generation economics of mixture-of-experts models on legacy systems create unacceptable latency for real-time robotic or spatial applications.</p>
+          <p class="body-text">The decisive technical breakthrough addressing this bottleneck is NVIDIA's comprehensive launch of the Vera Rubin platform at the GTC 2026 conference. This architecture completely abandons the paradigm of discrete accelerator cards in favor of a monolithic, liquid-cooled, rack-scale supercomputer comprising seven tightly integrated and codesigned custom chips. Crucially, the platform incorporates the Groq Language Processing Unit architecture—integrated through a $20 billion acquihire and non-exclusive IP licensing agreement rather than a full corporate acquisition—via a dedicated LPX rack to achieve deterministic, ultra-low latency inference, running alongside a new Vera central processing unit optimized explicitly for high-bandwidth data movement.</p>
+          <p class="body-text">The immediate market reaction has been electric, rendering previous generation infrastructure mathematically obsolete for cost-effective frontier model deployment. Cloud service providers and major hyperscalers, including AWS, Google Cloud, and CoreWeave, are aggressively securing capacity in the new systems to avoid falling behind the efficiency curve, triggering a massive wave of immediate capital expenditure.</p>
+        </div>
+
+        <!-- Strategic Impact -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">⚡</span>
+            <span class="subsec-label c5">Strategic Impact</span>
+          </div>
+          <div class="metric-row metric-row-3">
+            <div class="metric-card">
+              <div class="metric-val c5">10×</div>
+              <div class="metric-label">Inference Token Cost</div>
+              <div class="metric-sub">Reduction vs Blackwell NVL72</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val c5">35×</div>
+              <div class="metric-label">Throughput / Megawatt</div>
+              <div class="metric-sub">NVL72 + LPX vs Blackwell</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val c5">4×</div>
+              <div class="metric-label">Fewer GPUs for MoE</div>
+              <div class="metric-sub">Training vs Blackwell</div>
+            </div>
+          </div>
+          <!-- Spec comparison bars -->
+          <div class="spec-compare" style="margin-top:14px">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px">Performance Delta vs. Blackwell NVL72 (Verified)</div>
+            <div class="spec-row">
+              <span class="spec-label">Inference Token Cost</span>
+              <div class="spec-bar-wrap"><div class="spec-bar bg-c5" style="width:100%"></div></div>
+              <span class="spec-val c5">10× better</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Throughput/MW (+ LPX)</span>
+              <div class="spec-bar-wrap"><div class="spec-bar bg-c5" style="width:100%"></div></div>
+              <span class="spec-val c5">35× better</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">GPU Compute (50 PF vs 10)</span>
+              <div class="spec-bar-wrap"><div class="spec-bar bg-c5" style="width:100%"></div></div>
+              <span class="spec-val c5">5× better</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">NVLink Bandwidth</span>
+              <div class="spec-bar-wrap"><div class="spec-bar bg-c5" style="width:60%"></div></div>
+              <span class="spec-val c5">2× better</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">GPUs Needed (MoE Train)</span>
+              <div class="spec-bar-wrap"><div class="spec-bar bg-c5" style="width:40%"></div></div>
+              <span class="spec-val c5">4× fewer</span>
+            </div>
+          </div>
+          <div class="impact-box lc5" style="border-left:4px solid var(--c5);margin-top:12px">
+            <p style="font-size:13.5px;line-height:1.75;color:var(--ink)">The Vera Rubin platform introduces a paradigm shift that will dramatically devalue existing Ampere, Hopper, and even early Blackwell generation clusters by fundamentally altering the cost-per-token economics of the artificial intelligence sector. By demonstrating a tenfold reduction in inference costs and a 35x higher throughput per megawatt when the full NVL72 and LPX rack combination is deployed against Blackwell NVL72 baselines—and a 10x improvement for Vera Rubin NVL72 in isolation—NVIDIA ensures that operators utilizing legacy hardware will be structurally unable to price-match compute services competitively in the open market. The extreme codesign strategy deepens the moat around NVIDIA's ecosystem, forcing integrators to adopt their proprietary networking (ConnectX-9), switching (NVLink 6), and storage protocols (BlueField-4) entirely, rather than blending heterogeneous hardware from competitors like AMD or Intel.</p>
+          </div>
+        </div>
+
+        <!-- Technical Deep Dive -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">🔬</span>
+            <span class="subsec-label c5">Technical Deep Dive</span>
+            <span class="subsec-tag lc5 c5">7-Chip Architecture &amp; Full Specifications</span>
+          </div>
+          <!-- Architecture diagram -->
+          <div style="background:var(--c5-l);border:1px solid #DDD6FE;border-radius:10px;padding:16px;margin-bottom:14px">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--c5);margin-bottom:12px">Vera Rubin NVL72 — 7-Chip Codesigned Architecture</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px">
+              <div style="background:#fff;border:1px solid #C4B5FD;border-radius:7px;padding:10px;text-align:center">
+                <div style="font-size:18px;margin-bottom:4px">⚡</div>
+                <div style="font-size:11px;font-weight:700;color:var(--c5)">Rubin GPU</div>
+                <div style="font-size:10px;color:var(--ink-3)">50 PFLOPS NVFP4<br/>22 TB/s HBM4 BW</div>
+              </div>
+              <div style="background:#fff;border:1px solid #C4B5FD;border-radius:7px;padding:10px;text-align:center">
+                <div style="font-size:18px;margin-bottom:4px">🧠</div>
+                <div style="font-size:11px;font-weight:700;color:var(--c5)">Vera CPU</div>
+                <div style="font-size:10px;color:var(--ink-3)">1.2 TB/s memory BW<br/>High-BW data movement</div>
+              </div>
+              <div style="background:#fff;border:1px solid #C4B5FD;border-radius:7px;padding:10px;text-align:center">
+                <div style="font-size:18px;margin-bottom:4px">🔗</div>
+                <div style="font-size:11px;font-weight:700;color:var(--c5)">NVLink 6 Switch</div>
+                <div style="font-size:10px;color:var(--ink-3)">3.6 TB/s all-to-all<br/>per GPU</div>
+              </div>
+              <div style="background:#fff;border:1px solid #C4B5FD;border-radius:7px;padding:10px;text-align:center">
+                <div style="font-size:18px;margin-bottom:4px">🚀</div>
+                <div style="font-size:11px;font-weight:700;color:var(--c5)">Groq LPU</div>
+                <div style="font-size:10px;color:var(--ink-3)">Ultra-low latency<br/>deterministic inference</div>
+              </div>
+              <div style="background:#fff;border:1px solid #C4B5FD;border-radius:7px;padding:10px;text-align:center">
+                <div style="font-size:18px;margin-bottom:4px">🌐</div>
+                <div style="font-size:11px;font-weight:700;color:var(--c5)">ConnectX-9</div>
+                <div style="font-size:10px;color:var(--ink-3)">1.6 Tb/s per GPU<br/>external bandwidth</div>
+              </div>
+              <div style="background:#fff;border:1px solid #C4B5FD;border-radius:7px;padding:10px;text-align:center">
+                <div style="font-size:18px;margin-bottom:4px">💾</div>
+                <div style="font-size:11px;font-weight:700;color:var(--c5)">BlueField-4 DPU</div>
+                <div style="font-size:10px;color:var(--ink-3)">Storage &amp; networking<br/>offload processing</div>
+              </div>
+              <div style="background:#fff;border:1px solid #C4B5FD;border-radius:7px;padding:10px;text-align:center">
+                <div style="font-size:18px;margin-bottom:4px">💧</div>
+                <div style="font-size:11px;font-weight:700;color:var(--c5)">Liquid Cooling</div>
+                <div style="font-size:10px;color:var(--ink-3)">Mandatory DTC<br/>&gt;120 kW rack density</div>
+              </div>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="info-table">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>Specification</th>
+                  <th>Delta vs Blackwell</th>
+                  <th>Verified</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>GPU Compute (Inference)</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c5)">50 PFLOPS NVFP4</td>
+                  <td style="font-family:var(--mono)">5× improvement</td>
+                  <td>✓ Yes (HashrateIndex)</td>
+                </tr>
+                <tr>
+                  <td>HBM4 Memory Bandwidth</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c5)">22 TB/s</td>
+                  <td style="font-family:var(--mono)">—</td>
+                  <td>✓ Yes (HashrateIndex)</td>
+                </tr>
+                <tr>
+                  <td>NVLink 6 All-to-All BW</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c5)">3.6 TB/s per GPU</td>
+                  <td style="font-family:var(--mono)">2× vs prior NVLink</td>
+                  <td>✓ Yes (Nvidia.com)</td>
+                </tr>
+                <tr>
+                  <td>Per-GPU External BW</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c5)">1.6 Tb/s per GPU</td>
+                  <td style="font-family:var(--mono)">—</td>
+                  <td>✓ Yes (Nvidia.com)</td>
+                </tr>
+                <tr>
+                  <td>Vera CPU Memory BW</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c5)">1.2 TB/s</td>
+                  <td style="font-family:var(--mono)">—</td>
+                  <td>✓ Yes (HashrateIndex)</td>
+                </tr>
+                <tr>
+                  <td>Inference Token Cost</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c5)">10× reduction</td>
+                  <td style="font-family:var(--mono)">vs Blackwell NVL72</td>
+                  <td>✓ Yes (Nvidia Newsroom)</td>
+                </tr>
+                <tr>
+                  <td>MoE Training GPU Count</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c5)">4× fewer required</td>
+                  <td style="font-family:var(--mono)">vs Blackwell</td>
+                  <td>✓ Yes (Nvidia Newsroom)</td>
+                </tr>
+                <tr>
+                  <td>Throughput/MW (NVL72 + LPX)</td>
+                  <td style="font-family:var(--mono);font-weight:700;color:var(--c5)">35× improvement</td>
+                  <td style="font-family:var(--mono)">vs Blackwell NVL72</td>
+                  <td>✓ Yes (multiple sources)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="chart-wrap" style="margin-top:16px">
+            <canvas id="nvidiaChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Visual / Evidence -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">📋</span>
+            <span class="subsec-label c5">Visual / Evidence</span>
+          </div>
+          <div class="warn-box">⚠ No official visual found at time of publication. Architecture diagram derived from verified NVIDIA Newsroom and Hashrate Index source data.</div>
+          <div class="quote-block" style="margin-top:14px">
+            <p>The agentic artificial intelligence inflection point has arrived, and Vera Rubin is kicking off the greatest infrastructure buildout in history with a generational leap built to power every phase of the ecosystem.</p>
+            <div class="quote-attr">— NVIDIA Official Newsroom — nvidianews.nvidia.com</div>
+          </div>
+          <div class="quote-block">
+            <p>Our close collaboration ensures that compute and memory are designed to scale together from day one, allowing the next era to be defined by tightly integrated platforms.</p>
+            <div class="quote-attr">— Micron (on HBM4 production for Vera Rubin) — investors.micron.com</div>
+          </div>
+        </div>
+
+        <!-- Critical View -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">⚠️</span>
+            <span class="subsec-label c5">Critical View</span>
+          </div>
+          <p class="body-text">Despite its monumental, paradigm-shifting performance metrics, the Vera Rubin platform presents severe infrastructure integration challenges that will gate its adoption velocity. The rack-scale, fully liquid-cooled design mandates extreme physical retrofits for existing data centers, heavily penalizing operators lacking access to advanced direct-to-chip thermal management systems capable of handling rack densities exceeding 120 kilowatts.</p>
+          <p class="body-text">The integration of Groq's Language Processing Unit technology, while exceptional for latency reduction, requires the adoption of entirely new software compilation paradigms, which may introduce significant friction for developers accustomed solely to the traditional CUDA environment. Furthermore, the extreme capital cost of the fully populated NVL72 racks and associated multi-chip ecosystem lock-in raises profound concerns about vendor dependency.</p>
+          <p class="body-text">By bundling compute, switching, optics, and storage processing into a singular architectural dependency, NVIDIA grants itself unparalleled, monopolistic leverage over the operational expenditures and roadmap agility of the world's largest technology conglomerates.</p>
+        </div>
+
+        <!-- Community Sentiment -->
+        <div class="subsec">
+          <div class="subsec-head">
+            <span class="subsec-icon">💬</span>
+            <span class="subsec-label c5">Community Sentiment</span>
+          </div>
+          <div class="sentiment-grid">
+            <div class="sentiment-card lc5">
+              <div class="sent-emoji">⚡</div>
+              <div class="sent-label c5">Hyperscalers: Aggressively Securing</div>
+              <div class="sent-desc">AWS, Google Cloud, CoreWeave racing to lock in NVL72 capacity — falling behind the efficiency curve creates existential pricing risk</div>
+            </div>
+            <div class="sentiment-card lc3">
+              <div class="sent-emoji">🗑️</div>
+              <div class="sent-label c3">Legacy Hardware: Obsolete</div>
+              <div class="sent-desc">Ampere, Hopper, early Blackwell clusters mathematically unable to price-match compute services against NVL72 operators</div>
+            </div>
+            <div class="sentiment-card lc1">
+              <div class="sent-emoji">🏰</div>
+              <div class="sent-label c1">NVIDIA: Monopolistic Moat</div>
+              <div class="sent-desc">ConnectX-9, NVLink 6, BlueField-4 bundle creates full-stack lock-in — competitors forced into purely defensive postures</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </article>
+
+    <!-- ══════════════════════════════════════════
          CLOSING SYNTHESIS
-    ════════════════════════════════════ -->
-    <section class="synth" id="synthesis">
-      <div class="synth-sub">Executive Summary &amp; Strategic Roadmap · March 20, 2026</div>
-      <h2 class="synth-title">Closing Synthesis &amp; Trajectory</h2>
+    ═══════════════════════════════════════════ -->
+    <section class="synthesis" id="synthesis">
+      <div class="syn-eyebrow">Executive Summary &amp; Forward-Looking Outlook</div>
+      <h2 class="syn-title">Closing Synthesis &amp; Trajectory</h2>
 
-      <div class="synth-block">
-        <div class="synth-num">01</div>
+      <div class="syn-block">
+        <div class="syn-num">01</div>
         <div>
-          <div class="synth-hdg">Briefing Summary</div>
-          <p class="synth-txt">The artificial intelligence infrastructure sector has decisively exited the phase of unconstrained algorithmic experimentation and has entered a critical inflection point dominated by extreme physical, regulatory, and thermodynamic realities. The strategic events verified within this operational window underscore a macro-transition: the ultimate determinant of AI supremacy is no longer merely software architecture, but rather raw physical scale, energy procurement sovereignty, and absolute supply chain resilience.</p>
+          <div class="syn-heading">Briefing Summary</div>
+          <p class="syn-text">The artificial intelligence infrastructure sector has reached a highly volatile critical inflection point, characterized by the forceful convergence of sovereign capital deployment, extreme hardware codesign paradigms, and aggressive regulatory enforcement over supply chains. The traditional assumption of relying on globalized, horizontally integrated specialized supply chains is rapidly collapsing under the weight of geopolitical realities and physical scaling limits. NVIDIA's launch of the Vera Rubin platform permanently alters the economic geometry of agentic model inference, mandating immediate and incredibly expensive data center retrofits to harness its tenfold token cost efficiency. Concurrently, the staggering $37.5 billion SoftBank and AEP Ohio project, alongside Tesla's initial twenty-billion-dollar Terafab commitment—with total build-out costs estimated to reach as high as forty billion dollars by decade's end—demonstrates that tier-one players are aggressively bypassing traditional bottlenecks. They are no longer merely purchasing silicon; they are vertically integrating gigawatt-scale power plants, high-voltage transmission grids, and fundamental sub-three-nanometer chip fabrication capabilities. This aggressive physical expansion is colliding forcefully with federal and state realities, as evidenced by the Department of Justice's ruthless pursuit of high-level OEM executives for supply chain smuggling, and the White House's attempt to preemptively standardize the legal landscape through overarching federal legislative proposals. Capital allocation must urgently pivot away from isolated hardware acquisitions toward holistic, hyper-localized, and highly secured sovereign technology stacks to survive the next iteration of the artificial intelligence arms race.</p>
         </div>
       </div>
 
-      <div class="synth-block">
-        <div class="synth-num">02</div>
+      <div class="syn-block">
+        <div class="syn-num">02</div>
         <div>
-          <div class="synth-hdg">Energy &amp; Supply Chain Layer</div>
-          <p class="synth-txt">The historic 10-gigawatt public-private partnership between the U.S. Department of Energy, SoftBank, and AEP Ohio acts as the primary catalyst in this transition. It demonstrates conclusively that securing dedicated, massive-scale base-load power—predominantly through pragmatic natural gas deployments connected to and reinforcing the regional grid—is now the ultimate prerequisite for frontier AI deployment. This shifts the capital allocation model, establishing new financial parameters that only nation-states and top-tier hyperscalers can comfortably accommodate without destroying balance sheet integrity. Concurrently, NVIDIA's comprehensive rollout of the Vera Rubin platform forces an uncompromising industry-wide pivot toward liquid-cooled, vertically integrated rack architectures. By lowering token generation costs by an order of magnitude and integrating custom Vera CPUs alongside Groq 3 LPX inference accelerators, NVIDIA is systematically depreciating the economic viability of legacy air-cooled clusters and encroaching heavily upon the traditional x86 orchestration market.</p>
+          <div class="syn-heading">Regulatory &amp; Enforcement Layer</div>
+          <p class="syn-text">The White House's newly proposed National Policy Framework seeks to weaponize federal legislative supremacy to shield critical AI infrastructure from fragmented, highly restrictive state-level regulations. If successfully passed by Congress, this framework proposes to establish a highly favorable, deregulated environment optimized for massive domestic data center expansion and rapid grid permitting. Concurrently, the unsealed Department of Justice indictment of Supermicro's co-founder for a $2.5 billion silicon smuggling operation exposes catastrophic, systemic vulnerabilities within the global hardware supply chain's auditing mechanisms, severely penalizing opaque integration networks and demanding an immediate re-evaluation of OEM counterparty risk.</p>
         </div>
       </div>
 
-      <div class="synth-block">
-        <div class="synth-num">03</div>
+      <div class="syn-block">
+        <div class="syn-num">03</div>
         <div>
-          <div class="synth-hdg">Regulatory &amp; Legal Turbulence</div>
-          <p class="synth-txt">However, these aggressive physical infrastructure deployments are violently counterbalanced by profound regulatory and geopolitical turbulence. The criminal indictment of an entity identified by media reports as Supermicro's executive leadership over alleged multibillion-dollar export diversion schemes exposes severe frailties in current geopolitical containment strategies. This unprecedented legal action will inevitably trigger aggressive compliance friction, intensive Bureau of Industry and Security (BIS) audits, and widespread procurement paranoia, disrupting near-term hardware delivery schedules across the entire original equipment manufacturer (OEM) ecosystem. In parallel, the White House has formally introduced a sweeping National Policy Framework for Artificial Intelligence to Congress, proposing the preemption of discordant state-level laws to create a unified regulatory landscape and explicitly targeting the streamlining of data center permitting to ease physical expansion bottlenecks. However, given that Congress has already rejected analogous preemption provisions in two prior legislative vehicles this session, investors should assign low near-term probability to binding statutory outcomes from this framework.</p>
+          <div class="syn-heading">Infrastructure &amp; Silicon Layer</div>
+          <p class="syn-text">On the technological front, the SoftBank and AEP Ohio partnership demonstrates that hyperscaler-adjacent infrastructure now requires sovereign-scale power generation — not procurement. Tesla's highly ambitious $20–$40 billion Terafab gambit aims to shatter reliance on the TSMC/Samsung foundry duopoly by internalizing the 2nm manufacturing process. Anchoring all of these shifts is NVIDIA's strategic masterstroke at GTC 2026: the co-optation of the inference market through the direct integration of Groq LPUs into the Vera Rubin hardware architecture, delivering 35× throughput-per-megawatt improvements that cement an architectural monopoly forcing all competitors into defensive, reactionary postures.</p>
         </div>
       </div>
 
-      <div class="synth-block">
-        <div class="synth-num">04</div>
+      <div class="syn-block">
+        <div class="syn-num">04</div>
         <div>
-          <div class="synth-hdg">Silicon Sovereignty &amp; Capital Mandate</div>
-          <p class="synth-txt">Finally, Tesla's aggressive push to secure 40,000 wafers per month on Samsung's unproven 2-nanometer process—figures that remain unverified and sourced from a single secondary outlet—vividly illustrates the extreme lengths to which organizations will go to establish sovereign, vertically integrated silicon pipelines. By accepting massive foundry execution risk at the Taylor, Texas facility, Tesla seeks to permanently escape the pricing power and allocation constraints of merchant GPU monopolies. Moving forward, capital allocators must aggressively pivot their defensive strategies toward firms actively securing locked-in utility agreements and those remaining unburdened by export control liabilities. Success in the upcoming fiscal cycles requires prioritizing physical asset reality and regulatory compliance over theoretical architectural capability.</p>
+          <div class="syn-heading">Capital Allocation Mandate</div>
+          <p class="syn-text">For capital allocators, the mandate resulting from this cycle is clear: direct major investments toward sovereign-secure infrastructure plays, agile sovereign-aligned neoclouds, and entities controlling the physical packaging and power delivery layers, while heavily discounting legacy hardware assemblers exposed to Asian regulatory or supply chain attrition.</p>
         </div>
       </div>
 
-      <div class="outlook">
-        <div class="out-title">Anticipated High-Impact Events — Next Quarter to 12 Months</div>
+      <div class="outlook-box">
+        <div class="outlook-title">Anticipated High-Impact Events — Next Quarter to 12 Months</div>
 
-        <div class="out-item">
-          <span class="out-badge" style="background:rgba(16,185,129,.2);color:#6EE7B7">CONFIRMED SCHEDULED</span>
-          <p class="out-txt">Full commercial availability and broad customer shipment of the NVIDIA Vera Rubin NVL72 platforms in the second half of 2026, forcing a massive capital cycle upgrade among hyperscalers.</p>
+        <div class="outlook-item">
+          <span class="outlook-badge" style="background:rgba(220,38,38,.2);color:#FCA5A5">CONFIRMED SCHEDULED</span>
+          <p class="outlook-text">The preliminary injunction hearing regarding Anthropic's lawsuit against the Department of Defense over the "supply chain risk" designation is set for March 24, 2026, before Judge Rita Lin in the Northern District of California, which will establish immediate legal precedent regarding the military procurement of autonomous systems and the rights of developers to enforce algorithmic guardrails.</p>
         </div>
 
-        <div class="out-item">
-          <span class="out-badge" style="background:rgba(220,38,38,.2);color:#FCA5A5">WIDELY ANTICIPATED</span>
-          <p class="out-txt">Severe secondary market contractions and intense supply chain audits targeting the manufacturer implicated in the DOJ indictment and its enterprise customers, as the Department of Justice expands its export control enforcement investigations into related OEMs and logistics providers.</p>
+        <div class="outlook-item">
+          <span class="outlook-badge" style="background:rgba(16,185,129,.2);color:#6EE7B7">WIDELY ANTICIPATED</span>
+          <p class="outlook-text">SoftBank and American Electric Power are expected to officially break ground on the massive ten-gigawatt Ohio data center campus and initiate the installation of the initial natural gas turbines by the end of the year, cementing the physical reality of the gigawatt-class artificial intelligence ecosystem despite ongoing grid interconnection scrutiny and active environmental remediation obligations at the Portsmouth site.</p>
         </div>
 
-        <div class="out-item">
-          <span class="out-badge" style="background:rgba(59,130,246,.2);color:#93C5FD">WIDELY ANTICIPATED</span>
-          <p class="out-txt">Intense global political friction and highly contested congressional battles following the introduction of the White House's National Policy Framework, with state lawmakers and privacy advocates actively introducing federal legislation to block the proposed preemption of state-level AI regulations. Prior congressional rejection of analogous preemption provisions further constrains the probability of near-term passage.</p>
+        <div class="outlook-item">
+          <span class="outlook-badge" style="background:rgba(124,58,237,.2);color:#C4B5FD">SPECULATIVE</span>
+          <p class="outlook-text">Based on mounting logistical delays at incumbent foundries and extreme ultraviolet lithography backlogs, Tesla's AI6 autonomous driving silicon—already tracking approximately six months behind schedule due to Samsung 2nm production constraints—may suffer further cascading tape-out delays, pushing volume production well beyond its current late-2026 target, forcing the conglomerate to rely on its internal Terafab capabilities earlier than structurally viable.</p>
         </div>
 
-        <div class="out-item">
-          <span class="out-badge" style="background:rgba(245,158,11,.2);color:#FCD34D">SPECULATIVE</span>
-          <p class="out-txt">Potential cascading delays in Tesla's AI6 December 2026 tape-out milestone due to suspected yield instability and timeline slippage within Samsung's nascent 2-nanometer Gate-All-Around (GAA) fabrication process at the Taylor, Texas facility; an inference based on historical challenges scaling new process nodes, recent supply chain reports, and the CEO's own conditional framing of the timeline.</p>
+        <div class="outlook-item">
+          <span class="outlook-badge" style="background:rgba(245,158,11,.2);color:#FCD34D">SPECULATIVE</span>
+          <p class="outlook-text">Regulatory backlash from the European Union is highly probable in response to the aggressive deregulation and federal preemption proposed within the United States National Artificial Intelligence Legislative Framework, potentially resulting in retaliatory data localization mandates against American foundational models.</p>
         </div>
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer style="text-align:center;padding:20px 0 40px;color:var(--ink-3);font-size:11px;line-height:1.9">
-      <div style="font-weight:700;margin-bottom:4px">AI Infrastructure Briefing · March 20, 2026</div>
+    <footer style="text-align:center;padding:16px 0 36px;color:var(--ink-3);font-size:11px;line-height:1.9">
+      <div style="font-weight:700;margin-bottom:3px">Strategic AI Infrastructure Briefing · March 2026</div>
       <div>AI-generated content — For reference purposes only · 참고용으로만 이용해주세요</div>
-      <div style="margin-top:6px;opacity:.6;font-size:10px">Sources: U.S. Department of Energy · U.S. Department of Justice · The White House · NVIDIA · Teslarati · SammyFans · Sullivan &amp; Cromwell LLP</div>
+      <div style="margin-top:6px;font-size:10px;opacity:.6">Sources: MLQ.ai · Electrek · The White House · U.S. Department of Justice · U.S. Department of Energy · NVIDIA Newsroom · Hashrate Index</div>
     </footer>
 
   </main>
@@ -1003,149 +1498,141 @@ p.body:last-child{margin-bottom:0}
 
 <!-- Charts -->
 <script>
-Chart.defaults.font.family = "'DM Sans', sans-serif";
-Chart.defaults.color = '#7C7568';
+Chart.defaults.font.family = "'Instrument Sans', sans-serif";
+Chart.defaults.color = '#7A736A';
+Chart.defaults.borderColor = '#E4E0D8';
 
-// Ohio Power Chart
-(function(){
-  const ctx = document.getElementById('ohioChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Natural Gas Generation (GW)', 'Other Power Sources (GW)', 'Japanese Capital ($B)', 'Transmission Investment ($B)'],
-      datasets: [{
-        label: 'Value',
-        data: [9.2, 0.8, 33.3, 4.2],
-        backgroundColor: ['#FCD34D','#FDE68A','#F59E0B','#D97706'],
-        borderRadius: 5,
-        borderWidth: 0,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        title: { display: true, text: 'Ohio 10GW Partnership: Power & Capital Breakdown', font: { size: 12, weight: '600' } },
-        tooltip: { callbacks: { label: c => {
-          const units = [' GW',' GW',' Billion USD',' Billion USD'];
-          return ' ' + c.raw + units[c.dataIndex];
-        }}}
-      },
-      scales: {
-        y: { beginAtZero: true, grid: { color: '#EEEBE3' }, ticks: { font: { size: 10 } } },
-        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
-      }
-    }
-  });
-})();
-
-// Supermicro Chart
-(function(){
-  const ctx = document.getElementById('smciChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Total Alleged Scheme ($B)', 'Apr–May 2025 Confirmed ($M / 100)', 'SMCI Equity Decline (%)'],
-      datasets: [{
-        label: 'Financial Impact',
-        data: [2.5, 5.1, 28],
-        backgroundColor: ['#DC2626','#F87171','#FCA5A5'],
-        borderRadius: 5,
-        borderWidth: 0,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        title: { display: true, text: 'Supermicro Indictment: Financial & Market Impact', font: { size: 12, weight: '600' } },
-        tooltip: { callbacks: { label: c => {
-          const labels = ['$' + c.raw + 'B total scheme value','$' + (c.raw * 100) + 'M confirmed diversion','−' + c.raw + '% equity loss'];
-          return ' ' + labels[c.dataIndex];
-        }}}
-      },
-      scales: {
-        y: { beginAtZero: true, grid: { color: '#EEEBE3' }, ticks: { font: { size: 10 } } },
-        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
-      }
-    }
-  });
-})();
-
-// Policy Chart
-(function(){
-  const ctx = document.getElementById('policyChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Compliance Burden', 'Legal Uncertainty', 'DC Permit Friction', 'Innovation Risk'],
-      datasets: [
-        { label: 'Current (50-State Fragmented)', data: [88, 82, 75, 80], backgroundColor: '#FCA5A5', borderColor: '#DC2626', borderWidth: 1.5, borderRadius: 4 },
-        { label: 'Proposed Federal Framework', data: [20, 18, 28, 15], backgroundColor: '#BFDBFE', borderColor: '#1D4ED8', borderWidth: 1.5, borderRadius: 4 }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'top', labels: { font: { size: 11 } } },
-        title: { display: true, text: 'Regulatory Burden: Current vs Proposed Federal Framework (Indexed 0–100)', font: { size: 12, weight: '600' } }
-      },
-      scales: {
-        y: { beginAtZero: true, max: 100, grid: { color: '#EEEBE3' }, ticks: { font: { size: 10 } } },
-        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
-      }
-    }
-  });
-})();
-
-// NVIDIA Performance Chart
-(function(){
-  const ctx = document.getElementById('nvidiaChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['FP4 Compute (PFLOPS)', 'HBM Bandwidth per GPU (TB/s)', 'Token Cost Reduction (vs Blkwl 10×)', 'NVLink BW per GPU (TB/s)'],
-      datasets: [
-        { label: 'Blackwell (Prior Gen, Normalized)', data: [10, 8, 1, 1.8], backgroundColor: '#D1FAE5', borderColor: '#059669', borderWidth: 1.5, borderRadius: 4 },
-        { label: 'Vera Rubin (NVL72)', data: [50, 22, 10, 3.6], backgroundColor: '#6EE7B7', borderColor: '#059669', borderWidth: 1.5, borderRadius: 4 }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'top', labels: { font: { size: 11 } } },
-        title: { display: true, text: 'NVIDIA Vera Rubin vs Blackwell: Key Performance Metrics', font: { size: 12, weight: '600' } }
-      },
-      scales: {
-        y: { beginAtZero: true, grid: { color: '#EEEBE3' }, ticks: { font: { size: 10 } } },
-        x: { grid: { display: false }, ticks: { font: { size: 9 } } }
-      }
-    }
-  });
-})();
-
-// Tesla AI Chip Roadmap Chart
+// TESLA — AI5 vs AI4 performance comparison
 (function(){
   const ctx = document.getElementById('teslaChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Compute Performance\n(Relative)', 'Memory Capacity\n(Relative)', 'Process Node\nAdvancement', 'Integration Efficiency\n(Relative)'],
-      datasets: [
-        { label: 'AI4 (Baseline)', data: [1, 1, 1, 1], backgroundColor: '#EDE9FE', borderColor: '#7C3AED', borderWidth: 1.5, borderRadius: 4 },
-        { label: 'AI5 (Volume First)', data: [10, 4, 2, 2], backgroundColor: '#C4B5FD', borderColor: '#7C3AED', borderWidth: 1.5, borderRadius: 4 },
-        { label: 'AI6 (Target: 2× AI5)', data: [20, 8, 3, 4], backgroundColor: '#7C3AED', borderColor: '#5B21B6', borderWidth: 1.5, borderRadius: 4 }
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Compute Performance (AI5 vs AI4)','Memory Capacity (AI5 vs AI4)','Single Chip Match (AI6 vs AI5 dual)'],
+      datasets:[
+        {label:'AI4 (Baseline)',data:[1,1,1],backgroundColor:'#FEF3C7',borderColor:'#D97706',borderWidth:2,borderRadius:5},
+        {label:'AI5 / AI6 (Terafab Target)',data:[45,9,2],backgroundColor:'#D97706',borderColor:'#B45309',borderWidth:0,borderRadius:5}
       ]
     },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'top', labels: { font: { size: 11 } } },
-        title: { display: true, text: 'Tesla AI Chip Generational Roadmap (Relative Performance Units)', font: { size: 12, weight: '600' } }
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{position:'top',labels:{font:{size:11},boxWidth:12}},
+        title:{display:true,text:'Tesla AI5/AI6 vs AI4: Performance Delta (Relative Units — Single-Source, Unverified)',font:{size:11.5,weight:'600'},color:'#3C3830'}
       },
-      scales: {
-        y: { beginAtZero: true, grid: { color: '#EEEBE3' }, ticks: { font: { size: 10 } } },
-        x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+      scales:{
+        y:{beginAtZero:true,grid:{color:'#F0EDE6'},ticks:{font:{size:10}}},
+        x:{grid:{display:false},ticks:{font:{size:10}}}
+      }
+    }
+  });
+})();
+
+// POLICY — State vs Federal regulatory burden index
+(function(){
+  const ctx = document.getElementById('policyChart').getContext('2d');
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Compliance\nOverhead','Permit\nLatency','Legal\nCertainty','CapEx\nRisk','Energy\nCost Stability'],
+      datasets:[
+        {label:'Current State-Level (Burden Index)',data:[85,88,18,72,40],backgroundColor:'#FECACA',borderColor:'#DC2626',borderWidth:1.5,borderRadius:5},
+        {label:'Proposed Federal Framework (Burden Index)',data:[22,28,78,26,72],backgroundColor:'#BFDBFE',borderColor:'#1D4ED8',borderWidth:1.5,borderRadius:5}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{position:'top',labels:{font:{size:11},boxWidth:12}},
+        title:{display:true,text:'Regulatory Impact Comparison: Current State-Level vs. Proposed Federal Framework (Indexed 0–100)',font:{size:11.5,weight:'600'},color:'#3C3830'}
+      },
+      scales:{
+        y:{beginAtZero:true,max:100,grid:{color:'#F0EDE6'},ticks:{font:{size:10}}},
+        x:{grid:{display:false},ticks:{font:{size:10}}}
+      }
+    }
+  });
+})();
+
+// SUPERMICRO — Financial impact bar chart
+(function(){
+  const ctx = document.getElementById('supermicroChart').getContext('2d');
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Total Server\nPurchases Alleged ($B)','Value Confirmed\nDiverted to China ($M)'],
+      datasets:[{
+        label:'USD',
+        data:[2500,510],
+        backgroundColor:['#DC2626','#F87171'],
+        borderRadius:6,borderWidth:0
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{display:false},
+        title:{display:true,text:'DOJ Supermicro Indictment — Financial Scale (USD Millions)',font:{size:11.5,weight:'600'},color:'#3C3830'},
+        tooltip:{callbacks:{label:c=>' $'+c.raw.toLocaleString()+'M'}}
+      },
+      scales:{
+        y:{beginAtZero:true,grid:{color:'#F0EDE6'},ticks:{font:{size:10},callback:v=>'$'+v+'M'}},
+        x:{grid:{display:false},ticks:{font:{size:10}}}
+      }
+    }
+  });
+})();
+
+// SOFTBANK — Power breakdown + financial comparison
+(function(){
+  const ctx = document.getElementById('softbankChart').getContext('2d');
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Japanese Capital\nCommitment ($B)','Transmission\nInvestment ($B)','Natural Gas\nGeneration (GW)','Total Data Center\nCapacity (GW)'],
+      datasets:[{
+        label:'Value',
+        data:[33.3,4.2,9.2,10],
+        backgroundColor:['#0F766E','#14B8A6','#5EEAD4','#99F6E4'],
+        borderRadius:6,borderWidth:0
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{display:false},
+        title:{display:true,text:'SoftBank & AEP Ohio Partnership — Capital & Power Metrics',font:{size:11.5,weight:'600'},color:'#3C3830'}
+      },
+      scales:{
+        y:{beginAtZero:true,grid:{color:'#F0EDE6'},ticks:{font:{size:10}}},
+        x:{grid:{display:false},ticks:{font:{size:10}}}
+      }
+    }
+  });
+})();
+
+// NVIDIA — Performance delta vs Blackwell
+(function(){
+  const ctx = document.getElementById('nvidiaChart').getContext('2d');
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Inference Token\nCost Reduction','GPU Compute\nImprovement','NVLink\nBandwidth','MoE GPU Count\nReduction','Throughput/MW\n(NVL72 + LPX)'],
+      datasets:[
+        {label:'Blackwell NVL72 (Baseline = 1×)',data:[1,1,1,1,1],backgroundColor:'#E9D5FF',borderColor:'#7C3AED',borderWidth:1.5,borderRadius:5},
+        {label:'Vera Rubin (Improvement Factor)',data:[10,5,2,4,35],backgroundColor:'#7C3AED',borderColor:'#5B21B6',borderWidth:0,borderRadius:5}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{position:'top',labels:{font:{size:11},boxWidth:12}},
+        title:{display:true,text:'NVIDIA Vera Rubin NVL72 — Verified Performance Delta vs. Blackwell NVL72',font:{size:11.5,weight:'600'},color:'#3C3830'},
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw}×`}}
+      },
+      scales:{
+        y:{beginAtZero:true,grid:{color:'#F0EDE6'},ticks:{font:{size:10},callback:v=>v+'×'}},
+        x:{grid:{display:false},ticks:{font:{size:9}}}
       }
     }
   });
@@ -1155,5 +1642,6 @@ Chart.defaults.color = '#7C7568';
 <a href="index.html" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; padding: 14px 24px; background-color: var(--ink); color: #fff; text-decoration: none; border-radius: 50px; font-weight: 500; font-family: var(--sans); box-shadow: var(--shadow-lg); font-size: 14px; transition: transform 0.2s;">
   ⬅️ 제미나이 버전 보기
 </a>
+
 </body>
 </html>
