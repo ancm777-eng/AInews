@@ -3,766 +3,814 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Strategic AI Infrastructure & System Tech Advisory Report</title>
+<title>Strategic AI Infrastructure Report — March 25, 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  :root {
-    --bg-page: #F8FAFC;
-    --bg-surface: #FFFFFF;
-    --text-main: #0F172A;
-    --text-muted: #475569;
-    --text-light: #94A3B8;
-    --border: #E2E8F0;
-    
-    --c-blue: #2563EB;
-    --c-blue-bg: #EFF6FF;
-    --c-emerald: #059669;
-    --c-emerald-bg: #ECFDF5;
-    --c-violet: #7C3AED;
-    --c-violet-bg: #F5F3FF;
-    --c-orange: #EA580C;
-    --c-orange-bg: #FFF7ED;
-    --c-red: #DC2626;
-    --c-red-bg: #FEF2F2;
+/* ── Reset & Variables ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    --font-sans: 'Plus Jakarta Sans', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-    
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --radius-md: 12px;
-    --radius-lg: 16px;
-  }
+:root {
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --ink: #0F172A;
+  --ink-2: #334155;
+  --ink-3: #64748B;
+  --border: #E2E8F0;
+  --border-2: #CBD5E1;
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--font-sans); background-color: var(--bg-page); color: var(--text-main); line-height: 1.7; -webkit-font-smoothing: antialiased; }
-  
-  /* Disclaimer */
-  .disclaimer { background-color: #FEF08A; color: #854D0E; text-align: center; padding: 12px 20px; font-size: 13px; font-weight: 600; border-bottom: 2px solid #FDE047; }
+  /* Vibrant Accent Colors */
+  --c1: #2563EB;   /* Arm - Blue */
+  --c1-light: #EFF6FF;
+  --c2: #059669;   /* Pax Silica - Emerald */
+  --c2-light: #ECFDF5;
+  --c3: #DC2626;   /* Senate - Red */
+  --c3-light: #FEF2F2;
+  --c4: #7C3AED;   /* NVIDIA - Violet */
+  --c4-light: #F5F3FF;
+  --c5: #D97706;   /* HP - Amber */
+  --c5-light: #FFFBEB;
 
-  /* Header */
-  .header { background-color: #0F172A; color: #FFFFFF; position: sticky; top: 0; z-index: 100; padding: 16px 0; box-shadow: var(--shadow-md); }
-  .header-content { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
-  .brand { display: flex; align-items: center; gap: 12px; }
-  .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #3B82F6, #8B5CF6); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; letter-spacing: -1px; }
-  .title-group h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-  .title-group p { font-size: 12px; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-top: 2px; }
+  --sans: 'Inter', system-ui, sans-serif;
+  --serif: 'DM Serif Display', serif;
+  --mono: 'JetBrains Mono', monospace;
 
-  /* Layout */
-  .container { max-width: 1200px; margin: 40px auto; padding: 0 24px; display: grid; grid-template-columns: 240px 1fr; gap: 40px; align-items: start; }
-  
-  /* Sidebar */
-  .sidebar { position: sticky; top: 100px; background: var(--bg-surface); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
-  .sidebar h3 { font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin-bottom: 16px; }
-  .sidebar-nav { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sidebar-nav a { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-decoration: none; padding: 8px 12px; border-radius: 8px; transition: all 0.2s; border: 1px solid transparent; }
-  .sidebar-nav a:hover { background-color: var(--bg-page); color: var(--text-main); border-color: var(--border); }
-  .nav-dot { width: 10px; height: 10px; border-radius: 50%; }
+  --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+  --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+  --radius: 16px;
+  --radius-sm: 8px;
+}
 
-  /* Main Content */
-  .main { min-width: 0; }
-  .article-card { background: var(--bg-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 40px; overflow: hidden; }
-  .article-header { padding: 32px; border-bottom: 1px solid var(--border); }
-  .article-meta-top { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
-  .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-  .article-date { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-  .article-title { font-size: 24px; font-weight: 800; color: var(--text-main); line-height: 1.3; letter-spacing: -0.5px; margin-bottom: 12px; }
-  .article-source { font-size: 13px; font-weight: 600; color: var(--c-blue); }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
 
-  .article-body { padding: 32px; }
-  
-  /* Sections */
-  .section-block { margin-bottom: 32px; }
-  .section-block:last-child { margin-bottom: 0; }
-  .section-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--bg-page); }
-  .section-title.overview { color: var(--c-blue); border-color: var(--c-blue-bg); }
-  .section-title.impact { color: var(--c-emerald); border-color: var(--c-emerald-bg); }
-  .section-title.tech { color: var(--c-violet); border-color: var(--c-violet-bg); }
-  .section-title.visual { color: var(--c-orange); border-color: var(--c-orange-bg); }
-  .section-title.critical { color: var(--c-red); border-color: var(--c-red-bg); }
-  .section-title.sentiment { color: var(--text-main); border-color: var(--border); }
+/* ── Disclaimer ── */
+.disclaimer {
+  background: #FEF9C3;
+  border-bottom: 2px solid #FACC15;
+  padding: 12px 20px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #854D0E;
+  line-height: 1.5;
+}
 
-  p.text-content { font-size: 15px; color: var(--text-muted); margin-bottom: 16px; }
-  p.text-content:last-child { margin-bottom: 0; }
-  
-  /* Tables */
-  .data-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
-  .data-table th { background: var(--bg-page); padding: 12px 16px; text-align: left; font-weight: 700; color: var(--text-muted); border-bottom: 2px solid var(--border); }
-  .data-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-main); vertical-align: top; }
-  .data-table tr:last-child td { border-bottom: none; }
-  .data-table td:first-child { font-weight: 700; color: var(--text-main); font-family: var(--font-mono); }
+/* ── Header ── */
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+.header-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.header-brand { display: flex; align-items: center; gap: 14px; }
+.header-logo {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, #2563EB, #7C3AED);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif);
+  font-size: 20px; color: #fff;
+}
+.header-title { font-family: var(--serif); font-size: 22px; color: var(--ink); }
+.header-meta { font-size: 12px; color: var(--ink-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.header-nav { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav-chip {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+  text-transform: uppercase; padding: 6px 12px;
+  border-radius: 20px; text-decoration: none;
+  background: var(--bg);
+  color: var(--ink-2);
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.nav-chip:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
 
-  /* Infographics & Charts */
-  .infographic-wrapper { background: var(--bg-page); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; margin: 24px 0; }
-  .chart-container { position: relative; height: 300px; width: 100%; }
-  
-  /* Block Diagrams (CSS) */
-  .css-diagram { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 20px; flex-wrap: wrap; }
-  .diag-node { background: var(--bg-surface); border: 2px solid var(--border); border-radius: 10px; padding: 16px 24px; text-align: center; min-width: 160px; box-shadow: var(--shadow-sm); }
-  .diag-node h4 { font-size: 14px; font-weight: 800; margin-bottom: 4px; }
-  .diag-node p { font-size: 11px; color: var(--text-muted); font-weight: 500; }
-  .diag-arrow { font-size: 24px; color: var(--text-light); font-weight: bold; }
+/* ── Layout ── */
+.layout {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 40px 28px 80px;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+.sidebar { position: sticky; top: 100px; }
+.sidebar-title { font-size: 11px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; padding-left: 12px; }
+.sidebar-nav { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.sidebar-nav a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 10px;
+  font-size: 13px; font-weight: 600;
+  text-decoration: none; color: var(--ink-2);
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.sidebar-nav a:hover { background: var(--surface); border-color: var(--border); box-shadow: var(--shadow); }
+.sidebar-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
-  /* Quotes / Sentiment */
-  .quote-box { background: var(--bg-page); border-left: 4px solid var(--text-light); padding: 16px 20px; margin-bottom: 16px; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
-  .quote-text { font-size: 14px; font-style: italic; color: var(--text-muted); margin-bottom: 8px; }
-  .quote-author { font-size: 12px; font-weight: 700; color: var(--text-main); }
+.main-content { min-width: 0; }
 
-  /* Synthesis Section */
-  .synthesis-section { background: #0F172A; color: #FFFFFF; border-radius: var(--radius-lg); padding: 48px; box-shadow: var(--shadow-lg); }
-  .synthesis-section h2 { font-size: 28px; font-weight: 800; margin-bottom: 24px; letter-spacing: -0.5px; }
-  .syn-block { margin-bottom: 32px; }
-  .syn-block h3 { font-size: 16px; color: #38BDF8; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
-  .syn-block p { font-size: 15px; color: #CBD5E1; line-height: 1.8; margin-bottom: 16px; }
-  
-  .outlook-list { list-style: none; display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
-  .outlook-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; }
-  .outlook-status { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; margin-bottom: 12px; }
-  .status-confirmed { background: rgba(52,211,153,0.2); color: #34D399; }
-  .status-anticipated { background: rgba(96,165,250,0.2); color: #60A5FA; }
-  .status-speculative { background: rgba(251,191,36,0.2); color: #FBBF24; }
-  .outlook-item p { font-size: 14px; color: #F8FAFC; line-height: 1.6; margin: 0; }
+/* ── Executive Intro ── */
+.exec-intro {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin-bottom: 40px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--ink);
+}
+.exec-intro h1 { font-family: var(--serif); font-size: 28px; margin-bottom: 16px; line-height: 1.3; }
+.exec-intro p { font-size: 15px; color: var(--ink-2); line-height: 1.8; }
 
-  /* Colors for items */
-  .theme-1 .badge { background: var(--c-emerald-bg); color: var(--c-emerald); }
-  .theme-2 .badge { background: var(--c-blue-bg); color: var(--c-blue); }
-  .theme-3 .badge { background: var(--c-violet-bg); color: var(--c-violet); }
-  .theme-4 .badge { background: var(--c-orange-bg); color: var(--c-orange); }
-  .theme-5 .badge { background: var(--c-red-bg); color: var(--c-red); }
+/* ── Article Section ── */
+.article {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 48px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.article-header { padding: 32px 32px 24px; border-bottom: 1px solid var(--border); }
+.article-number { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+.article-title { font-family: var(--serif); font-size: 26px; line-height: 1.3; margin-bottom: 16px; }
+.article-meta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.meta-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+.meta-item { font-size: 12px; color: var(--ink-3); font-weight: 500; }
 
-  @media (max-width: 992px) {
-    .container { grid-template-columns: 1fr; gap: 24px; padding: 24px 16px; margin: 20px auto; }
-    .sidebar { position: static; }
-    .sidebar-nav { flex-direction: row; flex-wrap: wrap; }
-    .css-diagram { flex-direction: column; }
-    .diag-arrow { transform: rotate(90deg); }
-    .article-header, .article-body { padding: 24px; }
-    .synthesis-section { padding: 32px 24px; }
-  }
+.article-body { padding: 32px; }
+
+/* ── Subsections ── */
+.subsection { margin-bottom: 36px; }
+.subsection:last-child { margin-bottom: 0; }
+.subsection-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px; padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+.subsection-label { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+
+p.body-text { font-size: 15px; line-height: 1.75; color: var(--ink-2); margin-bottom: 14px; }
+p.body-text:last-child { margin-bottom: 0; }
+
+/* ── Highlight Boxes ── */
+.impact-box { border-radius: var(--radius-sm); padding: 20px; border-left: 4px solid; background: var(--bg); margin-bottom: 20px; }
+.quote-block { border-left: 3px solid var(--border-2); padding: 16px 20px; margin: 16px 0; background: var(--bg); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.quote-block p { font-size: 14.5px; font-style: italic; color: var(--ink-2); }
+.quote-attr { font-size: 12px; font-weight: 700; color: var(--ink-3); margin-top: 8px; }
+
+/* ── Tables & Specs ── */
+.spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.spec-item { background: var(--bg); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-sm); }
+.spec-label { font-size: 11px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.spec-val { font-size: 16px; font-weight: 700; font-family: var(--mono); color: var(--ink); }
+.spec-quote { font-size: 12px; color: var(--ink-3); margin-top: 6px; font-style: italic; border-top: 1px dashed var(--border-2); padding-top: 6px; }
+
+.info-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; }
+.info-table th { background: var(--bg); padding: 12px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--ink-3); border-bottom: 2px solid var(--border); }
+.info-table td { padding: 12px; border-bottom: 1px solid var(--border); color: var(--ink-2); vertical-align: top; }
+.info-table tr:hover td { background: var(--bg); }
+
+/* ── Infographics (HTML/CSS) ── */
+.diagram-container { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 24px; margin: 20px 0; box-shadow: var(--shadow); }
+.diagram-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--ink-3); margin-bottom: 16px; text-align: center; }
+.flow-diagram { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+.flow-box { background: var(--bg); border: 2px solid var(--border-2); padding: 16px; border-radius: 8px; text-align: center; flex: 1; min-width: 150px; }
+.flow-box.active { border-color: var(--c1); background: var(--c1-light); }
+.flow-box h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--ink); }
+.flow-box p { font-size: 12px; color: var(--ink-3); }
+.flow-arrow { font-size: 24px; color: var(--border-2); font-weight: bold; }
+.chart-wrap { position: relative; height: 300px; width: 100%; margin: 24px 0; }
+
+/* ── Closing Synthesis ── */
+.synthesis { background: var(--ink); color: #fff; border-radius: var(--radius); padding: 48px; box-shadow: var(--shadow-lg); }
+.synthesis-title { font-family: var(--serif); font-size: 32px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px; }
+.outlook-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 24px; margin-bottom: 16px; }
+.outlook-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; margin-bottom: 12px; }
+.outlook-text { font-size: 14.5px; line-height: 1.7; color: rgba(255,255,255,0.8); }
+
+/* ── Utilities ── */
+.c1 { color: var(--c1); } .bg-c1 { background: var(--c1); color: #fff; } .border-c1 { border-color: var(--c1); }
+.c2 { color: var(--c2); } .bg-c2 { background: var(--c2); color: #fff; } .border-c2 { border-color: var(--c2); }
+.c3 { color: var(--c3); } .bg-c3 { background: var(--c3); color: #fff; } .border-c3 { border-color: var(--c3); }
+.c4 { color: var(--c4); } .bg-c4 { background: var(--c4); color: #fff; } .border-c4 { border-color: var(--c4); }
+.c5 { color: var(--c5); } .bg-c5 { background: var(--c5); color: #fff; } .border-c5 { border-color: var(--c5); }
+
+/* ── Responsive ── */
+@media (max-width: 960px) {
+  .layout { grid-template-columns: 1fr; gap: 32px; padding: 20px 16px 80px; }
+  .sidebar { position: static; }
+  .sidebar-nav { flex-direction: row; flex-wrap: wrap; }
+  .header-nav { display: none; }
+  .flow-diagram { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+  .article-header { padding: 24px; }
+  .article-body { padding: 24px; }
+  .synthesis { padding: 32px 24px; }
+}
 </style>
 </head>
 <body>
 
 <div class="disclaimer">
-  ⚠️ This content was generated by AI and may contain inaccuracies. For reference purposes only. <br>
+  ⚠ This content was generated by AI and may contain inaccuracies. For reference purposes only. <br>
   본 내용은 AI가 작성한 내용으로 부정확할 수 있습니다. 참고용으로만 이용해주세요.
 </div>
 
-<header class="header">
-  <div class="header-content">
-    <div class="brand">
-      <div class="logo">AI</div>
-      <div class="title-group">
-        <h1>Strategic AI Infrastructure</h1>
-        <p>System Tech Advisory Report</p>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-logo">S</div>
+      <div>
+        <div class="header-title">Strategic AI Infrastructure Report</div>
+        <div class="header-meta">March 25, 2026 &nbsp;·&nbsp; Executive Briefing</div>
       </div>
     </div>
+    <nav class="header-nav">
+      <a class="nav-chip" href="#arm">Arm AGI</a>
+      <a class="nav-chip" href="#pax">Pax Silica</a>
+      <a class="nav-chip" href="#senate">Senate Freeze</a>
+      <a class="nav-chip" href="#nvidia">NVIDIA DRA</a>
+      <a class="nav-chip" href="#hp">HP IQ</a>
+    </nav>
   </div>
 </header>
 
-<div class="container">
+<div class="layout">
+
   <aside class="sidebar">
-    <h3>Contents</h3>
+    <div class="sidebar-title">Contents</div>
     <ul class="sidebar-nav">
-      <li><a href="#item-1"><div class="nav-dot" style="background: var(--c-emerald);"></div> Nebius $4.34B</a></li>
-      <li><a href="#item-2"><div class="nav-dot" style="background: var(--c-blue);"></div> NVIDIA Flexible Grid</a></li>
-      <li><a href="#item-3"><div class="nav-dot" style="background: var(--c-violet);"></div> Gimlet Labs</a></li>
-      <li><a href="#item-4"><div class="nav-dot" style="background: var(--c-orange);"></div> HPE Sovereign AI</a></li>
-      <li><a href="#item-5"><div class="nav-dot" style="background: var(--c-red);"></div> Terafab Project</a></li>
-      <li><a href="#synthesis"><div class="nav-dot" style="background: #0F172A;"></div> Closing Synthesis</a></li>
+      <li><a href="#arm"><span class="sidebar-dot bg-c1"></span> Arm AGI CPU</a></li>
+      <li><a href="#pax"><span class="sidebar-dot bg-c2"></span> Pax Silica $4T</a></li>
+      <li><a href="#senate"><span class="sidebar-dot bg-c3"></span> Senate Export Freeze</a></li>
+      <li><a href="#nvidia"><span class="sidebar-dot bg-c4"></span> NVIDIA DRA Open Source</a></li>
+      <li><a href="#hp"><span class="sidebar-dot bg-c5"></span> HP IQ Local Model</a></li>
+      <li><a href="#synthesis"><span class="sidebar-dot" style="background:var(--ink)"></span> Synthesis & Trajectory</a></li>
     </ul>
   </aside>
 
-  <main class="main">
-    
-    <article class="article-card theme-1" id="item-1">
-      <div class="article-header">
-        <div class="article-meta-top">
-          <span class="badge">Official</span>
-          <span class="article-date">March 23, 2026</span>
+  <main class="main-content">
+
+    <section class="exec-intro">
+      <h1>The Rise of Vertical Silicon and the $4 Trillion Geopolitical Compute Layer</h1>
+      <p>As of March 25, 2026, the AI infrastructure sector has shifted from a horizontal licensing model to a vertical "Silicon-as-a-Service" paradigm. The last 24 hours have seen a historic pivot by Arm Holdings into direct data center silicon production, specifically targeted at agentic orchestration. This development, combined with the U.S. government's $4 trillion "Pax Silica" capital mobilization, signals a move toward a partitioned global supply chain where hardware and energy assets are treated as sovereign security pillars. Simultaneously, the industry is moving toward "on-device" autonomy, as evidenced by the launch of local 20-billion-parameter intelligence layers for enterprise endpoints. This briefing analyzes these shifts to guide multi-billion dollar capital allocation in an increasingly vertically integrated and geopolitically contested compute ecosystem.</p>
+    </section>
+
+    <article class="article" id="arm">
+      <div class="article-header border-c1" style="border-top: 4px solid var(--c1);">
+        <div class="article-number c1">01 / Silicon Production</div>
+        <h2 class="article-title">Arm AGI CPU: Historic Pivot from IP Licensing to Direct Silicon Production</h2>
+        <div class="article-meta">
+          <span class="meta-badge bg-c1">Official / Press</span>
+          <span class="meta-item">📅 March 24, 2026</span>
+          <span class="meta-item">Source: StreetInsider, Phoronix, Wccftech</span>
         </div>
-        <h2 class="article-title">1. Nebius Group Raises $4.34B to Fuel Global AI Infrastructure Expansion Following $27B Meta Deal</h2>
-        <div class="article-source">Source: Seeking Alpha</div>
       </div>
       <div class="article-body">
         
-        <div class="section-block">
-          <h3 class="section-title overview"><span>🔭</span> [Overview]</h3>
-          <p class="text-content">Nebius Group has successfully closed a $4.34 billion private offering of convertible senior notes — structured as $2.5875 billion in notes due 2031 and $1.75 billion due 2033, inclusive of overallotment — to rapidly scale its global artificial intelligence cloud infrastructure. This capital raise follows two landmark events: on March 16, the company announced a five-year AI infrastructure supply agreement with Meta Platforms carrying a contract value of up to $27 billion, and on March 20, formally closed the convertible offering. Under the Meta agreement, Nebius will provide $12 billion of dedicated compute capacity based on one of the industry's first large-scale deployments of the NVIDIA Vera Rubin platform, with deliveries commencing in early 2027. An additional $15 billion in optional capacity has been committed by Meta under certain conditions, with Nebius intending to sell that capacity to third-party customers first, with remaining volume absorbed by Meta. The immediate market reaction highlights a fundamental shift in hyperscaler strategy: rather than relying entirely on proprietary data centers, tech giants like Meta are actively underwriting specialized AI infrastructure providers to guarantee early access to the most advanced silicon architectures available.</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c1">[Overview]</span></div>
+          <p class="body-text">For decades, the semiconductor industry relied on a horizontal model where Arm Holdings licensed designs for others to manufacture. However, as agentic AI workloads have made the CPU a critical bottleneck for hyperscale orchestration, Arm has moved to own the full stack. On March 24, 2026, at the "Arm Everywhere" keynote, CEO Rene Haas announced the Arm AGI CPU, the first production silicon product in the company's history. The core breakthrough is a 136-core design built specifically for the "agentic control plane," where the CPU must handle massive I/O, memory management, and tool-calling for GPU clusters. Meta served as the lead co-developer, indicating that major hyperscalers are seeking alternatives to traditional x86 and proprietary vendor CPUs to improve data center performance density. Competitors Intel and AMD are now faced with their primary IP supplier becoming a direct hardware rival in the high-end server market.</p>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title impact"><span>⚡</span> [Strategic Impact]</h3>
-          <p class="text-content">Critically, Meta is not Nebius's first large-scale hyperscaler commitment. Nebius had already secured a $17.4 billion contract with Microsoft — expandable to up to $19.4 billion over five years — with GPU infrastructure delivery commencing in late 2025. The Meta agreement therefore represents the second major anchor relationship in a rapidly consolidating neocloud customer base. To fund the build-out, Nebius has structured a layered capital approach: approximately 60% of growth capital is expected to be sourced from customer prepayments by Microsoft and Meta, with the remaining 40% drawn from equity and debt instruments, including the recently closed convertible notes. Additionally, Nebius sold $2 billion in stock warrants to NVIDIA at a strike price of $94.94 per share, cementing a strategic alignment with its primary hardware supplier. Nebius has set a 2026 capital expenditure target of $16 billion to $20 billion, establishing it as one of the most capital-intensive independent AI infrastructure operators globally. For capital allocators, this multilayered structure validates the neocloud model's ability to leverage hyperscaler demand commitments as balance sheet collateral, radically de-risking the debt raise while accelerating time-to-deployment for next-generation silicon at scale.</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c1">[Strategic Impact]</span></div>
+          <div class="impact-box" style="border-color: var(--c1); background: var(--c1-light);">
+            <p class="body-text">This move fundamentally disrupts the technology thesis of "neutral IP provision," as Arm now competes directly with its licensees like NVIDIA and AMD for rack-space. By offering a production-ready chip that claims 2x performance per rack versus current x86 systems, Arm is positioning itself to capture the high-margin "orchestration layer" of the AI factory. For investors, this signals the end of NVIDIA's exclusive advantage in Arm-based server IP, as any vendor can now build a rack-scale system around the AGI CPU without proprietary licensing restrictions. The transition to 3nm manufacturing via TSMC validates the capital-intensive nature of this pivot and introduces immediate supply chain competition for leading-edge node capacity.</p>
+          </div>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title tech"><span>🔬</span> [Technical Deep Dive]</h3>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Metric</th>
-                <th>Value</th>
-                <th>Source</th>
-                <th>Quote</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Capital Raised</td>
-                <td>~$4.34 billion [Convertible Notes]</td>
-                <td>Seeking Alpha</td>
-                <td>"Nebius closes convertible debt offering, raises ~$4.3B."</td>
-              </tr>
-              <tr>
-                <td>Meta Contract Value</td>
-                <td>Up to $27 billion</td>
-                <td>Nebius Newsroom</td>
-                <td>"The agreement has a contract value of up to approximately $27 billion."</td>
-              </tr>
-              <tr>
-                <td>Base Capacity Commitment (Meta)</td>
-                <td>$12 billion</td>
-                <td>Nebius Newsroom</td>
-                <td>"Nebius will provide $12 billion of dedicated capacity... based on one of the first large-scale deployments of the NVIDIA Vera Rubin platform."</td>
-              </tr>
-              <tr>
-                <td>Microsoft Contract Value</td>
-                <td>$17.4B–$19.4B</td>
-                <td>Multiple sources</td>
-                <td>Five-year GPU infrastructure supply agreement, delivery commenced late 2025</td>
-              </tr>
-              <tr>
-                <td>NVIDIA Warrant Issuance</td>
-                <td>$2 billion at $94.94/share</td>
-                <td>Multiple sources</td>
-                <td>Strategic warrant sold to NVIDIA</td>
-              </tr>
-              <tr>
-                <td>2026 CapEx Target</td>
-                <td>$16B–$20B</td>
-                <td>Multiple sources</td>
-                <td>Company-guided capital expenditure range for fiscal 2026</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="text-content"><strong>Comparison:</strong> The Meta agreement is Nebius's second major hyperscaler anchor contract after Microsoft, together representing a combined committed or optioned contract value potentially exceeding $46 billion across a combined five-year horizon, funded via a structured 60% customer prepayment and 40% capital markets approach.</p>
-        </div>
-
-        <div class="section-block">
-          <h3 class="section-title visual"><span>📊</span> [Visual/Evidence]</h3>
-          <p class="text-content">No official visual found. (Data visualized below)</p>
-          <div class="infographic-wrapper">
-            <div class="chart-container">
-              <canvas id="nebiusChart"></canvas>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c1">[Technical Deep Dive]</span></div>
+          <div class="spec-grid">
+            <div class="spec-item">
+              <div class="spec-label">Core Count</div>
+              <div class="spec-val c1">136 Neoverse V3</div>
+              <div class="spec-quote">"features up to 136 ARM Neoverse V3 cores per CPU"</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Process Node</div>
+              <div class="spec-val c1">TSMC 3nm</div>
+              <div class="spec-quote">"TSMC will manufacture... using its 3-nanometer process technology."</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Memory Bandwidth</div>
+              <div class="spec-val c1">6 GB/s per core</div>
+              <div class="spec-quote">"offering 6GB/s memory bandwidth per core at sub-100ns latency"</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">I/O Lanes</div>
+              <div class="spec-val c1">96x PCIe Gen 6</div>
+              <div class="spec-quote">"96x PCIe Gen 6 lanes, along with CXL 3.0 memory expansion"</div>
             </div>
           </div>
+          <table class="info-table">
+            <thead><tr><th>Comparison Metric</th><th>Details</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Performance per Rack</strong></td><td>Delivers a 2x increase in performance per rack compared to current x86 platforms.</td></tr>
+              <tr><td><strong>Air-Cooled Density</strong></td><td>Supports up to 8,160 cores in a 36kW air-cooled rack, significantly exceeding standard Xeon/EPYC.</td></tr>
+              <tr><td><strong>Liquid-Cooled Density</strong></td><td>45,000+ cores per rack in liquid-cooled deployments.</td></tr>
+            </tbody>
+          </table>
+          <p class="body-text"><strong>Source Traceability:</strong> [Core/TDP/Bandwidth] — Arm — AGI CPU. [3nm Process] — TSMC — Manufacturing. Primary URL verified: Yes. Cross-verified: Yes (Phoronix, Wccftech).</p>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title critical"><span>⚠️</span> [Critical View]</h3>
-          <p class="text-content">While the $27 billion Meta deal and the $4.34 billion capital raise are extraordinary milestones for Nebius, the company's revenue profile is now characterized by deep bilateral concentration risk across two dominant hyperscaler relationships. Microsoft and Meta together represent the overwhelming majority of Nebius's contracted forward revenue, and any sudden shift in either company's internal AI infrastructure strategy — whether driven by macroeconomic pressure, model architecture pivots, or the emergence of proprietary silicon — could simultaneously destabilize both anchor relationships. Furthermore, Nebius is contractually obligated to deliver one of the world's first large-scale deployments of the highly complex NVIDIA Vera Rubin platform by early 2027. The Vera Rubin architecture demands unprecedented direct-to-chip liquid cooling and novel power delivery mechanisms, meaning any supply chain disruption from NVIDIA or physical data center construction delays could trigger catastrophic breach-of-contract scenarios across multiple customer commitments simultaneously. The 2026 capital expenditure target of $16 billion to $20 billion — among the highest ever guided by an independent neocloud operator — leaves Nebius deeply exposed to refinancing risk and margin compression should GPU supply availability deteriorate or customer demand taper before full deployment is achieved.</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c1">[Visual / Evidence]</span></div>
+          <p class="body-text">Arm showcased a 1OU (Open Unit) dual-node server reference design containing 272 cores per blade.</p>
+          
+          <div class="diagram-container">
+            <div class="diagram-title c1">Arm Strategic Pivot (HTML Schematic)</div>
+            <div class="flow-diagram">
+              <div class="flow-box"><h4>Legacy Model</h4><p>Arm licenses IP<br>to NVIDIA / AMD</p></div>
+              <div class="flow-arrow c1">→</div>
+              <div class="flow-box active" style="border-color: var(--c1);"><h4>New Direct Model</h4><p>Arm AGI CPU<br>Direct to Data Center</p></div>
+              <div class="flow-arrow c1">→</div>
+              <div class="flow-box"><h4>Deployment</h4><p>Hyperscalers (e.g. Meta)<br>2x Rack Density</p></div>
+            </div>
+          </div>
+
+          <div class="chart-wrap"><canvas id="armChart"></canvas></div>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title sentiment"><span>💬</span> [Community Sentiment]</h3>
-          <div class="quote-box">
-            <p class="quote-text">"We are pleased to expand our significant partnership with Meta as part of securing more large, long-term capacity contracts to accelerate the build-out and growth of our core AI cloud business."</p>
-            <p class="quote-author">— Arkady Volozh, Founder and CEO, Nebius Group</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c1">[Community Sentiment]</span></div>
+          <div class="quote-block border-c1">
+            <p>"We worked alongside ARM to develop the ARM AGI CPU to deploy an efficient compute platform that significantly improves our data center performance density."</p>
+            <div class="quote-attr">— Meta Platforms, Official Statement</div>
+          </div>
+          <div class="quote-block border-c1">
+            <p>"With the expansion into delivering production silicon... we are giving partners more choices... to support agentic AI infrastructure at global scale."</p>
+            <div class="quote-attr">— Rene Haas, CEO, Arm Holdings</div>
           </div>
         </div>
+
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c1">[Critical View]</span></div>
+          <p class="body-text">While the AGI CPU removes CPU-side bottlenecks, its success is entirely dependent on TSMC's 3nm yields, which remain under pressure from competing Apple and NVIDIA orders. Furthermore, the transition to direct silicon sales creates a conflict of interest with longtime IP partners, potentially driving firms like NVIDIA to accelerate their own custom core designs or adopt RISC-V to maintain architectural independence.</p>
+        </div>
+
       </div>
     </article>
 
-    <article class="article-card theme-2" id="item-2">
-      <div class="article-header">
-        <div class="article-meta-top">
-          <span class="badge">Official</span>
-          <span class="article-date">March 23, 2026</span>
+    <article class="article" id="pax">
+      <div class="article-header border-c2" style="border-top: 4px solid var(--c2);">
+        <div class="article-number c2">02 / Infrastructure Capital</div>
+        <h2 class="article-title">Expansion of "Pax Silica": The $4 Trillion Sovereign Investment Consortium</h2>
+        <div class="article-meta">
+          <span class="meta-badge bg-c2">Official / Press</span>
+          <span class="meta-item">📅 March 24, 2026</span>
+          <span class="meta-item">Source: Tom's Hardware, StockStory, Reuters</span>
         </div>
-        <h2 class="article-title">2. NVIDIA and Emerald AI Pioneer Flexible AI Factories for Grid Integration</h2>
-        <div class="article-source">Source: NVIDIA Newsroom</div>
       </div>
       <div class="article-body">
-        
-        <div class="section-block">
-          <h3 class="section-title overview"><span>🔭</span> [Overview]</h3>
-          <p class="text-content">NVIDIA has partnered with Emerald AI and a broad coalition of leading energy producers — including AES, Constellation, Invenergy, NextEra Energy, Nscale Energy & Power, and Vistra — to pioneer a new architectural paradigm known as Flexible AI Factories. The core industry pain point addressed by this initiative is the severe power bottleneck throttling the artificial intelligence infrastructure buildout, where conventional grid interconnection timelines extend for years and peak power demands threaten to destabilize existing utility networks. The decisive strategic shift lies in the deployment of the NVIDIA Vera Rubin DSX AI Factory reference design, natively paired with the DSX Flex software library and Emerald AI's Conductor platform, transforming data centers from static, parasitic loads into dynamic, grid-responsive assets. This will be first operationalized at the 96MW Aurora AI Factory in Manassas, Virginia, slated to open in the first half of 2026, establishing the initial benchmark for gigawatt-scale grid-responsive compute. By co-locating energy generation and battery storage to serve as initial bridge power, these hybrid facilities can bypass utility queues to come online rapidly, and subsequently modulate their power consumption through precise computational orchestration and dynamic GPU frequency scaling.</p>
+
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c2">[Overview]</span></div>
+          <p class="body-text">The global AI infrastructure race has reached a "sovereign" level of capital mobilization, as traditional private equity and venture capital are no longer sufficient to fund the trillion-dollar requirements of the next-generation compute layer. On March 24, 2026, at the Hill and Valley Forum in Washington, the Trump administration announced a massive expansion of the "Pax Silica" initiative, originally launched in late 2025. The core breakthrough is the creation of a voluntary investment consortium targeting $4 trillion in total funding to secure semiconductor supply chains, energy resiliency, and critical mineral refining for the U.S. and its allies. The U.S. government will contribute an initial $250 million to anchor the fund and provide "concierge" services to fast-track allied purchases of U.S.-made AI hardware. Founding members include global sovereign wealth giants SoftBank, Temasek, and Mubadala, who collectively manage over $1 trillion in assets.</p>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title impact"><span>⚡</span> [Strategic Impact]</h3>
-          <p class="text-content">This development fundamentally alters the calculus for AI infrastructure capital allocation. The introduction of software-defined, power-flexible AI factories validates a highly disruptive new investment thesis: the direct monetization of computational flexibility. By utilizing Emerald AI's Conductor platform to throttle latency-insensitive workloads — such as massive batch pretraining or synthetic data curation — during periods of peak grid stress, operators can negotiate favorable tariffs, secure flexibility payments, and drastically accelerate interconnection timelines. This paradigm shift directly addresses the primary risk factor for the projected $650 billion to $690 billion AI capital expenditure supercycle slated for 2026: sheer energy availability. The ability to utilize behind-the-meter bridge power allows infrastructure funds to bypass regulatory bottlenecks entirely, radically accelerating time-to-revenue for multibillion-dollar GPU deployments and deeply validating NVIDIA's strategy of expanding beyond silicon design to dictate the entire physical architecture of the modern intelligence factory.</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c2">[Strategic Impact]</span></div>
+          <div class="impact-box" style="border-color: var(--c2); background: var(--c2-light);">
+            <p class="body-text">The "Pax Silica" expansion provides a massive capital floor for the domestic semiconductor industry, effectively underwriting the construction of next-generation fabs and energy-intensive data center campuses. For investment firms, this reduces the downside risk of CapEx-intensive bets on firms like Applied Materials, KLA Corporation, and MACOM, all of which saw stock surges following the announcement. However, the initiative introduces significant supply chain risk for firms with substantial exposure to Chinese refining or manufacturing, as the fund is explicitly designed to offset China's control over rare earth magnets and legacy chip capacity.</p>
+          </div>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title tech"><span>🔬</span> [Technical Deep Dive]</h3>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Metric</th>
-                <th>Value</th>
-                <th>Quote</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Grid Capacity Unlock Potential</td>
-                <td>100 GW</td>
-                <td>"could unlock an estimated 100 GW of capacity on the existing electricity system"</td>
-              </tr>
-              <tr>
-                <td>Power Reduction — Flex 1</td>
-                <td>Up to 10% reduction</td>
-                <td>"Flex 1 allows up to 10% average throughput reduction"</td>
-              </tr>
-              <tr>
-                <td>Power Reduction — Flex 2</td>
-                <td>Up to 25% reduction</td>
-                <td>"Flex 2 up to 25% and Flex 3 up to 50% over a six-hour period"</td>
-              </tr>
-              <tr>
-                <td>Power Reduction — Flex 3</td>
-                <td>Up to 50% reduction</td>
-                <td>"Flex 2 up to 25% and Flex 3 up to 50% over a six-hour period"</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="text-content"><strong>Comparison:</strong> The Emerald Conductor platform delivers up to a 25% power reduction during peak grid demand while maintaining stringent AI performance targets, compared to traditional static load baselines that cannot modulate without dropping jobs.</p>
-        </div>
-
-        <div class="section-block">
-          <h3 class="section-title visual"><span>📊</span> [Visual/Evidence]</h3>
-          <p class="text-content">No official visual found in the source documents. (Architecture visualized below)</p>
-          <div class="infographic-wrapper">
-            <div class="css-diagram">
-              <div class="diag-node" style="border-color: #F59E0B;">
-                <h4 style="color: #F59E0B;">Utility Grid</h4>
-                <p>Grid Stress Signals</p>
-              </div>
-              <div class="diag-arrow">⟷</div>
-              <div class="diag-node" style="border-color: var(--c-blue);">
-                <h4 style="color: var(--c-blue);">Emerald Conductor</h4>
-                <p>DSX Flex Software</p>
-              </div>
-              <div class="diag-arrow">⟷</div>
-              <div class="diag-node" style="border-color: #10B981;">
-                <h4 style="color: #10B981;">Flexible AI Factory</h4>
-                <p>Dynamic GPU Throttling</p>
-              </div>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c2">[Technical Deep Dive]</span></div>
+          <div class="spec-grid">
+            <div class="spec-item">
+              <div class="spec-label">Total Fund Target</div>
+              <div class="spec-val c2">$4 Trillion</div>
+              <div class="spec-quote">"voluntary investment consortium targeting $4 trillion in funding"</div>
             </div>
-            <div class="chart-container" style="height: 250px; margin-top: 20px;">
-              <canvas id="emeraldChart"></canvas>
+            <div class="spec-item">
+              <div class="spec-label">Member Assets</div>
+              <div class="spec-val c2">&gt;$1 Trillion</div>
+              <div class="spec-quote">"collectively manage more than $1 trillion in combined assets."</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Piketon Capacity</div>
+              <div class="spec-val c2">10 Gigawatts</div>
+              <div class="spec-quote">"Piketon targets 10 gigawatts of compute capacity at full build-out."</div>
             </div>
           </div>
+          <p class="body-text"><strong>Comparison:</strong> The $4 trillion target represents more than double the total global foreign direct investment of 2025 ($1.6 trillion). The Piketon 10GW project would provide more than half the total operating capacity of every data center currently running in the U.S.</p>
+          <p class="body-text"><strong>Source Traceability:</strong> [Investment Fund] — Trump Administration — Pax Silica Phase II. [Piketon Capacity] — SoftBank — Piketon Project. Primary URL verified: Yes. Cross-verified: Yes (Business Times, Bloomberg).</p>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title critical"><span>⚠️</span> [Critical View]</h3>
-          <p class="text-content">While the conceptual framework of the power-flexible AI factory is technically elegant, its physical execution at scale introduces profound operational vulnerabilities. Workload orchestration that dynamically throttles GPU frequencies and pauses massive training runs based on external grid signals requires an exceptionally robust middleware layer. Any failure in state preservation during a deep power-down event could permanently corrupt weeks of multi-million-dollar foundational model training. Additionally, the economics of bridge power — relying on on-site natural gas generation or massive battery energy storage systems — significantly inflates upfront capital expenditure, eroding the margin improvements gained from utility flexibility payments. From a regulatory standpoint, relying on carbon-intensive bridge power to circumvent transmission delays may attract fierce opposition from environmental groups and state utility commissions. Finally, the core assumption that legacy utility providers possess the digital agility to integrate these dynamic, multi-megawatt loads into their antiquated grid management systems in real-time remains highly speculative, threatening to severely delay the realization of the promised 100 gigawatt national capacity unlock.</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c2">[Visual / Evidence]</span></div>
+          <p class="body-text">No official visual found. The announcement was made by Under Secretary of State Jacob Helberg at the Hill and Valley Forum.</p>
+          <div class="chart-wrap"><canvas id="paxChart"></canvas></div>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title sentiment"><span>💬</span> [Community Sentiment]</h3>
-          <div class="quote-box">
-            <p class="quote-text">"AI factories are the engines of the intelligence era, and like any great engine, every system must be designed together — energy, compute, networking and cooling as one architecture."</p>
-            <p class="quote-author">— Jensen Huang, Founder and CEO, NVIDIA</p>
-          </div>
-          <div class="quote-box">
-            <p class="quote-text">"AI factories are too valuable to be treated as either passive loads or permanent islands; they produce tremendously valuable AI tokens and knowledge, and with DSX Flex, they can also provide measurable relief back to the grid."</p>
-            <p class="quote-author">— Varun Sivaram, Founder and CEO, Emerald AI</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c2">[Community Sentiment]</span></div>
+          <div class="quote-block border-c2">
+            <p>"The investment consortium [is] focused on ensuring that minerals, ports, factories, and energy assets... remain under allied control."</p>
+            <div class="quote-attr">— Jacob Helberg, Under Secretary of State</div>
           </div>
         </div>
+
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c2">[Critical View]</span></div>
+          <p class="body-text">The $4 trillion figure is perceived as an aspirational marketing target, given the U.S. contribution is a mere 0.006% of the goal. There is significant litigation risk regarding the "concierge service" for export licenses, which may be challenged by companies not selected for pre-set consortia. Furthermore, the grid modernization required for 10GW sites faces an arduous implementation timeline due to local power constraints.</p>
+        </div>
+
       </div>
     </article>
 
-    <article class="article-card theme-3" id="item-3">
-      <div class="article-header">
-        <div class="article-meta-top">
-          <span class="badge">Press</span>
-          <span class="article-date">March 23, 2026</span>
+    <article class="article" id="senate">
+      <div class="article-header border-c3" style="border-top: 4px solid var(--c3);">
+        <div class="article-number c3">03 / Policy & Regulation</div>
+        <h2 class="article-title">Bipartisan Senate Demand for AI Export Freeze to Southeast Asian Intermediaries</h2>
+        <div class="article-meta">
+          <span class="meta-badge bg-c3">Pending Vote</span>
+          <span class="meta-item">📅 March 24, 2026</span>
+          <span class="meta-item">Source: Bankless, HS Today, U.S. Senate Press</span>
         </div>
-        <h2 class="article-title">3. Gimlet Labs Launches Multi-Silicon Inference Cloud Following $80M Series A</h2>
-        <div class="article-source">Source: GlobeNewswire</div>
       </div>
       <div class="article-body">
-        
-        <div class="section-block">
-          <h3 class="section-title overview"><span>🔭</span> [Overview]</h3>
-          <p class="text-content">Gimlet Labs has officially emerged from stealth to announce an $80 million Series A funding round, led by Menlo Ventures, to rapidly scale the industry's first true multi-silicon inference cloud. The fundamental industry pain point driving this innovation is the extreme economic and thermal inefficiency of utilizing homogeneous hardware — specifically expensive, power-hungry advanced GPUs like the H100 or Blackwell series — for complex, multi-step agentic workflows that encompass compute-bound prompt prefill, memory-bound sequential decode, and network-bound tool calls. Gimlet Labs introduces a decisive strategic shift through a proprietary software stack that automatically slices and orchestrates generative models across diverse hardware architectures in real-time, pairing high-end GPUs for prefill with legacy silicon, CPUs, and specialized SRAM-centric accelerators such as Cerebras and d-Matrix for rapid decoding. The startup reportedly achieved eight-figure revenues within just five months of operation and secured binding contracts with top-tier frontier AI labs and hyperscalers, as inference volumes surge to quadrillions of tokens per month.</p>
+
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c3">[Overview]</span></div>
+          <p class="body-text">The global AI hardware supply chain is facing an acute regulatory crisis following evidence of systemic leakage. On March 24, 2026, Senators Elizabeth Warren (D-MA) and Jim Banks (R-IN) issued a bipartisan letter to Secretary of Commerce Howard Lutnick demanding an immediate suspension of export licenses for advanced AI chips to four Southeast Asian nations: Malaysia, Thailand, Vietnam, and Singapore. The industry pain point has been the "Super Micro Crisis," where high-performance servers were allegedly diverted to China through transshipment networks. The core breakthrough is the bipartisan consensus that these regional hubs now pose an "unacceptable risk" as intermediaries for restricted Chinese entities. The reaction from markets has been immediate anxiety, as a formal export freeze "proposes" to halt billions in planned data center investments across these emerging hubs.</p>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title impact"><span>⚡</span> [Strategic Impact]</h3>
-          <p class="text-content">Gimlet Labs' multi-silicon orchestration platform introduces significant deflationary pressure on inference costs, directly challenging the assumption that every AI workload requires the absolute latest generation of monolithic general-purpose GPUs. By proving that large language models can be dynamically sliced so that optimal chips handle specific phases of generation, Gimlet fundamentally extends the useful lifecycle of older silicon generations, drastically improving return on invested capital for existing enterprise data center deployments. The ability to route memory-bound decoding tasks to ultra-fast, statically scheduled SRAM accelerators further validates the multi-billion dollar valuations of custom silicon startups competing against NVIDIA, and accelerates the commercial viability of autonomous AI agents currently constrained by the latency profiles of traditional cloud infrastructure.</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c3">[Strategic Impact]</span></div>
+          <div class="impact-box" style="border-color: var(--c3); background: var(--c3-light);">
+            <p class="body-text">If the requested suspension is "enacted," it would fundamentally devalue current data center clusters in Southeast Asia and validate the technology thesis that only domestic or "sovereign-aligned" sites are secure for multi-generational silicon investments. The move introduces massive supply chain risk for global hyperscalers like Amazon and Google, who have recently pledged over $300 billion in collective infrastructure spending, much of it directed toward these regions. For investors, this signal suggests that the "Pax Silica" concierge service will prioritize onshoring over international expansion, potentially leading to a "compute famine" in Southeast Asia.</p>
+          </div>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title tech"><span>🔬</span> [Technical Deep Dive]</h3>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Metric</th>
-                <th>Value</th>
-                <th>Quote</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Inference Speed Multiplier</td>
-                <td>3-10X faster speed [Gimlet Cloud]</td>
-                <td>"technology delivers 3-10X faster speed for the same cost and power envelope"</td>
-              </tr>
-              <tr>
-                <td>Performance Target</td>
-                <td>10-100X performance increases</td>
-                <td>"unlock the next 10-100X performance increases needed in use cases"</td>
-              </tr>
-              <tr>
-                <td>Power Efficiency</td>
-                <td>Order of magnitude better perf/watt</td>
-                <td>"deliver an order of magnitude better performance per watt for our customers"</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="text-content"><strong>Comparison:</strong> Delivers 3 to 10 times the inference speed within identical cost and power constraints when compared to traditional homogeneous GPU deployments, achieving an order of magnitude better performance per watt.</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c3">[Technical Deep Dive]</span></div>
+          <div class="spec-grid">
+            <div class="spec-item">
+              <div class="spec-label">Hardware Diverted</div>
+              <div class="spec-val c3">&gt;$2.5 Billion</div>
+              <div class="spec-quote">"diverted approximately $2.5 billion worth of Nvidia hardware"</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Proposed Cluster Limit</div>
+              <div class="spec-val c3">200,000 GPUs</div>
+              <div class="spec-quote">"particularly those involving 200,000 Nvidia GB300 GPUs or more"</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Max Penalty</div>
+              <div class="spec-val c3">20 years per count</div>
+              <div class="spec-quote">"violating the Export Controls Reform Act... maximum term... of 20 years"</div>
+            </div>
+          </div>
+          <p class="body-text"><strong>Comparison:</strong> The proposed freeze targets the fastest-growing secondary AI data center market globally. The diversion case involves thousands of "dummy" servers, a technique using hair dryers to swap serial number labels and bypass physical compliance audits.</p>
+          <p class="body-text"><strong>Source Traceability:</strong> [Senate Letter] — U.S. Senate — 2026-03-24. [Diversion Value] — DOJ / Bloomberg — Investigation. Primary URL verified: Yes. Cross-verified: Yes (HS Today, Bankless).</p>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title visual"><span>📊</span> [Visual/Evidence]</h3>
-          <p class="text-content">No official visual found in the source documents. (Architecture visualized below)</p>
-          <div class="infographic-wrapper">
-            <div class="css-diagram">
-              <div class="diag-node" style="border-color: #EF4444;">
-                <h4 style="color: #EF4444;">Prefill Phase</h4>
-                <p>Compute-bound (H100/Blackwell)</p>
-              </div>
-              <div class="diag-arrow">⟶</div>
-              <div class="diag-node" style="border-color: var(--c-violet); background: var(--c-violet-bg);">
-                <h4 style="color: var(--c-violet);">Gimlet Orchestrator</h4>
-                <p>Dynamic Slicing & Routing</p>
-              </div>
-              <div class="diag-arrow">⟶</div>
-              <div class="diag-node" style="border-color: #3B82F6;">
-                <h4 style="color: #3B82F6;">Decode Phase</h4>
-                <p>Memory-bound (SRAM Accelerators)</p>
-              </div>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c3">[Visual / Evidence]</span></div>
+          <p class="body-text">No official visual found. The senators' letter, addressed to Secretary Lutnick, references the SMCI affiliates' indictment unsealed on March 19, 2026, as its primary evidentiary basis. Media reporting has characterized the broader investigation as targeting a coordinated smuggling ring that used straw purchasers and transshipment hubs across Southeast Asia.</p>
+          
+          <div class="diagram-container">
+            <div class="diagram-title c3">Targeted Transshipment Vulnerabilities</div>
+            <div class="flow-diagram">
+              <div class="flow-box"><h4>U.S. Source</h4><p>OEM Hardware</p></div>
+              <div class="flow-arrow c3">→</div>
+              <div class="flow-box active" style="border-color: var(--c3); background: var(--c3-light);"><h4>SE Asia Intermediaries</h4><p>Malaysia, Thailand,<br>Vietnam, Singapore</p></div>
+              <div class="flow-arrow c3">→</div>
+              <div class="flow-box" style="border-color: var(--c3); border-style: dashed;"><h4>Restricted Entities</h4><p>China</p></div>
             </div>
           </div>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title critical"><span>⚠️</span> [Critical View]</h3>
-          <p class="text-content">Gimlet Labs is attempting to commercialize a solution to one of the most notoriously difficult problems in distributed computing: heterogeneous compiler optimization and dynamic workload orchestration across highly non-uniform memory architectures. While routing dense prefill tasks to a GPU and routing lightweight decode tasks to an SRAM-centric chip sounds highly efficient in theoretical benchmarks, the massive interconnect bandwidth required to transfer multi-gigabyte Key-Value cache state between physically distinct chips in real-time introduces severe network latency risks. If the data center network fabric cannot sustain the required transfer rates seamlessly, the entire performance gain of disaggregated inference collapses into a networking bottleneck. Furthermore, the proprietary and closed nature of vendor-specific software stacks — most notably NVIDIA's CUDA ecosystem — historically resists seamless integration into universal third-party orchestration layers. Gimlet faces the monumental task of maintaining perfectly optimized, custom execution kernels for every new hardware architecture introduced to the market, a scale of constant software maintenance that has traditionally crushed smaller compiler and middleware startups.</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c3">[Community Sentiment]</span></div>
+          <div class="quote-block border-c3">
+            <p>"We want a complete export freeze on all NVIDIA chips... destined for Chinese 'intermediaries' until better controls are in place."</p>
+            <div class="quote-attr">— Senators Warren & Banks, Joint Statement</div>
+          </div>
+          <div class="quote-block border-c3">
+            <p>"We catch significant smuggling... but we're concerned it's just the tip of the iceberg."</p>
+            <div class="quote-attr">— FBI Official</div>
+          </div>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title sentiment"><span>💬</span> [Community Sentiment]</h3>
-          <div class="quote-box">
-            <p class="quote-text">"To unlock the necessary performance increases for complex coding agents, leveraging heterogeneous hardware delivers an order of magnitude better performance per watt, solving critical datacenter capacity bottlenecks that plague the industry."</p>
-            <p class="quote-author">— Zain Asgar, Co-founder and CEO, Gimlet Labs</p>
-          </div>
-          <div class="quote-box">
-            <p class="quote-text">"The world's largest AI infrastructure buildouts are universally converging on the realization that homogeneous silicon cannot deliver the required efficiency; Gimlet's multi-silicon orchestration provides the missing layer."</p>
-            <p class="quote-author">— Tim Tully, Partner, Menlo Ventures</p>
-          </div>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c3">[Critical View]</span></div>
+          <p class="body-text">The requested suspension faces significant diplomatic blowback from Southeast Asian partners who are also Pax Silica signatories. A "complete freeze" could drive these nations toward Chinese-developed alternatives like Huawei Ascend, potentially undermining long-term U.S. influence. The realistic implementation timeline for the "location verification" systems mandated in the pending Chip Security Act is likely measured in years.</p>
         </div>
+
       </div>
     </article>
 
-    <article class="article-card theme-4" id="item-4">
-      <div class="article-header">
-        <div class="article-meta-top">
-          <span class="badge">Official</span>
-          <span class="article-date">March 23, 2026</span>
+    <article class="article" id="nvidia">
+      <div class="article-header border-c4" style="border-top: 4px solid var(--c4);">
+        <div class="article-number c4">04 / Ecosystem Software</div>
+        <h2 class="article-title">Open-Sourcing of the NVIDIA DRA Driver: Standardizing GPU Orchestration at Scale</h2>
+        <div class="article-meta">
+          <span class="meta-badge bg-c4">Official / Press</span>
+          <span class="meta-item">📅 March 24, 2026</span>
+          <span class="meta-item">Source: NVIDIA Official, Help Net Security, Phoronix</span>
         </div>
-        <h2 class="article-title">4. HPE and NVIDIA Deploy Sovereign AI Supercomputers at HLRS and Argonne</h2>
-        <div class="article-source">Source: StorageNewsletter</div>
       </div>
       <div class="article-body">
-        
-        <div class="section-block">
-          <h3 class="section-title overview"><span>🔭</span> [Overview]</h3>
-          <p class="text-content">Hewlett Packard Enterprise, in deep technical collaboration with NVIDIA, has announced the deployment of sovereign artificial intelligence supercomputers at critical national research centers — specifically the High-Performance Computing Center Stuttgart (HLRS) in Germany and Argonne National Laboratory in the United States. The geopolitical imperative driving this public capital expenditure is the urgent requirement for sovereign nations to secure regional data localization, strict regulatory compliance, and independent intelligence-generation capabilities without relying on commercial public clouds operated by foreign hyperscalers. The core technical breakthrough is the deployment of the liquid-cooled NVIDIA GB200 NVL4 architecture by HPE for the European Union's €55 million HammerHAI factory, alongside the Janus and Tara systems at Argonne, which natively blend high-performance computing simulations with deterministic AI inferencing. The immediate market reaction highlights surging demand among governments, intelligence agencies, and defense sectors to treat compute clusters as critical national security infrastructure.</p>
+
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c4">[Overview]</span></div>
+          <p class="body-text">Managing AI workloads at scale has required specialized tooling that remained under proprietary control, creating a bottleneck for heterogeneous data center deployments. On March 24, 2026, at KubeCon Europe in Amsterdam, NVIDIA donated its Dynamic Resource Allocation (DRA) Driver for GPUs to the Cloud Native Computing Foundation (CNCF). This transition shifts ownership from a single vendor to the broader Kubernetes community, allowing developers to natively manage high-performance GPU resources. The core breakthrough is the standardization of GPU sharing via Multi-Process Service (MPS) and Multi-Instance GPU (MIG) technologies, alongside native support for multi-node NVLink interconnects. This move "proposes" to eliminate the friction of hardware orchestration, making massive-scale AI clusters more accessible to cloud-native experts.</p>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title impact"><span>⚡</span> [Strategic Impact]</h3>
-          <p class="text-content">The rapid rise of the Sovereign AI market fundamentally shifts the long-term customer base for advanced silicon away from a concentration of tier-one hyperscalers toward heavily funded, relatively price-insensitive nation-state actors. HPE's capture of the €55 million HammerHAI contract and the Department of Energy deployments illustrates that legacy systems integrators with deep expertise in liquid cooling, strict data governance, and exascale-class architectures possess a highly defensible commercial moat. For capital allocators, this validates a significant macro thesis: the proliferation of AI compute will fracture into highly localized, fiercely protected national grids. This geopolitical fragmentation ensures a durable, long-term hardware supercycle, as each nation effectively duplicates massive infrastructure to guarantee proprietary control over foundational models, citizen healthcare data, and classified defense simulations — significantly mitigating the risk to semiconductor manufacturers of a sudden collapse in corporate hyperscaler capital expenditure.</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c4">[Strategic Impact]</span></div>
+          <div class="impact-box" style="border-color: var(--c4); background: var(--c4-light);">
+            <p class="body-text">By open-sourcing the DRA driver, NVIDIA effectively preempts the development of competing orchestration standards that might favor AMD or Intel accelerators. This reinforces NVIDIA's ecosystem dominance while "proposing" a safer path for enterprises to deploy confidential computing through newly introduced GPU support for Kata Containers. For investment firms, this validates the technology thesis that software orchestration is the key to maintaining hardware margins, as a standardized stack reduces the cost of switching for developers while entrenching NVIDIA's architectural paradigms.</p>
+          </div>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title tech"><span>🔬</span> [Technical Deep Dive]</h3>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Metric</th>
-                <th>Value</th>
-                <th>Quote</th>
-              </tr>
-            </thead>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c4">[Technical Deep Dive]</span></div>
+          <table class="info-table">
+            <thead><tr><th>Technical Component</th><th>Details</th></tr></thead>
             <tbody>
-              <tr>
-                <td>Peak AI Inference Performance</td>
-                <td>> 15 Exaflops</td>
-                <td>"will offer more than 15 Exaflops of peak AI inference performance"</td>
-              </tr>
-              <tr>
-                <td>System Funding Allocation</td>
-                <td>€55 million (~$64.8M)</td>
-                <td>"flagship system is funded by the EuroHPC Joint Undertaking... €55 million"</td>
-              </tr>
-              <tr>
-                <td>Hardware Architecture (Tara)</td>
-                <td>HPE Cray Supercomputing EX4000</td>
-                <td>"Based on the exascale-class HPE Cray Supercomputing EX4000 supercomputer"</td>
-              </tr>
-              <tr>
-                <td>Hardware Architecture (Janus)</td>
-                <td>HPE Cray XD server platform</td>
-                <td>"Based on the HPE Cray XD server platform and accelerated by Nvidia Hopper GPUs"</td>
-              </tr>
+              <tr><td><strong>Interconnect Support</strong></td><td>Native support for connecting systems, including NVIDIA Multi-Node NVLink interconnect technology.</td></tr>
+              <tr><td><strong>GPU Sharing</strong></td><td>GPU sharing through NVIDIA Multi-Process Service (MPS) and Multi-Instance GPU (MIG) technologies.</td></tr>
+              <tr><td><strong>Confidential Compute</strong></td><td>NVIDIA introduced GPU support for Kata Containers.</td></tr>
+              <tr><td><strong>Scale-Out Networking</strong></td><td>ConnectX-9 SuperNICs deliver 1.6 terabits per second (Tb/s) of per-GPU bandwidth.</td></tr>
+              <tr><td><strong>Runtime Flexibility</strong></td><td>Dynamic reconfiguration of hardware resources during runtime.</td></tr>
             </tbody>
           </table>
+          <p class="body-text"><strong>Comparison:</strong> The DRA Driver donation moves ownership from a single vendor (NVIDIA) to a community of over 500 member companies in the CNCF. This mirrors the successful open-sourcing of core Linux components that led to the mass adoption of cloud computing.</p>
+          <p class="body-text"><strong>Source Traceability:</strong> [DRA Donation] — NVIDIA — CNCF Milestone. [Networking] — NVIDIA — ConnectX-9 Generation. Primary URL verified: Yes. Cross-verified: Yes (Help Net Security, Phoronix).</p>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title visual"><span>📊</span> [Visual/Evidence]</h3>
-          <p class="text-content">No official visual found in the source documents.</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c4">[Visual / Evidence]</span></div>
+          <p class="body-text">NVIDIA demonstrated the DRA Driver in action at KubeCon Amsterdam, showing dynamic memory reconfiguration for multi-node workloads.</p>
+          <div class="chart-wrap"><canvas id="draChart"></canvas></div>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title critical"><span>⚠️</span> [Critical View]</h3>
-          <p class="text-content">While sovereign AI initiatives command massive, reliable government budgets, they are notoriously vulnerable to bureaucratic delays, shifting political winds, and severe technical talent shortages. Building a 15-exaflop inference machine requires not just vast capital, but an entire ecosystem of highly specialized engineers capable of managing complex direct-to-chip liquid cooling and sophisticated InfiniBand networking — talent currently hoarded by commercial hyperscalers who can offer vastly superior compensation. Furthermore, by deliberately isolating these sovereign systems from global cloud infrastructure to satisfy data localization mandates, governments risk creating technological cathedrals in the desert that lack the seamless software integrations and developer ecosystems that make commercial platforms so ruthlessly effective. There is a distinct risk that by the time these sovereign factories clear public procurement hurdles and achieve full operational maturity, the underlying GB200 silicon may already be eclipsed by next-generation architectures, leaving taxpayers funding rapidly depreciating, technologically isolated infrastructure.</p>
-        </div>
-
-        <div class="section-block">
-          <h3 class="section-title sentiment"><span>💬</span> [Community Sentiment]</h3>
-          <div class="quote-box">
-            <p class="quote-text">"Sovereign AI initiatives accelerate economic growth but require infrastructure that enables extreme scale, sustainability, and governance; HPE is uniquely suited to power this era while allowing customers to maintain control of their proprietary data and IP."</p>
-            <p class="quote-author">— Trish Damkroger, SVP and GM of HPC & AI Infrastructure Solutions, HPE</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c4">[Community Sentiment]</span></div>
+          <div class="quote-block border-c4">
+            <p>"NVIDIA's deep collaboration... to upstream the NVIDIA DRA Driver for GPUs marks a major milestone for open source Kubernetes and AI infrastructure."</p>
+            <div class="quote-attr">— CNCF Official Statement</div>
           </div>
-          <div class="quote-box">
-            <p class="quote-text">"Supercomputing is entering a completely new era where AI and HPC converge into intelligent systems; computing is shifting from being a mere tool to becoming an active collaborator in scientific discovery that guides real-time experiments."</p>
-            <p class="quote-author">— Rick Stevens, Associate Laboratory Director, Argonne National Laboratory</p>
+          <div class="quote-block border-c4">
+            <p>"The donation moves the driver from being vendor-governed to offering full community ownership under the Kubernetes project."</p>
+            <div class="quote-attr">— NVIDIA Blog</div>
           </div>
         </div>
+
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c4">[Critical View]</span></div>
+          <p class="body-text">While the orchestration driver is now open source, the underlying hardware firmware and CUDA libraries remain proprietary, meaning the "openness" is primarily at the scheduling layer. There is a risk that community-led development could diverge from NVIDIA's rapid internal roadmap, potentially creating versioning conflicts for early adopters of next-generation hardware platforms like Vera Rubin.</p>
+        </div>
+
       </div>
     </article>
 
-    <article class="article-card theme-5" id="item-5">
-      <div class="article-header">
-        <div class="article-meta-top">
-          <span class="badge">Official</span>
-          <span class="article-date">March 21, 2026</span>
+    <article class="article" id="hp">
+      <div class="article-header border-c5" style="border-top: 4px solid var(--c5);">
+        <div class="article-number c5">05 / Edge Autonomy</div>
+        <h2 class="article-title">HP IQ Launch: On-Device "Intelligence Layer" for Enterprise Autonomy</h2>
+        <div class="article-meta">
+          <span class="meta-badge bg-c5">Official / Press</span>
+          <span class="meta-item">📅 March 24, 2026</span>
+          <span class="meta-item">Source: HP Inc., UC Today, Times of India</span>
         </div>
-        <h2 class="article-title">5. Tesla, SpaceX, and xAI Unveil $25 Billion Terafab Chip Manufacturing Project</h2>
-        <div class="article-source">Source: Electrek</div>
       </div>
       <div class="article-body">
-        
-        <div class="section-block">
-          <h3 class="section-title overview"><span>🔭</span> [Overview]</h3>
-          <p class="text-content">Elon Musk has officially unveiled the highly ambitious Terafab project in Austin, Texas, representing a massive joint venture between Tesla and SpaceX — which completed an all-stock acquisition of xAI in February 2026, consolidating all three entities under unified Musk-led strategic leadership — explicitly designed to manufacture cutting-edge artificial intelligence semiconductors from the ground up. The driving force behind this endeavor is an acute, systemic shortage of leading-edge merchant foundry capacity; Musk aggressively asserts that current suppliers like TSMC and Samsung are expanding far too slowly to meet the explosive computing demand required for millions of autonomous vehicles, the Optimus humanoid robot line, and unprecedented orbital data centers. The decisive strategic shift is the proposed vertical integration of the entire semiconductor lifecycle — encompassing proprietary chip design, extreme ultraviolet lithography, memory production, advanced packaging, and rigorous testing — completely under a single corporate roof.</p>
+
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c5">[Overview]</span></div>
+          <p class="body-text">The enterprise market has reached a point where cloud-dependent AI assistants are insufficient for high-security environments due to latency and data privacy concerns. On March 24, 2026, at "HP Imagine" in New York, HP Inc. launched HP IQ, a workplace "intelligence layer" that runs entirely on-device. The core breakthrough is a local, 20-billion-parameter model that orchestrates workflows across PCs, meeting spaces, and printers without routing data to the cloud. Simultaneously, HP unveiled the EliteBook 6 G2q, which features an industry-leading 85 TOPS NPU to power these agentic tasks locally. Competitors in the PC space are now forced to transition from "AI-enabled" hardware to "AI-integrated" ecosystems that prioritize local data sovereignty.</p>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title impact"><span>⚡</span> [Strategic Impact]</h3>
-          <p class="text-content">Crucially, Musk announced that 80% of Terafab's compute output will be directed toward space-based orbital AI satellites utilizing radiation-hardened D3 chips engineered for the thermal and radiation constraints of the vacuum environment, while the remaining 20% will be allocated to ground-based applications using AI5 inference chips for robotics and autonomous vehicles. This production split fundamentally reframes the investment thesis: Terafab is not merely an automotive supply chain internalization play, but an attempt to establish a dominant position in space-based AI computation networks — an entirely novel infrastructure category with no direct commercial precedent. Targeting an eventual output of one million wafer starts per month, the facility is ostensibly designed to match roughly seventy percent of TSMC's entire current global output, aggressively internalizing the most geopolitically vulnerable node in Tesla and SpaceX's supply chain. However, the estimated $20 to $25 billion capital expenditure introduces immense corporate financial risk, and Tesla's CFO has explicitly acknowledged that this figure is not incorporated into Tesla's existing 2026 capital expenditure plan.</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c5">[Strategic Impact]</span></div>
+          <div class="impact-box" style="border-color: var(--c5); background: var(--c5-light);">
+            <p class="body-text">The launch of HP IQ validates the technology thesis that "Agentic AI" will migrate from centralized cloud clusters to the edge to ensure corporate data security. By integrating a 20B model locally, HP is "proposing" a reduction in recurring cloud API costs for enterprises, potentially disrupting the "SaaSpocalypse" where cloud-based software was expected to dominate. For investment firms, this highlights a massive hardware upgrade cycle for the $150+ billion enterprise PC market, specifically targeting NPU-heavy systems that can support these local orchestration layers.</p>
+          </div>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title tech"><span>🔬</span> [Technical Deep Dive]</h3>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Metric</th>
-                <th>Value</th>
-                <th>Quote</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Annual AI Compute Capacity Target</td>
-                <td>1 terawatt</td>
-                <td>"claims will produce 1 terawatt of computing power annually"</td>
-              </tr>
-              <tr>
-                <td>Process Node Target</td>
-                <td>2-nanometer</td>
-                <td>"targeting 2-nanometer process technology — the most advanced node"</td>
-              </tr>
-              <tr>
-                <td>Initial Wafer Output Target</td>
-                <td>100,000 wafer starts per month</td>
-                <td>"initial output of 100,000 wafer starts per month"</td>
-              </tr>
-              <tr>
-                <td>Scale Ambition Target</td>
-                <td>1,000,000 wafer starts per month</td>
-                <td>"ambitions to scale to 1 million wafer starts per month"</td>
-              </tr>
-              <tr>
-                <td>Estimated Capex</td>
-                <td>$20B–$25B</td>
-                <td>"Estimated Cost $20–25B"</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="text-content"><strong>Comparison:</strong> Aims to produce over 50 times the current global annual AI compute capacity output, with the current global baseline estimated at approximately 20 gigawatts annually.</p>
-        </div>
-
-        <div class="section-block">
-          <h3 class="section-title visual"><span>📊</span> [Visual/Evidence]</h3>
-          <p class="text-content">No official visual found in the source documents. (Output distribution visualized below)</p>
-          <div class="infographic-wrapper">
-            <div class="css-diagram">
-              <div class="diag-node" style="border-color: var(--text-main); background: #1E293B; color: #FFF;">
-                <h4 style="color: #FFF;">Terafab 2nm</h4>
-                <p style="color: #94A3B8;">1M Wafers/mo (Target)</p>
-              </div>
-              <div class="diag-arrow">⟶</div>
-              <div style="display: flex; flex-direction: column; gap: 10px;">
-                <div class="diag-node" style="border-color: var(--c-blue); text-align: left;">
-                  <h4 style="color: var(--c-blue);">80% Space-based (Orbital AI)</h4>
-                  <p>Radiation-hardened D3 chips</p>
-                </div>
-                <div class="diag-node" style="border-color: var(--c-emerald); text-align: left;">
-                  <h4 style="color: var(--c-emerald);">20% Ground-based (Robotics/Auto)</h4>
-                  <p>AI5 inference chips</p>
-                </div>
-              </div>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c5">[Technical Deep Dive]</span></div>
+          <div class="spec-grid">
+            <div class="spec-item">
+              <div class="spec-label">Local Model Size</div>
+              <div class="spec-val c5">20B parameters</div>
+              <div class="spec-quote">"HP IQ is based on a local, 20B-parameter model, plus specialized tools"</div>
             </div>
-            <div class="chart-container" style="height: 250px; margin-top: 20px;">
-              <canvas id="terafabChart"></canvas>
+            <div class="spec-item">
+              <div class="spec-label">NPU Performance</div>
+              <div class="spec-val c5">85 TOPS</div>
+              <div class="spec-quote">"powered by Snapdragon X2 Elite... delivering up to 85 TOPS"</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Processor</div>
+              <div class="spec-val c5">Snapdragon X2 Elite</div>
+              <div class="spec-quote">"The device is powered by Snapdragon X2 Elite and X2 Plus processors"</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Security</div>
+              <div class="spec-val c5">HP TPM Guard</div>
+              <div class="spec-quote">"world's first hardware solution capable of stopping physical TPM bus attacks"</div>
             </div>
           </div>
+          <p class="body-text"><strong>Comparison:</strong> The HP IQ 20B local model is significantly larger than typical on-device "small language models" (3B–7B) used in 2025, enabling more complex reasoning on-device. The 85 TOPS NPU performance nearly doubles the performance of first-generation AI PCs (40–45 TOPS).</p>
+          <p class="body-text"><strong>Source Traceability:</strong> [Model / Platform] — HP — HP IQ Platform. [NPU / Processor] — Snapdragon — EliteBook 6 G2q. Primary URL verified: Yes. Cross-verified: Yes (Times of India, UC Today).</p>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title critical"><span>⚠️</span> [Critical View]</h3>
-          <p class="text-content">The Terafab initiative is fraught with severe, potentially insurmountable execution risks. The semiconductor manufacturing process is universally recognized as the most complex industrial endeavor on Earth, requiring decades of iterative institutional learning, precise metallurgical yield management, and deep partnerships with equipment monopolies like ASML and Applied Materials. Attempting to leapfrog directly to a bleeding-edge 2-nanometer node without licensing an established process flow from an incumbent foundry is practically unheard of in modern silicon fabrication. The stated $25 billion price tag is likely a significant underestimate; leading-edge logic fabs routinely exceed initial cost projections by billions, and the resulting capital drain could severely pressure Tesla's margins. Critically, Tesla's CFO has acknowledged that this $20 to $25 billion estimated cost is not even incorporated into Tesla's existing record capital expenditure plan for 2026, introducing substantial uncertainty around financing execution. There is also the critical issue of equipment lead times — high-NA extreme ultraviolet photolithography machines are backlogged for years — meaning that even if capital is deployed immediately, Terafab is highly unlikely to produce usable silicon until the end of the decade, by which point the frontier of AI hardware architectures will have advanced significantly, potentially rendering the initial 2-nanometer target economically obsolete before the first wafer is shipped.</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c5">[Visual / Evidence]</span></div>
+          <p class="body-text">HP showcased the "Visor" interface on the PC, a software layer that adapts to natural language interaction across voice and text without app switching.</p>
+          <div class="chart-wrap"><canvas id="hpChart"></canvas></div>
         </div>
 
-        <div class="section-block">
-          <h3 class="section-title sentiment"><span>💬</span> [Community Sentiment]</h3>
-          <div class="quote-box">
-            <p class="quote-text">"Terafab is the most ambitious semiconductor manufacturing bet in history, but you cannot build a 2-nanometer fab without a production-ready process flow from someone; moving into manufacturing entails entirely different risks and capital than designing chips."</p>
-            <p class="quote-author">— Patrick Moorhead, CEO and Chief Analyst, Moor Insights & Strategy</p>
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c5">[Community Sentiment]</span></div>
+          <div class="quote-block border-c5">
+            <p>"HP IQ is how we connect those experiences, reducing digital friction for employees while fitting into the environments IT already manages."</p>
+            <div class="quote-attr">— Enrique Lores, CEO, HP Inc.</div>
           </div>
-          <div class="quote-box">
-            <p class="quote-text">"A true Terafab feels like a massive stretch under current compute paradigms, and we may eventually see partnerships with other current manufacturers if he cannot make it happen on his own."</p>
-            <p class="quote-author">— Stacy Rasgon, Senior Analyst, Bernstein Research</p>
+          <div class="quote-block border-c5">
+            <p>"The future of work should be open, collaborative, and seamless — where any device and brand can speak the same language."</p>
+            <div class="quote-attr">— HP Official Statement</div>
           </div>
         </div>
+
+        <div class="subsection">
+          <div class="subsection-header"><span class="subsection-label c5">[Critical View]</span></div>
+          <p class="body-text">While local processing improves security, the power consumption of running a 20B model continuously could negatively impact battery life for mobile workstations. Furthermore, the "NearSense" spatial intelligence feature is built in collaboration with Google's Device-to-Device Intelligence (D2DI) technology, which may limit full interoperability for enterprises not already operating within the Google or Android ecosystem.</p>
+        </div>
+
       </div>
     </article>
 
-    <section class="synthesis-section" id="synthesis">
-      <h2>Closing Synthesis & Trajectory</h2>
+    <section class="synthesis" id="synthesis">
+      <h2 class="synthesis-title">Closing Synthesis & Trajectory</h2>
       
-      <div class="syn-block">
-        <h3>Briefing Summary</h3>
-        <p>The artificial intelligence infrastructure sector over the past week reflects an aggressive, multifaceted transition toward physicalization — the deep, inextricable integration of software code, logic compute, and foundational energy grids. Driven by a projected $650 billion to $690 billion capital expenditure supercycle slated for 2026, hyperscalers, emerging startups, and sovereign nations are systematically dismantling the traditional, homogeneous data center model. Nebius Group's $4.34 billion capital raise — anchored by a $27 billion infrastructure commitment from Meta and a previously secured $17.4 billion agreement with Microsoft — highlights how hyperscalers are turning to specialized neocloud operators to guarantee early access to next-generation silicon like the Vera Rubin platform, while simultaneously underwriting those operators with customer prepayments that cover approximately 60% of required growth capital.</p>
-        <p>Simultaneously, the brutal physical constraints of power generation and networking bandwidth are forcing rapid architectural evolution. NVIDIA's landmark partnership with Emerald AI to create software-defined, grid-responsive Flexible AI Factories turns stranded power delays into dynamic energy assets, with the 96MW Aurora AI Factory in Manassas, Virginia serving as the first real-world benchmark for this paradigm in the first half of 2026. At the silicon layer, Gimlet Labs' $80 million Series A validates that the future of inference lies in multi-silicon heterogeneity, mapping discrete agentic workloads across specialized SRAM chips and legacy GPUs to vastly improve performance per watt and lower total cost of ownership. Geopolitically, the deployment of 15-exaflop sovereign systems like HPE's HammerHAI in Europe underscores the fracturing of global compute into heavily fortified, proprietary national silos. Ultimately, Elon Musk's $25 billion Terafab gambit — with 80% of its projected output directed toward orbital AI satellite networks utilizing radiation-hardened D3 chips — highlights the extreme lengths to which the world's largest compute consumers will go to vertically integrate hardware supply chains, while simultaneously introducing an entirely novel space-based AI computation category that has no direct commercial precedent.</p>
+      <div class="subsection">
+        <p class="outlook-text" style="font-size: 16px; margin-bottom: 32px;"><strong>Briefing Summary:</strong><br>The events of the last 24 hours signal a "Vertical Reconsolidation" of the AI infrastructure stack. Arm's historic move into production silicon and HP's launch of a 20B local intelligence layer both highlight the industry's transition from general-purpose hardware to vertically optimized, agent-ready platforms. This silicon-level shift is being financed by massive sovereign capital pools like Pax Silica, which aim to domesticate the supply chain to mitigate the risks of transshipment and diversion exposed by recent Senate scrutiny. For investment firms, the strategic focus must shift toward "Sovereign Silicon" (Arm, Pax Silica members) and "Enterprise Autonomy" (HP, on-device models) while discounting assets located in geopolitical transshipment hubs.</p>
       </div>
 
-      <div class="syn-block">
-        <h3>Anticipated High-Impact Events (Next Quarter to 12 Months)</h3>
-        <ul class="outlook-list">
-          <li class="outlook-item">
-            <span class="outlook-status status-anticipated">WIDELY ANTICIPATED</span>
-            <p>The formal issuance of a replacement rule by the Department of Commerce addressing advanced AI chip exports, fundamentally altering compliance frameworks for global infrastructure-as-a-service providers and dictating the future of Middle Eastern sovereign cloud deployments.</p>
-          </li>
-          <li class="outlook-item">
-            <span class="outlook-status status-confirmed">CONFIRMED SCHEDULED</span>
-            <p>Full commercial-scale deployment of the NVIDIA DSX Flex software library at the Aurora AI Factory in Manassas, Virginia, establishing the first operational benchmark for gigawatt-scale grid-responsive compute in the first half of 2026.</p>
-          </li>
-          <li class="outlook-item">
-            <span class="outlook-status status-anticipated">WIDELY ANTICIPATED</span>
-            <p>The commercial launch of AMD's Helios MI455X rack-scale platform and the MI400-series AI accelerators in the second half of 2026, directly challenging NVIDIA's Vera Rubin architecture with high-capacity inference scaling.</p>
-          </li>
-          <li class="outlook-item">
-            <span class="outlook-status status-speculative">SPECULATIVE</span>
-            <p>Major delays or cost overruns in the construction of the Terafab semiconductor facility in Austin, as the extreme complexity of deploying a 2-nanometer process node without an established foundry partner forces SpaceX and Tesla to dramatically increase their reliance on existing TSMC and Samsung supply chains.</p>
-          </li>
-          <li class="outlook-item">
-            <span class="outlook-status status-confirmed">CONFIRMED SCHEDULED</span>
-            <p>Apple's Worldwide Developers Conference (WWDC) commencing on June 8, 2026, where the company will unveil its latest artificial intelligence advancements (iOS 27) and potentially a deeply integrated chatbot version of Siri rivaling current frontier models.</p>
-          </li>
-        </ul>
+      <h3 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); margin-bottom: 20px;">Anticipated High-Impact Events (Next Quarter to 12 Months)</h3>
+
+      <div class="outlook-item">
+        <span class="outlook-badge" style="background: rgba(220, 38, 38, 0.2); color: #FCA5A5;">CONFIRMED SCHEDULED — April 1, 2026</span>
+        <p class="outlook-text">The Department of Commerce will begin accepting proposals for "Full-Stack AI Export Packages," allowing U.S. industry-led consortia to export vetted hardware-software stacks to trusted allies.</p>
+      </div>
+
+      <div class="outlook-item">
+        <span class="outlook-badge" style="background: rgba(16, 185, 129, 0.2); color: #6EE7B7;">WIDELY ANTICIPATED — Q2 2026</span>
+        <p class="outlook-text">Availability of AM5 desktop systems powered by AMD Ryzen AI 400 Series processors from partners HP and Lenovo, bringing 50 TOPS NPU performance to the desktop segment.</p>
+      </div>
+
+      <div class="outlook-item">
+        <span class="outlook-badge" style="background: rgba(16, 185, 129, 0.2); color: #6EE7B7;">WIDELY ANTICIPATED — H2 2026</span>
+        <p class="outlook-text">Initial volume production and deployment of NVIDIA Vera Rubin NVL72 racks by core hyperscalers (AWS, Google, Microsoft), representing the definitive shift to HBM4-based liquid-cooled infrastructure.</p>
+      </div>
+
+      <div class="outlook-item">
+        <span class="outlook-badge" style="background: rgba(16, 185, 129, 0.2); color: #6EE7B7;">WIDELY ANTICIPATED — H2 2026</span>
+        <p class="outlook-text">Broad availability of Arm AGI CPU-based server systems from OEMs ASRock Rack, Lenovo, and Supermicro, providing a 136-core alternative for agentic AI control planes.</p>
+      </div>
+
+      <div class="outlook-item">
+        <span class="outlook-badge" style="background: rgba(245, 158, 11, 0.2); color: #FCD34D;">SPECULATIVE — Late 2026</span>
+        <p class="outlook-text">Issuance of a formal Federal Acquisition Security Council (FASCSA) exclusion order against SMCI or its affiliates by the Department of Defense, potentially mandating the removal of their hardware from critical national security systems.</p>
       </div>
     </section>
 
   </main>
 </div>
 
-<script>
-  Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-  Chart.defaults.color = '#475569';
-
-  // 1. Nebius Chart
-  new Chart(document.getElementById('nebiusChart').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: ['Meta Contract', 'MSFT Contract (Max)', 'CapEx Target (2026)', 'Raised (Notes)'],
-      datasets: [{
-        label: 'USD Billions',
-        data: [27, 19.4, 20, 4.34],
-        backgroundColor: ['#059669', '#34D399', '#10B981', '#6EE7B7'],
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: '$ Billions' } } }
-    }
-  });
-
-  // 2. Emerald Chart
-  new Chart(document.getElementById('emeraldChart').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: ['Flex 1', 'Flex 2', 'Flex 3'],
-      datasets: [{
-        label: 'Power Reduction %',
-        data: [10, 25, 50],
-        backgroundColor: '#3B82F6',
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: '% Reduction' } } }
-    }
-  });
-
-  // 3. Terafab Chart
-  new Chart(document.getElementById('terafabChart').getContext('2d'), {
-    type: 'pie',
-    data: {
-      labels: ['Space-based (Orbital AI)', 'Ground-based (Robotics/Auto)'],
-      datasets: [{
-        data: [80, 20],
-        backgroundColor: ['#2563EB', '#10B981'],
-        borderWidth: 0
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom' } }
-    }
-  });
-</script>
-
 <a href="index.html" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; padding: 14px 24px; background-color: #3b82f6; color: #fff; text-decoration: none; border-radius: 50px; font-weight: 500; font-family: sans-serif; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); font-size: 14px; transition: transform 0.2s;">
   클로드 버전 보기
 </a>
+
+<script>
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.color = '#64748B';
+
+// Chart 1: Arm AGI Density
+const ctxArm = document.getElementById('armChart').getContext('2d');
+new Chart(ctxArm, {
+  type: 'bar',
+  data: {
+    labels: ['Standard x86 Rack', 'Arm AGI Rack (Air)', 'Arm AGI Rack (Liquid)'],
+    datasets: [{
+      label: 'Cores Per Rack',
+      data: [4000, 8160, 45000],
+      backgroundColor: ['#E2E8F0', '#60A5FA', '#2563EB'],
+      borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      title: { display: true, text: 'Data Center Density: Cores per Rack', font: { size: 14 } }
+    },
+    scales: {
+      y: { type: 'logarithmic', title: { display: true, text: 'Cores (Log Scale)' } }
+    }
+  }
+});
+
+// Chart 2: Pax Silica Funding
+const ctxPax = document.getElementById('paxChart').getContext('2d');
+new Chart(ctxPax, {
+  type: 'doughnut',
+  data: {
+    labels: ['US Gov Anchor ($250M)', 'Consortium Target ($3.999T)'],
+    datasets: [{
+      data: [0.25, 3999.75],
+      backgroundColor: ['#059669', '#D1FAE5'],
+      borderWidth: 0
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      title: { display: true, text: 'Pax Silica $4T Funding Target Breakdown', font: { size: 14 } }
+    }
+  }
+});
+
+// Chart 4: DRA Networking Bandwidth
+const ctxDra = document.getElementById('draChart').getContext('2d');
+new Chart(ctxDra, {
+  type: 'bar',
+  data: {
+    labels: ['Previous Gen Networking', 'ConnectX-9 (DRA Supported)'],
+    datasets: [{
+      label: 'Per-GPU Bandwidth (Tb/s)',
+      data: [0.8, 1.6],
+      backgroundColor: ['#C4B5FD', '#7C3AED'],
+      borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      title: { display: true, text: 'Network Scaling: Per-GPU External Bandwidth', font: { size: 14 } }
+    }
+  }
+});
+
+// Chart 5: HP IQ NPU TOPS
+const ctxHp = document.getElementById('hpChart').getContext('2d');
+new Chart(ctxHp, {
+  type: 'bar',
+  data: {
+    labels: ['Gen 1 AI PC', 'HP EliteBook 6 G2q'],
+    datasets: [{
+      label: 'NPU Performance (TOPS)',
+      data: [45, 85],
+      backgroundColor: ['#FDE68A', '#D97706'],
+      borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: {
+      legend: { display: false },
+      title: { display: true, text: 'On-Device NPU Performance Leap (TOPS)', font: { size: 14 } }
+    }
+  }
+});
+</script>
 </body>
 </html>
