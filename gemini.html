@@ -1,1481 +1,842 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AI Infrastructure Intelligence Briefing — March 31, 2026</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<style>
-/* ── Reset & Variables ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Intelligence Briefing: AI Infrastructure</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-:root {
-  --bg-color: #F8FAFC;
-  --surface-color: #FFFFFF;
-  --text-main: #0F172A;
-  --text-muted: #475569;
-  --text-light: #94A3B8;
-  --border-color: #E2E8F0;
-  
-  --brand-primary: #3B82F6;
-  --brand-dark: #1E293B;
-  
-  --c1: #F97316; /* Amazon - Orange */
-  --c1-light: #FFF7ED;
-  --c2: #EF4444; /* Regulatory - Red */
-  --c2-light: #FEF2F2;
-  --c3: #0EA5E9; /* Pax Silica - Sky Blue */
-  --c3-light: #F0F9FF;
-  --c4: #10B981; /* Military - Emerald */
-  --c4-light: #ECFDF5;
-  --c5: #8B5CF6; /* Claude - Violet */
-  --c5-light: #F5F3FF;
+    <style>
+        :root {
+            /* Color Palette */
+            --bg-body: #F9F8F6;
+            --bg-surface: #FFFFFF;
+            --bg-sidebar: #1E232A;
+            
+            --ink-main: #1C1A17;
+            --ink-muted: #5C5A55;
+            --ink-light: #8E8C86;
+            
+            --accent-blue: #1E3A8A;
+            --accent-emerald: #065F46;
+            --accent-amber: #B45309;
+            --accent-crimson: #991B1B;
+            --accent-purple: #4C1D95;
+            
+            --border-soft: #EAE6DF;
+            --border-strong: #D1CDC4;
+            
+            /* Typography */
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
 
-  --font-sans: 'Inter', sans-serif;
-  --font-display: 'Outfit', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
-  --radius-md: 12px;
-  --radius-sm: 8px;
-}
+        body {
+            font-family: var(--font-sans);
+            color: var(--ink-main);
+            background-color: var(--bg-body);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-body {
-  font-family: var(--font-sans);
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  line-height: 1.7;
-  font-size: 15px;
-  -webkit-font-smoothing: antialiased;
-}
+        /* Disclaimer */
+        .disclaimer-banner {
+            background-color: var(--accent-amber);
+            color: #FFFFFF;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 1000;
+            position: relative;
+        }
 
-/* ── Disclaimer ── */
-.top-disclaimer {
-  background-color: #FEF3C7;
-  border-bottom: 2px solid #F59E0B;
-  padding: 12px 20px;
-  text-align: center;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: #92400E;
-  letter-spacing: -0.01em;
-}
+        /* Layout */
+        .dashboard-container {
+            display: flex;
+            flex: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
 
-/* ── Header ── */
-.app-header {
-  background-color: var(--brand-dark);
-  color: #FFFFFF;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-}
-.header-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 16px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.header-logo-box {
-  width: 42px;
-  height: 42px;
-  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 700;
-  color: #FFF;
-  box-shadow: 0 2px 10px rgba(59,130,246,0.4);
-}
-.header-title-wrapper {
-  display: flex;
-  flex-direction: column;
-}
-.header-title {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-.header-subtitle {
-  font-size: 12px;
-  color: #94A3B8;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-.header-nav {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.nav-pill {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  padding: 6px 14px;
-  border-radius: 30px;
-  text-decoration: none;
-  background-color: rgba(255,255,255,0.1);
-  color: #F8FAFC;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(255,255,255,0.05);
-}
-.nav-pill:hover {
-  background-color: rgba(255,255,255,0.2);
-  color: #FFF;
-}
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: var(--bg-sidebar);
+            color: #FFFFFF;
+            padding: 2rem 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
 
-/* ── Layout Structure ── */
-.main-layout {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 40px 24px 80px;
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  gap: 40px;
-  align-items: start;
-}
+        .sidebar-brand {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            margin-bottom: 2.5rem;
+            color: #F3F1EC;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
+        }
 
-/* ── Sidebar ── */
-.sidebar {
-  position: sticky;
-  top: 90px;
-}
-.sidebar-title {
-  font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 16px;
-  padding-left: 12px;
-}
-.sidebar-menu {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.sidebar-menu a {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 13.5px;
-  font-weight: 600;
-  text-decoration: none;
-  color: var(--text-main);
-  background-color: transparent;
-  transition: all 0.2s;
-  border: 1px solid transparent;
-}
-.sidebar-menu a:hover {
-  background-color: var(--surface-color);
-  border-color: var(--border-color);
-  box-shadow: var(--shadow-sm);
-  transform: translateX(4px);
-}
-.dot-indicator {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+        .nav-link {
+            display: block;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            padding: 0.75rem 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: color 0.2s;
+        }
 
-/* ── Content Area ── */
-.content-area {
-  min-width: 0;
-}
+        .nav-link:hover {
+            color: #FFFFFF;
+        }
 
-/* Executive Summary Block */
-.exec-summary {
-  background: var(--surface-color);
-  border-radius: var(--radius-md);
-  padding: 32px 40px;
-  margin-bottom: 40px;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-color);
-  border-top: 4px solid var(--brand-primary);
-}
-.exec-summary h2 {
-  font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 16px;
-  color: var(--brand-dark);
-}
-.exec-summary p {
-  color: var(--text-muted);
-  font-size: 15.5px;
-  line-height: 1.8;
-}
+        .confidence-meter {
+            margin-top: 3rem;
+            background: rgba(255,255,255,0.05);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
 
-/* ── Article Cards ── */
-.news-article {
-  background: var(--surface-color);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  margin-bottom: 40px;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.news-article:hover {
-  box-shadow: var(--shadow-lg);
-}
-.article-header {
-  padding: 32px 32px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
-  border-bottom: 1px solid var(--border-color);
-}
-.article-number-badge {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.article-headline {
-  font-family: var(--font-display);
-  font-size: 26px;
-  line-height: 1.3;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: -0.01em;
-}
-.article-status-pill {
-  flex-shrink: 0;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 6px 12px;
-  border-radius: 20px;
-  color: #FFF;
-}
-.article-metadata-bar {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 32px;
-  background-color: #F8FAFC;
-  border-bottom: 1px solid var(--border-color);
-  flex-wrap: wrap;
-}
-.meta-info {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.meta-divider {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background-color: #CBD5E1;
-}
-.article-content {
-  padding: 32px;
-}
+        .confidence-meter h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 1rem;
+        }
 
-/* ── Subsections inside Articles ── */
-.sub-section {
-  margin-bottom: 36px;
-}
-.sub-section:last-child {
-  margin-bottom: 0;
-}
-.sub-section-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid var(--border-color);
-}
-.sub-section-icon {
-  font-size: 18px;
-}
-.sub-section-title {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.sub-section-body p {
-  margin-bottom: 14px;
-  color: var(--text-muted);
-  font-size: 15px;
-}
-.sub-section-body p:last-child {
-  margin-bottom: 0;
-}
+        .meter-bar-bg {
+            background: rgba(255,255,255,0.1);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
 
-/* ── Custom UI Elements ── */
-.highlight-box {
-  border-radius: var(--radius-sm);
-  padding: 20px 24px;
-  margin: 16px 0;
-  border-left: 5px solid;
-}
-.highlight-box p {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text-main) !important;
-  line-height: 1.7;
-}
+        .meter-bar-fill {
+            background: #10B981;
+            height: 100%;
+            width: 88%;
+        }
 
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-  font-size: 13.5px;
-  background-color: #FFF;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
-}
-.data-table th {
-  background-color: #F1F5F9;
-  padding: 12px 16px;
-  text-align: left;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 2px solid var(--border-color);
-}
-.data-table td {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border-color);
-  color: var(--text-main);
-  vertical-align: top;
-}
-.data-table tr:last-child td {
-  border-bottom: none;
-}
-.data-table td:first-child {
-  font-weight: 600;
-}
+        .meter-text {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #10B981;
+        }
 
-/* ── Custom Infographics (HTML/CSS) ── */
-.visual-diagram {
-  background-color: #F8FAFC;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 24px;
-  margin: 20px 0;
-}
-.diagram-title {
-  font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-bottom: 20px;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 3rem 4rem;
+            max-width: 1100px;
+        }
 
-/* Flex Flow Diagram (Amazon) */
-.flex-flow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.flow-step {
-  flex: 1;
-  min-width: 180px;
-  background-color: #FFF;
-  border: 2px solid;
-  border-radius: var(--radius-sm);
-  padding: 20px;
-  text-align: center;
-  box-shadow: var(--shadow-sm);
-}
-.flow-step h4 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-.flow-step p {
-  font-size: 12px !important;
-  color: var(--text-muted);
-  line-height: 1.4;
-}
-.flow-arrow {
-  font-size: 24px;
-  color: var(--text-light);
-  font-weight: 700;
-}
+        .report-header {
+            margin-bottom: 4rem;
+        }
 
-/* Grid Compare (Pax Silica) */
-.grid-compare {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-.compare-box {
-  background: #FFF;
-  border: 1px solid var(--border-color);
-  border-top: 4px solid;
-  border-radius: var(--radius-sm);
-  padding: 24px;
-  box-shadow: var(--shadow-sm);
-}
-.compare-box h4 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-.compare-list {
-  list-style: none;
-}
-.compare-list li {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-  padding-left: 16px;
-  position: relative;
-}
-.compare-list li::before {
-  content: '•';
-  position: absolute;
-  left: 0;
-  color: var(--text-light);
-  font-weight: bold;
-}
+        .report-title {
+            font-family: var(--font-serif);
+            font-size: 2.75rem;
+            line-height: 1.2;
+            color: var(--ink-main);
+            margin-bottom: 1.5rem;
+        }
 
-/* Stacked Pyramid (Claude Mythos) */
-.pyramid-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-.pyramid-layer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 20px;
-  border-radius: var(--radius-sm);
-  font-weight: 700;
-  color: #FFF;
-  text-align: center;
-  box-shadow: var(--shadow-sm);
-}
-.pyramid-layer p {
-  margin: 0;
-  font-size: 12px !important;
-  font-weight: 400;
-  opacity: 0.9;
-  margin-left: 8px;
-  color: #FFF !important;
-}
+        .report-intro {
+            font-size: 1.1rem;
+            color: var(--ink-muted);
+            max-width: 800px;
+        }
 
-/* Empty State / N/A */
-.empty-state {
-  font-style: italic;
-  color: var(--text-light) !important;
-  background-color: #F8FAFC;
-  padding: 16px;
-  border-radius: var(--radius-sm);
-  border: 1px dashed var(--border-color);
-  text-align: center;
-}
+        /* Article Card */
+        .article-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            padding: 3rem;
+            margin-bottom: 4rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
 
-/* Charts */
-.chart-container {
-  position: relative;
-  height: 300px;
-  width: 100%;
-  margin: 24px 0;
-  background-color: #FFF;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
-}
+        .article-header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-soft);
+            padding-bottom: 1.5rem;
+        }
 
-/* ── Synthesis Section ── */
-.synthesis-section {
-  background: var(--brand-dark);
-  color: #FFF;
-  border-radius: var(--radius-md);
-  padding: 48px;
-  box-shadow: var(--shadow-lg);
-  margin-top: 60px;
-}
-.synthesis-title {
-  font-family: var(--font-display);
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 24px;
-  letter-spacing: -0.02em;
-}
-.synthesis-content p {
-  color: #CBD5E1;
-  font-size: 16px;
-  line-height: 1.8;
-  margin-bottom: 20px;
-}
-.events-box {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--radius-sm);
-  padding: 32px;
-  margin-top: 32px;
-}
-.events-title {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 24px;
-  color: #F8FAFC;
-}
-.event-item {
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-.event-item:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-.event-badge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  padding: 4px 10px;
-  border-radius: 4px;
-  margin-bottom: 12px;
-}
-.event-item p {
-  color: #94A3B8;
-  font-size: 14.5px;
-  margin: 0;
-}
+        .article-title {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            margin: 1rem 0;
+            color: var(--ink-main);
+        }
 
-/* Color Classes */
-.bg-c1 { background-color: var(--c1); } .text-c1 { color: var(--c1); } .border-c1 { border-color: var(--c1); } .light-c1 { background-color: var(--c1-light); }
-.bg-c2 { background-color: var(--c2); } .text-c2 { color: var(--c2); } .border-c2 { border-color: var(--c2); } .light-c2 { background-color: var(--c2-light); }
-.bg-c3 { background-color: var(--c3); } .text-c3 { color: var(--c3); } .border-c3 { border-color: var(--c3); } .light-c3 { background-color: var(--c3-light); }
-.bg-c4 { background-color: var(--c4); } .text-c4 { color: var(--c4); } .border-c4 { border-color: var(--c4); } .light-c4 { background-color: var(--c4-light); }
-.bg-c5 { background-color: var(--c5); } .text-c5 { color: var(--c5); } .border-c5 { border-color: var(--c5); } .light-c5 { background-color: var(--c5-light); }
+        /* Badges */
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
 
-/* ── Responsive ── */
-@media (max-width: 1024px) {
-  .main-layout {
-    grid-template-columns: 1fr;
-    padding: 24px 16px 60px;
-    gap: 24px;
-  }
-  .sidebar {
-    display: none; /* Hide sidebar on smaller screens, rely on top nav */
-  }
-  .article-header {
-    flex-direction: column;
-    padding: 24px;
-  }
-  .article-content {
-    padding: 24px;
-  }
-  .flex-flow {
-    flex-direction: column;
-  }
-  .flow-arrow {
-    transform: rotate(90deg);
-  }
-  .grid-compare {
-    grid-template-columns: 1fr;
-  }
-  .synthesis-section {
-    padding: 32px 24px;
-  }
-}
+        .badge {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
 
-@media (max-width: 600px) {
-  .header-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .header-nav {
-    display: none;
-  }
-  .article-headline {
-    font-size: 22px;
-  }
-  .exec-summary {
-    padding: 24px;
-  }
-}
-</style>
+        .badge-breaking { background: var(--accent-crimson); color: white; }
+        .badge-market { background: var(--accent-blue); color: white; }
+        .badge-confidence { background: var(--accent-emerald); color: white; }
+        .badge-risk { background: var(--accent-amber); color: white; }
+        .badge-tech { background: var(--accent-purple); color: white; }
+
+        /* Metric Cards */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .metric-card {
+            background: var(--bg-body);
+            border: 1px solid var(--border-soft);
+            border-left: 4px solid var(--accent-blue);
+            padding: 1.25rem;
+            border-radius: 4px;
+        }
+
+        .metric-value {
+            font-family: var(--font-mono);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--ink-main);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--ink-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Content Sections */
+        .section-tag {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--accent-blue);
+            margin: 2.5rem 0 1rem 0;
+            border-bottom: 1px solid var(--border-soft);
+            padding-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .content-block p {
+            margin-bottom: 1.25rem;
+        }
+
+        .content-block ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .content-block li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Infographics / Visuals */
+        .visual-container {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: var(--bg-body);
+            border: 1px solid var(--border-soft);
+            border-radius: 8px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* HTML/CSS Diagrams */
+        .html-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        .diag-node {
+            background: var(--bg-surface);
+            border: 2px solid var(--accent-blue);
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--ink-main);
+            min-width: 140px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .diag-node.core {
+            border-color: var(--accent-emerald);
+            background: rgba(6, 95, 70, 0.05);
+        }
+
+        .diag-node.threat {
+            border-color: var(--accent-crimson);
+            background: rgba(153, 27, 27, 0.05);
+        }
+
+        .diag-link {
+            color: var(--ink-muted);
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .diag-link::after {
+            content: '→';
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .closing-synthesis {
+            background: var(--bg-surface);
+            padding: 3rem;
+            border-top: 4px solid var(--ink-main);
+            margin-top: 4rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 1.5rem;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .sidebar-brand { margin-bottom: 0; border: none; padding: 0; }
+            .nav-links { display: none; }
+            .confidence-meter { margin-top: 0; padding: 1rem; }
+            .main-content { padding: 2rem; }
+        }
+
+        @media (max-width: 768px) {
+            .article-card { padding: 1.5rem; }
+            .metric-grid { grid-template-columns: 1fr; }
+            .html-diagram { flex-direction: column; }
+            .diag-link::after { content: '↓'; }
+        }
+    </style>
 </head>
 <body>
 
-<div class="top-disclaimer">
-  ⚠️ This content was generated by AI and may contain inaccuracies. For reference purposes only. <br/> 본 내용은 AI가 작성한 내용으로 부정확할 수 있습니다. 참고용으로만 이용해주세요.
-</div>
-
-<header class="app-header">
-  <div class="header-container">
-    <div class="header-brand">
-      <div class="header-logo-box">AI</div>
-      <div class="header-title-wrapper">
-        <div class="header-title">AI Infrastructure Intelligence Briefing</div>
-        <div class="header-subtitle">March 31, 2026 • Executive Overview</div>
-      </div>
+    <div class="disclaimer-banner">
+        🚨 본 내용은 AI가 작성한 내용으로 부정확할 수 있습니다. 참고용으로만 이용해주세요. (This content is AI-generated and may contain inaccuracies. Use for reference only.)
     </div>
-    <nav class="header-nav">
-      <a href="#amazon" class="nav-pill">Amazon</a>
-      <a href="#regs" class="nav-pill">Regulations</a>
-      <a href="#pax" class="nav-pill">Pax Silica</a>
-      <a href="#military" class="nav-pill">Military AI</a>
-      <a href="#claude" class="nav-pill">Claude Mythos</a>
-    </nav>
-  </div>
-</header>
 
-<div class="main-layout">
-  
-  <aside class="sidebar">
-    <div class="sidebar-title">Contents</div>
-    <ul class="sidebar-menu">
-      <li><a href="#amazon"><span class="dot-indicator bg-c1"></span> Amazon Supercycle</a></li>
-      <li><a href="#regs"><span class="dot-indicator bg-c2"></span> Chip Security Act</a></li>
-      <li><a href="#pax"><span class="dot-indicator bg-c3"></span> Pax Silica Strategy</a></li>
-      <li><a href="#military"><span class="dot-indicator bg-c4"></span> Military Infrastructure</a></li>
-      <li><a href="#claude"><span class="dot-indicator bg-c5"></span> Claude Mythos Leak</a></li>
-      <li><a href="#synthesis"><span class="dot-indicator" style="background-color:#94A3B8;"></span> Synthesis & Outlook</a></li>
-    </ul>
-  </aside>
-
-  <main class="content-area">
-
-    <section class="exec-summary">
-      <h2>Executive Summary</h2>
-      <p>The global artificial intelligence infrastructure sector has reached a critical inflection point as of March 31, 2026. The transition from speculative model training to high-efficiency inference at scale — referred to by industry participants as Generative AI Phase 2 — is driving unprecedented shifts in capital allocation and hardware architecture. Analysis of current market dynamics reveals four dominant themes: the aggressive pursuit of Silicon Sovereignty by hyperscalers, the formal operationalization of two complementary U.S. government programs promoting American AI technology abroad, a tightening regulatory net regarding semiconductor smuggling, and the sudden disruption of model hierarchies following an accidental data leak from Anthropic.</p>
-      <p>Investment strategies are now dictated by energy efficiency, vertical integration, and proactive risk mitigation against autonomous agentic threats. Amazon's $200 billion capital expenditure plan underscores the immense cost of maintaining cloud dominance, while the U.S. Commerce Department's new American AI Exports Program and the State Department's parallel Pax Silica Fund together mark a shift toward promoting full-stack American AI infrastructure as a primary instrument of foreign policy. Concurrently, the accidental exposure of Anthropic's "Claude Mythos" model has triggered a valuation crisis in the cybersecurity sector, demonstrating that the next generation of AI may outpace current defensive infrastructure. This report evaluates these developments and their long-term implications for the AI infrastructure ecosystem, providing the strategic foresight necessary for multi-billion dollar investment decisions.</p>
-    </section>
-
-    <article class="news-article" id="amazon">
-      <div class="article-header border-c1">
-        <div>
-          <div class="article-number-badge text-c1">01 / Corporate Strategy</div>
-          <h2 class="article-headline">Amazon Infrastructure Supercycle: The $200 Billion "Silicon Sovereignty" Mandate</h2>
-        </div>
-        <div class="article-status-pill bg-c1">Official / Press</div>
-      </div>
-      <div class="article-metadata-bar">
-        <span class="meta-info">📅 Event: 2026-02-05</span>
-        <span class="meta-divider"></span>
-        <span class="meta-info">Source: Money Morning, Finterra, TIKR, Reuters</span>
-        <span class="meta-divider"></span>
-        <span class="meta-info" style="color:#D97706;">⬤ MEDIUM Confidence</span>
-      </div>
-      
-      <div class="article-content">
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">🔭</span>
-            <h3 class="sub-section-title text-c1">[Overview]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>Amazon has signaled a definitive shift in its corporate strategy with a staggering $200 billion capital expenditure guidance for the 2026 fiscal year, a move intended to secure its lead in what analysts have termed the Great AI Build-out. While the original guidance was delivered during the Q4 2025 earnings call on February 5, 2026, recent market repricing reflects a growing realization of the costs required to build a vertically integrated AI stack spanning from proprietary 3nm silicon to global satellite-based internet connectivity. The infrastructure expansion is a direct response to aggressive cloud market share gains by competitors; while AWS maintains a plurality with 31% of the market, Microsoft and Google Cloud have closed the gap to 25% and 13% respectively. The market's reaction has been characterized by capex sticker shock, as the $200 billion figure far exceeded Wall Street's prior estimates and contributed to a reported 70% decline in free cash flow, causing shares to pull back over 20% from their 2025 highs. Despite this financial pressure, CEO Andy Jassy maintains that achieving Silicon Sovereignty is essential to avoid long-term reliance on third-party GPU vendors and to capture the burgeoning market for inference at scale.</p>
-            <p>The strategic necessity of this spending is underscored by the technical requirements of agentic AI. As AI shifts from training massive models to deploying autonomous agents that reason, plan, and act in real-time, the demand for cost-effective compute capacity has moved beyond the capabilities of generic hardware. Amazon's internal deployment of AI in sales and operations, coupled with the growth of high-margin advertising revenue — which grew 22% last year — provides the fundamental cash flow to support this infrastructure offensive. The build-out includes high-risk elements such as the Amazon Leo satellite project, which began offering 1 Gbps internet to remote enterprise and AWS customers in March 2026 to support edge-AI deployments in regions lacking traditional fiber infrastructure. This integrated approach seeks to create a closed-loop ecosystem where Amazon controls the chip (Trainium3), the platform (Bedrock), and the connectivity (Leo), effectively insulating its margins from the volatility of the third-party component market.</p>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">⚡</span>
-            <h3 class="sub-section-title text-c1">[Strategic Impact]</h3>
-          </div>
-          <div class="sub-section-body">
-            <div class="highlight-box light-c1 border-c1">
-              <p>The $200 billion commitment represents a transformative moment for AI infrastructure capital allocation, validating the thesis that the sector is entering a utility-scale land grab phase. For global investment firms, this move effectively devalues data center clusters that lack a clear path toward vertical integration or energy efficiency. By deploying its own 3nm Trainium3 chips, Amazon is claiming a 40% cost advantage over third-party GPUs for large-scale model training, a delta that could fundamentally disrupt NVIDIA's pricing power within the AWS ecosystem. This Silicon Sovereignty allows Amazon to prioritize its internal projects and a select group of enterprise partners, potentially limiting the availability of high-end compute to the broader market and forcing smaller competitors into a secondary tier of hardware access.</p>
+    <div class="dashboard-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-brand">Intelligence Briefing</div>
+            <nav class="nav-links">
+                <a href="#article-1" class="nav-link">1. NVIDIA-Marvell Strategic Pivot</a>
+                <a href="#article-2" class="nav-link">2. Google TurboQuant Breakthrough</a>
+                <a href="#article-3" class="nav-link">3. Mamba-3: Linear Architectures</a>
+                <a href="#article-4" class="nav-link">4. OpenClaw Security Reckoning</a>
+                <a href="#article-5" class="nav-link">5. Nebius 310 MW AI Factory</a>
+                <a href="#closing" class="nav-link" style="color: white; font-weight: bold; margin-top: 1rem;">Synthesis & Trajectory</a>
+            </nav>
+            <div class="confidence-meter">
+                <h4>Overall Briefing Confidence</h4>
+                <div class="meter-bar-bg">
+                    <div class="meter-bar-fill"></div>
+                </div>
+                <div class="meter-text">88% - HIGH RELIABILITY</div>
             </div>
-          </div>
-        </div>
+        </aside>
 
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">🔬</span>
-            <h3 class="sub-section-title text-c1">[Technical Deep Dive]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>Amazon's infrastructure strategy is built on the deployment of custom silicon designed to handle the specific memory and compute bottlenecks of modern transformer models. The Trainium3 chip, built on a 3nm process, is the cornerstone of this effort.</p>
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Metric</th>
-                  <th>Value</th>
-                  <th>Product Generation / Tag</th>
-                  <th>Verbatim Quote</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Cost Advantage</td>
-                  <td class="text-c1">40%</td>
-                  <td>Trainium3 vs. 3rd Party</td>
-                  <td>"claiming a 40% cost advantage over third-party GPUs"</td>
-                </tr>
-                <tr>
-                  <td>Process Node</td>
-                  <td class="text-c1">3nm</td>
-                  <td>Trainium3</td>
-                  <td>"Built on a 3nm process, Amazon's newest AI chip"</td>
-                </tr>
-                <tr>
-                  <td>2026 Capex</td>
-                  <td class="text-c1">$200 Billion</td>
-                  <td>FY2026 Guidance</td>
-                  <td>"expenditure forecast came in at roughly $200 billion"</td>
-                </tr>
-                <tr>
-                  <td>Internet Speed</td>
-                  <td class="text-c1">1 Gbps</td>
-                  <td>Amazon Leo</td>
-                  <td>"offering 'Leo Ultra' (1 Gbps) internet to remote enterprise"</td>
-                </tr>
-                <tr>
-                  <td>Annual Chip Revenue</td>
-                  <td class="text-c1">$10 Billion+</td>
-                  <td>Trainium & Graviton</td>
-                  <td>"combined now exceed $10 billion in annualized revenue"</td>
-                </tr>
-                <tr>
-                  <td>FCF Decline</td>
-                  <td class="text-c1">~70%</td>
-                  <td>FY2025 vs. FY2024</td>
-                  <td>"free cash flow has already fallen more than 70%"</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">📊</span>
-            <h3 class="sub-section-title text-c1">[Visual/Evidence]</h3>
-          </div>
-          <div class="sub-section-body">
-            <div class="visual-diagram">
-              <div class="diagram-title">Amazon Vertical AI Stack (Silicon Sovereignty)</div>
-              <div class="flex-flow">
-                <div class="flow-step border-c1">
-                  <h4 class="text-c1">Trainium3 Silicon</h4>
-                  <p>3nm process node custom chip with 40% cost advantage over 3rd party GPUs.</p>
-                </div>
-                <div class="flow-arrow">→</div>
-                <div class="flow-step border-c1">
-                  <h4 class="text-c1">Amazon Bedrock</h4>
-                  <p>Core platform for model training and deployment at AWS hyperscale.</p>
-                </div>
-                <div class="flow-arrow">→</div>
-                <div class="flow-step border-c1">
-                  <h4 class="text-c1">Leo Satellite Link</h4>
-                  <p>1 Gbps global internet enabling edge-AI deployments everywhere.</p>
-                </div>
-              </div>
-            </div>
+        <main class="main-content">
             
-            <div class="chart-container">
-              <canvas id="amazonChart"></canvas>
-            </div>
-          </div>
-        </div>
+            <header class="report-header">
+                <h1 class="report-title">Strategic Analysis of AI Infrastructure: Technical Briefing for April 1, 2026</h1>
+                <p class="report-intro">The global landscape of artificial intelligence infrastructure is undergoing a fundamental architectural pivot. As of today, Wednesday, April 1, 2026, the transition from monolithic GPU clusters to heterogeneous, interconnect-centric "AI Factories" has reached an inflection point. This report synthesizes five critical developments identified within the mandatory 24-hour reporting window—specifically focusing on the market-shaking events of March 31—while incorporating technical corrections and new primary source data regarding extreme efficiency, post-Transformer scaling, and infrastructure security.</p>
+            </header>
 
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">⚠️</span>
-            <h3 class="sub-section-title text-c1">[Critical View]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>The primary risk to Amazon's 2026 roadmap is the potential for a capex overbuild, where monetization of inference at scale does not materialize at projected growth rates, resulting in underutilized data center capacity. The reported 70% drop in free cash flow raises the burden of proof for the AI infrastructure payoff, particularly in a volatile macroeconomic environment characterized by an energy-driven selloff and shifting geopolitical alliances. Investors should note that the FCF decline figure is derived from a single secondary source and has not been independently corroborated by Amazon's official filings at the time of this report.</p>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">💬</span>
-            <h3 class="sub-section-title text-c1">[Community Sentiment]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>Nikhil Devnani, Analyst at Bernstein, reiterated an Outperform rating with a $300 price target in January 2026, characterizing the current setup as one of the strongest bull cases since the pandemic. Andy Jassy, CEO of Amazon, defended the budget during the Q4 2025 earnings call, stating the build-out is necessary to meet "strong demand in AI, chips, robotics, and low-earth-orbit satellites."</p>
-          </div>
-        </div>
-      </div>
-    </article>
-
-
-    <article class="news-article" id="regs">
-      <div class="article-header border-c2">
-        <div>
-          <div class="article-number-badge text-c2">02 / Regulatory Escalation</div>
-          <h2 class="article-headline">The Chip Security Act and Smuggling Enforcement</h2>
-        </div>
-        <div class="article-status-pill bg-c2">Passed [Committee]</div>
-      </div>
-      <div class="article-metadata-bar">
-        <span class="meta-info">📅 Event: 2026-03-26</span>
-        <span class="meta-divider"></span>
-        <span class="meta-info">Source: House Foreign Affairs Committee, DOJ</span>
-        <span class="meta-divider"></span>
-        <span class="meta-info" style="color:#059669;">⬤ HIGH Confidence</span>
-      </div>
-      
-      <div class="article-content">
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">🔭</span>
-            <h3 class="sub-section-title text-c2">[Overview]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>The U.S. House Foreign Affairs Committee, chaired by Brian Mast, passed the Chip Security Act during a full committee markup on March 26, 2026. This bipartisan legislation, co-sponsored by Representatives Bill Huizenga (R-MI) and Bill Foster (D-IL), is designed to prevent advanced American semiconductors from reaching foreign adversaries, particularly China. The move is a direct response to a March 2026 report by the Select Committee on the Chinese Communist Party (SCCCP), which concluded that the Chinese firm DeepSeek had successfully used restricted NVIDIA chips — illegally diverted to the PRC — to develop its latest artificial intelligence models. The act proposes a stringent new regulatory framework requiring the U.S. Department of Commerce to implement location verification mechanisms to ensure that high-end AI chips are not diverted to unauthorized regions. This legislative push coincides with an aggressive enforcement campaign by the Department of Justice, which recently filed charges against individuals accused of smuggling billions of dollars' worth of AI accelerators through third-party transshipment countries, including Thailand and Malaysia. The committee's action signifies a move to codify the AI Action Plan, shifting from broad export prohibitions to granular, hardware-level tracking and verification.</p>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">⚡</span>
-            <h3 class="sub-section-title text-c2">[Strategic Impact]</h3>
-          </div>
-          <div class="sub-section-body">
-            <div class="highlight-box light-c2 border-c2">
-              <p>If signed into law, the Chip Security Act would fundamentally alter the global AI infrastructure landscape by introducing a Hardware-as-a-Regulated-Asset framework for high-end accelerators. The legislation seeks to close the loopholes that allowed Chinese companies to access restricted compute via offshore rentals or illicit smuggling networks. For global investment firms, this introduces a heightened compliance premium for data center projects with international partners, as every chip deployment would require verifiable location tracking. Strategically, this may lead to a bifurcated market where verified trusted clusters in allied countries receive the latest silicon, while non-aligned regions are relegated to unverified hardware tiers.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">🔬</span>
-            <h3 class="sub-section-title text-c2">[Technical Deep Dive]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>The legislation focuses on Total Processing Performance (TPP) and location verification of hardware units, rather than simply banning specific companies.</p>
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Metric / Requirement</th>
-                  <th>Value / Threshold</th>
-                  <th>Status / Provision</th>
-                  <th>Verbatim Quote</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Smuggling Value</td>
-                  <td class="text-c2">Billions of dollars</td>
-                  <td>DOJ Charge Basis</td>
-                  <td>"smuggling billions of dollars' worth of advanced AI chips"</td>
-                </tr>
-                <tr>
-                  <td>Enforcement Budget</td>
-                  <td class="text-c2">$10 Million</td>
-                  <td>FY26 Request</td>
-                  <td>"receive at least $10 million targeted for 'enforcement'"</td>
-                </tr>
-                <tr>
-                  <td>Export TPP Limit</td>
-                  <td class="text-c2">21,000</td>
-                  <td>Case-by-Case Trigger</td>
-                  <td>"total processing performance (TPP) of less than 21,000"</td>
-                </tr>
-                <tr>
-                  <td>DRAM Bandwidth Limit</td>
-                  <td class="text-c2">6,500 GB/s</td>
-                  <td>Case-by-Case Trigger</td>
-                  <td>"total DRAM bandwidth less than 6,500 GB/s"</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">📊</span>
-            <h3 class="sub-section-title text-c2">[Visual/Evidence]</h3>
-          </div>
-          <div class="sub-section-body">
-            <div class="chart-container">
-              <canvas id="regChart"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">⚠️</span>
-            <h3 class="sub-section-title text-c2">[Critical View]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>Critics argue that mandatory location verification and reporting requirements could prove burdensome and overreaching, potentially hindering the competitiveness of American technology firms operating internationally. There is also significant litigation risk; should the government attempt to use these verification mechanisms to penalize firms for protected speech or business decisions — as alleged in the related Anthropic v. War Department proceedings — the legislation could face constitutional challenges that delay or constrain its implementation.</p>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">💬</span>
-            <h3 class="sub-section-title text-c2">[Community Sentiment]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>John Moolenaar, Chairman of the SCCCP, stated the legislation would "strengthen protections for US industry, secure jobs, and limit adversaries' access to critical computing power." Emil Michael, Under Secretary of Defense, described the focus on operational control as a necessity to prevent AI models from being interrupted mid-operation in a military context.</p>
-          </div>
-        </div>
-      </div>
-    </article>
-
-
-    <article class="news-article" id="pax">
-      <div class="article-header border-c3">
-        <div>
-          <div class="article-number-badge text-c3">03 / Foreign Policy</div>
-          <h2 class="article-headline">Pax Silica Operationalization: American AI Exports Program and Pax Silica Fund</h2>
-        </div>
-        <div class="article-status-pill bg-c3">Implementation Active</div>
-      </div>
-      <div class="article-metadata-bar">
-        <span class="meta-info">📅 Event: 2026-03-30</span>
-        <span class="meta-divider"></span>
-        <span class="meta-info">Source: Dept of Commerce (ITA), Dept of State</span>
-        <span class="meta-divider"></span>
-        <span class="meta-info" style="color:#059669;">⬤ HIGH Confidence</span>
-      </div>
-      
-      <div class="article-content">
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">🔭</span>
-            <h3 class="sub-section-title text-c3">[Overview]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>Two complementary but administratively distinct U.S. government initiatives were operationalized on March 30, 2026, together forming the practical architecture of the administration's Pax Silica strategy.</p>
-            <p>The first, the American AI Exports Program, was formally announced by the U.S. Department of Commerce's International Trade Administration (ITA), under the authority of Under Secretary William Kimmitt. Issued pursuant to the White House AI Action Plan directives, the program opens a Call for Proposals from U.S. industry-led consortia beginning April 1, 2026, inviting submissions of full-stack AI technology packages for export to trusted allies and partners. These packages are defined to encompass AI-optimized computer hardware, data center storage and networking, frontier AI models, cybersecurity measures, and downstream applications. The Commerce Department, in consultation with the Secretaries of State, War, and Energy, as well as the Director of OSTP, will designate selected proposals as priority AI export packages, granting them access to federal credit programs, diplomatic advocacy, and prioritized export control reviews. The program distinguishes between pre-set consortia maintaining ongoing global offerings and on-demand consortia formed in response to specific regional opportunities.</p>
-            <p>The second initiative, the Pax Silica Fund, is a separate State Department program announced independently on the same date. With a proposed capitalization of $250 million, the fund is designed to finance trusted supply-chain capacity for allied nations, with a focus on critical minerals extraction, processing, and semiconductor manufacturing assets. While the Pax Silica Fund and the American AI Exports Program are administratively distinct — managed by different cabinet departments with different mandates — they are strategically complementary: the Commerce program creates the export channel, while the State Department fund finances the receiving infrastructure in partner countries. Together, they signal that AI infrastructure has moved beyond a commercial product to become a primary instrument of U.S. foreign policy.</p>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">⚡</span>
-            <h3 class="sub-section-title text-c3">[Strategic Impact]</h3>
-          </div>
-          <div class="sub-section-body">
-            <div class="highlight-box light-c3 border-c3">
-              <p>The American AI Exports Program introduces a concierge export channel that significantly reduces regulatory friction for selected American vendors, potentially accelerating their global expansion. For global investment firms, this validates the thesis that verified trusted clusters in allied countries will receive preferential access to 3nm and 2nm silicon, creating a distinct valuation premium for projects aligned with the Pax Silica framework. Strategically, the combined programs may catalyze an American-led AI bloc, where participating nations receive financing and security guarantees in exchange for adopting U.S. standards and hardware ecosystems.</p>
-              <p>However, the program also introduces favoritism risk. The Commerce Department's broad discretion to designate favored industry consortia has already drawn scrutiny from trade watchdog groups, as it may create a class of government-backed winners that crowd out smaller innovators. Furthermore, by embedding cybersecurity measures directly into export packages, the U.S. government retains a level of operational oversight that may challenge the genuine sovereignty of recipient nations, potentially accelerating hedging strategies by countries such as India that seek to reduce dependence on foreign control.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">🔬</span>
-            <h3 class="sub-section-title text-c3">[Technical Deep Dive]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>The American AI Exports Program mandates a full-stack approach covering all layers of the AI ecosystem. The Pax Silica Fund is listed separately, as it is administered by the State Department under a distinct mandate.</p>
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Metric / Provision</th>
-                  <th>Value / Requirement</th>
-                  <th>Tag / Jurisdiction</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Proposals Open</td>
-                  <td class="text-c3">April 1, 2026 (90 Days)</td>
-                  <td>Commerce / ITA</td>
-                </tr>
-                <tr>
-                  <td>Hardware Layer</td>
-                  <td class="text-c3">Chips, Servers, Networking</td>
-                  <td>Commerce / ITA</td>
-                </tr>
-                <tr>
-                  <td>Software Layer</td>
-                  <td class="text-c3">Models, Apps, Security</td>
-                  <td>Commerce / ITA</td>
-                </tr>
-                <tr>
-                  <td>Proposed Capitalization</td>
-                  <td class="text-c3">$250 Million</td>
-                  <td>State Department</td>
-                </tr>
-                <tr>
-                  <td>Focus Area</td>
-                  <td class="text-c3">Critical minerals, fab capacity</td>
-                  <td>State Department</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">📊</span>
-            <h3 class="sub-section-title text-c3">[Visual/Evidence]</h3>
-          </div>
-          <div class="sub-section-body">
-            <div class="visual-diagram">
-              <div class="diagram-title">Pax Silica Strategic Architecture</div>
-              <div class="grid-compare">
-                <div class="compare-box border-c3">
-                  <h4 class="text-c3">Dept of Commerce (ITA)</h4>
-                  <ul class="compare-list">
-                    <li><strong>Program:</strong> American AI Exports</li>
-                    <li><strong>Action:</strong> Call for Proposals (April 1)</li>
-                    <li><strong>Scope:</strong> Full-stack AI technology packages</li>
-                    <li><strong>Result:</strong> Access to federal credit, diplomacy</li>
-                  </ul>
+            <article id="article-1" class="article-card">
+                <div class="badge-container">
+                    <span class="badge badge-breaking">BREAKING</span>
+                    <span class="badge badge-market">MARKET EVENT</span>
+                    <span class="badge badge-confidence">CONFIDENCE: HIGH</span>
                 </div>
-                <div class="compare-box" style="border-color:#1E293B;">
-                  <h4 style="color:#1E293B;">Dept of State</h4>
-                  <ul class="compare-list">
-                    <li><strong>Program:</strong> Pax Silica Fund</li>
-                    <li><strong>Capital:</strong> $250 Million proposed</li>
-                    <li><strong>Scope:</strong> Critical minerals, processing, fabs</li>
-                    <li><strong>Result:</strong> Finance trusted supply-chain in allied nations</li>
-                  </ul>
+                <div class="article-header">
+                    <h2 class="article-title">1. NVIDIA-Marvell Strategic Pivot: The NVLink Fusion Infrastructure Era</h2>
+                    <p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-muted);">Source: NVIDIA Investor Relations / The Motley Fool / The Next Platform | Event Date: 2026-03-31</p>
                 </div>
-              </div>
+
+                <div class="metric-grid">
+                    <div class="metric-card" style="border-left-color: var(--accent-blue);">
+                        <div class="metric-value">$2,000,000,000</div>
+                        <div class="metric-label">NVIDIA Equity Stake</div>
+                    </div>
+                    <div class="metric-card" style="border-left-color: var(--accent-emerald);">
+                        <div class="metric-value">12.84%</div>
+                        <div class="metric-label">MRVL Share Surge</div>
+                    </div>
+                    <div class="metric-card" style="border-left-color: var(--accent-purple);">
+                        <div class="metric-value">5x</div>
+                        <div class="metric-label">Effective Bandwidth (vs PCIe 6/7)</div>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <div class="section-tag">[Overview]</div>
+                    <p>NVIDIA and Marvell Technology have finalized a strategic partnership to integrate Marvell's custom semiconductor capabilities into the NVIDIA AI factory ecosystem via the NVLink Fusion platform. This collaboration is anchored by a $2 billion equity investment from NVIDIA, structured as a private issuance of Series A Convertible Preferred Stock. The precise number of shares and per-share conversion price are pending confirmation against the official SEC 8-K filing; internal consistency checks suggest that any figure near 2,000,000 shares at approximately $91.84 per share would imply a total of roughly $184 million—well short of the stated $2 billion—and the actual share count is therefore likely in the range of tens of millions of shares. Investors and analysts should treat the specific share structure as unconfirmed until the 8-K is reviewed. The move signals the end of the "one-chip-fits-all" paradigm, as NVIDIA opens its proprietary interconnect fabric to third-party custom XPUs and advanced silicon photonics. By enabling heterogeneous AI infrastructure that is fully compatible with the CUDA software stack, the partnership addresses the critical industry bottleneck of interconnect lock-in while leveraging Marvell's Photonic Fabric technology—bolstered by their December 2025 acquisition of Celestial AI for $3.25 billion. The market responded with significant conviction; Marvell (MRVL) shares surged 12.84% to close at $99.05, and NVIDIA (NVDA) closed up 5.56%, underscoring investor confidence in the shift toward semi-custom, rack-scale compute.</p>
+
+                    <div class="section-tag">[Strategic Impact]</div>
+                    <p>The NVLink Fusion alliance devalues rigid, HBM-heavy clusters by prioritizing the rack-scale interconnect as the primary computer. For the board circuit designer, this shift moves focus toward 224G and 448G SerDes signal integrity and the integration of Co-Packaged Optics (CPO) to manage the memory wall. NVIDIA's parallel $2 billion investments in Lumentum and Coherent—made in early March 2026—suggest a broad strategy to pre-secure the CPO supply chain ahead of the Vera Rubin platform ramp. From an investment perspective, this increases the CAPEX efficiency of Tier 1 players like Meta and Alphabet, who can now design NVLink-native custom silicon for specific token-generation workloads while remaining within the NVIDIA system-level architecture.</p>
+
+                    <div class="section-tag">[Technical Deep Dive]</div>
+                    <p><strong>Hardware Specs:</strong></p>
+                    <ul>
+                        <li>NVIDIA Equity Stake: $2,000,000,000 (Series A Preferred Stock; specific share count and conversion price pending SEC 8-K confirmation)</li>
+                        <li>Marvell Revenue Forecast: ~$15,000,000,000 by FY2028 (Source: Q4 FY2026 Earnings Call, March 5, 2026; management guidance)</li>
+                        <li>Interconnect Tech: NVIDIA NVLink Fusion (Rack-Scale)</li>
+                        <li>Target Process Node: TSMC 3nm / 2nm (Unconfirmed — Inferred)</li>
+                    </ul>
+                    <p><strong>Comparison:</strong> NVLink Fusion provides up to 5x the effective bandwidth of standard PCIe Gen 6/7 for memory-pooling across heterogeneous XPU nodes, while also enabling coherent memory semantics that PCIe's non-coherent model cannot provide without additional overhead.</p>
+
+                    <div class="visual-container">
+                        <h4 style="font-family: var(--font-sans); margin-bottom: 1rem; color: var(--ink-muted);">NVLink Fusion Rack-Scale Architecture Topology</h4>
+                        <div class="html-diagram">
+                            <div class="diag-node">Third-Party<br/>Marvell XPU</div>
+                            <div class="diag-link">NVLink Protocol</div>
+                            <div class="diag-node core">Unified Rack-Scale<br/>Backplane / Switch</div>
+                            <div class="diag-link">Coherent Memory</div>
+                            <div class="diag-node">Vera CPU &<br/>Rubin GPU</div>
+                        </div>
+                    </div>
+
+                    <div class="section-tag">[Visual/Evidence]</div>
+                    <p>NVIDIA press release describes a "unified rack-scale backplane" integrating Vera CPUs, ConnectX NICs, BlueField DPUs, and Spectrum-X switches.</p>
+                    <p><strong>Jensen Huang, CEO, NVIDIA</strong> — "The inference inflection has arrived. Token generation demand is surging, and the world is racing to build AI factories. Together with Marvell, we are enabling customers to leverage NVIDIA's AI infrastructure ecosystem and scale to build specialized AI compute."</p>
+                    <p><strong>Matt Murphy, CEO, Marvell</strong> — "By connecting Marvell's leadership in high-performance analog, optical DSP, silicon photonics and custom silicon to NVIDIA's expanding AI ecosystem through NVLink Fusion, we are enabling customers to build scalable, efficient AI infrastructure."</p>
+
+                    <div class="section-tag">[Critical View]</div>
+                    <p>Supply chain dependency is the primary risk; NVIDIA and Marvell are both constrained by TSMC's 3nm/2nm capacity. A secondary concern, noted by analysts at The Next Platform, is the ambiguity around NVLink protocol licensing: it remains unclear under what conditions customers developing custom XPUs gain access to NVLink software alongside the hardware, and whether Marvell's new Structera S 60260 PCIe 6.0 switch is designed to carry the NVLink protocol over standard PCIe infrastructure—which would broaden the ecosystem significantly but also introduce interoperability risks.</p>
+
+                    <div class="section-tag">[Community Sentiment]</div>
+                    <p>While the hardware-level integration is guaranteed, the software overhead of optimizing non-NVIDIA logic for CUDA and Triton kernels may create a performance gap between native GPUs and semi-custom XPUs. Antitrust regulators in the US and EU are also likely to examine whether such semi-custom exclusive partnerships stifle competition from smaller chip startups.</p>
+                </div>
+            </article>
+
+            <article id="article-2" class="article-card">
+                <div class="badge-container">
+                    <span class="badge badge-tech">RESEARCH BREAKTHROUGH</span>
+                    <span class="badge badge-risk">HBM VOLATILITY</span>
+                    <span class="badge badge-confidence">CONFIDENCE: HIGH</span>
+                </div>
+                <div class="article-header">
+                    <h2 class="article-title">2. Google TurboQuant: Algorithmic Memory Compression Breakthrough</h2>
+                    <p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-muted);">Source: Google Research / NYU / Tom's Hardware | Event Date: 2026-03-24</p>
+                </div>
+
+                <div class="metric-grid">
+                    <div class="metric-card" style="border-left-color: var(--accent-purple);">
+                        <div class="metric-value">3-bit</div>
+                        <div class="metric-label">Quantization Bit-Width</div>
+                    </div>
+                    <div class="metric-card" style="border-left-color: var(--accent-blue);">
+                        <div class="metric-value">6x</div>
+                        <div class="metric-label">KV Cache Compression</div>
+                    </div>
+                    <div class="metric-card" style="border-left-color: var(--accent-emerald);">
+                        <div class="metric-value">100%</div>
+                        <div class="metric-label">Context Accuracy (104k)</div>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <div class="section-tag">[Overview]</div>
+                    <p>Google Research, in collaboration with New York University (NYU), has introduced TurboQuant, a two-stage quantization pipeline that compresses LLM key-value (KV) caches down to 3 bits with zero accuracy loss on standard benchmarks. The technique utilizes PolarQuant to convert Cartesian coordinates into polar coordinates, mapping data to a predictable circular grid and eliminating the need for expensive per-block normalization constants. A subsequent 1-bit Quantized Johnson-Lindenstrauss (QJL) stage acts as a zero-overhead error-correction layer designed to eliminate quantization bias from inner product computations. The paper will be presented at ICLR 2026 next month, co-authored by research scientist Amir Zandieh and VP Vahab Mirrokni at Google, alongside collaborators at NYU. While the release caused a temporary dip in memory chip stocks (Micron, SK Hynix) due to fears of reduced HBM demand, subsequent analyst commentary—including from Morgan Stanley—clarifies that TurboQuant targets inference-time KV cache memory only, not model weight storage or training workloads. The net effect is therefore a surge in inference efficiency rather than a reduction in total HBM volume demand.</p>
+
+                    <div class="section-tag">[Strategic Impact]</div>
+                    <p>TurboQuant fundamentally changes the memory wall economics of inference. Rather than devaluing HBM, it allows for significantly higher concurrency and longer context windows within the same HBM footprint, effectively increasing revenue-per-GPU for cloud providers. For system designers, the bottleneck shifts from HBM capacity to the on-chip SRAM required to handle high-speed quantization kernels. The critical insight for investors is that TurboQuant enables scaling through efficiency, allowing Google to deploy larger Gemini models across existing TPUv5/v6 fleets without an immediate hardware refresh. It is worth noting that the 6x compression figure is measured on Llama-3.1-8B-Instruct; results on very small models (under 3B parameters) are more variable, and developers should test carefully before deploying at 3-bit precision on sub-8B architectures.</p>
+
+                    <div class="section-tag">[Technical Deep Dive]</div>
+                    <p><strong>Hardware Specs:</strong></p>
+                    <ul>
+                        <li>KV Cache Compression: At least 6x (Baseline: Llama-3.1-8B-Instruct on NVIDIA H100)</li>
+                        <li>Attention Speedup: Up to 8x (4-bit TurboQuant vs. unquantized 32-bit keys, NVIDIA H100)</li>
+                        <li>Quantization Bit-Width: 3-bit / 4-bit (Training-free, data-oblivious)</li>
+                        <li>Context Accuracy: 100% on "Needle-in-a-Haystack" (104,000 tokens)</li>
+                        <li>Preprocessing Time: Near-Zero (Data-oblivious; no calibration pass required)</li>
+                    </ul>
+                    <p><strong>Comparison:</strong> Unlike the KIVI baseline, which shows logic degradation at aggressive compression ratios, TurboQuant maintains full-precision accuracy across diverse downstream tasks at 4-bit. At 3-bit, quality is essentially indistinguishable from FP16 on models of 8B parameters and above; smaller models require more careful evaluation.</p>
+
+                    <div class="visual-container">
+                        <div class="chart-wrapper">
+                            <canvas id="chartTurboQuant"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="section-tag">[Visual/Evidence]</div>
+                    <p>Google Research blog includes benchmark charts comparing TurboQuant against Product Quantization and RaBitQ, showing superior recall across bit-widths. Independent community benchmarks on llama.cpp further validate 4.9x compression at 3-bit (TQ3) with MSE matching paper values within 1%.</p>
+                    <p><strong>Vahab Mirrokni, VP and Google Fellow</strong> — "Techniques like TurboQuant allow for building and querying large vector indices with minimal memory, delivering near-optimal distortion rates in a data-oblivious manner."</p>
+                    <p><strong>Amir Zandieh, Research Scientist, Google Research</strong> (in collaboration with NYU co-author Majid Daliri) — "QJL acts as a mathematical error-checker that eliminates bias, leading to a more accurate attention score."</p>
+
+                    <div class="section-tag">[Critical View]</div>
+                    <p>Community experiments across multiple independent implementations (llama.cpp, PyTorch, Triton) have produced a consistent and important finding: the QJL stage, while theoretically unbiased for raw inner products, can amplify random noise when scores pass through a softmax layer. Because softmax exponentially amplifies variance, QJL's random noise is magnified in practice—meaning MSE-only quantization without QJL consistently produces better Top-1 token matching in attention operations. QJL does remain valid for its other stated use case of vector search, where no softmax is involved. This represents a meaningful gap between the paper's theoretical claims and production behavior in standard autoregressive attention, and implementers targeting inference performance should default to the MSE-only variant of TurboQuant until further research resolves this asymmetry.</p>
+
+                    <div class="section-tag">[Community Sentiment]</div>
+                    <p>A second structural issue is Key/Value asymmetry. Modern LLMs exhibit significant magnitude differences between key and value vectors. Community benchmarking has identified value quantization as the primary quality bottleneck: 2-bit values produce cosine similarity degradation to approximately 0.94, while 4-bit values maintain 0.997. Uniform 3-bit allocation across both key and value caches is therefore suboptimal, and asymmetric precision strategies—assigning more bits to value vectors—are likely to deliver better results than the uniform scheme described in the paper. Finally, it should be noted that the paper's novelty claims have faced a public challenge from the authors of RaBitQ, who documented on OpenReview that TurboQuant's core rotation mechanism is shared with prior work, with the primary novel contribution being the pairing with provably optimal Lloyd-Max codebooks and formal lower-bound analysis.</p>
+                </div>
+            </article>
+
+            <article id="article-3" class="article-card">
+                <div class="badge-container">
+                    <span class="badge badge-tech">POST-TRANSFORMER</span>
+                    <span class="badge badge-risk">HBM DEMAND SHIFT</span>
+                    <span class="badge" style="background:var(--ink-muted); color:white;">CONFIDENCE: MEDIUM</span>
+                </div>
+                <div class="article-header">
+                    <h2 class="article-title">3. Mamba-3: The Transition to Inference-First Linear Architectures</h2>
+                    <p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-muted);">Source: Together AI / CMU / Princeton / Cartesia AI | Event Date: 2026-03-17</p>
+                </div>
+
+                <div class="metric-grid">
+                    <div class="metric-card" style="border-left-color: var(--accent-purple);">
+                        <div class="metric-value">7x</div>
+                        <div class="metric-label">Inference Speedup</div>
+                    </div>
+                    <div class="metric-card" style="border-left-color: var(--accent-emerald);">
+                        <div class="metric-value">O(N)</div>
+                        <div class="metric-label">Memory Scaling</div>
+                    </div>
+                    <div class="metric-card" style="border-left-color: var(--accent-blue);">
+                        <div class="metric-value">+1.8 pp</div>
+                        <div class="metric-label">Downstream Accuracy</div>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <div class="section-tag">[Overview]</div>
+                    <p>Together AI, in collaboration with researchers from Carnegie Mellon University, Princeton University, and Cartesia AI, released Mamba-3 on March 17, 2026—a Selective State Space Model (SSM) specifically engineered for the inference-first era. The paper has been accepted at ICLR 2026. While prior SSMs, including Mamba-2, were optimized for training efficiency, Mamba-3 introduces three core improvements: exponential-trapezoidal discretization for a more expressive recurrence, complex-valued state updates via the RoPE trick to enable state tracking that prior linear models could not perform, and Multi-Input Multi-Output (MIMO) updates that raise arithmetic intensity to solve the Tensor Core utilization problem. In earlier SSM generations, theoretical linear inference was hardware-inefficient in practice, resulting in only 10–15% GPU utilization on standard NVIDIA hardware (a community-cited figure, not explicitly quantified in the paper). Mamba-3's MIMO formulation now achieves hardware utilization comparable to Transformers by restructuring the state update as a matrix multiplication rather than an outer product. At a 16,384-token sequence length on NVIDIA H100 hardware, the SISO variant achieves prefill-plus-decode speeds approximately 7x faster than a Llama-3.2-1B Transformer baseline. The model reaches comparable perplexity to Mamba-2 while using only half the internal state size, and at the 1.5B scale the MIMO variant improves average downstream accuracy by 1.8 percentage points over the next-best baseline (Gated DeltaNet)—reported in media as a roughly 4% relative improvement, though these two figures reflect different measurement bases and benchmarks.</p>
+
+                    <div class="section-tag">[Strategic Impact]</div>
+                    <p>Mamba-3 favors hardware architectures with high SRAM-to-FLOPS ratios over raw HBM bandwidth. Since the hidden state does not grow with sequence length, it enables very long context windows on a fraction of the hardware required by Transformer KV caches. For the board designer, this validates the architectural direction of high-speed local SRAM pools—as in Groq's LPU architecture—over traditional DDR/HBM-dominated designs. As an investment thesis, Mamba-3 increases the long-term risk for HBM-only hardware plays while boosting the strategic value of inference-first silicon companies. The rise of agentic workflows, explicitly cited in the Mamba-3 paper itself—referencing OpenClaw, Claude Code, and Codex as demand drivers for inference throughput—provides a strong production motivation for this architectural transition.</p>
+
+                    <div class="section-tag">[Technical Deep Dive]</div>
+                    <p><strong>Hardware Specs:</strong></p>
+                    <ul>
+                        <li>Computational Complexity: O(N) Linear Scaling in Memory and Time</li>
+                        <li>Throughput Advantage: Up to 7x faster than Llama-3.2-1B Transformer (16,384-token sequence, NVIDIA H100-SXM 80GB)</li>
+                        <li>Accuracy Gain: +1.8 pp average downstream accuracy (MIMO variant vs. Gated DeltaNet, 1.5B scale)</li>
+                        <li>Prefill+Decode Latency: 140.61s (Mamba-3 SISO) vs. 976.50s (Llama-3.2-1B), at 16,384-token context</li>
+                        <li>Internal State Efficiency: 2x reduction in state size vs. Mamba-2</li>
+                    </ul>
+                    <p><strong>Comparison:</strong> At the 1.5B scale, Mamba-3 outperforms Llama-3.2 (Transformer) on language modeling capability by 1.8 pp absolute (MIMO variant vs. Gated DeltaNet) and by approximately 4% relative improvement as cited across media sources, reflecting different benchmark baselines. At a sequence length of one million tokens, a Transformer model would require over 100x the memory of Mamba-3 to store the equivalent KV cache, effectively rendering real-time inference impossible without extreme chunking.</p>
+
+                    <div class="visual-container">
+                        <div class="chart-wrapper">
+                            <canvas id="chartMambaScaling"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="section-tag">[Visual/Evidence]</div>
+                    <p>Benchmark charts from the Together AI blog and the ICLR paper show Mamba-3 (SISO and MIMO) outperforming Mamba-2, Gated DeltaNet, and Llama-3.2-1B across all tested sequence lengths on both accuracy and latency metrics. Benchmarks were conducted on a single H100-SXM 80GB with batch size 128.</p>
+                    <p><strong>Tri Dao (Princeton / Together AI) and Albert Gu (CMU / Cartesia AI)</strong> — Lead researchers, whose prior work on Mamba-1, Mamba-2, and the State Space Duality (SSD) framework provides the theoretical foundation for Mamba-3's MIMO formulation and hardware efficiency gains.</p>
+
+                    <div class="section-tag">[Critical View]</div>
+                    <p>Despite 7x inference speedups, Mamba-3 still lags Transformers in precise associative recall and In-Context Learning (ICL) tasks that require exact token-level retrieval. The fixed-size hidden state, which is the source of Mamba-3's memory efficiency, is also its fundamental limitation: information that exceeds the state's compression capacity is irretrievably lost, unlike the Transformer's KV cache which retains all prior tokens exactly.</p>
+
+                    <div class="section-tag">[Community Sentiment]</div>
+                    <p>The entire industrial AI ecosystem—GGUF quantization, LoRA fine-tuning, FlashAttention kernels—is currently built for the Transformer paradigm, creating a high switching cost. Hybrid models that interleave Mamba-3 layers for long-range efficiency with self-attention layers for precise retrieval are the likely near-term production winners, and initial results from NVIDIA and IBM confirm that hybrid Mamba-Transformer deployments are already being used in enterprise settings.</p>
+                </div>
+            </article>
+
+            <article id="article-4" class="article-card">
+                <div class="badge-container">
+                    <span class="badge badge-breaking" style="background:var(--accent-crimson);">SECURITY ALERT</span>
+                    <span class="badge badge-risk">HIGH RISK</span>
+                    <span class="badge badge-confidence">CONFIDENCE: HIGH</span>
+                </div>
+                <div class="article-header">
+                    <h2 class="article-title">4. OpenClaw Security Reckoning: "TroyDen's Lure Factory" Campaign</h2>
+                    <p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-muted);">Source: Netskope Threat Labs / Dark Reading / VentureBeat | Event Date: 2026-03-24</p>
+                </div>
+
+                <div class="metric-grid">
+                    <div class="metric-card" style="border-left-color: var(--accent-crimson);">
+                        <div class="metric-value">~500,000</div>
+                        <div class="metric-label">Exposed Instances</div>
+                    </div>
+                    <div class="metric-card" style="border-left-color: var(--accent-amber);">
+                        <div class="metric-value">8.8</div>
+                        <div class="metric-label">CVSS Score (CVE-2026-25253)</div>
+                    </div>
+                    <div class="metric-card" style="border-left-color: var(--ink-muted);">
+                        <div class="metric-value">29,000 Yr</div>
+                        <div class="metric-label">Anti-Sandbox Sleep Timer</div>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <div class="section-tag">[Overview]</div>
+                    <p>Netskope Threat Labs published its analysis on March 24, 2026, identifying a large-scale AI-assisted malware campaign tracked as TroyDen's Lure Factory. The campaign distributes over 300 trojanized GitHub packages via a fake OpenClaw Docker deployer repository, among other lures targeting developers, gamers, and general users. The malware employs a two-component LuaJIT loader design: a renamed LuaJIT runtime (unc.exe) paired with an obfuscated encrypted script (license.txt), launched by a batch file. Submitted individually, each component appears harmless and evades sandbox detection; the threat emerges only when both execute together. Once active, the payload performs five anti-analysis checks—including debugger detection, low-RAM filters, short-uptime inspection, and a sleep command equivalent to approximately 29,000 years to defeat timing-based sandboxes—before capturing screenshots, geolocating the victim, and exfiltrating credentials to a Frankfurt-based command-and-control server. The lure directory names use AI-generated terminology drawn from archaic Latin, extinct biological taxonomy, and rare medical conditions, a pattern inconsistent with human-curated naming at scale. The TroyDen operator persona has been active on Telegram since June 2025, months before the GitHub campaigns appeared.</p>
+                    <p>This campaign must be understood in the broader context of OpenClaw's security posture. Creator Peter Steinberger moved to OpenAI on February 14, 2026, and the critical CVE-2026-25253 (CVSS 8.8, one-click RCE via WebSocket token exfiltration) was patched in version 2026.1.29 in late January. However, OpenClaw has no centralized patch management plane or fleet-wide kill switch, leaving a large number of instances unpatched. VentureBeat and CrowdStrike's Falcon telemetry from RSAC 2026 (March 23–26) identified approximately 500,000 internet-facing OpenClaw instances, with CrowdStrike CEO George Kurtz highlighting ClawHavoc—a separate malicious skill distributed via ClawHub, the OpenClaw skill marketplace—as the first major documented supply chain attack on an AI agent ecosystem, using it as the primary case study for the newly published OWASP Agentic Skills Top 10. Separately, Chinese authorities issued internal restrictions on OpenClaw use at state-run enterprises and government agencies around March 11, 2026—not a formal nationwide ban, but internal memos directing employees not to install the software on office devices, with some notices requiring prior approval for use. This predates the current campaign and reflects a broader structural concern about agentic tools requiring broad system access rather than a response to TroyDen specifically.</p>
+
+                    <div class="section-tag">[Strategic Impact]</div>
+                    <p>The governance gap in agentic infrastructure necessitates a shift from software-only security to hardware-level isolation. For the circuit designer, this elevates the priority of Trusted Execution Environments (TEE) such as ARM TrustZone and Intel SGX, as well as hardware-enforced memory partitioning, to prevent lateral movement from compromised agents. From an investment perspective, this Security Reckoning favors enterprise-grade managed platforms and purpose-built secure agent runtimes—such as ZeroClaw (Rust, deny-by-default, under 4 MB memory footprint) and NanoClaw (Docker-isolated, Claude-native)—over self-hosted bare-metal deployments. The pattern of agentic tools inheriting full user permissions—including API keys, CI/CD credentials, and file system access—turns a single poisoned package install into a complete supply-chain compromise event.</p>
+
+                    <div class="section-tag">[Technical Deep Dive]</div>
+                    <p><strong>Hardware Specs:</strong></p>
+                    <ul>
+                        <li>Compromised Packages: 300+ (via TroyDen's Lure Factory, multiple GitHub repositories)</li>
+                        <li>Internet-Facing Instances: ~500,000 (CrowdStrike Falcon telemetry / VentureBeat, RSAC 2026)</li>
+                        <li>Vulnerability CVSS: 8.8 (CVE-2026-25253 — RCE via WebSocket token exfiltration; patched in v2026.1.29)</li>
+                        <li>ZeroClaw Memory Footprint: 4 MB (Rust rewrite; official ZeroClaw blog figure)</li>
+                        <li>ClawHub Malicious Skills: ~824 confirmed malicious skills tied to ClawHavoc (Koi Security, RSAC 2026)</li>
+                    </ul>
+                    <p><strong>Comparison:</strong> Compared to the original CVE-2026-25253 disclosure in late January, the TroyDen campaign represents a qualitatively more sophisticated threat: rather than exploiting a known architectural flaw in a running instance, it poisons the supply chain before installation, using AI-generated social proof to manufacture legitimacy at scale. The attack vector—developer toolchain poisoning—is significantly harder to detect and remediate than a network-level CVE patch.</p>
+
+                    <div class="visual-container">
+                        <h4 style="font-family: var(--font-sans); margin-bottom: 1rem; color: var(--ink-muted);">TroyDen Infection Vector & Evasion Topology</h4>
+                        <div class="html-diagram">
+                            <div class="diag-node">GitHub Package<br/><small>(Fake OpenClaw Deployer)</small></div>
+                            <div class="diag-link">Execution</div>
+                            <div class="diag-node threat">Launch.bat +<br/>unc.exe & license.txt</div>
+                            <div class="diag-link">29,000 Yr Sleep</div>
+                            <div class="diag-node threat">Exfiltration to<br/>Frankfurt C2</div>
+                        </div>
+                    </div>
+
+                    <div class="section-tag">[Visual/Evidence]</div>
+                    <p>Netskope's analysis includes a diagram of the two-component payload structure (Launch.bat, unc.exe, license.txt), C2 communication architecture, and AI-generated lure directory naming patterns. The same 771 KB trojanized binary was confirmed across three distinct lure repositories targeting entirely different audience segments, all routing to the same Frankfurt C2 infrastructure.</p>
+                    <p><strong>Netskope Threat Labs</strong> — "It includes two inert components that only become dangerous when executed together, a payload that sleeps for 29,000 years the moment a sandbox starts timing, and a lure factory that rotates audiences while the infrastructure stays constant... The lure names suggest AI-assisted generation: obscure biological taxonomy, archaic Latin, and medical terminology applied systematically at scale. Each victim is geolocated, and their desktop screenshot is sent to a server in Frankfurt."</p>
+                    <p><strong>George Kurtz, CEO, CrowdStrike</strong> — Cited ClawHavoc at RSAC 2026 as the first major supply chain attack on an AI agent ecosystem and presented it as the primary case study for the OWASP Agentic Skills Top 10, warning that organizations are deploying AI agents "with less governance than they'd give an intern."</p>
+
+                    <div class="section-tag">[Critical View]</div>
+                    <p>The structural problem with OpenClaw is not any single CVE but its trust model. Because OpenClaw runs with full user-level permissions by default—including shell access, file operations, and API key exposure—any compromised skill or poisoned dependency inherits the same access level as the user. There is no centralized patching mechanism, no enterprise kill switch, and no fleet-wide management plane; individual administrators must update each instance manually, and the majority have not done so. The TroyDen campaign exploits precisely this gap: rather than attacking a running instance, it poisons the developer's toolchain before the software is even installed.</p>
+
+                    <div class="section-tag">[Community Sentiment]</div>
+                    <p>The Chinese government's restriction approach—issuing internal memos rather than formal legislation—reflects the regulatory difficulty of banning a tool that local governments are simultaneously subsidizing for AI development. This dual posture, described by analysts as "capturing the economic upside while keeping it out of the party-state's bloodstream," is likely to persist and does not represent a clean policy signal for enterprise risk assessment.</p>
+                </div>
+            </article>
+
+            <article id="article-5" class="article-card">
+                <div class="badge-container">
+                    <span class="badge badge-market">INFRASTRUCTURE SCALE</span>
+                    <span class="badge badge-confidence">CONFIDENCE: HIGH</span>
+                </div>
+                <div class="article-header">
+                    <h2 class="article-title">5. Nebius 310 MW "AI Factory" Expansion: The Gigawatt Buildout</h2>
+                    <p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-muted);">Source: Nebius Newsroom / CNBC / GlobeNewswire | Event Date: 2026-03-31</p>
+                </div>
+
+                <div class="metric-grid">
+                    <div class="metric-card" style="border-left-color: var(--accent-blue);">
+                        <div class="metric-value">310 MW</div>
+                        <div class="metric-label">Lappeenranta Facility Power</div>
+                    </div>
+                    <div class="metric-card" style="border-left-color: var(--accent-emerald);">
+                        <div class="metric-value">$27B</div>
+                        <div class="metric-label">Meta Deal Value (5-Year)</div>
+                    </div>
+                    <div class="metric-card" style="border-left-color: var(--accent-amber);">
+                        <div class="metric-value">>3 GW</div>
+                        <div class="metric-label">Target Global Power by 2026</div>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <div class="section-tag">[Overview]</div>
+                    <p>Nebius, the Amsterdam-headquartered AI cloud company, announced on March 31 the construction of a 310 MW AI Factory in Lappeenranta, Finland. This facility represents a 4.1x capacity increase over their existing 75 MW site in Mäntsälä—which already houses Europe's first operational deployment of the NVIDIA GB300 NVL72 platform—and contributes to Nebius's global contracted power target of more than 3 GW by year-end 2026. The Lappeenranta campus spans approximately 100 acres and is expected to deliver its first customer capacity in 2027. Nebius has also secured approval for its first gigawatt-scale AI factory in Independence, Missouri, and has contracted over 750 MW across EMEA, including a 240 MW facility near Lille, France. These expansions are underpinned by a major demand anchor: on March 16, 2026, Nebius announced a five-year infrastructure agreement with Meta Platforms valued at up to $27 billion, comprising $12 billion in dedicated GPU capacity and up to $15 billion in elastic compute across upcoming Nebius clusters. Nebius intends to sell this capacity first to third-party customers of its AI cloud business, with Meta as the committed backstop purchaser of remaining capacity—a structure that provides Nebius with significant downside protection while preserving commercial flexibility. The company is projecting 2026 revenue of $3.0–$3.4 billion, representing approximately a sixfold increase over 2025's approximately $550 million. Separately, the EU released a new legislative framework for data center sustainability today, though independent sourcing for this specific document remains pending and readers should verify through official EU channels.</p>
+
+                    <div class="section-tag">[Strategic Impact]</div>
+                    <p>The AI Factory has replaced the general-purpose data center as the primary unit of capital. Control over contracted power at gigawatt scale and purpose-built cooling infrastructure is now the primary competitive moat, rather than chip allocation alone. For the circuit designer, the move to the GB300 NVL72 rack configuration requires a fundamental transition to 480V rack-level power distribution and direct-to-chip liquid cooling as the baseline standard, as rack power densities now routinely exceed 130–140 kW. The Mäntsälä facility's design, which already ranks among the most energy-efficient globally and recovers waste heat into district heating networks, provides a proven template for the Lappeenranta build. From an investment perspective, Nebius is positioned as the leading European sovereign cloud winner, benefiting simultaneously from US-China hardware access restrictions, Meta's massive committed infrastructure spend, and NVIDIA's $2 billion equity investment made concurrently with the Marvell announcement on March 31.</p>
+
+                    <div class="section-tag">[Technical Deep Dive]</div>
+                    <p><strong>Hardware Specs:</strong></p>
+                    <ul>
+                        <li>Planned Power (Lappeenranta): 310 MW</li>
+                        <li>Mäntsälä Reference Facility: 75 MW (Europe's first operational GB300 NVL72 deployment)</li>
+                        <li>2026 Revenue Target: $3,000,000,000 – $3,400,000,000 (management guidance)</li>
+                        <li>Rack Configuration: NVIDIA GB300 NVL72 (Direct-to-Chip Liquid Cooled)</li>
+                        <li>Global Contracted Power Target: >3 GW by end of 2026</li>
+                        <li>Meta Deal Value: Up to $27,000,000,000 over five years ($12B dedicated + up to $15B elastic)</li>
+                    </ul>
+                    <p><strong>Comparison:</strong> The single Lappeenranta site will represent approximately 41% of Nebius's current total EMEA contracted power (750 MW) once fully deployed, illustrating the step-change in facility scale that the Blackwell-to-Rubin architectural transition demands. This compares to the prior generation where Nebius's largest European site was 75 MW.</p>
+
+                    <div class="visual-container">
+                        <div class="chart-wrapper">
+                            <canvas id="chartNebiusPower"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="section-tag">[Visual/Evidence]</div>
+                    <p>The Mäntsälä facility already houses Europe's first operational deployment of the NVIDIA GB300 NVL72 platform, providing a live reference deployment for the technologies to be scaled at Lappeenranta.</p>
+                    <p><strong>Arkady Volozh, Founder and CEO, Nebius</strong> — "We have been building in Finland for many years and are pleased to be expanding our presence here. Lappeenranta represents a significant addition to our global AI infrastructure build-out, and will make a significant contribution to achieving our 2026 target of securing more than 3 GW."</p>
+                    <p><strong>Jim Rickards, Economist (GlobeNewswire)</strong> — Warned that the AI buildout "is not just a financial phenomenon—it is a physical one," placing extraordinary demands on energy grids and requiring miles of physical pipeline infrastructure that have not yet been built.</p>
+
+                    <div class="section-tag">[Critical View]</div>
+                    <p>Sustainability regulation is an emerging risk. The EU framework released today, if confirmed, would mandate higher efficiency standards including direct-to-chip liquid cooling for all high-density deployments exceeding defined power thresholds. Nebius's design philosophy already aligns with these requirements, but legacy European competitors using air-cooled infrastructure face potential construction delays and retrofit costs. The meta-level risk, however, is the concentration of the Meta deal's structure. While the $12 billion dedicated capacity commitment provides genuine downside protection for Nebius, the elastic $15 billion component is contingent on Nebius failing to sell that capacity to other customers—which creates a perverse incentive dynamic if Meta's own silicon strategy (MTIA) matures faster than expected. Any meaningful acceleration in Meta's in-house silicon roadmap would reduce Meta's elastic compute draw while simultaneously reducing the addressable market for Nebius's third-party capacity.</p>
+
+                    <div class="section-tag">[Community Sentiment]</div>
+                    <p>A second systemic risk is the hardware generation bet: the Lappeenranta facility is being purpose-built around Blackwell and Rubin architectures; if post-Transformer models like Mamba-3 hybrid architectures reach production scale and require materially different rack profiles—lower HBM density, higher SRAM ratios—the facility's configuration could require costly mid-deployment modifications.</p>
+                </div>
+            </article>
+
+            <div id="closing" class="closing-synthesis">
+                <h2 style="font-family: var(--font-serif); font-size: 2rem; margin-bottom: 1.5rem; color: var(--ink-main);">Summary and Forward-Looking Outlook</h2>
+                <p style="margin-bottom: 1.5rem; color: var(--ink-muted); font-size: 1.1rem;">The infrastructure landscape on April 1, 2026, is defined by the transition to system-level scaling. The NVIDIA-Marvell $2 billion partnership and Nebius's gigawatt-scale factory buildouts illustrate that individual chips are now components of a larger rack-scale computer where the interconnect fabric and contracted power are the scarce resources. Simultaneously, algorithmic breakthroughs—TurboQuant compressing KV caches to 3-bit and Mamba-3 achieving O(N) linear scaling—are dismantling the memory wall from the software side, shifting the primary competitive benchmark from raw GPU count to inference efficiency per dollar. The OpenClaw security reckoning underlines that agentic infrastructure at scale introduces a new class of supply-chain risk that hardware-level isolation solutions have not yet fully addressed.</p>
+                <p style="margin-bottom: 2.5rem; color: var(--ink-muted); font-size: 1.1rem;">For the global executive, the strategic priority has shifted from securing GPU supply to securing three things simultaneously: contracted power at gigawatt scale, software-hardware co-design talent capable of implementing extreme quantization and linear-scaling architectures, and enterprise-grade agentic security infrastructure. The $2 billion NVIDIA investment in Marvell is the clearest market signal that the heterogeneous fabric era has arrived—the interconnect is now the computer, and the race to own it has begun in earnest.</p>
+
+                <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--ink-main);">Anticipated High-Impact Events (Next Quarter to 12 Months)</h3>
+                <ul style="color: var(--ink-muted); line-height: 1.8; margin-left: 1.5rem;">
+                    <li><strong>GTC 2026 Developer Conference (Next Week):</strong> Expected detailed roadmap for NVLink Fusion ecosystem partners and first public benchmarks of the Groq LPU integrated within the Vera Rubin NVL72 platform, with focus on deterministic sub-40ms inference latency.</li>
+                    <li><strong>Volume Manufacturing of Marvell NVLink-Native XPUs:</strong> First semi-custom reference designs featuring Marvell's 1.6T optical interconnects expected H2 2026, marking the first heterogeneous NVLink clusters in customer hands.</li>
+                    <li><strong>Deployment of NVIDIA Rubin R100:</strong> Supply chain sources indicate H2 2026 for the first cloud cohort (AWS, CoreWeave, Nebius), featuring HBM4 bandwidth and further integration of silicon photonics at the package level.</li>
+                    <li><strong>Post-Transformer Scaling Laws at 70B+:</strong> The first published results of Mamba-3 or hybrid Mamba-Transformer models at the 100B+ parameter scale are expected by mid-2026 and will be the decisive data point determining whether linear-scaling architectures can challenge the Transformer at flagship model scale.</li>
+                    <li><strong>OpenAI IPO (Q4 2026):</strong> Anticipated public listing following the company's $122 billion funding round and reported $852 billion valuation, which would make it one of the largest technology IPOs in history and provide a public market benchmark for the agentic AI infrastructure thesis.</li>
+                </ul>
             </div>
-          </div>
-        </div>
 
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">⚠️</span>
-            <h3 class="sub-section-title text-c3">[Critical View]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>The primary risk for the American AI Exports Program is implementation incoherence. Critics argue that balancing allied nations' desire for genuine sovereign AI with the U.S. government's insistence on maintaining operational oversight creates a sovereignty gap that may alienate key partners, particularly in the Indo-Pacific. There is also a risk that the program becomes bureaucratically burdensome if the licensing process remains complex despite its concierge branding. For investors, the reliance on federal credit programs introduces political risk; should administration priorities shift or congressional funding be withheld, the projected global expansion of U.S. AI clusters could be severely constrained.</p>
-          </div>
-        </div>
+        </main>
+    </div>
 
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">💬</span>
-            <h3 class="sub-section-title text-c3">[Community Sentiment]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>William Kimmitt, Under Secretary of Commerce for International Trade, stated that America's leadership depends on "our ability to export our AI to allies around the world" and to "position America's AI innovators and workers to win globally." Industry analysts have cautioned that the breadth of discretion afforded to Washington in selecting favored industry partners is beginning to attract scrutiny from trade watchdog groups concerned about structural favoritism in the designation process.</p>
-          </div>
-        </div>
-      </div>
-    </article>
+    <script>
+        // Common Chart Defaults
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#5C5A55';
 
+        // TurboQuant Chart (Bar)
+        const ctxTurbo = document.getElementById('chartTurboQuant').getContext('2d');
+        new Chart(ctxTurbo, {
+            type: 'bar',
+            data: {
+                labels: ['32-bit (Baseline)', '8-bit', '4-bit TurboQuant', '3-bit TurboQuant'],
+                datasets: [{
+                    label: 'KV Cache Relative Size (Smaller is Better)',
+                    data: [100, 25, 12.5, 9.37],
+                    backgroundColor: ['#D1CDC4', '#8E8C86', '#4C1D95', '#1E3A8A'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'TurboQuant Memory Compression Ratio vs Baseline' }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#EAE6DF' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
 
-    <article class="news-article" id="military">
-      <div class="article-header border-c4">
-        <div>
-          <div class="article-number-badge text-c4">04 / Military Infrastructure</div>
-          <h2 class="article-headline">Enterprise AI Coding Initiative [Program Name Unverified]</h2>
-        </div>
-        <div class="article-status-pill bg-c4">Call for Solutions</div>
-      </div>
-      <div class="article-metadata-bar">
-        <span class="meta-info">📅 Event: 2026-03-30</span>
-        <span class="meta-divider"></span>
-        <span class="meta-info">Source: CDO Magazine, SAM.gov</span>
-        <span class="meta-divider"></span>
-        <span class="meta-info" style="color:#D97706;">⬤ MEDIUM Confidence</span>
-      </div>
-      
-      <div class="article-content">
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">🔭</span>
-            <h3 class="sub-section-title text-c4">[Overview]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>The U.S. Chief Digital and Artificial Intelligence Office (CDAO), in partnership with the Department of the Army, has escalated an initiative to fast-track the adoption of enterprise-scale AI-enabled coding tools across the Department of Defense, recently rebranded as the War Department. An updated Call for Solutions was formalized on March 30, 2026, seeking to equip the defense workforce with commercial-grade generative AI capabilities to increase software development velocity and automate vulnerability detection across heterogeneous desktop and virtual platforms. The solicitation specifically seeks two modalities: AI-powered coding assistance embedded in Integrated Development Environments (IDEs), and command-line interface (CLI)-based agentic tools capable of autonomous, multi-step coding tasks with human oversight. While internal documents have previously referenced a project designation of "GIDE" (Global Information Dominance Experiments), that label has not been verified for this specific solicitation and should be treated as unconfirmed.</p>
-            <p>This infrastructure push arrives during a period of acute legal friction between the executive branch and the private AI sector. President Trump moved to bar Anthropic from government business, directing federal agencies to cease use of Claude and designating the company a supply chain risk — reportedly after Anthropic declined to permit its models to be used for mass domestic surveillance or fully autonomous lethal weapons systems. However, on March 26, 2026, Federal District Judge Rita Lin issued a temporary injunction pausing these punitive measures, ruling that the government's supply chain risk designation was likely arbitrary and capricious. The injunction creates a temporary legal freeze on the administration's effort to mandate that federal agencies replace Claude with alternative tools, complicating the War Department's broader pivot toward government-controlled coding agents less constrained by commercial ethical restrictions.</p>
-          </div>
-        </div>
+        // Mamba-3 Scaling Chart (Line)
+        const ctxMamba = document.getElementById('chartMambaScaling').getContext('2d');
+        new Chart(ctxMamba, {
+            type: 'line',
+            data: {
+                labels: ['1k', '4k', '16k', '64k', '256k', '1M'],
+                datasets: [
+                    {
+                        label: 'Transformer (O(N²)) Memory Usage',
+                        data: [1, 16, 256, 4096, 65536, 1000000],
+                        borderColor: '#991B1B',
+                        backgroundColor: 'rgba(153, 27, 27, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Mamba-3 (O(N)) Memory Usage',
+                        data: [1, 4, 16, 64, 256, 1000],
+                        borderColor: '#065F46',
+                        backgroundColor: 'rgba(6, 95, 70, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Memory Scaling: Mamba-3 vs Standard Transformer (Log Scale)' }
+                },
+                scales: {
+                    y: { type: 'logarithmic', beginAtZero: true, grid: { color: '#EAE6DF' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
 
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">⚡</span>
-            <h3 class="sub-section-title text-c4">[Strategic Impact]</h3>
-          </div>
-          <div class="sub-section-body">
-            <div class="highlight-box light-c4 border-c4">
-              <p>The initiative represents a decisive move to integrate agentic AI into the core of U.S. military software infrastructure, seeking to overcome the engineering talent gap that has historically slowed defense software delivery cycles. For investment firms, this validates the dual-use technology thesis, where advancements in commercial generative AI are rapidly militarized in service of national security objectives. By mandating that these tools operate in air-gapped environments, the Pentagon is driving demand for on-premise AI infrastructure — a significant tailwind for vendors specializing in IL5 and IL6 secure cloud services.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">🔬</span>
-            <h3 class="sub-section-title text-c4">[Technical Deep Dive]</h3>
-          </div>
-          <div class="sub-section-body">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Requirement</th>
-                  <th>Value / Threshold</th>
-                  <th>Provision Type</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Security Level</td>
-                  <td class="text-c4">IL5 / IL6 / Air-gapped</td>
-                  <td>Mandatory Compliance</td>
-                </tr>
-                <tr>
-                  <td>Coding Modalities</td>
-                  <td class="text-c4">IDE-Embedded & CLI Agentic</td>
-                  <td>Functional Requirement</td>
-                </tr>
-                <tr>
-                  <td>Target Languages</td>
-                  <td class="text-c4">C++, Python, Java</td>
-                  <td>Primary Languages</td>
-                </tr>
-                <tr>
-                  <td>Legal Status</td>
-                  <td class="text-c4">Temporary Injunction Active</td>
-                  <td>Judicial Ruling (Mar 26)</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">📊</span>
-            <h3 class="sub-section-title text-c4">[Visual/Evidence]</h3>
-          </div>
-          <div class="sub-section-body">
-            <div class="visual-diagram">
-              <div class="diagram-title">War Department Enterprise Coding Architecture</div>
-              <div class="flex-flow">
-                <div class="flow-step border-c4">
-                  <h4 class="text-c4">IL5 / IL6 / Air-gapped Env.</h4>
-                  <p>Secure on-premise infrastructure isolated from commercial cloud.</p>
-                </div>
-                <div class="flow-arrow">+</div>
-                <div class="flow-step border-c4">
-                  <h4 class="text-c4">Dual Modalities</h4>
-                  <p>IDE-Embedded Coding Assistance & CLI-based Agentic Tools.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">⚠️</span>
-            <h3 class="sub-section-title text-c4">[Critical View]</h3>
-          </div>
-          <div class="sub-section-body">
-             <p class="empty-state">No specific critical view provided in the source material. Note contextual legal friction detailed in the Overview section regarding Anthropic's injunction.</p>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">💬</span>
-            <h3 class="sub-section-title text-c4">[Community Sentiment]</h3>
-          </div>
-          <div class="sub-section-body">
-             <p class="empty-state">No expert reactions or community sentiment provided in the source material.</p>
-          </div>
-        </div>
-      </div>
-    </article>
-
-
-    <article class="news-article" id="claude">
-      <div class="article-header border-c5">
-        <div>
-          <div class="article-number-badge text-c5">05 / Frontier Risk</div>
-          <h2 class="article-headline">The "Claude Mythos" Leak and the Capybara Paradigm</h2>
-        </div>
-        <div class="article-status-pill bg-c5">Community Verified</div>
-      </div>
-      <div class="article-metadata-bar">
-        <span class="meta-info">📅 Event: 2026-03-26</span>
-        <span class="meta-divider"></span>
-        <span class="meta-info">Source: Mashable, Investing.com</span>
-        <span class="meta-divider"></span>
-        <span class="meta-info" style="color:#059669;">⬤ HIGH Confidence</span>
-      </div>
-      
-      <div class="article-content">
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">🔭</span>
-            <h3 class="sub-section-title text-c5">[Overview]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>An accidental data leak on March 26, 2026 exposed Anthropic's most powerful AI model to date, codenamed Claude Mythos — the first entry in an entirely new model tier called Capybara. The leak occurred due to a misconfiguration in Anthropic's content management system, which inadvertently made approximately 3,000 unpublished assets publicly accessible. These assets comprised a mixture of images, PDFs, and draft blog posts; among them were technical descriptions of the Mythos model. The leak did not expose 3,000 documents exclusively about Mythos — rather, a draft blog post describing the model was among a much larger set of misconfigured CMS assets. Anthropic has since confirmed the model's existence and its current status in a restricted testing phase with select cybersecurity organizations. According to the leaked draft, Mythos significantly outperforms the current flagship Claude Opus 4.6 in software coding, academic reasoning, and particularly cybersecurity tasks, where it is described as being "currently far ahead of any other AI model in cyber capabilities." The model's emergence has sent shockwaves through the market, as investors assess the potential for such powerful systems to automate and accelerate vulnerability exploitation.</p>
-            <p>The introduction of the Capybara tier disrupts the industry's established three-tier model hierarchy — Haiku, Sonnet, Opus — positioning a new class of larger, more capable, and more compute-intensive models above it. Internal assessments highlight unprecedented cybersecurity risks, with Anthropic warning that the model presages a wave of AI that can exploit software vulnerabilities at speeds outpacing human defenders. Industry commentary has circulated descriptions of a recursive self-fixing capability that would allow the model to autonomously identify and patch vulnerabilities in its own code; however, this specific feature was not confirmed in the leaked draft materials and originates from community analysis rather than primary source documentation. It should therefore be treated as unverified speculation. The leak coincides with reports, described as speculative, that Anthropic is considering a public listing as early as October 2026.</p>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">⚡</span>
-            <h3 class="sub-section-title text-c5">[Strategic Impact]</h3>
-          </div>
-          <div class="sub-section-body">
-            <div class="highlight-box light-c5 border-c5">
-              <p>The revelation of the Capybara tier validates the thesis that the industry has not yet encountered hard scaling limits and introduces significant model obsolescence risk for current frontier offerings. The immediate market impact was a sharp sell-off in cybersecurity equities — including CrowdStrike and Palo Alto Networks — driven by fears that Mythos could function as an ultimate hacking tool, elevating the offensive capabilities of unsophisticated actors to near nation-state levels. Strategically, this forces a shift toward AI-native security architectures, as traditional defensive approaches based on known signatures and manual triage may be rendered ineffective against agentic systems capable of autonomous, multi-step exploit chains. The high compute requirements noted in the leaked documentation suggest that top-tier AI remains a capital-intensive domain favoring hyperscalers with the infrastructure to serve these models at scale.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">🔬</span>
-            <h3 class="sub-section-title text-c5">[Technical Deep Dive]</h3>
-          </div>
-          <div class="sub-section-body">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Metric</th>
-                  <th>Value</th>
-                  <th>Generation / Tag</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>AI Performance</td>
-                  <td class="text-c5">"Step change"</td>
-                  <td>Claude Mythos (Capybara)</td>
-                </tr>
-                <tr>
-                  <td>Cybersecurity Capability</td>
-                  <td class="text-c5">"Far ahead of any other"</td>
-                  <td>Claude Mythos (Capybara)</td>
-                </tr>
-                <tr>
-                  <td>Scale</td>
-                  <td class="text-c5">Larger and more intelligent</td>
-                  <td>vs. Claude Opus 4.6</td>
-                </tr>
-                <tr>
-                  <td>Training Cost</td>
-                  <td class="text-c5">Speculated ~$10 Billion</td>
-                  <td>Capybara Tier</td>
-                </tr>
-                <tr>
-                  <td>Leaked Assets</td>
-                  <td class="text-c5">~3,000 (mixed types)</td>
-                  <td>CMS Misconfiguration Scope</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">📊</span>
-            <h3 class="sub-section-title text-c5">[Visual/Evidence]</h3>
-          </div>
-          <div class="sub-section-body">
-            <div class="visual-diagram">
-              <div class="diagram-title">Anthropic Model Hierarchy Disruption</div>
-              <div class="pyramid-stack">
-                <div class="pyramid-layer bg-c5" style="width: 50%;">
-                  CAPYBARA (Mythos) <p>New Tier / ~$10B</p>
-                </div>
-                <div class="pyramid-layer" style="width: 70%; background-color:#6366f1;">
-                  OPUS (4.6) <p>Previous Flagship</p>
-                </div>
-                <div class="pyramid-layer" style="width: 90%; background-color:#94a3b8;">
-                  SONNET & HAIKU <p>Standard / Fast Tiers</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">⚠️</span>
-            <h3 class="sub-section-title text-c5">[Critical View]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>The primary risk is the dual-use dilemma: capabilities designed to strengthen cyber defense by identifying software bugs could be weaponized by state-sponsored actors or criminal organizations. The high compute requirements of the Capybara tier may limit its commercial viability to the highest-value use cases, creating a monetization bottleneck if efficiency does not improve on a rapid timeline. For investors, the accidental CMS misconfiguration itself raises pointed questions about Anthropic's internal security posture at a moment when its models are reaching unprecedented capability levels — an irony that is unlikely to be lost on the cybersecurity organizations that are its primary early-access partners.</p>
-          </div>
-        </div>
-
-        <div class="sub-section">
-          <div class="sub-section-header">
-            <span class="sub-section-icon">💬</span>
-            <h3 class="sub-section-title text-c5">[Community Sentiment]</h3>
-          </div>
-          <div class="sub-section-body">
-            <p>An Anthropic spokesperson confirmed the model's development, stating the company is being "deliberate about how we release it" given the meaningful advances in reasoning and coding capabilities. Adam Borg, Analyst at Stifel, wrote that "cyber risk just went higher" and characterized Mythos as having the potential to become the ultimate hacking tool for adversarial actors.</p>
-          </div>
-        </div>
-      </div>
-    </article>
-
-
-    <section class="synthesis-section" id="synthesis">
-      <h2 class="synthesis-title">Summary & Forward-Looking Outlook</h2>
-      
-      <div class="synthesis-content">
-        <h3 style="font-family: var(--font-display); margin-bottom: 12px; color: #3B82F6;">Briefing Summary</h3>
-        <p>The events of March 30–31, 2026 mark a transition from the Model Training era to the Inference at Scale era, now characterized by radical disruption in model capabilities and the accelerating militarization of AI infrastructure. Amazon's $200 billion capex commitment reflects the cost of Silicon Sovereignty at hyperscaler scale. The parallel launch of the Commerce Department's American AI Exports Program and the State Department's Pax Silica Fund — administratively distinct but strategically aligned — formalizes the Pax Silica doctrine as the organizing framework for U.S. AI diplomacy. Simultaneously, the accidental leak of Anthropic's Claude Mythos has introduced extreme cybersecurity risk into market calculations, triggering a sector-wide repricing as the industry grapples with the implications of Capybara-class model intelligence arriving ahead of schedule.</p>
-      </div>
-
-      <div class="events-box">
-        <h3 class="events-title">Anticipated High-Impact Events (Next Quarter to 12 Months)</h3>
-        
-        <div class="event-item">
-          <span class="event-badge" style="background-color:rgba(16,185,129,0.2); color:#34D399;">CONFIRMED SCHEDULED</span>
-          <p>The American AI Exports Program will begin accepting consortia proposals on April 1, 2026, with the first approved full-stack export packages expected by Q3 2026.</p>
-        </div>
-        
-        <div class="event-item">
-          <span class="event-badge" style="background-color:rgba(59,130,246,0.2); color:#60A5FA;">WIDELY ANTICIPATED</span>
-          <p>Meta is scheduled to begin the first 1-gigawatt deployment of its 6-gigawatt AMD Helios rack-scale infrastructure in H2 2026, utilizing custom MI450-based GPUs. Investors should note that SemiAnalysis has flagged engineering schedule risk, with large-scale production token generation on MI455X potentially slipping to Q2 2027.</p>
-        </div>
-        
-        <div class="event-item">
-          <span class="event-badge" style="background-color:rgba(59,130,246,0.2); color:#60A5FA;">WIDELY ANTICIPATED</span>
-          <p>Amazon's Q1 2026 earnings report in late April is expected to reveal whether AWS revenue growth holds above 24%, a critical marker for validating the $200 billion capex supercycle thesis.</p>
-        </div>
-        
-        <div class="event-item">
-          <span class="event-badge" style="background-color:rgba(139,92,246,0.2); color:#A78BFA;">SPECULATIVE</span>
-          <p>Anthropic's potential IPO in October 2026 may be preceded by the official public release of Claude Mythos, contingent on cybersecurity safeguards being validated by current early-access partners.</p>
-        </div>
-        
-        <div class="event-item">
-          <span class="event-badge" style="background-color:rgba(139,92,246,0.2); color:#A78BFA;">SPECULATIVE</span>
-          <p>Litigation over the supply chain risk designation in Anthropic v. War Department may move toward a full merits hearing by mid-2027, potentially establishing binding precedent on the limits of executive power over private AI infrastructure providers.</p>
-        </div>
-      </div>
-    </section>
-
-  </main>
-</div>
-
-<script>
-// Chart Defaults (Bright & Readable)
-Chart.defaults.font.family = "'Inter', sans-serif";
-Chart.defaults.color = '#64748B';
-Chart.defaults.borderColor = '#E2E8F0';
-
-// 1. Amazon Chart: Capex vs Market Shift
-(function(){
-  const ctx = document.getElementById('amazonChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Estimated 2025 Capex ($B)', 'Announced 2026 Capex ($B)'],
-      datasets: [{
-        label: 'AWS Infrastructure Expenditure',
-        data: [70, 200],
-        backgroundColor: ['#FDBA74', '#F97316'],
-        borderRadius: 8,
-        borderWidth: 0
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        title: { display: true, text: 'Amazon Capital Expenditure Scale (USD Billions)', font: { size: 14, weight: '700' }, color: '#0F172A' }
-      },
-      scales: {
-        y: { beginAtZero: true, grid: { color: '#F1F5F9' }, ticks: { font: { size: 11 }, callback: v => '$' + v + 'B' } },
-        x: { grid: { display: false }, ticks: { font: { size: 12, weight: '600' } } }
-      }
-    }
-  });
-})();
-
-// 2. Regulation Chart: Export Constraints
-(function(){
-  const ctx = document.getElementById('regChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Total Processing Perf. (TPP Limit)', 'DRAM Bandwidth Limit (GB/s)'],
-      datasets: [{
-        label: 'Hardware Limits',
-        data: [21000, 6500],
-        backgroundColor: ['#FCA5A5', '#EF4444'],
-        borderRadius: 8,
-        borderWidth: 0
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        title: { display: true, text: 'Chip Security Act: Proposed Export Threshold Triggers', font: { size: 14, weight: '700' }, color: '#0F172A' }
-      },
-      scales: {
-        y: { beginAtZero: true, grid: { color: '#F1F5F9' }, ticks: { font: { size: 11 } } },
-        x: { grid: { display: false }, ticks: { font: { size: 12, weight: '600' } } }
-      }
-    }
-  });
-})();
-</script>
-
-<a href="index.html" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; padding: 14px 24px; background-color: #3b82f6; color: #fff; text-decoration: none; border-radius: 50px; font-weight: 500; font-family: sans-serif; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); font-size: 14px; transition: transform 0.2s;">
-  클로드 버전 보기
-</a>
-
+        // Nebius Power Chart (Doughnut)
+        const ctxNebius = document.getElementById('chartNebiusPower').getContext('2d');
+        new Chart(ctxNebius, {
+            type: 'doughnut',
+            data: {
+                labels: ['Lappeenranta (New)', 'Mäntsälä (Existing)', 'Lille (Existing/WIP)', 'Other EMEA Contracted'],
+                datasets: [{
+                    data: [310, 75, 240, 125],
+                    backgroundColor: ['#1E3A8A', '#065F46', '#B45309', '#8E8C86'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Nebius EMEA Contracted Power Allocation (MW)' }
+                },
+                cutout: '65%'
+            }
+        });
+    </script>
 </body>
 </html>
