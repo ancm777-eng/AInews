@@ -1,720 +1,593 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Architectures of Autonomous Intelligence - Premium Briefing</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Architectures of Autonomous Intelligence (April 2026)</title>
+<link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ── Reset & Variables ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <style>
-        /* CSS Variables & Resets */
-        :root {
-            --bg-color: #F8FAFC;
-            --surface-color: #FFFFFF;
-            --text-main: #0F172A;
-            --text-muted: #334155;
-            --text-light: #64748B;
-            --border-color: #E2E8F0;
-            
-            /* Thematic Colors */
-            --theme-blue: #1E3A8A;
-            --theme-blue-light: #DBEAFE;
-            --theme-emerald: #065F46;
-            --theme-emerald-light: #D1FAE5;
-            --theme-amber: #B45309;
-            --theme-amber-light: #FEF3C7;
-            --theme-purple: #4C1D95;
-            --theme-purple-light: #EDE9FE;
-            --theme-rose: #9F1239;
-            --theme-rose-light: #FFE4E6;
+:root {
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --ink: #0F172A;
+  --ink-2: #334155;
+  --ink-3: #64748B;
+  --border: #E2E8F0;
+  --border-2: #CBD5E1;
 
-            --font-sans: 'Inter', sans-serif;
-            --font-serif: 'Playfair Display', serif;
-            --font-mono: 'JetBrains Mono', monospace;
+  --c1: #3B82F6;   /* Blue */
+  --c1-light: #EFF6FF;
+  --c2: #10B981;   /* Emerald */
+  --c2-light: #ECFDF5;
+  --c3: #F59E0B;   /* Amber */
+  --c3-light: #FFFBEB;
+  --c4: #EF4444;   /* Red */
+  --c4-light: #FEF2F2;
+  --c5: #8B5CF6;   /* Violet */
+  --c5-light: #F5F3FF;
 
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            
-            --radius-md: 12px;
-            --radius-lg: 16px;
-        }
+  --sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  --mono: 'Fira Code', 'Courier New', monospace;
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: var(--font-sans); background-color: var(--bg-color); color: var(--text-main); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius: 16px;
+  --radius-sm: 8px;
+}
 
-        /* Disclaimer */
-        .disclaimer { background-color: var(--theme-amber-light); color: var(--theme-amber); text-align: center; padding: 12px 20px; font-size: 0.85rem; font-weight: 600; border-bottom: 2px solid #F59E0B; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
 
-        /* Header */
-        header { background-color: var(--text-main); color: var(--surface-color); padding: 24px 0; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-lg); }
-        .header-content { max-width: 1400px; margin: 0 auto; padding: 0 32px; display: flex; justify-content: space-between; align-items: center; }
-        .header-title { font-family: var(--font-serif); font-size: 1.6rem; letter-spacing: -0.02em; display: flex; align-items: center; gap: 16px; }
-        .header-logo { background: linear-gradient(135deg, var(--theme-blue), var(--theme-purple)); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-style: italic; font-weight: 700; font-size: 1.3rem; }
-        .header-meta { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: #94A3B8; margin-top: 6px; }
+/* ── Disclaimer ── */
+.disclaimer {
+  background: #FFFBEB;
+  border-bottom: 2px solid #FCD34D;
+  padding: 12px 20px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #B45309;
+  line-height: 1.5;
+}
 
-        /* Layout */
-        .container { max-width: 1400px; margin: 40px auto; padding: 0 32px; display: grid; grid-template-columns: 280px 1fr; gap: 48px; align-items: start; }
-        
-        /* Sidebar */
-        .sidebar { position: sticky; top: 110px; background: var(--surface-color); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
-        .sidebar-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-light); letter-spacing: 0.1em; margin-bottom: 16px; }
-        .sidebar-nav { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-        .sidebar-nav a { text-decoration: none; color: var(--text-muted); font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; transition: all 0.2s ease; border: 1px solid transparent; }
-        .sidebar-nav a:hover { background-color: var(--bg-color); color: var(--text-main); border-color: var(--border-color); }
-        .nav-dot { width: 8px; height: 8px; border-radius: 50%; }
-        .confidence-meter { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
-        .confidence-badge { background-color: var(--theme-emerald-light); color: var(--theme-emerald); padding: 8px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; letter-spacing: 0.05em; width: 100%; justify-content: center; }
+/* ── Header ── */
+.site-header {
+  background: #0B1120;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.header-brand { display: flex; align-items: center; gap: 14px; }
+.header-logo {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 20px; color: #fff;
+}
+.header-title { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+.header-meta { font-size: 12px; color: #94A3B8; font-weight: 500; margin-top: 4px; }
+.header-nav { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav-chip {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+  padding: 6px 12px; border-radius: 20px; text-decoration: none;
+  background: rgba(255,255,255,0.1); color: #E2E8F0;
+  transition: all 0.2s; white-space: nowrap;
+}
+.nav-chip:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-        /* Introduction */
-        .intro-section { background: var(--surface-color); padding: 36px; border-radius: var(--radius-lg); margin-bottom: 40px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); border-left: 5px solid var(--theme-blue); }
-        .intro-section h1 { font-family: var(--font-serif); font-size: 2.2rem; color: var(--text-main); margin-bottom: 16px; line-height: 1.2; }
-        .intro-section p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.8; }
+/* ── Layout ── */
+.layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+.sidebar { position: sticky; top: 90px; }
+.sidebar-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+  color: var(--ink-3); margin-bottom: 12px; padding-left: 4px;
+  text-transform: uppercase;
+}
+.sidebar-nav { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.sidebar-nav a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600;
+  text-decoration: none; color: var(--ink-2);
+  transition: all 0.15s;
+}
+.sidebar-nav a:hover { background: var(--surface); box-shadow: var(--shadow); color: var(--ink); }
+.s-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-        /* Article Cards */
-        .article-card { background: var(--surface-color); border-radius: var(--radius-lg); padding: 48px; margin-bottom: 48px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); }
-        .article-header { margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
-        .article-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-        .badge { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 12px; border-radius: 6px; }
-        .article-title { font-family: var(--font-serif); font-size: 2rem; color: var(--text-main); line-height: 1.3; }
-        
-        /* Subheaders inside original text */
-        .original-subheader { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 20px 0 10px 0; border-left: 3px solid var(--text-light); padding-left: 12px; }
+.main-content { min-width: 0; }
+.intro-text { font-size: 16px; line-height: 1.8; color: var(--ink-2); margin-bottom: 32px; padding: 24px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border-left: 4px solid var(--ink); }
 
-        /* Metric Cards */
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 40px; }
-        .metric-card { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; text-align: center; }
-        .metric-value { font-family: var(--font-mono); font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
-        .metric-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+/* ── Article ── */
+.article {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 40px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.article-header {
+  padding: 28px 32px 20px;
+  border-bottom: 3px solid;
+}
+.art-num { font-size: 12px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+.art-title { font-size: 22px; line-height: 1.4; font-weight: 700; color: var(--ink); }
+.article-body { padding: 24px 32px 32px; }
 
-        /* Content Sections */
-        .section-block { margin-bottom: 36px; }
-        .section-title { display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; padding: 6px 12px; background: var(--bg-color); border-radius: 6px; border: 1px solid var(--border-color); }
-        .section-content { color: var(--text-muted); font-size: 1rem; line-height: 1.8; }
-        .section-content p { margin-bottom: 16px; }
-        .section-content p:last-child { margin-bottom: 0; }
-        .section-content ul, .section-content ol { margin-left: 24px; margin-bottom: 16px; }
-        .section-content li { margin-bottom: 8px; }
-        
-        /* Code blocks */
-        code { font-family: var(--font-mono); background: var(--bg-color); border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: var(--theme-rose); }
+/* ── Subsection ── */
+.subsec { margin-bottom: 28px; }
+.subsec:last-child { margin-bottom: 0; }
+.subsec-head {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+}
+.subsec-icon { font-size: 16px; }
+.subsec-label { font-size: 13px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
 
-        /* Tables */
-        .table-container { overflow-x: auto; margin: 24px 0; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
-        .data-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
-        .data-table th { background: var(--bg-color); padding: 16px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-main); border-bottom: 2px solid var(--border-color); }
-        .data-table td { padding: 16px; border-bottom: 1px solid var(--border-color); color: var(--text-muted); vertical-align: top; }
-        .data-table tr:last-child td { border-bottom: none; }
-        .data-table td:first-child { font-weight: 600; color: var(--text-main); }
+p.body-text { font-size: 15px; line-height: 1.7; color: var(--ink-2); margin-bottom: 12px; font-family: var(--sans); }
+p.body-text:last-child { margin-bottom: 0; }
 
-        /* Custom Infographics (CSS Only) */
-        .css-diagram { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 32px; margin: 32px 0; }
-        .diagram-node { background: var(--surface-color); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 16px; box-shadow: var(--shadow-sm); border-top: 4px solid; }
-        .diagram-node-title { font-weight: 700; font-size: 1rem; margin-bottom: 8px; color: var(--text-main); }
-        .diagram-node-desc { font-size: 0.85rem; color: var(--text-muted); }
-        .diagram-arrow { text-align: center; color: var(--text-light); margin: 12px 0; font-size: 1.2rem; font-weight: bold; }
-        
-        .grid-diagram { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        .grid-diagram .diagram-node { margin-bottom: 0; }
+/* ── Infographics & Boxes ── */
+.info-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0; }
+.info-table th { background: var(--bg); padding: 12px; text-align: left; font-weight: 700; color: var(--ink-3); border-bottom: 2px solid var(--border-2); }
+.info-table td { padding: 12px; border-bottom: 1px solid var(--border); color: var(--ink-2); vertical-align: middle; }
 
-        /* Charts */
-        .chart-container { position: relative; height: 350px; width: 100%; margin: 32px 0; background: var(--surface-color); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
+/* Block Diagram UI */
+.diagram-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 16px 0; }
+.d-card { padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow); }
+.d-card-title { font-size: 13px; font-weight: 800; margin-bottom: 6px; font-family: var(--mono); }
+.d-card-text { font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
 
-        /* Closing Synthesis */
-        .synthesis-section { background: var(--text-main); color: var(--surface-color); padding: 56px; border-radius: var(--radius-lg); margin-top: 64px; box-shadow: var(--shadow-lg); }
-        .synthesis-header { font-family: var(--font-serif); font-size: 2.5rem; margin-bottom: 32px; color: var(--surface-color); }
-        .synthesis-content { font-size: 1.1rem; line-height: 1.8; color: #CBD5E1; }
-        .synthesis-content p { margin-bottom: 20px; }
-        .synthesis-content p:last-child { margin-bottom: 0; }
+.chart-wrap { position: relative; margin: 24px 0; padding: 20px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); box-shadow: var(--shadow); }
+.chart-wrap canvas { max-height: 320px; }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .container { grid-template-columns: 1fr; }
-            .sidebar { position: static; margin-bottom: 32px; z-index: 10; }
-        }
-        @media (max-width: 768px) {
-            .article-card { padding: 24px; }
-            .article-title { font-size: 1.6rem; }
-            .grid-diagram { grid-template-columns: 1fr; }
-            .intro-section h1 { font-size: 1.8rem; }
-        }
-    </style>
+/* ── Colors ── */
+.c1 { color: var(--c1); } .bg-c1 { background: var(--c1); } .bc-c1 { border-color: var(--c1); }
+.c2 { color: var(--c2); } .bg-c2 { background: var(--c2); } .bc-c2 { border-color: var(--c2); }
+.c3 { color: var(--c3); } .bg-c3 { background: var(--c3); } .bc-c3 { border-color: var(--c3); }
+.c4 { color: var(--c4); } .bg-c4 { background: var(--c4); } .bc-c4 { border-color: var(--c4); }
+.c5 { color: var(--c5); } .bg-c5 { background: var(--c5); } .bc-c5 { border-color: var(--c5); }
+
+/* ── Closing Synthesis ── */
+.synthesis { background: #0F172A; color: #fff; border-radius: var(--radius); padding: 40px; box-shadow: var(--shadow-lg); }
+.syn-title { font-size: 24px; font-weight: 800; margin-bottom: 20px; color: #F8FAFC; border-bottom: 1px solid #334155; padding-bottom: 12px; }
+.syn-text { font-size: 15.5px; line-height: 1.8; color: #CBD5E1; margin-bottom: 16px; font-family: var(--sans); }
+
+/* ── Responsive ── */
+@media(max-width: 900px) {
+  .layout { grid-template-columns: 1fr; gap: 24px; padding: 24px 16px 80px; }
+  .sidebar { display: none; }
+  .header-nav { display: none; }
+  .article-header { padding: 20px 20px 16px; }
+  .article-body { padding: 16px 20px 24px; }
+  .synthesis { padding: 24px; }
+}
+</style>
 </head>
 <body>
 
-    <div class="disclaimer">
-        ⚠️ 본 내용은 AI가 작성한 내용으로 부정확할 수 있습니다. 참고용으로만 이용해주세요. (This content was generated by AI and may contain inaccuracies. For reference purposes only.)
+<div class="disclaimer">
+  This content was generated by AI and may contain inaccuracies. Please use for reference only.<br>
+  본 내용은 AI가 작성한 내용으로 부정확할 수 있습니다. 참고용으로만 이용해주세요.
+</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-logo">A</div>
+      <div>
+        <div class="header-title">Architectures of Autonomous Intelligence</div>
+        <div class="header-meta">Comprehensive Analysis of AI Infrastructure, Agentic Systems, and Market Shifts (April 2026)</div>
+      </div>
+    </div>
+    <nav class="header-nav">
+      <a class="nav-chip" href="#news1">Claude Code Leak</a>
+      <a class="nav-chip" href="#news2">NVIDIA & SambaNova</a>
+      <a class="nav-chip" href="#news3">Mamba-3 Scaling</a>
+      <a class="nav-chip" href="#news4">Amazon CAPEX</a>
+      <a class="nav-chip" href="#news5">Veo 3.1 Lite</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-label">Contents</div>
+    <ul class="sidebar-nav">
+      <li><a href="#news1"><span class="s-dot bg-c1"></span><span class="c1">1. Claude Code Leak</span></a></li>
+      <li><a href="#news2"><span class="s-dot bg-c2"></span><span class="c2">2. Hardware Shifts</span></a></li>
+      <li><a href="#news3"><span class="s-dot bg-c3"></span><span class="c3">3. Mamba-3</span></a></li>
+      <li><a href="#news4"><span class="s-dot bg-c4"></span><span class="c4">4. Amazon $200B Plan</span></a></li>
+      <li><a href="#news5"><span class="s-dot bg-c5"></span><span class="c5">5. Veo 3.1 Lite</span></a></li>
+      <li><a href="#synthesis"><span class="s-dot" style="background:#fff;border:1px solid #000"></span><span style="color:#000">Closing Synthesis</span></a></li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    
+    <div class="intro-text">
+      <strong>[도입부 요약]</strong><br>
+      2026년 2분기, AI 경제는 구조적 변곡점에 도달했습니다. 업계의 주요 초점이 파라미터 수 증가에서 '지능 밀도(Intelligence Density)' 최적화 및 추론 경제성 향상으로 이동했습니다. 2026년 3월 말에서 4월 초는 반응형 생성 모델에서 선제적 자율 에이전트로의 전환을 정의하며, 이와 함께 상당한 기술적, 경제적, 보안적 과제가 수반됩니다. 이 보고서는 Anthropic Claude Code 노출, NVIDIA 및 SambaNova의 차세대 실리콘 출시, 그리고 Amazon의 기록적인 인프라 투자를 포함한 핵심 개발 사항을 분석합니다.
     </div>
 
-    <header>
-        <div class="header-content">
-            <div>
-                <div class="header-title">
-                    <div class="header-logo">A</div>
-                    Architectures of Autonomous Intelligence
-                </div>
-                <div class="header-meta">Comprehensive Analysis of AI Infrastructure, Agentic Systems, and Market Shifts (April 2026)</div>
-            </div>
+    <article class="article" id="news1">
+      <div class="article-header bc-c1">
+        <div class="art-num c1">News 01</div>
+        <h2 class="art-title">1. The Anthropic Claude Code Leak: Blueprint for Production-Grade Agents</h2>
+      </div>
+      <div class="article-body">
+        
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">🔭</span><span class="subsec-label c1">[Overview]</span></div>
+          <p class="body-text">On March 31, 2026, the complete source code for Anthropic's flagship terminal-based agent, Claude Code, was accidentally exposed via the npm registry.</p>
         </div>
-    </header>
 
-    <div class="container">
-        <aside class="sidebar">
-            <div class="sidebar-title">Intelligence Navigation</div>
-            <ul class="sidebar-nav">
-                <li><a href="#article-1"><span class="nav-dot" style="background: var(--theme-blue);"></span> 1. Anthropic Claude Code Leak</a></li>
-                <li><a href="#article-2"><span class="nav-dot" style="background: var(--theme-emerald);"></span> 2. NVIDIA Rubin Architecture</a></li>
-                <li><a href="#article-3"><span class="nav-dot" style="background: var(--theme-purple);"></span> 3. Mamba-3 Algorithmic Evolution</a></li>
-                <li><a href="#article-4"><span class="nav-dot" style="background: var(--theme-amber);"></span> 4. Amazon $200B CAPEX Plan</a></li>
-                <li><a href="#article-5"><span class="nav-dot" style="background: var(--theme-rose);"></span> 5. Google Veo 3.1 Lite</a></li>
-                <li><a href="#synthesis"><span class="nav-dot" style="background: var(--text-light);"></span> Summary & Outlook</a></li>
-            </ul>
-            <div class="confidence-meter">
-                <div class="sidebar-title">Overall Trust Level</div>
-                <div class="confidence-badge">⬤ HIGH CONFIDENCE</div>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">⚡</span><span class="subsec-label c1">[Strategic Impact]</span></div>
+          <p class="body-text">This incident has provided a "glass-box" view into the architectural solutions required to manage autonomous agents at scale.</p>
+        </div>
+
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">🔬</span><span class="subsec-label c1">[Technical Deep Dive]</span></div>
+          <p class="body-text">The codebase revealed six interconnected systems that function as an "Agentic Operating System":</p>
+          <table class="info-table">
+            <thead><tr><th>System Name</th><th>Technical Function and Implementation</th><th>Strategic Objective</th></tr></thead>
+            <tbody>
+              <tr><td><strong>KAIROS</strong></td><td>Always-on background daemon that monitors file systems and GitHub PRs via webhook subscriptions and five-minute cron refresh cycles while the user is idle.</td><td>Transition from reactive assistant to proactive partner.</td></tr>
+              <tr><td><strong>autoDream</strong></td><td>Background memory consolidation process that runs during idle periods, merging disparate observations, removing logical contradictions, and converting vague insights into verified facts.</td><td>Solves "context entropy" to enable long-term operation.</td></tr>
+              <tr><td><strong>ULTRAPLAN</strong></td><td>Hybrid execution mode that offloads complex architecture planning to remote Cloud Container Runtime instances running Opus for up to 30 minutes, with results approved via browser UI before returning to the local terminal.</td><td>Overcomes local compute limits and drives high-value API consumption.</td></tr>
+              <tr><td><strong>Coordinator</strong></td><td>Infrastructure for multi-agent "swarms" that collaborate asynchronously via shared mailbox systems, with one coordinator instance managing multiple parallel worker agents.</td><td>Provides an "AI development team" environment rather than a single tool.</td></tr>
+              <tr><td><strong>Undercover</strong></td><td>Stealth system that prevents the model from leaking internal codenames or model versions (e.g., Capybara, Fennec, Numbat) in public OSS commits.</td><td>Advanced reputation management and ecosystem influence.</td></tr>
+              <tr><td><strong>ANTI_DISTILLATION</strong></td><td>Flag (`ANTI_DISTILLATION_CC`) that injects decoy ("fake") tool definitions into system prompts.</td><td>Corrupts training data recorded by competitors attempting to distill Claude's logic.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">📊</span><span class="subsec-label c1">[Visual/Evidence]</span></div>
+          <div style="background:var(--bg); padding:20px; border-radius:8px; border:1px solid var(--border);">
+            <div style="text-align:center; font-weight:700; margin-bottom:16px; color:var(--ink);">Agentic Operating System Architecture</div>
+            <div class="diagram-grid">
+              <div class="d-card"><div class="d-card-title c1">KAIROS & autoDream</div><div class="d-card-text">Idle background daemon & memory consolidation (solves context entropy).</div></div>
+              <div class="d-card"><div class="d-card-title c1">ULTRAPLAN & Coordinator</div><div class="d-card-text">Cloud compute offloading & multi-agent swarm synchronization.</div></div>
+              <div class="d-card"><div class="d-card-title c1">Security & Evasion</div><div class="d-card-text">Undercover (Codename stealth) & ANTI_DISTILLATION (Decoy tools).</div></div>
             </div>
-        </aside>
+          </div>
+        </div>
 
-        <main>
-            <div class="intro-section">
-                <h1>Architectures of Autonomous Intelligence: Comprehensive Analysis of AI Infrastructure, Agentic Systems, and Market Shifts (April 2026)</h1>
-                <p>The AI economy has reached a structural inflection point in the second quarter of 2026. The industry has shifted its primary focus from increasing parameter counts to optimizing "Intelligence Density" and improving inference economics. The period between late March and early April 2026 is defined by the transition from reactive generative models to proactive autonomous agents, a shift accompanied by significant technical, economic, and security challenges. This report analyzes pivotal developments, including the Anthropic Claude Code exposure, the arrival of next-generation silicon from NVIDIA and SambaNova, and Amazon's record-breaking infrastructure investment.</p>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">⚠️</span><span class="subsec-label c1">[Critical View]</span></div>
+          <p class="body-text">The leak was caused by a misconfigured production build of the @anthropic-ai/claude-code package (v2.1.88). A 59.8 MB JavaScript source map file, intended for internal debugging, was inadvertently included in the published package. This map file contained approximately 512,000 lines of unobfuscated TypeScript across roughly 1,906 files embedded directly in its `sourcesContent` field, making the entire codebase publicly accessible. The root cause was a missing `*.map` exclusion in Anthropic's `.npmignore` configuration — a single oversight in the release pipeline.</p>
+        </div>
+
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">💬</span><span class="subsec-label c1">[Community Sentiment]</span></div>
+          <p class="body-text">Contributing context was the Bun runtime's default behavior of generating source maps, though the absence of the `.npmignore` exclusion was the decisive failure. Coinciding with the leak, but unrelated to it, was a supply chain attack in which malicious versions of the widely-used axios HTTP library were published to npm containing a Remote Access Trojan, compounding the security incident for users who updated during the same window.</p>
+        </div>
+
+      </div>
+    </article>
+
+    <article class="article" id="news2">
+      <div class="article-header bc-c2">
+        <div class="art-num c2">News 02</div>
+        <h2 class="art-title">2. Hardware Architecture Shifts: NVIDIA Rubin and Inference Economics</h2>
+      </div>
+      <div class="article-body">
+        
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">🔭</span><span class="subsec-label c2">[Overview]</span></div>
+          <p class="body-text">As the market transitions toward agentic workflows, the center of gravity for AI compute has shifted from training to inference. NVIDIA's "Vera Rubin" platform, in full production as of Q1 2026 with partner availability scheduled for the second half of 2026, succeeds the Blackwell architecture with a focus on slashing inference costs.</p>
+        </div>
+
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">⚡</span><span class="subsec-label c2">[Strategic Impact]</span></div>
+          <p class="body-text">Cost-per-token is now the primary metric for Return on Investment (ROI). At the NVL72 rack level, NVIDIA claims a 10x reduction in inference token costs for Large Mixture-of-Experts (MoE) models compared to Blackwell — a system-level figure reflecting the combined benefit of higher compute density, HBM4 bandwidth, and NVLink 6 interconnect, rather than a single-GPU metric.</p>
+        </div>
+
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">🔬</span><span class="subsec-label c2">[Technical Deep Dive]</span></div>
+          <p class="body-text">The Rubin platform introduces the "Vera CPU," an 88-core custom Arm processor built on NVIDIA's proprietary "Olympus" core architecture with Spatial Multi-Threading, offering 1.8 TB/s of coherent NVLink-C2C bandwidth to the GPU. SambaNova has introduced the fifth-generation SN50 Reconfigurable Dataflow Unit (RDU). Unlike the SIMD (Single Instruction, Multiple Data) approach of GPUs, the SN50 uses a "Dataflow" architecture that maps the model's execution graph directly onto the processor, minimizing redundant memory access. Key specifications of the SN50 include:</p>
+          <ul style="padding-left:20px; line-height:1.7; color:var(--ink-2); margin-bottom:12px;">
+            <li><strong>Three-Tier Memory Architecture:</strong> 432 MB on-chip SRAM for real-time state updates, 64 GB HBM2E for model weights (intentionally selected over HBM3e to avoid supply chain constraints and cost pressure), and up to 2 TB of DDR5 to support models with up to 10 trillion parameters.</li>
+            <li><strong>Agentic Caching:</strong> Allows multiple models to remain resident in memory and switch in milliseconds, essential for multi-step agent workflows.</li>
+          </ul>
+        </div>
+
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">📊</span><span class="subsec-label c2">[Visual/Evidence]</span></div>
+          <div class="chart-wrap">
+            <canvas id="rubinChart"></canvas>
+          </div>
+          <table class="info-table" style="margin-top:12px;">
+            <thead><tr><th>Specification Metric</th><th>Blackwell (B200)</th><th>Vera Rubin (per GPU)</th><th>Performance Change</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Inference (NVFP4)</strong></td><td>~10 PFLOPS</td><td>50 PFLOPS</td><td>5x Increase</td></tr>
+              <tr><td><strong>Training (NVFP4)</strong></td><td>~10 PFLOPS</td><td>35 PFLOPS</td><td>3.5x Increase</td></tr>
+              <tr><td><strong>Memory per GPU</strong></td><td>192GB HBM3e</td><td>288GB HBM4</td><td>1.5x Expansion</td></tr>
+              <tr><td><strong>Memory Bandwidth</strong></td><td>~8 TB/s</td><td>22 TB/s</td><td>~2.75x Increase</td></tr>
+              <tr><td><strong>Transistor Count</strong></td><td>208 Billion</td><td>336 Billion</td><td>1.6x Increase</td></tr>
+              <tr><td><strong>Rack Bandwidth (NVL72)</strong></td><td>~130 TB/s</td><td>260 TB/s</td><td>2x Increase</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">⚠️</span><span class="subsec-label c2">[Critical View]</span></div>
+          <p class="body-text">Performance: Claims 5x the speed and 3x the throughput of Blackwell B200 for inference on Llama 3.3 70B. SambaNova also cites an 8x TCO advantage over B200, though these figures are drawn from the company's own benchmarks and have not been independently validated.</p>
+        </div>
+
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">💬</span><span class="subsec-label c2">[Community Sentiment]</span></div>
+          <p class="body-text">SambaNova has introduced the fifth-generation SN50 Reconfigurable Dataflow Unit (RDU), specifically engineered to compete with GPUs in the inference market. (Components intentionally selected over HBM3e to avoid supply chain constraints and cost pressure).</p>
+        </div>
+
+      </div>
+    </article>
+
+    <article class="article" id="news3">
+      <div class="article-header bc-c3">
+        <div class="art-num c3">News 03</div>
+        <h2 class="art-title">3. Algorithmic Evolution: Mamba-3 and Sub-Quadratic Scaling</h2>
+      </div>
+      <div class="article-body">
+        
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">🔭</span><span class="subsec-label c3">[Overview]</span></div>
+          <p class="body-text">Mamba-3, published as a conference paper at ICLR 2026 by researchers from CMU and Princeton — with support from Together AI and Cartesia AI — represents the most significant challenge to Transformer dominance in 2026.</p>
+        </div>
+
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">⚡</span><span class="subsec-label c3">[Strategic Impact]</span></div>
+          <p class="body-text">It addresses the memory-bound nature of inference by replacing the attention mechanism's quadratic computational complexity and linearly growing KV cache of Transformers with a fixed-size latent state, enabling constant memory requirements across sequence length.</p>
+        </div>
+
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">🔬</span><span class="subsec-label c3">[Technical Deep Dive]</span></div>
+          <p class="body-text">Key methodological improvements include:</p>
+          <ul style="padding-left:20px; line-height:1.7; color:var(--ink-2); margin-bottom:12px;">
+            <li><strong>1. Exponential-Trapezoidal Discretization:</strong> A data-dependent convex combination method that eliminates the need for the short causal convolutions previously required by recurrent models. Mathematically equivalent to applying a data-dependent width-2 convolution within the core recurrence, this scheme makes the architecture more expressive without added inference cost.</li>
+            <li><strong>2. Complex-Valued State Tracking:</strong> Uses complex-valued SSMs — shown to be equivalent to real-valued SSMs with data-dependent Rotary Positional Embeddings — to improve arithmetic reasoning and parity problem solving, which were fundamental weaknesses in prior real-valued linear models.</li>
+            <li><strong>3. Multi-Input, Multi-Output (MIMO):</strong> Transforms the state update from an outer product to a matrix-matrix multiplication, increasing decoding FLOPs by up to 4x relative to Mamba-2 at a fixed state size.</li>
+          </ul>
+        </div>
+
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">📊</span><span class="subsec-label c3">[Visual/Evidence]</span></div>
+          <div style="display:flex; flex-wrap:wrap; gap:16px; background:var(--bg); padding:20px; border-radius:8px; border:1px solid var(--border);">
+            <div style="flex:1; min-width:200px; background:var(--surface); padding:16px; border:1px solid #D1D5DB; border-radius:8px; text-align:center;">
+              <div style="font-weight:700; color:var(--ink); margin-bottom:8px;">Transformer Attention</div>
+              <div style="font-size:13px; color:var(--ink-3);">Quadratic computational complexity & linearly growing KV cache (Memory-bound)</div>
             </div>
+            <div style="display:flex; align-items:center; justify-content:center; font-size:24px; color:var(--ink-3);">➔</div>
+            <div style="flex:1; min-width:200px; background:var(--surface); padding:16px; border:1px solid var(--c3); border-radius:8px; text-align:center;">
+              <div style="font-weight:700; color:var(--c3); margin-bottom:8px;">Mamba-3 (MIMO)</div>
+              <div style="font-size:13px; color:var(--ink-3);">Fixed-size latent state.<br>Constant memory requirements & 4x decoding FLOPs</div>
+            </div>
+          </div>
+        </div>
 
-            <article id="article-1" class="article-card">
-                <div class="article-header">
-                    <div class="article-badges">
-                        <span class="badge" style="background: var(--theme-rose-light); color: var(--theme-rose);">BREAKING INCIDENT</span>
-                        <span class="badge" style="background: var(--theme-blue-light); color: var(--theme-blue);">RISK WARNING: SUPPLY CHAIN</span>
-                    </div>
-                    <h2 class="article-title">1. The Anthropic Claude Code Leak: Blueprint for Production-Grade Agents</h2>
-                </div>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">⚠️</span><span class="subsec-label c3">[Critical View]</span></div>
+          <p class="body-text">This exploits idle GPU tensor cores during decoding without increasing wall-clock latency.</p>
+        </div>
 
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-rose);">59.8 MB</div>
-                        <div class="metric-label">Source Map File</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-blue);">512,000</div>
-                        <div class="metric-label">Lines of Code</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-purple);">1,906</div>
-                        <div class="metric-label">Exposed Files</div>
-                    </div>
-                </div>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">💬</span><span class="subsec-label c3">[Community Sentiment]</span></div>
+          <p class="body-text">In benchmarks at the 1.5B scale, Mamba-3 MIMO demonstrated a nearly 4% relative improvement in language modeling over Transformer baselines while achieving up to 7x faster decoding at sequence lengths of 16,384.</p>
+        </div>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-blue);">[Overview]</div>
-                    <div class="section-content">
-                        <p>On March 31, 2026, the complete source code for Anthropic's flagship terminal-based agent, Claude Code, was accidentally exposed via the npm registry.</p>
-                    </div>
-                </div>
+      </div>
+    </article>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-emerald);">[Strategic Impact]</div>
-                    <div class="section-content">
-                        <p>This incident has provided a "glass-box" view into the architectural solutions required to manage autonomous agents at scale.</p>
-                    </div>
-                </div>
+    <article class="article" id="news4">
+      <div class="article-header bc-c4">
+        <div class="art-num c4">News 04</div>
+        <h2 class="art-title">4. Infrastructure Dominance: Amazon's $200 Billion CAPEX Plan</h2>
+      </div>
+      <div class="article-body">
+        
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">🔭</span><span class="subsec-label c4">[Overview]</span></div>
+          <p class="body-text">Amazon has committed to a record-breaking $200 billion capital expenditure plan for fiscal year 2026, a 52% increase over its 2025 spending.</p>
+        </div>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-purple);">[Technical Deep Dive]</div>
-                    <div class="section-content">
-                        <div class="original-subheader">The Mechanism of Exposure</div>
-                        <p>The leak was caused by a misconfigured production build of the @anthropic-ai/claude-code package (v2.1.88). A 59.8 MB JavaScript source map file, intended for internal debugging, was inadvertently included in the published package. This map file contained approximately 512,000 lines of unobfuscated TypeScript across roughly 1,906 files embedded directly in its <code>sourcesContent</code> field, making the entire codebase publicly accessible.</p>
-                        
-                        <div class="original-subheader">Core Agentic Systems Revealed</div>
-                        <p>The codebase revealed six interconnected systems that function as an "Agentic Operating System":</p>
-                        
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr><th>System Name</th><th>Technical Function and Implementation</th><th>Strategic Objective</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td><strong>KAIROS</strong></td><td>Always-on background daemon that monitors file systems and GitHub PRs via webhook subscriptions and five-minute cron refresh cycles while the user is idle.</td><td>Transition from reactive assistant to proactive partner.</td></tr>
-                                    <tr><td><strong>autoDream</strong></td><td>Background memory consolidation process that runs during idle periods, merging disparate observations, removing logical contradictions, and converting vague insights into verified facts.</td><td>Solves "context entropy" to enable long-term operation.</td></tr>
-                                    <tr><td><strong>ULTRAPLAN</strong></td><td>Hybrid execution mode that offloads complex architecture planning to remote Cloud Container Runtime instances running Opus for up to 30 minutes, with results approved via browser UI before returning to the local terminal.</td><td>Overcomes local compute limits and drives high-value API consumption.</td></tr>
-                                    <tr><td><strong>Coordinator</strong></td><td>Infrastructure for multi-agent "swarms" that collaborate asynchronously via shared mailbox systems, with one coordinator instance managing multiple parallel worker agents.</td><td>Provides an "AI development team" environment rather than a single tool.</td></tr>
-                                    <tr><td><strong>Undercover</strong></td><td>Stealth system that prevents the model from leaking internal codenames or model versions (e.g., Capybara, Fennec, Numbat) in public OSS commits.</td><td>Advanced reputation management and ecosystem influence.</td></tr>
-                                    <tr><td><strong>ANTI_DISTILLATION</strong></td><td>Flag (<code>ANTI_DISTILLATION_CC</code>) that injects decoy ("fake") tool definitions into system prompts.</td><td>Corrupts training data recorded by competitors attempting to distill Claude's logic.</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">⚡</span><span class="subsec-label c4">[Strategic Impact]</span></div>
+          <p class="body-text">This represents the most aggressive infrastructure expansion in private sector history, exceeding analyst consensus expectations by more than $50 billion. The strategy focuses on "Total Infrastructure Sovereignty".</p>
+        </div>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-amber);">[Visual/Evidence]</div>
-                    <div class="section-content">
-                        <div class="css-diagram">
-                            <div style="text-align: center; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--theme-blue); margin-bottom: 24px;">CLAUDE CODE LEAK: REVEALED AGENTIC OS ARCHITECTURE</div>
-                            <div class="diagram-node" style="border-top-color: var(--theme-purple);">
-                                <div class="diagram-node-title">KAIROS Daemon</div>
-                                <div class="diagram-node-desc">5-minute cron refresh & webhook subscriptions</div>
-                            </div>
-                            <div class="diagram-arrow">Triggers & Coordinates</div>
-                            <div class="grid-diagram">
-                                <div class="diagram-node" style="border-top-color: var(--theme-emerald);">
-                                    <div class="diagram-node-title">autoDream Process</div>
-                                    <div class="diagram-node-desc">Background memory consolidation & insight verification</div>
-                                </div>
-                                <div class="diagram-node" style="border-top-color: var(--theme-amber);">
-                                    <div class="diagram-node-title">ULTRAPLAN</div>
-                                    <div class="diagram-node-desc">Remote Cloud Container Runtime offload (up to 30 mins)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">🔬</span><span class="subsec-label c4">[Technical Deep Dive]</span></div>
+          <ul style="padding-left:20px; line-height:1.7; color:var(--ink-2); margin-bottom:12px;">
+            <li><strong>Custom Silicon:</strong> High-volume deployment of "Trainium 3," Amazon's proprietary training chip built on a 3nm process, designed to reduce dependency on NVIDIA.</li>
+            <li><strong>Energy Verticalization:</strong> Investment in Small Modular Reactors (SMRs) and carbon-free nuclear power through partnerships with utilities like Constellation Energy to ensure 24/7 power for data centers.</li>
+          </ul>
+        </div>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-rose);">[Critical View]</div>
-                    <div class="section-content">
-                        <p>The root cause was a missing <code>*.map</code> exclusion in Anthropic's <code>.npmignore</code> configuration — a single oversight in the release pipeline. Contributing context was the Bun runtime's default behavior of generating source maps, though the absence of the <code>.npmignore</code> exclusion was the decisive failure.</p>
-                    </div>
-                </div>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">📊</span><span class="subsec-label c4">[Visual/Evidence]</span></div>
+          <div class="chart-wrap">
+            <canvas id="amazonChart"></canvas>
+          </div>
+        </div>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--text-muted);">[Community Sentiment]</div>
-                    <div class="section-content">
-                        <p>Coinciding with the leak, but unrelated to it, was a supply chain attack in which malicious versions of the widely-used axios HTTP library were published to npm containing a Remote Access Trojan, compounding the security incident for users who updated during the same window.</p>
-                    </div>
-                </div>
-            </article>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">⚠️</span><span class="subsec-label c4">[Critical View]</span></div>
+          <p class="body-text"><strong>Megascale Projects:</strong> Includes a $50 billion U.S. Government AI Cloud dedicated to national security workloads...</p>
+        </div>
 
-            <article id="article-2" class="article-card">
-                <div class="article-header">
-                    <div class="article-badges">
-                        <span class="badge" style="background: var(--theme-emerald-light); color: var(--theme-emerald);">MARKET EVENT</span>
-                        <span class="badge" style="background: var(--theme-blue-light); color: var(--theme-blue);">HARDWARE PARADIGM</span>
-                    </div>
-                    <h2 class="article-title">2. Hardware Architecture Shifts: NVIDIA Rubin and Inference Economics</h2>
-                </div>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">💬</span><span class="subsec-label c4">[Community Sentiment]</span></div>
+          <p class="body-text">...alongside massive regional hubs in Indiana ($15 billion) and Louisiana ($12 billion).</p>
+        </div>
 
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-emerald);">5x</div>
-                        <div class="metric-label">Inference Leap (NVFP4)</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-blue);">288GB</div>
-                        <div class="metric-label">HBM4 per Rubin GPU</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-amber);">432MB</div>
-                        <div class="metric-label">SN50 On-Chip SRAM</div>
-                    </div>
-                </div>
+      </div>
+    </article>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-blue);">[Overview]</div>
-                    <div class="section-content">
-                        <p>As the market transitions toward agentic workflows, the center of gravity for AI compute has shifted from training to inference. Cost-per-token is now the primary metric for Return on Investment (ROI).</p>
-                    </div>
-                </div>
+    <article class="article" id="news5">
+      <div class="article-header bc-c5">
+        <div class="art-num c5">News 05</div>
+        <h2 class="art-title">5. Democratizing Multimodal Production: Google Veo 3.1 Lite</h2>
+      </div>
+      <div class="article-body">
+        
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">🔭</span><span class="subsec-label c5">[Overview]</span></div>
+          <p class="body-text">On March 31, 2026, Google released Veo 3.1 Lite, its most cost-effective video generation model to date, arriving days after OpenAI announced the shutdown of its Sora video generation platform.</p>
+        </div>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-emerald);">[Strategic Impact]</div>
-                    <div class="section-content">
-                        <div class="original-subheader">NVIDIA Vera Rubin: The 5x Inference Leap</div>
-                        <p>NVIDIA's "Vera Rubin" platform, in full production as of Q1 2026 with partner availability scheduled for the second half of 2026, succeeds the Blackwell architecture with a focus on slashing inference costs.</p>
-                        <div class="original-subheader">SambaNova SN50: Dataflow Architecture for Agents</div>
-                        <p>SambaNova has introduced the fifth-generation SN50 Reconfigurable Dataflow Unit (RDU), specifically engineered to compete with GPUs in the inference market.</p>
-                    </div>
-                </div>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">⚡</span><span class="subsec-label c5">[Strategic Impact]</span></div>
+          <p class="body-text">The "Lite" designation refers not to generation speed — which matches Veo 3.1 Fast — but to an optimized parameter configuration that enables the significantly lower price point.</p>
+        </div>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-purple);">[Technical Deep Dive]</div>
-                    <div class="section-content">
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr><th>Specification Metric</th><th>Blackwell (B200)</th><th>Vera Rubin (per GPU)</th><th>Performance Change</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td><strong>Inference (NVFP4)</strong></td><td>~10 PFLOPS</td><td>50 PFLOPS</td><td>5x Increase</td></tr>
-                                    <tr><td><strong>Training (NVFP4)</strong></td><td>~10 PFLOPS</td><td>35 PFLOPS</td><td>3.5x Increase</td></tr>
-                                    <tr><td><strong>Memory per GPU</strong></td><td>192GB HBM3e</td><td>288GB HBM4</td><td>1.5x Expansion</td></tr>
-                                    <tr><td><strong>Memory Bandwidth</strong></td><td>~8 TB/s</td><td>22 TB/s</td><td>~2.75x Increase</td></tr>
-                                    <tr><td><strong>Transistor Count</strong></td><td>208 Billion</td><td>336 Billion</td><td>1.6x Increase</td></tr>
-                                    <tr><td><strong>Rack Bandwidth (NVL72)</strong></td><td>~130 TB/s</td><td>260 TB/s</td><td>2x Increase</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <p>The Rubin platform introduces the "Vera CPU," an 88-core custom Arm processor built on NVIDIA's proprietary "Olympus" core architecture with Spatial Multi-Threading, offering 1.8 TB/s of coherent NVLink-C2C bandwidth to the GPU.</p>
-                        
-                        <p>Key specifications of the SN50 include:</p>
-                        <ul>
-                            <li><strong>Three-Tier Memory Architecture:</strong> 432 MB on-chip SRAM for real-time state updates, 64 GB HBM2E for model weights (intentionally selected over HBM3e to avoid supply chain constraints and cost pressure), and up to 2 TB of DDR5 to support models with up to 10 trillion parameters.</li>
-                            <li><strong>Agentic Caching:</strong> Allows multiple models to remain resident in memory and switch in milliseconds, essential for multi-step agent workflows.</li>
-                        </ul>
-                    </div>
-                </div>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">🔬</span><span class="subsec-label c5">[Technical Deep Dive]</span></div>
+          <p class="body-text">Built on a Diffusion Transformer (DiT) architecture, it processes frames as spatio-temporal patches in a compressed latent space to maintain temporal consistency.</p>
+        </div>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-amber);">[Visual/Evidence]</div>
-                    <div class="section-content">
-                        <div class="chart-container">
-                            <canvas id="rubinChart"></canvas>
-                        </div>
-                    </div>
-                </div>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">📊</span><span class="subsec-label c5">[Visual/Evidence]</span></div>
+          <table class="info-table">
+            <thead><tr><th>Model Tier</th><th>720p Price/Sec</th><th>1080p Price/Sec</th><th>Key Features</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Veo 3.1 Lite</strong></td><td>$0.05</td><td>$0.08</td><td>Optimized for high-volume prototyping and batch production.</td></tr>
+              <tr><td><strong>Veo 3.1 Fast</strong></td><td>$0.10 (from Apr 7)</td><td>$0.12 (from Apr 7)</td><td>High-speed generation with cinematic control.</td></tr>
+              <tr><td><strong>Veo 3.1</strong></td><td>~$0.40</td><td>~$0.40</td><td>Full-fidelity output with native audio generation.</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-rose);">[Critical View]</div>
-                    <div class="section-content">
-                        <p>Unlike the SIMD (Single Instruction, Multiple Data) approach of GPUs, the SN50 uses a "Dataflow" architecture that maps the model's execution graph directly onto the processor, minimizing redundant memory access.</p>
-                    </div>
-                </div>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">⚠️</span><span class="subsec-label c5">[Critical View]</span></div>
+          <p class="body-text">Veo 3.1 Lite includes SynthID digital watermarking for identifying AI-generated content...</p>
+        </div>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--text-muted);">[Community Sentiment]</div>
-                    <div class="section-content">
-                        <p>At the NVL72 rack level, NVIDIA claims a 10x reduction in inference token costs for Large Mixture-of-Experts (MoE) models compared to Blackwell — a system-level figure reflecting the combined benefit of higher compute density, HBM4 bandwidth, and NVLink 6 interconnect, rather than a single-GPU metric.</p>
-                        <ul>
-                            <li><strong>Performance:</strong> Claims 5x the speed and 3x the throughput of Blackwell B200 for inference on Llama 3.3 70B. SambaNova also cites an 8x TCO advantage over B200, though these figures are drawn from the company's own benchmarks and have not been independently validated.</li>
-                        </ul>
-                    </div>
-                </div>
-            </article>
+        <div class="subsec">
+          <div class="subsec-head"><span class="subsec-icon">💬</span><span class="subsec-label c5">[Community Sentiment]</span></div>
+          <p class="body-text">...and supports text-to-video and image-to-video at 720p and 1080p in both landscape (16:9) and portrait (9:16) orientations, with clip durations of 4, 6, or 8 seconds.</p>
+        </div>
 
-            <article id="article-3" class="article-card">
-                <div class="article-header">
-                    <div class="article-badges">
-                        <span class="badge" style="background: var(--theme-purple-light); color: var(--theme-purple);">R&D BREAKTHROUGH</span>
-                    </div>
-                    <h2 class="article-title">3. Algorithmic Evolution: Mamba-3 and Sub-Quadratic Scaling</h2>
-                </div>
+      </div>
+    </article>
 
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-purple);">4%</div>
-                        <div class="metric-label">Relative LM Improvement</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-blue);">7x</div>
-                        <div class="metric-label">Faster Decoding Speed</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-emerald);">16,384</div>
-                        <div class="metric-label">Sequence Length Tested</div>
-                    </div>
-                </div>
+    <section class="synthesis" id="synthesis">
+      <h2 class="syn-title">Closing Synthesis & Trajectory</h2>
+      <p class="syn-text">The early second quarter of 2026 marks the "Industrialization of Intelligence." The convergence of agentic architectures (Claude Code), hardware efficiency (NVIDIA Rubin, SambaNova SN50), and massive capital deployment (Amazon $200B plan) indicates that the market is now prioritizing infrastructure sovereignty and inference tokenomics over raw parameter scaling.</p>
+      <p class="syn-text">The upcoming 12 months will likely see the rise of "Hybrid SSM-Attention" models as the enterprise standard, as they combine the efficiency of Mamba-3's fixed-state recurrence with the precise recall of Transformer attention. The pattern is already visible in production: NVIDIA's Nemotron 3 Super, a 120B hybrid Mamba-Transformer MoE, was released at GTC 2026 just one week before Mamba-3 itself. As autonomous agents move into high-stakes infrastructure and enterprise operations, the architectural and security lessons surfaced by the Claude Code leak — from multi-agent coordination to anti-distillation countermeasures — will increasingly define the baseline expectations for production-grade agentic systems.</p>
+    </section>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-blue);">[Overview]</div>
-                    <div class="section-content">
-                        <p>Mamba-3, published as a conference paper at ICLR 2026 by researchers from CMU and Princeton — with support from Together AI and Cartesia AI — represents the most significant challenge to Transformer dominance in 2026.</p>
-                    </div>
-                </div>
+  </main>
+</div>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-emerald);">[Strategic Impact]</div>
-                    <div class="section-content">
-                        <p>It addresses the memory-bound nature of inference by replacing the attention mechanism's quadratic computational complexity and linearly growing KV cache of Transformers with a fixed-size latent state, enabling constant memory requirements across sequence length.</p>
-                    </div>
-                </div>
+<script>
+Chart.defaults.font.family = "'Pretendard', 'Fira Code', sans-serif";
+Chart.defaults.color = '#64748B';
+Chart.defaults.borderColor = '#E2E8F0';
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-purple);">[Technical Deep Dive]</div>
-                    <div class="section-content">
-                        <p>Key methodological improvements include:</p>
-                        <ol>
-                            <li><strong>Exponential-Trapezoidal Discretization:</strong> A data-dependent convex combination method that eliminates the need for the short causal convolutions previously required by recurrent models. Mathematically equivalent to applying a data-dependent width-2 convolution within the core recurrence, this scheme makes the architecture more expressive without added inference cost.</li>
-                            <li><strong>Complex-Valued State Tracking:</strong> Uses complex-valued SSMs — shown to be equivalent to real-valued SSMs with data-dependent Rotary Positional Embeddings — to improve arithmetic reasoning and parity problem solving, which were fundamental weaknesses in prior real-valued linear models.</li>
-                            <li><strong>Multi-Input, Multi-Output (MIMO):</strong> Transforms the state update from an outer product to a matrix-matrix multiplication, increasing decoding FLOPs by up to 4x relative to Mamba-2 at a fixed state size. This exploits idle GPU tensor cores during decoding without increasing wall-clock latency.</li>
-                        </ol>
-                    </div>
-                </div>
+// News 2: Rubin Chart
+(function(){
+  const ctx = document.getElementById('rubinChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Inference (NVFP4) PFLOPS', 'Training (NVFP4) PFLOPS', 'Memory Bandwidth (TB/s)'],
+      datasets: [
+        {
+          label: 'Blackwell (B200)',
+          data: [10, 10, 8],
+          backgroundColor: '#A7F3D0', // Emerald 200
+          borderRadius: 4
+        },
+        {
+          label: 'Vera Rubin (per GPU)',
+          data: [50, 35, 22],
+          backgroundColor: '#10B981', // Emerald 500
+          borderRadius: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top' },
+        title: { display: true, text: 'NVIDIA Hardware Performance: Blackwell vs Vera Rubin', font: {size: 14, weight: 'bold'} }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+})();
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-amber);">[Visual/Evidence]</div>
-                    <div class="section-content">
-                        <div class="css-diagram">
-                            <div style="text-align: center; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--theme-purple); margin-bottom: 24px;">SCALING BEHAVIOR: TRANSFORMER VS MAMBA-3</div>
-                            <div class="grid-diagram">
-                                <div class="diagram-node" style="border-top-color: var(--text-light); background: #F1F5F9;">
-                                    <div class="diagram-node-title">Transformer (KV Cache)</div>
-                                    <div class="diagram-node-desc">Linearly growing memory & Quadratic compute complexity over sequence length</div>
-                                </div>
-                                <div class="diagram-node" style="border-top-color: var(--theme-purple); background: var(--theme-purple-light);">
-                                    <div class="diagram-node-title">Mamba-3 (Latent State)</div>
-                                    <div class="diagram-node-desc">Constant memory requirements (Fixed-size state) & Linear compute complexity</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+// News 4: Amazon Chart
+(function(){
+  const ctx = document.getElementById('amazonChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['2025 Spending (Est.)', '2026 Plan (Committed)'],
+      datasets: [
+        {
+          label: 'CAPEX (Billion USD)',
+          data: [131.5, 200], // 52% increase mapping
+          backgroundColor: ['#FCA5A5', '#EF4444'], // Red 300 & Red 500
+          borderRadius: 6,
+          barThickness: 60
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        title: { display: true, text: 'Amazon FY2026 CAPEX Plan ($200 Billion)', font: {size: 14, weight: 'bold'} }
+      },
+      scales: {
+        y: { beginAtZero: true, suggestedMax: 220 }
+      }
+    }
+  });
+})();
+</script>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-rose);">[Critical View]</div>
-                    <div class="section-content">
-                        <p>While Mamba-3 mitigates the memory-bound nature of inference and introduces constant memory requirements, the true long-term viability against hyper-optimized attention mechanisms in production environments remains a point of observation for enterprise deployment.</p>
-                    </div>
-                </div>
+<a href="index.html" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; padding: 14px 24px; background-color: var(--ink); color: #fff; text-decoration: none; border-radius: 50px; font-weight: 500; font-family: var(--sans); box-shadow: var(--shadow-lg); font-size: 14px; transition: transform 0.2s;">
+  ⬅️ 클로드 버전 보기
+</a>
 
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--text-muted);">[Community Sentiment]</div>
-                    <div class="section-content">
-                        <p>In benchmarks at the 1.5B scale, Mamba-3 MIMO demonstrated a nearly 4% relative improvement in language modeling over Transformer baselines while achieving up to 7x faster decoding at sequence lengths of 16,384.</p>
-                    </div>
-                </div>
-            </article>
-
-            <article id="article-4" class="article-card">
-                <div class="article-header">
-                    <div class="article-badges">
-                        <span class="badge" style="background: var(--theme-amber-light); color: var(--theme-amber);">CAPEX SUPERCYCLE</span>
-                        <span class="badge" style="background: var(--theme-emerald-light); color: var(--theme-emerald);">SOVEREIGNTY SHIFT</span>
-                    </div>
-                    <h2 class="article-title">4. Infrastructure Dominance: Amazon's $200 Billion CAPEX Plan</h2>
-                </div>
-
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-amber);">$200B</div>
-                        <div class="metric-label">FY2026 CAPEX</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-blue);">52%</div>
-                        <div class="metric-label">Increase over 2025</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-emerald);">$50B</div>
-                        <div class="metric-label">U.S. Gov AI Cloud</div>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-blue);">[Overview]</div>
-                    <div class="section-content">
-                        <p>Amazon has committed to a record-breaking $200 billion capital expenditure plan for fiscal year 2026, a 52% increase over its 2025 spending.</p>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-emerald);">[Strategic Impact]</div>
-                    <div class="section-content">
-                        <p>This represents the most aggressive infrastructure expansion in private sector history, exceeding analyst consensus expectations by more than $50 billion.</p>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-purple);">[Technical Deep Dive]</div>
-                    <div class="section-content">
-                        <p>The strategy focuses on "Total Infrastructure Sovereignty":</p>
-                        <ul>
-                            <li><strong>Custom Silicon:</strong> High-volume deployment of "Trainium 3," Amazon's proprietary training chip built on a 3nm process, designed to reduce dependency on NVIDIA.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-amber);">[Visual/Evidence]</div>
-                    <div class="section-content">
-                        <div class="chart-container">
-                            <canvas id="amazonChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-rose);">[Critical View]</div>
-                    <div class="section-content">
-                        <ul>
-                            <li><strong>Megascale Projects:</strong> Includes a $50 billion U.S. Government AI Cloud dedicated to national security workloads, alongside massive regional hubs in Indiana ($15 billion) and Louisiana ($12 billion).</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--text-muted);">[Community Sentiment]</div>
-                    <div class="section-content">
-                        <ul>
-                            <li><strong>Energy Verticalization:</strong> Investment in Small Modular Reactors (SMRs) and carbon-free nuclear power through partnerships with utilities like Constellation Energy to ensure 24/7 power for data centers.</li>
-                        </ul>
-                    </div>
-                </div>
-            </article>
-
-            <article id="article-5" class="article-card">
-                <div class="article-header">
-                    <div class="article-badges">
-                        <span class="badge" style="background: var(--theme-blue-light); color: var(--theme-blue);">MULTIMODAL AI</span>
-                        <span class="badge" style="background: var(--theme-purple-light); color: var(--theme-purple);">PRODUCT LAUNCH</span>
-                    </div>
-                    <h2 class="article-title">5. Democratizing Multimodal Production: Google Veo 3.1 Lite</h2>
-                </div>
-
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-blue);">$0.05</div>
-                        <div class="metric-label">720p Price/Sec</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-purple);">$0.08</div>
-                        <div class="metric-label">1080p Price/Sec</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" style="color: var(--theme-emerald);">DiT</div>
-                        <div class="metric-label">Core Architecture</div>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-blue);">[Overview]</div>
-                    <div class="section-content">
-                        <p>On March 31, 2026, Google released Veo 3.1 Lite, its most cost-effective video generation model to date, arriving days after OpenAI announced the shutdown of its Sora video generation platform.</p>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-emerald);">[Strategic Impact]</div>
-                    <div class="section-content">
-                        <p>Built on a Diffusion Transformer (DiT) architecture, it processes frames as spatio-temporal patches in a compressed latent space to maintain temporal consistency.</p>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-purple);">[Technical Deep Dive]</div>
-                    <div class="section-content">
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr><th>Model Tier</th><th>720p Price/Sec</th><th>1080p Price/Sec</th><th>Key Features</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td><strong>Veo 3.1 Lite</strong></td><td>$0.05</td><td>$0.08</td><td>Optimized for high-volume prototyping and batch production.</td></tr>
-                                    <tr><td><strong>Veo 3.1 Fast</strong></td><td>$0.10 (from Apr 7)</td><td>$0.12 (from Apr 7)</td><td>High-speed generation with cinematic control.</td></tr>
-                                    <tr><td><strong>Veo 3.1</strong></td><td>~$0.40</td><td>~$0.40</td><td>Full-fidelity output with native audio generation.</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-amber);">[Visual/Evidence]</div>
-                    <div class="section-content">
-                        <div class="css-diagram">
-                            <div style="text-align: center; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--theme-blue); margin-bottom: 24px;">VEO 3.1 LITE: PRODUCTION PIPELINE</div>
-                            <div class="diagram-node" style="border-top-color: var(--theme-blue);">
-                                <div class="diagram-node-title">Text/Image Prompts</div>
-                            </div>
-                            <div class="diagram-arrow">Spatio-temporal Patches</div>
-                            <div class="diagram-node" style="border-top-color: var(--theme-purple); background: var(--theme-purple-light);">
-                                <div class="diagram-node-title">Diffusion Transformer (DiT)</div>
-                                <div class="diagram-node-desc">Compressed Latent Space Processing</div>
-                            </div>
-                            <div class="diagram-arrow">Temporal Consistency Generation</div>
-                            <div class="diagram-node" style="border-top-color: var(--theme-emerald);">
-                                <div class="diagram-node-title">Final Output & SynthID</div>
-                                <div class="diagram-node-desc">Watermarked 720p/1080p Video (4/6/8 sec)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--theme-rose);">[Critical View]</div>
-                    <div class="section-content">
-                        <p>Veo 3.1 Lite includes SynthID digital watermarking for identifying AI-generated content and supports text-to-video and image-to-video at 720p and 1080p in both landscape (16:9) and portrait (9:16) orientations, with clip durations of 4, 6, or 8 seconds.</p>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <div class="section-title" style="color: var(--text-muted);">[Community Sentiment]</div>
-                    <div class="section-content">
-                        <p>The "Lite" designation refers not to generation speed — which matches Veo 3.1 Fast — but to an optimized parameter configuration that enables the significantly lower price point.</p>
-                    </div>
-                </div>
-            </article>
-
-            <section id="synthesis" class="synthesis-section">
-                <h2 class="synthesis-header">Summary and Forward Outlook</h2>
-                <div class="synthesis-content">
-                    <p>The early second quarter of 2026 marks the "Industrialization of Intelligence." The convergence of agentic architectures (Claude Code), hardware efficiency (NVIDIA Rubin, SambaNova SN50), and massive capital deployment (Amazon $200B plan) indicates that the market is now prioritizing infrastructure sovereignty and inference tokenomics over raw parameter scaling.</p>
-                    <p>The upcoming 12 months will likely see the rise of "Hybrid SSM-Attention" models as the enterprise standard, as they combine the efficiency of Mamba-3's fixed-state recurrence with the precise recall of Transformer attention. The pattern is already visible in production: NVIDIA's Nemotron 3 Super, a 120B hybrid Mamba-Transformer MoE, was released at GTC 2026 just one week before Mamba-3 itself.</p>
-                    <p>As autonomous agents move into high-stakes infrastructure and enterprise operations, the architectural and security lessons surfaced by the Claude Code leak — from multi-agent coordination to anti-distillation countermeasures — will increasingly define the baseline expectations for production-grade agentic systems.</p>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <script>
-        // Set global font for charts
-        Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.color = '#334155';
-
-        // Rubin vs Blackwell Chart
-        const ctxRubin = document.getElementById('rubinChart').getContext('2d');
-        new Chart(ctxRubin, {
-            type: 'bar',
-            data: {
-                labels: ['Inference (PFLOPS)', 'Training (PFLOPS)', 'Memory BW (TB/s)', 'Rack BW (x10 TB/s)'],
-                datasets: [
-                    {
-                        label: 'Blackwell (B200)',
-                        data: [10, 10, 8, 13],
-                        backgroundColor: '#94A3B8',
-                        borderRadius: 6
-                    },
-                    {
-                        label: 'Vera Rubin',
-                        data: [50, 35, 22, 26],
-                        backgroundColor: '#065F46',
-                        borderRadius: 6
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'top' },
-                    title: { display: true, text: 'NVIDIA Hardware Performance Evolution', font: { size: 14, weight: 'bold' } }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#E2E8F0' } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-
-        // Amazon CAPEX Chart
-        const ctxAmazon = document.getElementById('amazonChart').getContext('2d');
-        new Chart(ctxAmazon, {
-            type: 'bar',
-            data: {
-                labels: ['FY 2025 Spend', 'FY 2026 Projection (52% Increase)'],
-                datasets: [{
-                    label: 'Capital Expenditure (Billion USD)',
-                    data: [131.5, 200], 
-                    backgroundColor: ['#DBEAFE', '#B45309'],
-                    borderRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    title: { display: true, text: 'Amazon Capital Expenditure Supercycle ($B)', font: { size: 14, weight: 'bold' } }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#E2E8F0' } },
-                    x: { grid: { display: false }, barPercentage: 0.5 }
-                }
-            }
-        });
-    </script>
 </body>
 </html>
