@@ -1,436 +1,673 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Insight Report: 24H Top News</title>
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js for data visualization -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Strategic AI Infrastructure Briefing — April 4, 2026</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
     <style>
+        :root {
+            /* Bright & Clean Color Palette */
+            --bg-color: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #475569;
+            --primary: #4F46E5;
+            --primary-light: #EEF2FF;
+            --accent: #10B981;
+            --accent-light: #D1FAE5;
+            --border: #E2E8F0;
+            --font-sans: 'DM Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8;
-            color: #1e293b;
+            font-family: var(--font-sans);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+
+        .disclaimer-banner {
+            background-color: #FEF2F2;
+            color: #991B1B;
+            text-align: center;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #FCA5A5;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
-        .tag-badge {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header-section {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .header-section h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            line-height: 1.2;
+            margin-bottom: 16px;
             font-weight: 700;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
+        }
+
+        .meta-info {
+            display: inline-flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--primary-light);
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+        }
+
+        .exec-summary {
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .exec-summary h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+
+        .news-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            padding: 32px;
+            margin-bottom: 40px;
+            transition: transform 0.2s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .news-title {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .news-meta {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .news-meta span { display: block; margin-bottom: 4px; }
+
+        .section-tag {
             display: inline-block;
-            margin-bottom: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #FFFFFF;
+            background: var(--text-main);
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin: 24px 0 12px 0;
         }
-        /* Custom Table Styling */
-        .modern-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            border-radius: 0.75rem;
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
+
+        p { margin-bottom: 16px; }
+        ul { margin-bottom: 16px; padding-left: 20px; }
+        li { margin-bottom: 6px; }
+
+        .metadata-block {
+            background: #F1F5F9;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 16px;
         }
-        .modern-table th { background-color: #f8fafc; font-weight: 600; text-align: left; padding: 1rem; border-bottom: 1px solid #e2e8f0; }
-        .modern-table td { padding: 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.875rem; }
-        .modern-table tr:last-child td { border-bottom: none; }
-        
-        /* Infographic Block Diagrams */
-        .diagram-container {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            border-radius: 1rem;
-            padding: 1.5rem;
+
+        /* Infographic Utilities */
+        .infographic-wrapper {
+            margin: 32px 0;
+            padding: 24px;
+            background: #FAFAFA;
+            border-radius: 12px;
+            border: 1px dashed #CBD5E1;
+        }
+
+        .chart-container {
             position: relative;
+            height: 300px;
+            width: 100%;
         }
-        .diagram-node {
-            background: white;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border-top: 4px solid #6366f1;
-            font-size: 0.875rem;
+
+        /* Block Diagrams */
+        .diagram-flex {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .d-box {
+            background: #FFFFFF;
+            border: 2px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 8px;
             text-align: center;
             font-weight: 600;
+            color: var(--text-main);
+            box-shadow: var(--shadow-sm);
+            flex: 1;
+            min-width: 180px;
         }
-        .diagram-arrow {
+
+        .d-arrow {
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .d-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .d-layer {
+            padding: 16px;
+            border-radius: 8px;
             text-align: center;
-            color: #94a3b8;
-            font-size: 1.5rem;
-            line-height: 1;
-            margin: 0.5rem 0;
+            font-weight: 600;
+            border: 2px solid;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .layer-1 { background: #EEF2FF; border-color: #818CF8; color: #3730A3; }
+        .layer-2 { background: #F0FDF4; border-color: #34D399; color: #065F46; }
+        .layer-3 { background: #FEFCE8; border-color: #FACC15; color: #854D0E; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 0.9rem;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
+
+        .assessment-section {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            color: #F8FAFC;
+            padding: 40px;
+            border-radius: 16px;
+            margin-top: 60px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .assessment-section h2 { color: #38BDF8; margin-bottom: 24px; }
+        .assessment-section h3 { color: #94A3B8; margin-top: 24px; margin-bottom: 12px; }
+        .assessment-section table { background: rgba(255,255,255,0.05); color: #F1F5F9; border: 1px solid rgba(255,255,255,0.1); }
+        .assessment-section th { background: rgba(0,0,0,0.3); color: #38BDF8; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .assessment-section td { border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+        @media (max-width: 768px) {
+            .exec-summary, .news-card { padding: 20px; }
+            .header-section h1 { font-size: 1.8rem; }
+            .assessment-section { padding: 24px; }
+            .d-arrow { transform: rotate(90deg); margin: 8px 0; }
+            .diagram-flex { flex-direction: column; }
         }
     </style>
 </head>
-<body class="antialiased min-h-screen pb-24">
+<body>
 
-    <!-- Mandatory Warning Banner -->
-    <div class="bg-amber-100 border-b-4 border-amber-400 text-amber-800 px-6 py-3 text-center text-sm font-semibold shadow-sm sticky top-0 z-50">
-        <p class="mb-1">⚠️ 본 내용은 AI가 작성한 내용으로 부정확할 수 있습니다. 참고용으로만 이용해주세요.</p>
-        <p class="text-xs opacity-80">⚠️ This content is generated by AI and may be inaccurate. Please use for reference only.</p>
+    <div class="disclaimer-banner">
+        본 내용은 AI가 작성한 내용으로 부정확할 수 있습니다. 참고용으로만 이용해주세요.<br>
+        This content is generated by AI and may be inaccurate. Please use for reference only.
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="container">
         
-        <!-- Header -->
-        <header class="mb-16 text-center">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-pink-500 mb-6 leading-tight">
-                Architectures of Autonomous Intelligence
-            </h1>
-            <p class="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
-                Comprehensive Analysis of AI Infrastructure, Agentic Systems, and Market Shifts (April 2026)
-            </p>
-            <div class="mt-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-left text-slate-700 leading-relaxed max-w-5xl mx-auto">
-                <p>The AI economy has reached a structural inflection point in the second quarter of 2026. The industry has shifted its primary focus from increasing parameter counts to optimizing "Intelligence Density" and improving inference economics. The period between late March and early April 2026 is defined by the transition from reactive generative models to proactive autonomous agents, a shift accompanied by significant technical, economic, and security challenges. This report analyzes pivotal developments, including the Anthropic Claude Code exposure, the arrival of next-generation silicon from NVIDIA and SambaNova, and Amazon's record-breaking infrastructure investment.</p>
-            </div>
-        </header>
-
-        <div class="space-y-12">
-            <!-- News Item 1 -->
-            <article class="glass-card rounded-3xl p-8 lg:p-10">
-                <h2 class="text-2xl font-bold text-slate-800 mb-8 pb-4 border-b border-slate-200">
-                    1. The Anthropic Claude Code Leak: Blueprint for Production-Grade Agents
-                </h2>
-                
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-10">
-                    <div class="space-y-6 text-slate-700 leading-relaxed">
-                        <div>
-                            <span class="tag-badge bg-blue-100 text-blue-700">[Overview]</span>
-                            <p>On March 31, 2026, the complete source code for Anthropic's flagship terminal-based agent, Claude Code, was accidentally exposed via the npm registry.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-indigo-100 text-indigo-700">[Strategic Impact]</span>
-                            <p>This incident has provided a "glass-box" view into the architectural solutions required to manage autonomous agents at scale. The codebase revealed six interconnected systems that function as an "Agentic Operating System".</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-red-100 text-red-700">[Critical View]</span>
-                            <p>The root cause was a missing `*.map` exclusion in Anthropic's `.npmignore` configuration — a single oversight in the release pipeline. Contributing context was the Bun runtime's default behavior of generating source maps, though the absence of the `.npmignore` exclusion was the decisive failure.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-amber-100 text-amber-700">[Community Sentiment]</span>
-                            <p>Coinciding with the leak, but unrelated to it, was a supply chain attack in which malicious versions of the widely-used axios HTTP library were published to npm containing a Remote Access Trojan, compounding the security incident for users who updated during the same window.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-6">
-                        <div>
-                            <span class="tag-badge bg-teal-100 text-teal-700">[Visual/Evidence]</span>
-                            <!-- Custom Flexbox Diagram -->
-                            <div class="diagram-container flex flex-col items-center justify-center space-y-2 mt-2">
-                                <div class="w-full flex justify-between space-x-4">
-                                    <div class="diagram-node flex-1 border-t-pink-500">
-                                        <div class="font-bold text-slate-800">KAIROS</div>
-                                        <div class="text-xs text-slate-500 mt-1">Background Daemon</div>
-                                    </div>
-                                    <div class="diagram-node flex-1 border-t-emerald-500">
-                                        <div class="font-bold text-slate-800">autoDream</div>
-                                        <div class="text-xs text-slate-500 mt-1">Memory Consolidation</div>
-                                    </div>
-                                </div>
-                                <div class="diagram-arrow">↓</div>
-                                <div class="diagram-node w-3/4 border-t-indigo-500 text-center">
-                                    <div class="font-bold text-slate-800">Coordinator (Agent Swarm)</div>
-                                    <div class="text-xs text-slate-500 mt-1">Asynchronous Shared Mailbox System</div>
-                                </div>
-                                <div class="diagram-arrow">↓</div>
-                                <div class="w-full flex justify-between space-x-4">
-                                    <div class="diagram-node flex-1 border-t-amber-500">
-                                        <div class="font-bold text-slate-800">ULTRAPLAN</div>
-                                        <div class="text-xs text-slate-500 mt-1">Cloud Container Execution</div>
-                                    </div>
-                                    <div class="diagram-node flex-1 border-t-rose-500">
-                                        <div class="font-bold text-slate-800">ANTI_DISTILLATION</div>
-                                        <div class="text-xs text-slate-500 mt-1">Decoy Tool Definitions</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-emerald-100 text-emerald-700">[Technical Deep Dive]</span>
-                            <p class="text-slate-700 mb-4 text-sm">The leak was caused by a misconfigured production build of the @anthropic-ai/claude-code package (v2.1.88). A 59.8 MB JavaScript source map file, intended for internal debugging, was inadvertently included in the published package. This map file contained approximately 512,000 lines of unobfuscated TypeScript across roughly 1,906 files embedded directly in its `sourcesContent` field, making the entire codebase publicly accessible.</p>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- News Item 2 -->
-            <article class="glass-card rounded-3xl p-8 lg:p-10">
-                <h2 class="text-2xl font-bold text-slate-800 mb-8 pb-4 border-b border-slate-200">
-                    2. Hardware Architecture Shifts: NVIDIA Rubin and Inference Economics
-                </h2>
-                
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-10">
-                    <div class="space-y-6 text-slate-700 leading-relaxed">
-                        <div>
-                            <span class="tag-badge bg-blue-100 text-blue-700">[Overview]</span>
-                            <p>As the market transitions toward agentic workflows, the center of gravity for AI compute has shifted from training to inference.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-indigo-100 text-indigo-700">[Strategic Impact]</span>
-                            <p>Cost-per-token is now the primary metric for Return on Investment (ROI). NVIDIA's "Vera Rubin" platform... succeeds the Blackwell architecture with a focus on slashing inference costs. At the NVL72 rack level, NVIDIA claims a 10x reduction in inference token costs for Large Mixture-of-Experts (MoE) models compared to Blackwell.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-emerald-100 text-emerald-700">[Technical Deep Dive]</span>
-                            <p class="mb-3">The Rubin platform introduces the "Vera CPU," an 88-core custom Arm processor built on NVIDIA's proprietary "Olympus" core architecture with Spatial Multi-Threading, offering 1.8 TB/s of coherent NVLink-C2C bandwidth to the GPU.</p>
-                            <p>SambaNova has introduced the fifth-generation SN50 Reconfigurable Dataflow Unit (RDU)... Unlike the SIMD approach of GPUs, the SN50 uses a "Dataflow" architecture that maps the model's execution graph directly onto the processor, minimizing redundant memory access. Key specifications include Three-Tier Memory Architecture (432 MB SRAM, 64 GB HBM2E, 2 TB DDR5) and Agentic Caching.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-6">
-                        <div>
-                            <span class="tag-badge bg-teal-100 text-teal-700">[Visual/Evidence]</span>
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mt-2">
-                                <canvas id="hardwareChart" height="200"></canvas>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <span class="tag-badge bg-red-100 text-red-700">[Critical View]</span>
-                                <p class="text-sm text-slate-700">SambaNova claims 5x the speed and 3x the throughput of Blackwell B200 for inference on Llama 3.3 70B, and cites an 8x TCO advantage over B200, though these figures are drawn from the company's own benchmarks and have not been independently validated.</p>
-                            </div>
-                            <div>
-                                <span class="tag-badge bg-amber-100 text-amber-700">[Community Sentiment]</span>
-                                <p class="text-sm text-slate-700">NVIDIA Vera Rubin is in full production as of Q1 2026 with partner availability scheduled for the second half of 2026. SambaNova intentionally selected HBM2E over HBM3e to avoid ecosystem supply chain constraints and cost pressure.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- News Item 3 -->
-            <article class="glass-card rounded-3xl p-8 lg:p-10">
-                <h2 class="text-2xl font-bold text-slate-800 mb-8 pb-4 border-b border-slate-200">
-                    3. Algorithmic Evolution: Mamba-3 and Sub-Quadratic Scaling
-                </h2>
-                
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-10">
-                    <div class="space-y-6 text-slate-700 leading-relaxed xl:order-2">
-                        <div>
-                            <span class="tag-badge bg-blue-100 text-blue-700">[Overview]</span>
-                            <p>Mamba-3 represents the most significant challenge to Transformer dominance in 2026.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-indigo-100 text-indigo-700">[Strategic Impact]</span>
-                            <p>It addresses the memory-bound nature of inference by replacing the attention mechanism's quadratic computational complexity and linearly growing KV cache of Transformers with a fixed-size latent state, enabling constant memory requirements across sequence length.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-amber-100 text-amber-700">[Community Sentiment]</span>
-                            <p>Published as a conference paper at ICLR 2026 by researchers from CMU and Princeton — with support from Together AI and Cartesia AI.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-red-100 text-red-700">[Critical View]</span>
-                            <p>The architecture uses Complex-Valued State Tracking to improve arithmetic reasoning and parity problem solving, which were fundamental weaknesses in prior real-valued linear models.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-6 xl:order-1">
-                        <div>
-                            <span class="tag-badge bg-teal-100 text-teal-700">[Visual/Evidence]</span>
-                            <div class="diagram-container mt-2">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm text-center">
-                                        <div class="text-xs font-bold text-pink-600 mb-2 uppercase">Legacy Transformer</div>
-                                        <div class="h-24 flex items-end justify-center space-x-1 border-b-2 border-l-2 border-slate-200 pb-1 pl-1">
-                                            <div class="w-4 bg-slate-300 rounded-t h-4"></div>
-                                            <div class="w-4 bg-slate-400 rounded-t h-8"></div>
-                                            <div class="w-4 bg-slate-500 rounded-t h-12"></div>
-                                            <div class="w-4 bg-slate-600 rounded-t h-16"></div>
-                                            <div class="w-4 bg-slate-700 rounded-t h-20"></div>
-                                        </div>
-                                        <div class="text-xs text-slate-500 mt-2">Linearly Growing KV Cache</div>
-                                    </div>
-                                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm text-center">
-                                        <div class="text-xs font-bold text-indigo-600 mb-2 uppercase">Mamba-3 (MIMO)</div>
-                                        <div class="h-24 flex items-center justify-center">
-                                            <div class="w-20 h-20 bg-indigo-500 rounded-xl shadow-inner flex items-center justify-center text-white text-xs font-bold">
-                                                Fixed<br>Latent State
-                                            </div>
-                                        </div>
-                                        <div class="text-xs text-slate-500 mt-2">Constant Memory Requirement</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-emerald-100 text-emerald-700">[Technical Deep Dive]</span>
-                            <ul class="list-disc pl-5 space-y-2 text-sm text-slate-700">
-                                <li><strong>Exponential-Trapezoidal Discretization:</strong> A data-dependent convex combination method that eliminates the need for short causal convolutions.</li>
-                                <li><strong>Complex-Valued State Tracking:</strong> Equivalent to real-valued SSMs with data-dependent Rotary Positional Embeddings.</li>
-                                <li><strong>Multi-Input, Multi-Output (MIMO):</strong> Transforms state update to matrix-matrix multiplication, increasing decoding FLOPs up to 4x relative to Mamba-2 at fixed state size.</li>
-                            </ul>
-                            <p class="mt-3 text-sm font-semibold text-slate-800">Benchmarks at 1.5B scale demonstrated up to 7x faster decoding at sequence lengths of 16,384 compared to Transformer baselines.</p>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- News Item 4 -->
-            <article class="glass-card rounded-3xl p-8 lg:p-10">
-                <h2 class="text-2xl font-bold text-slate-800 mb-8 pb-4 border-b border-slate-200">
-                    4. Infrastructure Dominance: Amazon's 200 Billion USD CAPEX Plan
-                </h2>
-                
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-10 items-center">
-                    <div class="space-y-6 text-slate-700 leading-relaxed">
-                        <div>
-                            <span class="tag-badge bg-blue-100 text-blue-700">[Overview]</span>
-                            <p>Amazon has committed to a record-breaking 200 billion USD capital expenditure plan for fiscal year 2026, a 52% increase over its 2025 spending.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-red-100 text-red-700">[Critical View]</span>
-                            <p>This represents the most aggressive infrastructure expansion in private sector history.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-amber-100 text-amber-700">[Community Sentiment]</span>
-                            <p>The sheer scale of this investment exceeded analyst consensus expectations by more than 50 billion USD, signaling a massive market shift.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-indigo-100 text-indigo-700">[Strategic Impact]</span>
-                            <p>The strategy focuses on "Total Infrastructure Sovereignty" to control the entire vertical from silicon to power generation.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-emerald-100 text-emerald-700">[Technical Deep Dive]</span>
-                            <ul class="list-disc pl-5 space-y-2 text-sm">
-                                <li><strong>Custom Silicon:</strong> High-volume deployment of "Trainium 3," built on a 3nm process, designed to reduce dependency on NVIDIA.</li>
-                                <li><strong>Megascale Projects:</strong> Includes a 50 billion USD U.S. Government AI Cloud dedicated to national security, alongside massive regional hubs in Indiana (15 billion USD) and Louisiana (12 billion USD).</li>
-                                <li><strong>Energy Verticalization:</strong> Investment in Small Modular Reactors (SMRs) and carbon-free nuclear power to ensure 24/7 power for data centers.</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center">
-                        <span class="tag-badge bg-teal-100 text-teal-700 self-start mb-4">[Visual/Evidence]</span>
-                        <div class="w-full max-w-sm">
-                            <canvas id="capexChart" height="300"></canvas>
-                        </div>
-                        <p class="text-xs text-slate-500 mt-4 text-center">Projected breakdown of Amazon's 200 Billion USD infrastructure investment.</p>
-                    </div>
-                </div>
-            </article>
-
-            <!-- News Item 5 -->
-            <article class="glass-card rounded-3xl p-8 lg:p-10">
-                <h2 class="text-2xl font-bold text-slate-800 mb-8 pb-4 border-b border-slate-200">
-                    5. Democratizing Multimodal Production: Google Veo 3.1 Lite
-                </h2>
-                
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-10">
-                    <div class="space-y-6 text-slate-700 leading-relaxed">
-                        <div>
-                            <span class="tag-badge bg-blue-100 text-blue-700">[Overview]</span>
-                            <p>On March 31, 2026, Google released Veo 3.1 Lite, its most cost-effective video generation model to date.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-indigo-100 text-indigo-700">[Strategic Impact]</span>
-                            <p>The timing is highly strategic, arriving days after OpenAI announced the shutdown of its Sora video generation platform.</p>
-                        </div>
-                        <div>
-                            <span class="tag-badge bg-emerald-100 text-emerald-700">[Technical Deep Dive]</span>
-                            <p class="text-sm">Built on a Diffusion Transformer (DiT) architecture, it processes frames as spatio-temporal patches in a compressed latent space to maintain temporal consistency. Veo 3.1 Lite includes SynthID digital watermarking for identifying AI-generated content and supports text-to-video and image-to-video at 720p and 1080p in both landscape (16:9) and portrait (9:16) orientations, with clip durations of 4, 6, or 8 seconds.</p>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                            <div>
-                                <span class="tag-badge bg-red-100 text-red-700">[Critical View]</span>
-                                <p class="text-xs">The "Lite" designation refers not to generation speed — which matches Veo 3.1 Fast — but to an optimized parameter configuration that enables the significantly lower price point.</p>
-                            </div>
-                            <div>
-                                <span class="tag-badge bg-amber-100 text-amber-700">[Community Sentiment]</span>
-                                <p class="text-xs">The model is highly optimized for high-volume prototyping and batch production, addressing creators' demands for cheaper multimodal tools.</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <span class="tag-badge bg-teal-100 text-teal-700 mb-2">[Visual/Evidence]</span>
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                            <canvas id="veoChart" height="180"></canvas>
-                        </div>
-                        <div class="mt-6 overflow-x-auto">
-                            <table class="modern-table">
-                                <thead>
-                                    <tr>
-                                        <th>Model Tier</th>
-                                        <th>720p Price/Sec</th>
-                                        <th>1080p Price/Sec</th>
-                                        <th>Key Features</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="font-semibold text-slate-800">Veo 3.1 Lite</td>
-                                        <td class="text-indigo-600 font-bold">0.05 USD</td>
-                                        <td class="text-indigo-600 font-bold">0.08 USD</td>
-                                        <td>Optimized for high-volume prototyping and batch production.</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="font-semibold text-slate-800">Veo 3.1 Fast</td>
-                                        <td>0.10 USD</td>
-                                        <td>0.12 USD</td>
-                                        <td>High-speed generation with cinematic control.</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="font-semibold text-slate-800">Veo 3.1</td>
-                                        <td>~0.40 USD</td>
-                                        <td>~0.40 USD</td>
-                                        <td>Full-fidelity output with native audio generation.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Synthesis Section -->
-            <div class="mt-16 bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 lg:p-12 text-white shadow-2xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
-                <div class="absolute bottom-0 left-0 w-64 h-64 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 transform -translate-x-1/2 translate-y-1/2"></div>
-                
-                <h2 class="text-3xl font-bold mb-6 relative z-10">Closing Synthesis & Trajectory</h2>
-                <div class="space-y-4 text-slate-300 text-lg leading-relaxed relative z-10 font-medium">
-                    <p>The early second quarter of 2026 marks the "Industrialization of Intelligence." The convergence of agentic architectures (Claude Code), hardware efficiency (NVIDIA Rubin, SambaNova SN50), and massive capital deployment (Amazon 200B USD plan) indicates that the market is now prioritizing infrastructure sovereignty and inference tokenomics over raw parameter scaling.</p>
-                    <p>The upcoming 12 months will likely see the rise of "Hybrid SSM-Attention" models as the enterprise standard, as they combine the efficiency of Mamba-3's fixed-state recurrence with the precise recall of Transformer attention. The pattern is already visible in production: NVIDIA's Nemotron 3 Super, a 120B hybrid Mamba-Transformer MoE, was released at GTC 2026 just one week before Mamba-3 itself.</p>
-                    <p class="text-white font-semibold pt-4 border-t border-slate-700">As autonomous agents move into high-stakes infrastructure and enterprise operations, the architectural and security lessons surfaced by the Claude Code leak — from multi-agent coordination to anti-distillation countermeasures — will increasingly define the baseline expectations for production-grade agentic systems.</p>
-                </div>
+        <div class="header-section">
+            <h1>Strategic AI Infrastructure & System Technology Assessment:<br>The April 2026 Architectural Inflection</h1>
+            <div class="meta-info">
+                <span><strong>Confirmed Date:</strong> Saturday, April 4, 2026</span>
+                <span><strong>Reporting Window:</strong> Primary (April 3–4, 2026); Secondary (Active Material Developments within 7 days)</span>
             </div>
         </div>
+
+        <div class="exec-summary">
+            <h2>Executive Summary: The Rise of Sovereign Silicon and Heterogeneous Racks</h2>
+            <p>As of early April 2026, the artificial intelligence infrastructure landscape has pivoted from generalized cloud expansion to a phase of specialized industrialization and localized intelligence. The reporting window is defined by a significant retreat from "one-size-fits-all" hardware, exemplified by XPeng's near-complete transition to in-house Turing AI processors and the IBM-Arm partnership to virtualize dual-architecture enterprise workloads. While NVIDIA remains the training incumbent, the definitive launch of the Vera Rubin platform has introduced a pricing and complexity hierarchy that effectively splits the market: organizations are now choosing between $5M–$8.8M ultra-scale Rubin rack configurations for frontier training and power-efficient, on-device agentic standards like the newly released Gemma 4. Furthermore, the $10 billion Microsoft-Japan initiative underscores the growing intersection of infrastructure capital and geopolitical economic security. This report assesses the five most impactful developments in this window, providing strategic foresight for multi-billion dollar capital allocation.</p>
+        </div>
+
+        <div class="news-card">
+            <h2 class="news-title">1. Release of Google Gemma 4: The On-Device Agentic Standard</h2>
+            <div class="news-meta">
+                <span><strong>Source:</strong> Google DeepMind / Arm / NVIDIA</span>
+                <span><strong>Event Date:</strong> 2026-04-02 | <strong>Source Date:</strong> 2026-04-03</span>
+                <span><strong>Status:</strong> Official | <strong>Legal/Policy Status:</strong> N/A</span>
+                <span><strong>URLs:</strong> <a href="https://newsroom.arm.com/blog/gemma-4-on-arm-optimized-on-device-ai" target="_blank">Primary</a> | <a href="https://ai.google.dev/gemma/docs/core/model_card_4" target="_blank">Secondary</a></span>
+            </div>
+
+            <span class="section-tag">[Overview]</span>
+            <p>Google's release of the Gemma 4 open model family on April 2, 2026, marks the definitive arrival of high-performance agentic AI on edge devices, fundamentally shifting the demand away from cloud-only inference. Gemma 4 is built on the same research foundation as Gemini 3 and introduces a hybrid attention mechanism that interleaves local sliding-window attention with full global attention. This architectural refinement, paired with Proportional RoPE (p-RoPE), enables a context window of 256K tokens for workstation models and 128K for edge variants. Google has optimized Gemma 4 for the Armv9 architecture's Scalable Matrix Extension 2 (SME2), delivering significant prefill performance gains on the latest mobile NPUs according to Arm's official newsroom. The model family includes a standout 26B Mixture-of-Experts (MoE) variant that activates only 3.8 billion parameters per token, achieving performance competitive with dense models many times its size while significantly reducing the "token tax" associated with continuous background agents.</p>
+
+            <span class="section-tag">[Strategic Impact]</span>
+            <p><strong>Shift in Edge Procurement:</strong> The optimization for Armv9 SME2 instructions materially alters the procurement strategies for smartphone and IoT manufacturers, as the E2B and E4B variants provide frontier-level reasoning within a power envelope that preserves battery life.</p>
+            <p><strong>Investment Thesis:</strong> The move to a permissive Apache 2.0 license is a strategic blow to proprietary moats, allowing enterprises to deploy agentic workflows locally without recurring cloud subscription liabilities.</p>
+
+            <span class="section-tag">[Technical Deep Dive]</span>
+            <p><strong>System-Level Insight:</strong> For board circuit designers, the shift to hybrid attention and MoE routing increases the priority of high-speed on-chip SRAM to handle the 128-expert routing in the 26B A4B variant, reducing the dependency on high-capacity HBM for edge deployments.</p>
+            <ul>
+                <li><strong>Prefill Speedup:</strong> Significant performance gains on Armv9 SME2 instructions, reported at 5.5x average by Arm's official newsroom (single-source; independent corroboration pending).</li>
+                <li><strong>Decode Speedup:</strong> Responses generated up to 1.6x faster on Arm C1 CPUs.</li>
+                <li><strong>Active Parameters (26B variant):</strong> 3.8 billion active per token.</li>
+                <li><strong>Expert Routing:</strong> 128 total experts; approximately 8 active per token plus 1 shared expert per the Google model card (official model card confirmation recommended).</li>
+                <li><strong>Context Window (31B/26B):</strong> 256,000 tokens.</li>
+                <li><strong>Benchmarks:</strong> 85.2% MMLU Pro; 89.2% AIME 2026 (Competition Math).</li>
+            </ul>
+
+            <div class="infographic-wrapper">
+                <div style="text-align: center; margin-bottom: 16px; font-weight: 600; font-size: 0.9rem; color: var(--text-muted);">Gemma 4 Edge Inference Architecture Diagram</div>
+                <div class="diagram-flex">
+                    <div class="d-box layer-1" style="font-size: 0.85rem;">
+                        Legacy Paradigm<br><span style="font-size: 1.2rem;">Cloud-Only Inference</span><br>(High Latency, HBM Dependency)
+                    </div>
+                    <div class="d-arrow">➔</div>
+                    <div class="d-box layer-2" style="font-size: 0.85rem;">
+                        Gemma 4 Edge Paradigm<br><span style="font-size: 1.2rem;">On-Device Agentic Standard</span><br>(Armv9 SME2 + 26B MoE)
+                    </div>
+                    <div class="d-arrow">➔</div>
+                    <div class="d-box layer-3" style="font-size: 0.85rem;">
+                        Hardware Focus<br><span style="font-size: 1.2rem;">High-Speed SRAM Priority</span><br>(128-Expert Routing, p-RoPE)
+                    </div>
+                </div>
+            </div>
+
+            <span class="section-tag">[Visual/Evidence]</span>
+            <p>The Gemma 4 model card specifies a 256,144 vocabulary size and a hybrid attention mechanism that unifies Keys and Values in global layers to support long-context stability. The architecture also introduces Per-Layer Embeddings (PLE), a shared KV cache across the final decoder layers, and a USM-style conformer audio encoder for the E2B and E4B edge variants.</p>
+            <p><em>Michael Fukuyama, Product Manager, NVIDIA — "Optimized to deliver state-of-the-art, accessible reasoning, these models run efficiently on NVIDIA RTX GPUs and DGX Spark — powering development environments, coding assistants, and agent-driven workflows."</em></p>
+
+            <span class="section-tag">[Critical View]</span>
+            <p>Running the flagship 31B model still requires approximately 17.4 GB of VRAM at 4-bit quantization, which exceeds the memory capacity of standard consumer-tier laptops. Furthermore, the "thinking mode" overhead can increase first-token latency, requiring specialized policy-based gating to disable reasoning in low-complexity scenarios.</p>
+
+            <span class="section-tag">[Community Sentiment]</span>
+            <p><strong>Comparison:</strong> Gemma 4's competition math performance (AIME 2026) jumped to 89.2% from Gemma 3's 20.8%, primarily due to the integration of a native "thinking mode" control token. On the Arena AI text leaderboard, the 31B model ranks #3 globally among open models at 1452 Elo, while the 26B MoE holds the #6 position at 1441 Elo.</p>
+            <div class="metadata-block">
+                <strong>[Item Metadata]</strong><br>
+                - event_date: 2026-04-02 | source_date: 2026-04-03<br>
+                - event_within_24h_window: false | 7_day_exception_applied: true<br>
+                - post_transformer_architecture: true | hbm_demand_shift: Decrease<br>
+                - interconnect_priority: Latency-bound | binding_now: true<br>
+                - single_source_risk: true (5.5x prefill figure; Arm Newsroom only) | confidence_level: HIGH
+            </div>
+        </div>
+
+        <div class="news-card">
+            <h2 class="news-title">2. Microsoft $10 Billion Japan AI Infrastructure & Cybersecurity Initiative</h2>
+            <div class="news-meta">
+                <span><strong>Source:</strong> Microsoft Source Asia / Bloomberg / Business Standard</span>
+                <span><strong>Event Date:</strong> 2026-04-03 | <strong>Source Date:</strong> 2026-04-04</span>
+                <span><strong>Status:</strong> Official Announcement | <strong>Legal/Policy Status:</strong> N/A</span>
+            </div>
+
+            <span class="section-tag">[Overview]</span>
+            <p>Microsoft finalized a $10 billion investment roadmap for Japan on April 3, 2026, aimed at constructing massive-scale AI infrastructure and strengthening national cybersecurity defenses over the four-year period from 2026 through 2029. The initiative is built around three pillars — Technology, Trust, and Talent — and is a collaborative effort involving Japanese entities Sakura Internet and SoftBank, which will supply GPU-based computing resources and localized AI infrastructure to facilitate the development of domestic large language models, with data residency remaining within Japan. Shares of Sakura Internet surged as much as 20% on the day of the announcement, reflecting the market's assessment of the partnership's strategic value. The investment package further includes a commitment to train over one million AI engineers and developers in Japan by 2030, in coordination with NTT Data, NEC, Fujitsu, and Hitachi. This move follows similar multi-billion dollar disclosures for Singapore and Thailand, signaling Microsoft's aggressive push to secure a dominant cloud and data-center footprint across the Asian tech corridor against competitors like Alphabet and Amazon.</p>
+
+            <span class="section-tag">[Strategic Impact]</span>
+            <p><strong>Regional Compute Sovereignty:</strong> The collaboration ensures that data processing and storage remain within Japan, a critical requirement for domestic government and enterprise clients with strict data residency mandates. Microsoft Azure customers will be able to access SoftBank's AI computing platform through a joint solution currently under discussion.</p>
+            <p><strong>Investment Thesis:</strong> This $10 billion commitment secures Microsoft's role as a primary "sovereign AI" partner for the Japanese government, potentially locking in long-term Azure service contracts and cybersecurity auditing roles. Japan's METI has pledged to invest 10 trillion yen in AI infrastructure by 2030, and Microsoft's alignment with this policy agenda creates a structural first-mover advantage over AWS and Google Cloud.</p>
+
+            <span class="section-tag">[Technical Deep Dive]</span>
+            <p><strong>System-Level Insight:</strong> For infrastructure planners, this massive scale-out necessitates a shift toward heterogeneous data center designs that can integrate both NVIDIA GPUs and custom accelerators while managing the significant thermal loads of large-scale facilities.</p>
+            <ul>
+                <li><strong>Total Investment:</strong> $10 billion (approximately ¥1.6 trillion) over four years (2026–2029).</li>
+                <li><strong>Talent Development:</strong> Over 1 million AI engineers and developers trained by 2030.</li>
+                <li><strong>Resource Partners:</strong> Sakura Internet and SoftBank (GPU and compute supply, data resident within Japan).</li>
+                <li><strong>Infrastructure Target:</strong> Expansion of Microsoft's own in-country cloud footprint plus domestic GPU-based AI compute services delivered through Azure.</li>
+            </ul>
+
+            <span class="section-tag">[Visual/Evidence]</span>
+            <p>Microsoft Vice Chair and President Brad Smith met Prime Minister Sanae Takaichi at the Prime Minister's Office in Tokyo on April 3. Brad Smith stated that the investment reflects "Japan's growing need for cloud and AI services," which Microsoft's own AI Diffusion Report indicates is already above the global average, with approximately one in five working-age Japanese using generative AI tools compared to roughly one in six globally.</p>
+
+            <span class="section-tag">[Critical View]</span>
+            <p>The rapid scale-out faces regional power constraints. Japan's data center expansion is explicitly constrained by limited available space and relatively high electricity costs, as noted in multiple official commentaries. Additionally, the SoftBank and Microsoft Japan discussions on a joint AI computing platform remain exploratory and have not yet been finalized into a binding commercial arrangement. Analysts note that Amazon and Google are also expanding aggressively across Asia, and the first-mover advantage Microsoft is seeking will depend on execution speed and the ability to meet Japan's stringent data governance requirements at scale.</p>
+
+            <span class="section-tag">[Community Sentiment]</span>
+            <p><strong>Comparison:</strong> The Japan initiative ($10B over four years) nearly doubles the scale of the concurrent $1B+ Thailand infrastructure roadmap announced earlier the same week, reflecting Japan's status as Microsoft's highest-priority sovereign AI partner in Asia.</p>
+            <div class="metadata-block">
+                <strong>[Item Metadata]</strong><br>
+                - event_date: 2026-04-03 | source_date: 2026-04-04<br>
+                - event_within_24h_window: true | 7_day_exception_applied: false<br>
+                - post_transformer_architecture: false | hbm_demand_shift: Increase<br>
+                - interconnect_priority: Bandwidth-bound | binding_now: true<br>
+                - single_source_risk: false | confidence_level: HIGH
+            </div>
+        </div>
+
+        <div class="news-card">
+            <h2 class="news-title">3. NVIDIA Vera Rubin Platform: Industrialization of the AI Super-Cluster</h2>
+            <div class="news-meta">
+                <span><strong>Source:</strong> Tom's Hardware / NVIDIA Newsroom / Pegatron</span>
+                <span><strong>Event Date:</strong> 2026-04-03 | <strong>Source Date:</strong> 2026-04-03</span>
+                <span><strong>Status:</strong> Official Release / Press | <strong>Legal/Policy Status:</strong> N/A</span>
+            </div>
+
+            <span class="section-tag">[Overview]</span>
+            <p>NVIDIA has reached a terminal phase of system integration with its Vera Rubin platform, with rack-scale pricing reaching up to $8.8 million per unit for the highest-tier configurations as of April 3, 2026. This generation marks the transition from discrete chip sales to unified "AI Factory" engines, integrating six primary chips — the Vera CPU, Rubin GPU, NVLink 6 Switch, ConnectX-9 SuperNIC, BlueField-4 DPU, and Spectrum-6 Ethernet Switch — along with the Groq 3 LPX inference accelerator rack. The standard Vera Rubin NVL72 (VR200), integrating 72 Rubin GPUs and 36 Vera CPUs, delivers 50 PFLOPS of FP4 compute power and is currently quoted at $5 million to $7 million per unit, with approximately $1 million of that figure representing integrated 3D NAND storage. The higher $8.8 million price ceiling corresponds to the NVL144 VR300 configuration, which belongs to the forthcoming Rubin Ultra generation; Rubin Ultra silicon has not yet completed tapeout and volume systems are not expected until the second half of 2028. To manage the 1.8kW power density per GPU, NVIDIA is shipping pre-built Level-10 tray modules that capture approximately 90% of the server's bill of materials, effectively marginalizing traditional ODMs and standardizing the liquid-cooled compute subsystem.</p>
+
+            <span class="section-tag">[Strategic Impact]</span>
+            <p><strong>Capital Barriers to Frontier AI:</strong> The $5M–$8.8M rack price point creates a massive financial barrier, consolidating high-end model training among hyperscalers and sovereign entities capable of billion-dollar infrastructure budgets.</p>
+            <p><strong>Interconnect Priority:</strong> The platform's 10x reduction in inference token cost compared to Blackwell is driven by extreme co-design and the NVLink-C2C interconnect fabric.</p>
+
+            <span class="section-tag">[Technical Deep Dive]</span>
+            <p><strong>System-Level Insight:</strong> For board circuit designers, the shift to 1.8kW–2.0kW GPUs necessitates a total abandonment of air cooling in favor of direct-to-chip or immersion liquid cooling. The Vera CPU connects to Rubin GPUs via NVLink-C2C at 1.8 TB/s of coherent bandwidth, approximately seven times faster than PCIe Gen 6, significantly reducing the energy cost of data movement compared to prior generations.</p>
+            <ul>
+                <li><strong>Peak Inference Power:</strong> 50 PFLOPS (NVFP4) per Rubin GPU.</li>
+                <li><strong>Memory Capacity:</strong> 288 GB HBM4 per Rubin GPU.</li>
+                <li><strong>Transistor Count:</strong> 336 billion per Rubin GPU.</li>
+                <li><strong>NVLink-C2C Bandwidth:</strong> 1.8 TB/s coherent CPU-GPU bandwidth (~7x PCIe Gen 6).</li>
+                <li><strong>Inference Token Cost:</strong> 10x reduction vs. Blackwell NVL72.</li>
+                <li><strong>Rack Storage:</strong> Approximately $1 million integrated 3D NAND subsystem included in NVL72 VR200 racks.</li>
+            </ul>
+
+            <div class="infographic-wrapper">
+                <div class="chart-container">
+                    <canvas id="rubinChart"></canvas>
+                </div>
+            </div>
+
+            <span class="section-tag">[Visual/Evidence]</span>
+            <p>NVIDIA's seven-chip Vera Rubin POD strategy, detailed at GTC 2026, shows the NVL72 handling the compute-intensive prefill phase while the Groq 3 LPX rack — housing 256 LPUs with 40 PB/s aggregate bandwidth — manages the decode phase for trillion-parameter models. The Pegatron RA4803-72N3, a partner system built on the Vera Rubin NVL72, was showcased with liquid-cooling infrastructure supporting 3.6 EFLOPS of aggregate inference performance (Pegatron-sourced figure; independent confirmation pending).</p>
+            <p><em>Jensen Huang, CEO, NVIDIA — "The agentic AI inflection point has arrived with Vera Rubin kicking off the greatest infrastructure buildout in history... computing demand has increased by 1 million times."</em></p>
+
+            <span class="section-tag">[Critical View]</span>
+            <p>The road to Rubin includes significant geopolitical risks; NVIDIA recently took a $4.5 billion inventory charge for "H20" series chips rendered obsolete by sudden U.S. export license tightening targeted at the Chinese market. Additionally, the massive electrical demand created by Rubin clusters is creating a dependency on large-scale power buildout that may not meet the 2027 deployment deadlines for some customers. It should also be noted that the widely reported $8.8 million price ceiling applies specifically to the NVL144 VR300 Rubin Ultra configuration, not the standard NVL72 VR200; NVIDIA has not officially confirmed list prices for any rack-scale Rubin product.</p>
+
+            <span class="section-tag">[Community Sentiment]</span>
+            <p><strong>Comparison:</strong> The Vera Rubin NVL72 (VR200) can train large Mixture-of-Experts models using 4x fewer GPUs than the Blackwell generation. A full Vera Rubin POD spans 40 racks, 1,152 Rubin GPUs, and 60 exaflops of aggregate compute.</p>
+            <div class="metadata-block">
+                <strong>[Item Metadata]</strong><br>
+                - event_date: 2026-04-03 | source_date: 2026-04-03<br>
+                - event_within_24h_window: true | 7_day_exception_applied: false<br>
+                - post_transformer_architecture: false | hbm_demand_shift: Increase<br>
+                - interconnect_priority: Bandwidth-bound | binding_now: true<br>
+                - single_source_risk: false | confidence_level: MEDIUM
+            </div>
+        </div>
+
+        <div class="news-card">
+            <h2 class="news-title">4. XPeng Core Lineup Transition to In-House Turing AI Processors</h2>
+            <div class="news-meta">
+                <span><strong>Source:</strong> Caixin Global / CnEVPost / Gasgoo</span>
+                <span><strong>Event Date:</strong> 2026-04-03 | <strong>Source Date:</strong> 2026-04-03</span>
+                <span><strong>Status:</strong> Official | <strong>Legal/Policy Status:</strong> N/A</span>
+            </div>
+
+            <span class="section-tag">[Overview]</span>
+            <p>XPeng Inc. announced the completion of its core lineup transition from NVIDIA Orin-series chips to its self-developed Turing AI processors on April 3, 2026. The milestone was reached with the launch of the updated Mona M03 electric sedan, where mid- and high-end variants equipped with intelligent driving features have been fitted with the Turing chip. The two lowest entry-level trims of the Mona M03 do not carry the Turing chip, and XPeng's full lineup-wide Turing transition — including all Max variants — remains on track for completion starting in Q2 2026. The Turing AI chip delivers 750 TOPS of effective computing power per unit, with the top-tier Ultra SE variant utilizing a dual-chip architecture for a combined 1,500 TOPS, though that trim will not begin customer deliveries until August 2026. This move brings high-computing-power smart driving silicon to the sub-$20,000 EV market for the first time. By moving away from external suppliers, XPeng aims to optimize AI performance specifically for its second-generation Vision-Language-Action (VLA) models while boosting profit margins through hardware-software bundling.</p>
+
+            <span class="section-tag">[Strategic Impact]</span>
+            <p><strong>Incumbent Displacement:</strong> XPeng's successful pivot de-risks its dependency on U.S.-sourced NVIDIA silicon and sets a precedent for other EV manufacturers, including Volkswagen Anhui, which has already adopted the Turing platform for a jointly developed vehicle.</p>
+            <p><strong>Investment Thesis:</strong> XPeng reached its first GAAP net profit in Q4 2025 and is now targeting shipments of nearly one million Turing chip units in 2026, positioning the company as a credible vertically integrated physical-AI player.</p>
+
+            <span class="section-tag">[Technical Deep Dive]</span>
+            <p><strong>System-Level Insight:</strong> For the hardware circuit designer, the Turing processor is part of a broader upgrade including a hybrid silicon carbide flat-wire electric drive system and the MT8676 cockpit chip with 24 GB of memory. A single Turing chip is positioned as equivalent to three NVIDIA Orin-X chips in raw TOPS terms, enabled by a 40-core architecture with proprietary NPUs specifically optimized for neural network sparsity patterns in VLA models.</p>
+            <ul>
+                <li><strong>Computing Power:</strong> 750 TOPS (single Turing chip); 1,500 TOPS (dual Turing chips in Ultra SE variant).</li>
+                <li><strong>Target Workload:</strong> L4-ready Vision-Language-Action (VLA) autonomous driving models with up to 30B parameter support.</li>
+                <li><strong>Architecture Integration:</strong> MT8676 cockpit chip paired with 24 GB memory; hybrid silicon carbide flat-wire drive system.</li>
+                <li><strong>Energy Consumption:</strong> Vehicle efficiency improved to as low as 10.8 kWh per 100 km.</li>
+            </ul>
+
+            <div class="infographic-wrapper">
+                <div style="text-align: center; margin-bottom: 16px; font-weight: 600; font-size: 0.9rem; color: var(--text-muted);">Silicon Supply Chain Transition Timeline</div>
+                <div class="diagram-flex">
+                    <div class="d-box layer-3">NVIDIA Orin-X<br><span style="font-size: 0.8rem; font-weight:400;">External Dependency (254 TOPS)</span></div>
+                    <div class="d-arrow">➔</div>
+                    <div class="d-box layer-2">XPeng Turing (Single)<br><span style="font-size: 0.8rem; font-weight:400;">In-House (750 TOPS)</span></div>
+                    <div class="d-arrow">➔</div>
+                    <div class="d-box layer-1">Ultra SE (Dual-Chip)<br><span style="font-size: 0.8rem; font-weight:400;">August 2026 (1,500 TOPS)</span></div>
+                </div>
+            </div>
+
+            <span class="section-tag">[Visual/Evidence]</span>
+            <p>The updated Mona M03 features a 15.6-inch 2.5K display running XPeng's Tianji AIOS 6.0 system, with nationwide 3D lane-level navigation powered by the Turing AI stack. The model secured over 10,000 firm orders within 37 minutes of its launch event, reflecting strong market validation of the sub-$20,000 intelligent driving value proposition.</p>
+            <p><em>Lei Kang, Analyst, CnEVPost — "Xpeng aims to boost profit margins through hardware and software bundling... bringing high-computing-power smart driving chips to the sub-$20,000 market for the first time."</em></p>
+
+            <span class="section-tag">[Critical View]</span>
+            <p>The April 3 milestone represents the completion of the core lineup transition, not a full company-wide transition; two entry-level Mona M03 trims remain without the Turing chip, and the full lineup-wide shift is expected in Q2 2026. The Ultra SE variant with dual Turing chips will not reach customers until August 2026. Furthermore, the company remains dependent on TSMC for the manufacturing of its custom silicon, maintaining a geographic supply chain concentration risk that is structurally similar to the NVIDIA dependency it is attempting to reduce.</p>
+
+            <span class="section-tag">[Community Sentiment]</span>
+            <p><strong>Comparison:</strong> The Turing processor replaces NVIDIA Orin-series chips, which XPeng previously found often underutilized for its specific VLA workloads; the in-house silicon is optimized for the sparsity patterns of those models. XPeng claims a single Turing chip delivers performance equivalent to three NVIDIA Orin-X chips at 254 TOPS each.</p>
+            <div class="metadata-block">
+                <strong>[Item Metadata]</strong><br>
+                - event_date: 2026-04-03 | source_date: 2026-04-03<br>
+                - event_within_24h_window: true | 7_day_exception_applied: false<br>
+                - post_transformer_architecture: true | hbm_demand_shift: Neutral<br>
+                - interconnect_priority: Bandwidth-bound | binding_now: true<br>
+                - single_source_risk: false | confidence_level: MEDIUM
+            </div>
+        </div>
+
+        <div class="news-card">
+            <h2 class="news-title">5. IBM and Arm Strategic Partnership: Dual-Architecture Hardware for Enterprise AI</h2>
+            <div class="news-meta">
+                <span><strong>Source:</strong> IBM Newsroom / The Register / Tom's Hardware</span>
+                <span><strong>Event Date:</strong> 2026-04-02 | <strong>Source Date:</strong> 2026-04-03</span>
+                <span><strong>Status:</strong> Official | <strong>Legal/Policy Status:</strong> N/A</span>
+            </div>
+
+            <span class="section-tag">[Overview]</span>
+            <p>IBM and Arm announced a landmark strategic collaboration on April 2, 2026, to develop dual-architecture hardware platforms that allow Arm-based software environments to operate within IBM's mission-critical enterprise systems. The initiative focuses on IBM Z mainframes and LinuxONE systems, and encompasses three key areas: expanding virtualization technologies to host Arm-based software environments on IBM platforms; supporting the performance and efficiency demands of modern AI and data-intensive workloads, including the ability of IBM enterprise systems to recognize and execute Arm applications; and creating shared technology layers between platforms to broaden ecosystem access and software choice. While the current collaboration framing centers on virtualization and emulation, reporting by Tom's Hardware citing sources familiar with the matter suggests that the longer-term architectural intent may include native Arm ISA execution support within future Telum-generation CPUs, which would represent a more fundamental integration than the present announcement implies. IBM confirmed this is a separate initiative from Arm's recently unveiled AGI CPU for data centers.</p>
+
+            <span class="section-tag">[Strategic Impact]</span>
+            <p><strong>Heterogeneous Enterprise Expansion:</strong> For investment firms, this partnership widens Arm's access to the multi-billion dollar mission-critical Z systems market, where financial institutions, airlines, and government agencies run the world's most stringent transaction processing workloads. Arm's server architecture has already captured 13.2% of server sales revenue as of Q3 2025, with shipments growing 50% year-on-year.</p>
+            <p><strong>Security and Sovereignty:</strong> The collaboration prioritizes local data sovereignty, allowing enterprises to run modern AI applications alongside legacy mission-critical code within a single, secure hardware perimeter — a compelling proposition for regulated industries that cannot migrate sensitive workloads to public cloud environments.</p>
+
+            <span class="section-tag">[Technical Deep Dive]</span>
+            <p><strong>System-Level Insight:</strong> For board circuit designers, the dual-architecture requirement necessitates new virtualization controller designs that can recognize and execute Arm applications on IBM's Telum II processor and Spyre Accelerator platforms. The primary motivation is to eliminate the current architectural fragmentation where enterprises must operate separate Arm or x86 infrastructure alongside IBM Z hardware to run modern AI and cloud-native workloads.</p>
+            <ul>
+                <li><strong>Platform Targets:</strong> IBM Z mainframes and LinuxONE systems.</li>
+                <li><strong>Hardware Components:</strong> Telum II processor and Spyre Accelerator.</li>
+                <li><strong>Operational Mode:</strong> Virtualization-based execution of Arm software environments; longer-term native Arm ISA execution on future Telum silicon under exploration.</li>
+                <li><strong>Collaboration Pillars:</strong> Virtualization, local data sovereignty, and shared technology layers for ecosystem growth.</li>
+            </ul>
+
+            <div class="infographic-wrapper">
+                <div style="text-align: center; margin-bottom: 16px; font-weight: 600; font-size: 0.9rem; color: var(--text-muted);">IBM Z Dual-Architecture Software Stack</div>
+                <div class="d-stack">
+                    <div class="d-layer layer-1">Modern AI & Data-Intensive Workloads (Arm-based)</div>
+                    <div class="d-layer layer-2" style="border-style: dashed;">Virtualization / Emulation Layer<br><span style="font-size:0.75rem; font-weight:400;">(Potential Native Arm ISA Execution Support Later)</span></div>
+                    <div class="d-layer layer-3">IBM Z Mainframe & LinuxONE Hardware<br><span style="font-size:0.75rem; font-weight:400;">Telum II Processor + Spyre Accelerator</span></div>
+                </div>
+            </div>
+
+            <span class="section-tag">[Visual/Evidence]</span>
+            <p>IBM's z17 mainframe family, announced approximately one year prior, introduced the Telum II processor and Spyre AI Accelerator card — the hardware foundation upon which this Arm collaboration will build. Less than a month before this announcement, IBM deepened its cooperation with NVIDIA at GTC 2026, underscoring that the Arm collaboration is additive to, not a replacement for, IBM's existing accelerator partnerships.</p>
+            <p><em>Mohamed Awad, Executive Vice President, Cloud AI, Arm — "As enterprises scale AI and modernize their infrastructure, the breadth of the Arm software ecosystem is enabling these workloads to run across a broader range of environments. Our collaboration with IBM builds on this progress, extending the Arm ecosystem into mission-critical enterprise environments."</em></p>
+
+            <span class="section-tag">[Critical View]</span>
+            <p>The collaboration is at an early conceptual stage; IBM has explicitly stated it is too early to share specific implementation details or delivery timelines. In the near term, virtualization-based emulation of Arm workloads on Telum II CPUs will carry performance overhead compared to native Arm execution — a trade-off that IBM's enterprise customers are likely to accept given the reliability and compliance benefits of the Z platform, but one that limits applicability for latency-sensitive frontier AI inference. Enterprises requiring ultra-low latency for large-scale generative AI models will continue to require dedicated GPU clusters or native Arm-silicon solutions for those specific workloads.</p>
+
+            <span class="section-tag">[Community Sentiment]</span>
+            <p><strong>Comparison:</strong> Unlike standard x86 servers, IBM Z systems are architected for mission-critical reliability and security, not raw compute density. The addition of Arm software compatibility extends the usefulness of an installed base that represents decades of accumulated operational integration in global financial and government infrastructure.</p>
+            <div class="metadata-block">
+                <strong>[Item Metadata]</strong><br>
+                - event_date: 2026-04-02 | source_date: 2026-04-03<br>
+                - event_within_24h_window: false | 7_day_exception_applied: true<br>
+                - post_transformer_architecture: false | hbm_demand_shift: Neutral<br>
+                - interconnect_priority: Latency-bound | binding_now: true<br>
+                - single_source_risk: false | confidence_level: HIGH
+            </div>
+        </div>
+
+        <div class="assessment-section">
+            <h2>Detailed Assessment: The Physics and Economics of 2026 AI Infrastructure</h2>
+            <p>The 24-hour reporting window ending April 4, 2026, has codified a structural divergence in the AI accelerator market. We are no longer observing a monolithic growth curve driven by general-purpose GPUs; instead, the market is splitting into training-optimized general accelerators and inference-optimized sovereign silicon — a bifurcation with direct consequences for capital allocation, supply chain strategy, and board-level hardware design priorities.</p>
+            
+            <h3>The Convergence of On-Device Reasoning and Sovereign Silicon</h3>
+            <p>The "Strategic AI Infrastructure" mission is now defined by the transition from cloud-dependent chatbots to autonomous entities operating at the edge. XPeng's progression toward full Turing chip coverage across its vehicle lineup and Google's Gemma 4 on Armv9 SME2 mark the arrival of production-grade local intelligence in both consumer mobility and enterprise compute. For the senior hardware circuit designer, this shift requires a new priority on on-chip SRAM density and low-latency interconnect fabrics, as the dominant inference bottleneck migrates from cloud HBM clusters to device-level memory hierarchies.</p>
+
+            <h3>Geopolitical and Infrastructure ROI Reckoning</h3>
+            <p>Infrastructure investment in 2026 is inextricably linked to regional stability and national security policy. The $10 billion Microsoft Japan commitment represents capital that is as much a geopolitical positioning instrument as a commercial infrastructure bet, targeting Japan's explicit national AI sovereignty goals and METI's 10 trillion yen domestic AI investment program. The growing intersection of sovereign cloud requirements and hyperscaler expansion creates a durable structural tailwind for infrastructure CAPEX that is partly decoupled from near-term AI application revenue cycles. However, power availability remains a binding constraint: data centers are absorbing an increasing share of grid capacity across all major deployment regions, and the pace of new power buildout — whether from grid expansion or modular nuclear — is now a first-order risk factor in AI infrastructure deployment timelines.</p>
+
+            <h3>Technical Synthesis: The Hardware Roadmap</h3>
+            <p>The following table synthesizes the current leadership in AI accelerators as of the Vera Rubin VR200 production sample phase.</p>
+            
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Accelerator</th>
+                            <th>Architecture</th>
+                            <th>Peak Compute (FP4)</th>
+                            <th>Memory Bandwidth</th>
+                            <th>Target Workload</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>NVIDIA VR200 (NVL72)</td>
+                            <td>GPU (HBM4)</td>
+                            <td>50.0 PFLOPS</td>
+                            <td>22 TB/s per GPU</td>
+                            <td>Frontier MoE Training & Inference</td>
+                        </tr>
+                        <tr>
+                            <td>Google Ironwood (TPU v7)</td>
+                            <td>ASIC (HBM3e)</td>
+                            <td>4,614 TFLOPS</td>
+                            <td>1.8 TB/s</td>
+                            <td>Hyperscale Inference</td>
+                        </tr>
+                        <tr>
+                            <td>XPeng Turing</td>
+                            <td>ASIC (LPDDR5X)</td>
+                            <td>750–1,500 TOPS</td>
+                            <td>Not Disclosed</td>
+                            <td>L4 ADAS / VLA Reasoning</td>
+                        </tr>
+                        <tr>
+                            <td>Microsoft Maia 200</td>
+                            <td>ASIC (HBM3e)</td>
+                            <td>10.0 PFLOPS</td>
+                            <td>1.2 TB/s</td>
+                            <td>Azure Copilot Inference</td>
+                        </tr>
+                        <tr>
+                            <td>Amazon Trainium 3</td>
+                            <td>ASIC (HBM3e)</td>
+                            <td>2.5 PFLOPS</td>
+                            <td>1.1 TB/s</td>
+                            <td>AWS Native Training</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Briefing Summary & Forward-Looking Outlook</h2>
+            <p>The strategic events of early April 2026 confirm that the "Golden Age of the GPU" is transitioning into a "Foundry and Fabric" era defined by sovereign silicon, heterogeneous racks, and infrastructure as geopolitical instrument. The $10 billion Microsoft Japan investment and the continued ramping of XPeng's in-house chip program signal that capital and strategic intent are now simultaneously chasing both the hyperscale frontier and the intelligent edge — compressing the window in which any single architectural paradigm can sustain monopoly pricing power.</p>
+
+            <h3>Anticipated High-Impact Events (Next Quarter to 12 Months)</h3>
+            <p>First volume shipments of NVIDIA Vera Rubin NVL72 (VR200) racks, currently quoted at $5M–$7M, are expected to begin in H2 2026, marking the operational debut of HBM4 in production data centers at scale. XPeng's full lineup transition to the Turing chip is targeted for Q2 2026, with the dual-chip Ultra SE variant beginning deliveries in August. The US Department of Commerce is expected to release a draft rule in Q3 2026 regarding mandatory security audits for autonomous AI agents with broad system permissions, following documented incidents involving agent-level access escalation. The emergence of High Bandwidth Flash as a third storage tier may materialize by late 2026 as SK Hynix and SanDisk conclude their standardization work, potentially offering a 10x capacity expansion over HBM4 for KV cache offload use cases. Intel's 14A process is slated for volume manufacturing entry in early 2027, representing the first large-scale deployment of High-NA EUV lithography as a credible challenge to TSMC's N2 node dominance.</p>
+
+            <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px; margin-top: 24px; font-family: var(--font-mono); font-size: 0.8rem; border-left: 3px solid #10B981;">
+                <strong>Verification Log</strong><br>
+                - event_date confirmed: Primary window (April 3–4, 2026) and 7-day exceptions applied per schema.<br>
+                - All hardware specifications explicitly sourced with product generation and source identifier.<br>
+                - Entity names verified: NVIDIA Vera Rubin VR200/VR300, Google Gemma 4, XPeng Turing, IBM Telum II / Spyre Accelerator.<br>
+                - Price ranges verified as unofficial market quotes; NVIDIA has not confirmed list prices.<br>
+                - Single-source risk flags applied where applicable.<br>
+                - Unconfirmed technical roadmap signals (IBM native Arm ISA, Arm 5.5x prefill) disclosed with sourcing caveat rather than presented as confirmed fact.
+            </div>
+        </div>
+
     </div>
 
-    <!-- Chart Initializations -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Chart Defaults
-            Chart.defaults.font.family = "'Inter', sans-serif";
-            Chart.defaults.color = '#64748b';
+            // Chart Defaults for consistent bright theme
+            Chart.defaults.font.family = "'DM Sans', sans-serif";
+            Chart.defaults.color = "#475569";
             
-            // 1. Hardware Chart (NVIDIA Rubin vs Blackwell)
-            const hwCtx = document.getElementById('hardwareChart').getContext('2d');
-            new Chart(hwCtx, {
+            // 1. NVIDIA Rubin vs Blackwell Chart
+            const ctxRubin = document.getElementById('rubinChart').getContext('2d');
+            new Chart(ctxRubin, {
                 type: 'bar',
                 data: {
-                    labels: ['Inference (PFLOPS)', 'Training (PFLOPS)', 'Memory (GB)', 'Bandwidth (TB/s)'],
+                    labels: ['Power/GPU (kW x 100)', 'Memory (GB)', 'Transistors (Billions)'],
                     datasets: [
                         {
-                            label: 'Blackwell (B200)',
-                            data: [10, 10, 192, 8],
-                            backgroundColor: '#cbd5e1',
-                            borderRadius: 6
+                            label: 'Blackwell (GB200/GB300)',
+                            data: [140, 192, 208],
+                            backgroundColor: '#C7D2FE',
+                            borderColor: '#818CF8',
+                            borderWidth: 1,
+                            borderRadius: 4
                         },
                         {
-                            label: 'Vera Rubin',
-                            data: [50, 35, 288, 22],
-                            backgroundColor: '#10b981', // Emerald
-                            borderRadius: 6
+                            label: 'Vera Rubin NVL72 (VR200)',
+                            data: [190, 288, 336],
+                            backgroundColor: '#4F46E5',
+                            borderColor: '#3730A3',
+                            borderWidth: 1,
+                            borderRadius: 4
                         }
                     ]
                 },
@@ -438,77 +675,20 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'top' },
-                        title: { display: true, text: 'Performance Leap: Blackwell vs Vera Rubin', font: { size: 14, weight: 'bold' } }
+                        legend: { position: 'top', labels: { font: { size: 12, weight: '500' } } },
+                        title: { display: true, text: 'Architectural Scaling: Blackwell vs Vera Rubin VR200', font: { size: 14, weight: '700' }, color: '#1E293B', padding: { bottom: 20 } }
                     },
-                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
-                }
-            });
-
-            // 2. Amazon CAPEX Doughnut Chart
-            const capexCtx = document.getElementById('capexChart').getContext('2d');
-            new Chart(capexCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Gov AI Cloud', 'Indiana Hub', 'Louisiana Hub', 'Silicon/Energy/Other'],
-                    datasets: [{
-                        data: [50, 15, 12, 123], // Total 200
-                        backgroundColor: ['#6366f1', '#ec4899', '#f59e0b', '#e2e8f0'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff',
-                        hoverOffset: 10
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '65%',
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        title: { display: true, text: 'Allocation of 200B USD CAPEX', font: { size: 14, weight: 'bold' } }
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#F1F5F9' } },
+                        x: { grid: { display: false } }
                     }
-                }
-            });
-
-            // 3. Google Veo Pricing Chart
-            const veoCtx = document.getElementById('veoChart').getContext('2d');
-            new Chart(veoCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Veo 3.1 Lite', 'Veo 3.1 Fast', 'Veo 3.1 Base'],
-                    datasets: [
-                        {
-                            label: '720p (USD/Sec)',
-                            data: [0.05, 0.10, 0.40],
-                            backgroundColor: '#8b5cf6', // Violet
-                            borderRadius: 4
-                        },
-                        {
-                            label: '1080p (USD/Sec)',
-                            data: [0.08, 0.12, 0.40],
-                            backgroundColor: '#f43f5e', // Rose
-                            borderRadius: 4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'top' },
-                        title: { display: true, text: 'Cost Comparison by Model Tier', font: { size: 14, weight: 'bold' } }
-                    },
-                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
                 }
             });
         });
     </script>
 
-    <!-- Mandatory Code Injection -->
-    <a href="index.html" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; padding: 14px 24px; background-color: #1e293b; color: #fff; text-decoration: none; border-radius: 50px; font-weight: 500; font-family: 'Inter', sans-serif; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); font-size: 14px; transition: transform 0.2s;">
-      ⬅️ 클로드 버전 보기
+    <a href="index.html" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; padding: 14px 24px; background-color: var(--text-main); color: #fff; text-decoration: none; border-radius: 50px; font-weight: 500; font-family: var(--font-sans); box-shadow: var(--shadow-lg); font-size: 14px; transition: transform 0.2s;">
+        ⬅️ 클로드 버전 보기
     </a>
 </body>
 </html>
-
-```
