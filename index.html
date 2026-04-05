@@ -27,19 +27,52 @@
 
     <style>
         :root {
-            /* Theme Colors N=1~5 */
-            --c1: #0891B2; --lc1: #CFFAFE; /* Security / Software */
-            --c2: #7C3AED; --lc2: #EDE9FE; /* Infrastructure / Memory */
-            --c3: #059669; --lc3: #D1FAE5; /* Hardware / Compute */
-            --c4: #D97706; --lc4: #FEF3C7; /* Open Source / Edge */
-            --c5: #E11D48; --lc5: #FFE4E6; /* Physical AI / Robotics */
+            /* Base Theme Colors N=1~5 */
+            --c1: #0891B2; --lc1: #CFFAFE; 
+            --c2: #7C3AED; --lc2: #EDE9FE; 
+            --c3: #059669; --lc3: #D1FAE5; 
+            --c4: #D97706; --lc4: #FEF3C7; 
+            --c5: #E11D48; --lc5: #FFE4E6; 
             
+            /* Light Mode Variables */
             --bg-body: #F8FAFC;
             --bg-card: #FFFFFF;
-            --text-main: #0F172A;
+            --bg-card-inner: #F8FAFC;
+            --text-h1: #0F172A;
+            --text-lead: #1E293B;
+            --text-body: #475569;
             --text-mut: #64748B;
             --border: #E2E8F0;
             --sidebar: #0B1120;
+            --sidebar-border: #1E293B;
+            --comp-bg: #F1F5F9;
+            --comp-border: #CBD5E1;
+            --chart-text: #334155;
+            --chart-axis: #94A3B8;
+        }
+
+        body.dark {
+            /* Dark Mode Overrides */
+            --bg-body: #0B1120;
+            --bg-card: #1E293B;
+            --bg-card-inner: #0F172A;
+            --text-h1: #FFFFFF;
+            --text-lead: #F8FAFC;
+            --text-body: #94A3B8;
+            --text-mut: #CBD5E1;
+            --border: #334155;
+            --sidebar: #020617;
+            --sidebar-border: #1E293B;
+            --comp-bg: #0F172A;
+            --comp-border: #475569;
+            --chart-text: #F8FAFC;
+            --chart-axis: #475569;
+
+            --lc1: rgba(8, 145, 178, 0.15);
+            --lc2: rgba(124, 58, 237, 0.15);
+            --lc3: rgba(5, 150, 105, 0.15);
+            --lc4: rgba(217, 119, 6, 0.15);
+            --lc5: rgba(225, 29, 72, 0.15);
         }
 
         /* Utilities N=1~5 */
@@ -49,26 +82,29 @@
         .c4 { color: var(--c4) !important; } .bg-c4 { background-color: var(--c4) !important; color: #fff; } .lc4 { background-color: var(--lc4) !important; border-color: var(--c4) !important; }
         .c5 { color: var(--c5) !important; } .bg-c5 { background-color: var(--c5) !important; color: #fff; } .lc5 { background-color: var(--lc5) !important; border-color: var(--c5) !important; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background-color: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; line-height: 1.6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        body { background-color: var(--bg-body); color: var(--text-body); display: flex; min-height: 100vh; line-height: 1.6; }
         
         /* Skeleton Structure */
-        .sidebar { width: 280px; background-color: var(--sidebar); color: #fff; padding: 2rem; position: fixed; height: 100vh; overflow-y: auto; }
-        .sidebar-brand { font-size: 1.25rem; font-weight: 700; margin-bottom: 2rem; border-bottom: 1px solid #1E293B; padding-bottom: 1rem; line-height: 1.3; }
+        .sidebar { width: 280px; background-color: var(--sidebar); color: #fff; padding: 2rem; position: fixed; height: 100vh; overflow-y: auto; border-right: 1px solid var(--sidebar-border); z-index: 100; }
+        .sidebar-brand { font-size: 1.25rem; font-weight: 700; margin-bottom: 2rem; border-bottom: 1px solid var(--sidebar-border); padding-bottom: 1rem; line-height: 1.3; }
         .sidebar-nav { list-style: none; }
         .sidebar-nav li { margin-bottom: 1rem; font-size: 0.9rem; color: #94A3B8; cursor: pointer; transition: color 0.2s; }
         .sidebar-nav li:hover { color: #fff; }
+
+        .theme-btn { width: 100%; background: #1E293B; color: #fff; border: 1px solid #334155; padding: 0.75rem; border-radius: 8px; cursor: pointer; font-weight: 600; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: background 0.2s; }
+        .theme-btn:hover { background: #334155; }
         
         main { margin-left: 280px; flex: 1; padding: 3rem 4rem; max-width: 1400px; }
         header { margin-bottom: 3rem; }
-        header h1 { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem; color: #0F172A; }
+        header h1 { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem; color: var(--text-h1); }
         header .meta-info { font-size: 1rem; color: var(--text-mut); font-weight: 500; }
         
-        .intro-text { font-size: 1.1rem; color: #334155; margin-bottom: 2rem; column-count: 2; column-gap: 3rem; text-align: justify; }
+        .intro-text { font-size: 1.1rem; color: var(--text-lead); margin-bottom: 2rem; column-count: 2; column-gap: 3rem; text-align: justify; }
 
         /* Article Formatting */
         .article { background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); padding: 2.5rem; margin-bottom: 3rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .article-title { font-size: 1.75rem; font-weight: 600; margin-bottom: 2rem; line-height: 1.3; }
+        .article-title { font-size: 1.75rem; font-weight: 600; margin-bottom: 2rem; line-height: 1.3; color: var(--text-h1); }
         
         /* Subsections */
         .subsec { margin-bottom: 2.5rem; }
@@ -78,40 +114,40 @@
         .subsec-label { font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
         .subsec-tag { font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 600; margin-left: 0.5rem; }
         
-        .lead-text { font-size: 1.05rem; font-weight: 500; color: #1E293B; margin-bottom: 1rem; }
-        .body-text { font-size: 0.95rem; color: #475569; margin-bottom: 1rem; }
+        .lead-text { font-size: 1.05rem; font-weight: 500; color: var(--text-lead); margin-bottom: 1rem; }
+        .body-text { font-size: 0.95rem; color: var(--text-body); margin-bottom: 1rem; }
         
         /* Matrices & Components */
         .metric-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
-        .metric-card { background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; text-align: center; }
+        .metric-card { background: var(--bg-card-inner); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; text-align: center; }
         .metric-value { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
         .metric-label { font-size: 0.8rem; color: var(--text-mut); text-transform: uppercase; font-weight: 600; }
         
-        .impact-box { padding: 1.5rem; border-radius: 0 8px 8px 0; font-size: 0.95rem; font-weight: 500; }
+        .impact-box { padding: 1.5rem; border-radius: 0 8px 8px 0; font-size: 0.95rem; font-weight: 500; color: var(--text-lead); }
         
         .arch-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
-        .arch-chip { background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 6px; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: #334155; }
+        .arch-chip { background: var(--comp-bg); border: 1px solid var(--comp-border); border-radius: 6px; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: var(--text-lead); }
         
-        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--text-body); }
         .info-table th, .info-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); text-align: left; }
-        .info-table th { background: #F8FAFC; font-weight: 600; color: #475569; width: 40%; }
+        .info-table th { background: var(--bg-card-inner); font-weight: 600; color: var(--text-lead); width: 40%; }
         .info-table tr:last-child td, .info-table tr:last-child th { border-bottom: none; }
         
-        .chart-wrap { margin-top: 1.5rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; background: #FAFAFA; }
+        .chart-wrap { margin-top: 1.5rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card-inner); }
         
-        .flow-row { display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; padding: 1.5rem; border-radius: 8px; border: 1px dashed #CBD5E1; font-weight: 500; font-size: 0.9rem; }
-        .flow-step { flex: 1; text-align: center; padding: 1rem; background: #fff; border-radius: 6px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .flow-row { display: flex; align-items: center; justify-content: space-between; background: var(--bg-card-inner); padding: 1.5rem; border-radius: 8px; border: 1px dashed var(--comp-border); font-weight: 500; font-size: 0.9rem; }
+        .flow-step { flex: 1; text-align: center; padding: 1rem; background: var(--bg-card); color: var(--text-lead); border-radius: 6px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .flow-arrow { font-size: 1.5rem; color: var(--text-mut); margin: 0 1rem; }
         
         .comp-box { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .comp-side { padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); background: #fff; }
+        .comp-side { padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); }
         .comp-title { font-weight: 600; margin-bottom: 0.5rem; font-size: 1rem; }
         
         .sentiment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-        .sentiment-card { padding: 1.25rem; border: 1px solid var(--border); border-radius: 8px; background: #fff; display: flex; flex-direction: column; gap: 0.5rem; }
+        .sentiment-card { padding: 1.25rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); display: flex; flex-direction: column; gap: 0.5rem; }
         .sent-emoji { font-size: 1.5rem; }
-        .sent-label { font-weight: 600; font-size: 0.95rem; }
-        .sent-desc { font-size: 0.85rem; color: var(--text-mut); }
+        .sent-label { font-weight: 600; font-size: 0.95rem; color: var(--text-lead); }
+        .sent-desc { font-size: 0.85rem; color: var(--text-body); }
         
         /* Synthesis Section */
         .synthesis { background: #0F172A; color: #fff; border-radius: 12px; padding: 3rem; margin-top: 4rem; }
@@ -125,8 +161,8 @@
         
         /* Footer & Misc */
         footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--text-mut); font-size: 0.85rem; text-align: center; }
-        .disclaimer { font-size: 0.8rem; color: #94A3B8; background: #F1F5F9; padding: 1rem; border-radius: 6px; margin-top: 2rem; }
-        .fab { position: fixed; bottom: 2rem; right: 2rem; background: #0F172A; color: #fff; padding: 1rem 2rem; border-radius: 999px; font-weight: 600; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: 1px solid #334155; transition: transform 0.2s; }
+        .disclaimer { font-size: 0.8rem; color: #94A3B8; background: #0F172A; padding: 1rem; border-radius: 6px; margin-top: 2rem; text-align: left; border: 1px solid #1E293B; }
+        .fab { position: fixed; bottom: 2rem; right: 2rem; background: #0F172A; color: #fff; padding: 1rem 2rem; border-radius: 999px; font-weight: 600; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); border: 1px solid #334155; transition: transform 0.2s; z-index: 999; }
         .fab:hover { transform: translateY(-3px); }
     </style>
 </head>
@@ -134,6 +170,9 @@
 
     <aside class="sidebar">
         <div class="sidebar-brand">Fortune 500<br>Strategic Advisory</div>
+        
+        <button id="theme-toggle" class="theme-btn">🌙 Dark Mode</button>
+
         <ul class="sidebar-nav">
             <li>Macro Overview</li>
             <li>1. Anthropic & Agent Economics</li>
@@ -663,20 +702,27 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             
-            const commonOptions = {
+            const getCommonOptions = (textColor, axisColor) => ({
                 backgroundColor: 'transparent',
                 textStyle: { fontFamily: 'Outfit, sans-serif' },
-                tooltip: { trigger: 'axis' }
-            };
+                tooltip: { trigger: 'axis' },
+                title: { textStyle: { fontSize: 13, color: textColor } },
+                xAxis: { axisLine: { lineStyle: { color: axisColor } }, splitLine: { show: false } },
+                yAxis: { splitLine: { show: false } }
+            });
+
+            const initialTextColor = '#334155';
+            const initialAxisColor = '#94A3B8';
+            const initialOpts = getCommonOptions(initialTextColor, initialAxisColor);
 
             // Chart 1: Anthropic Economics (Art 1)
             let chart1 = echarts.init(document.getElementById('chart-art1'), null, {renderer: 'svg'});
             chart1.setOption({
-                ...commonOptions,
+                ...initialOpts,
                 color: ['#0891B2'],
-                title: { text: 'Monthly Agentic Compute Cost (USD)', textStyle: { fontSize: 13, color: '#334155' } },
-                xAxis: { type: 'category', data: ['Legacy Flat-Rate', 'Est. Pay-As-You-Go'], splitLine: { show: false }, axisLine: { lineStyle: { color: '#94A3B8' } } },
-                yAxis: { type: 'value', splitLine: { show: false }, axisLabel: { formatter: '${value}' } },
+                title: { ...initialOpts.title, text: 'Monthly Agentic Compute Cost (USD)' },
+                xAxis: { ...initialOpts.xAxis, type: 'category', data: ['Legacy Flat-Rate', 'Est. Pay-As-You-Go'] },
+                yAxis: { ...initialOpts.yAxis, type: 'value', axisLabel: { formatter: '${value}' } },
                 series: [{
                     data: [200, 3000],
                     type: 'bar',
@@ -688,11 +734,11 @@
             // Chart 2: Memory CapEx (Art 2)
             let chart2 = echarts.init(document.getElementById('chart-art2'), null, {renderer: 'svg'});
             chart2.setOption({
-                ...commonOptions,
+                ...initialOpts,
                 color: ['#7C3AED'],
-                title: { text: 'Memory Share of Hyperscaler CapEx (%)', textStyle: { fontSize: 13, color: '#334155' } },
-                xAxis: { type: 'category', data: ['2023', '2024', '2025(E)', '2026(P)'], splitLine: { show: false }, axisLine: { lineStyle: { color: '#94A3B8' } } },
-                yAxis: { type: 'value', splitLine: { show: false }, axisLabel: { formatter: '{value}%' } },
+                title: { ...initialOpts.title, text: 'Memory Share of Hyperscaler CapEx (%)' },
+                xAxis: { ...initialOpts.xAxis, type: 'category', data: ['2023', '2024', '2025(E)', '2026(P)'] },
+                yAxis: { ...initialOpts.yAxis, type: 'value', axisLabel: { formatter: '{value}%' } },
                 series: [{
                     data: [8, 8, 15, 30],
                     type: 'line',
@@ -705,11 +751,11 @@
             // Chart 3: Inference Leap (Art 3)
             let chart3 = echarts.init(document.getElementById('chart-art3'), null, {renderer: 'svg'});
             chart3.setOption({
-                ...commonOptions,
+                ...initialOpts,
                 color: ['#059669'],
-                title: { text: 'Inference Performance Scaling (PFLOPS)', textStyle: { fontSize: 13, color: '#334155' } },
-                xAxis: { type: 'category', data: ['Hopper', 'Blackwell', 'Vera Rubin'], splitLine: { show: false }, axisLine: { lineStyle: { color: '#94A3B8' } } },
-                yAxis: { type: 'value', splitLine: { show: false } },
+                title: { ...initialOpts.title, text: 'Inference Performance Scaling (PFLOPS)' },
+                xAxis: { ...initialOpts.xAxis, type: 'category', data: ['Hopper', 'Blackwell', 'Vera Rubin'] },
+                yAxis: { ...initialOpts.yAxis, type: 'value' },
                 series: [{
                     data: [4, 10, 50],
                     type: 'bar',
@@ -722,6 +768,28 @@
                 chart1.resize();
                 chart2.resize();
                 chart3.resize();
+            });
+
+            // Theme Toggle Logic
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark');
+                const isDark = document.body.classList.contains('dark');
+                themeToggle.innerHTML = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+                
+                // Fetch updated CSS variables for ECharts
+                const bodyStyles = getComputedStyle(document.body);
+                const textColor = bodyStyles.getPropertyValue('--chart-text').trim();
+                const axisColor = bodyStyles.getPropertyValue('--chart-axis').trim();
+                
+                const updateOpts = {
+                    title: { textStyle: { color: textColor } },
+                    xAxis: { axisLine: { lineStyle: { color: axisColor } } }
+                };
+                
+                chart1.setOption(updateOpts);
+                chart2.setOption(updateOpts);
+                chart3.setOption(updateOpts);
             });
         });
     </script>
