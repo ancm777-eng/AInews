@@ -27,56 +27,19 @@
 
     <style>
         :root {
-            /* Theme Accent Colors */
-            --c1: #0891B2; --lc1: #ECFEFF; 
-            --c2: #7C3AED; --lc2: #F5F3FF; 
-            --c3: #059669; --lc3: #ECFDF5; 
-            --c4: #D97706; --lc4: #FFFBEB; 
-            --c5: #E11D48; --lc5: #FFF1F2; 
+            /* Theme Colors N=1~5 */
+            --c1: #0891B2; --lc1: #CFFAFE; /* Security / Software */
+            --c2: #7C3AED; --lc2: #EDE9FE; /* Infrastructure / Memory */
+            --c3: #059669; --lc3: #D1FAE5; /* Hardware / Compute */
+            --c4: #D97706; --lc4: #FEF3C7; /* Open Source / Edge */
+            --c5: #E11D48; --lc5: #FFE4E6; /* Physical AI / Robotics */
             
-            /* High-Clarity Light Mode (Ultra Bright) */
-            --bg-body: #FFFFFF;
+            --bg-body: #F8FAFC;
             --bg-card: #FFFFFF;
-            --bg-card-inner: #F8FAFC;
-            --text-h1: #020617;
-            --text-lead: #1E293B;
-            --text-body: #334155;
+            --text-main: #0F172A;
             --text-mut: #64748B;
             --border: #E2E8F0;
-            --sidebar: #F1F5F9;
-            --sidebar-text: #0F172A;
-            --sidebar-border: #E2E8F0;
-            --comp-bg: #F8FAFC;
-            --comp-border: #CBD5E1;
-            --chart-text: #1E293B;
-            --chart-axis: #94A3B8;
-            --synthesis-bg: #0F172A;
-        }
-
-        body.dark {
-            /* Dark Mode Overrides */
-            --bg-body: #020617;
-            --bg-card: #0F172A;
-            --bg-card-inner: #1E293B;
-            --text-h1: #F8FAFC;
-            --text-lead: #E2E8F0;
-            --text-body: #94A3B8;
-            --text-mut: #64748B;
-            --border: #1E293B;
-            --sidebar: #020617;
-            --sidebar-text: #F8FAFC;
-            --sidebar-border: #1E293B;
-            --comp-bg: #020617;
-            --comp-border: #334155;
-            --chart-text: #F8FAFC;
-            --chart-axis: #475569;
-            --synthesis-bg: #1E293B;
-
-            --lc1: rgba(8, 145, 178, 0.1);
-            --lc2: rgba(124, 58, 237, 0.1);
-            --lc3: rgba(5, 150, 105, 0.1);
-            --lc4: rgba(217, 119, 6, 0.1);
-            --lc5: rgba(225, 29, 72, 0.1);
+            --sidebar: #0B1120;
         }
 
         /* Utilities N=1~5 */
@@ -86,381 +49,679 @@
         .c4 { color: var(--c4) !important; } .bg-c4 { background-color: var(--c4) !important; color: #fff; } .lc4 { background-color: var(--lc4) !important; border-color: var(--c4) !important; }
         .c5 { color: var(--c5) !important; } .bg-c5 { background-color: var(--c5) !important; color: #fff; } .lc5 { background-color: var(--lc5) !important; border-color: var(--c5) !important; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: all 0.25s ease; }
-        body { background-color: var(--bg-body); color: var(--text-body); display: flex; min-height: 100vh; line-height: 1.6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; line-height: 1.6; }
         
-        /* Sidebar */
-        .sidebar { width: 280px; background-color: var(--sidebar); color: var(--sidebar-text); padding: 2.5rem 2rem; position: fixed; height: 100vh; border-right: 1px solid var(--sidebar-border); z-index: 100; }
-        .sidebar-brand { font-size: 1.25rem; font-weight: 800; margin-bottom: 2.5rem; border-bottom: 2px solid var(--sidebar-border); padding-bottom: 1.5rem; line-height: 1.2; letter-spacing: -0.03em; }
+        /* Skeleton Structure */
+        .sidebar { width: 280px; background-color: var(--sidebar); color: #fff; padding: 2rem; position: fixed; height: 100vh; overflow-y: auto; }
+        .sidebar-brand { font-size: 1.25rem; font-weight: 700; margin-bottom: 2rem; border-bottom: 1px solid #1E293B; padding-bottom: 1rem; line-height: 1.3; }
         .sidebar-nav { list-style: none; }
-        .sidebar-nav li { margin-bottom: 1.2rem; font-size: 0.95rem; font-weight: 500; opacity: 0.7; cursor: pointer; }
-        .sidebar-nav li:hover { opacity: 1; color: var(--c1); }
-
-        /* Theme Toggle Button */
-        .theme-btn { width: 100%; background: var(--text-h1); color: var(--bg-body); border: none; padding: 0.85rem; border-radius: 10px; cursor: pointer; font-weight: 700; margin-bottom: 2.5rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .theme-btn:hover { transform: translateY(-2px); }
+        .sidebar-nav li { margin-bottom: 1rem; font-size: 0.9rem; color: #94A3B8; cursor: pointer; transition: color 0.2s; }
+        .sidebar-nav li:hover { color: #fff; }
         
-        main { margin-left: 280px; flex: 1; padding: 4rem 5rem; max-width: 1400px; }
-        header { margin-bottom: 4rem; }
-        header h1 { font-size: 3rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 1.5rem; color: var(--text-h1); line-height: 1.1; }
-        header .meta-info { font-size: 1rem; color: var(--text-mut); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        main { margin-left: 280px; flex: 1; padding: 3rem 4rem; max-width: 1400px; }
+        header { margin-bottom: 3rem; }
+        header h1 { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem; color: #0F172A; }
+        header .meta-info { font-size: 1rem; color: var(--text-mut); font-weight: 500; }
         
-        .intro-text { font-size: 1.15rem; color: var(--text-lead); margin-bottom: 3.5rem; column-count: 2; column-gap: 4rem; text-align: justify; font-weight: 400; line-height: 1.7; }
+        .intro-text { font-size: 1.1rem; color: #334155; margin-bottom: 2rem; column-count: 2; column-gap: 3rem; text-align: justify; }
 
-        /* Article */
-        .article { background: var(--bg-card); border-radius: 20px; border: 1px solid var(--border); padding: 3.5rem; margin-bottom: 4rem; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05); position: relative; overflow: hidden; }
-        .article-title { font-size: 2rem; font-weight: 700; margin-bottom: 2.5rem; line-height: 1.2; color: var(--text-h1); letter-spacing: -0.02em; }
+        /* Article Formatting */
+        .article { background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); padding: 2.5rem; margin-bottom: 3rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .article-title { font-size: 1.75rem; font-weight: 600; margin-bottom: 2rem; line-height: 1.3; }
         
         /* Subsections */
-        .subsec { margin-bottom: 3rem; }
-        .subsec-header { display: flex; align-items: center; margin-bottom: 1.25rem; gap: 0.6rem; }
-        .subsec-icon { font-size: 1.4rem; }
-        .subsec-label { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
-        .subsec-tag { font-size: 0.75rem; padding: 0.3rem 0.8rem; border-radius: 6px; font-weight: 800; margin-left: 0.75rem; border: 1px solid transparent; }
+        .subsec { margin-bottom: 2.5rem; }
+        .subsec:last-child { margin-bottom: 0; }
+        .subsec-header { display: flex; align-items: center; margin-bottom: 1rem; gap: 0.5rem; }
+        .subsec-icon { font-size: 1.25rem; }
+        .subsec-label { font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .subsec-tag { font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 600; margin-left: 0.5rem; }
         
-        .lead-text { font-size: 1.1rem; font-weight: 600; color: var(--text-lead); margin-bottom: 1.25rem; }
-        .body-text { font-size: 1rem; color: var(--text-body); margin-bottom: 1.25rem; }
+        .lead-text { font-size: 1.05rem; font-weight: 500; color: #1E293B; margin-bottom: 1rem; }
+        .body-text { font-size: 0.95rem; color: #475569; margin-bottom: 1rem; }
         
-        /* Matrices */
-        .metric-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 2rem; }
-        .metric-card { background: var(--bg-card-inner); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; }
-        .metric-value { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.4rem; letter-spacing: -0.02em; }
-        .metric-label { font-size: 0.75rem; color: var(--text-mut); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+        /* Matrices & Components */
+        .metric-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .metric-card { background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; text-align: center; }
+        .metric-value { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .metric-label { font-size: 0.8rem; color: var(--text-mut); text-transform: uppercase; font-weight: 600; }
         
-        .impact-box { padding: 1.75rem; border-radius: 0 12px 12px 0; font-size: 1rem; font-weight: 500; color: var(--text-lead); border-left-width: 5px !important; }
+        .impact-box { padding: 1.5rem; border-radius: 0 8px 8px 0; font-size: 0.95rem; font-weight: 500; }
         
-        .arch-grid { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 2rem; }
-        .arch-chip { background: var(--comp-bg); border: 1px solid var(--comp-border); border-radius: 8px; padding: 0.6rem 1.2rem; font-size: 0.85rem; font-weight: 700; color: var(--text-lead); }
+        .arch-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
+        .arch-chip { background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 6px; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: #334155; }
         
-        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; font-size: 0.95rem; }
-        .info-table th, .info-table td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); text-align: left; }
-        .info-table th { background: var(--bg-card-inner); font-weight: 700; color: var(--text-h1); width: 35%; }
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        .info-table th, .info-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); text-align: left; }
+        .info-table th { background: #F8FAFC; font-weight: 600; color: #475569; width: 40%; }
+        .info-table tr:last-child td, .info-table tr:last-child th { border-bottom: none; }
         
-        .chart-wrap { margin-top: 2rem; padding: 1.5rem; border: 1px solid var(--border); border-radius: 15px; background: var(--bg-card-inner); }
+        .chart-wrap { margin-top: 1.5rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; background: #FAFAFA; }
         
-        .flow-row { display: flex; align-items: center; justify-content: space-between; background: var(--bg-card-inner); padding: 2rem; border-radius: 15px; border: 2px dashed var(--comp-border); }
-        .flow-step { flex: 1; text-align: center; padding: 1.25rem; background: var(--bg-card); color: var(--text-h1); border-radius: 10px; border: 1px solid var(--border); font-weight: 700; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .flow-arrow { font-size: 1.8rem; color: var(--comp-border); margin: 0 1.25rem; }
+        .flow-row { display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; padding: 1.5rem; border-radius: 8px; border: 1px dashed #CBD5E1; font-weight: 500; font-size: 0.9rem; }
+        .flow-step { flex: 1; text-align: center; padding: 1rem; background: #fff; border-radius: 6px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .flow-arrow { font-size: 1.5rem; color: var(--text-mut); margin: 0 1rem; }
         
-        .comp-box { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        .comp-side { padding: 2rem; border-radius: 15px; border: 1px solid var(--border); background: var(--bg-card); }
-        .comp-title { font-weight: 800; margin-bottom: 0.75rem; font-size: 1.1rem; color: var(--text-h1); }
+        .comp-box { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .comp-side { padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); background: #fff; }
+        .comp-title { font-weight: 600; margin-bottom: 0.5rem; font-size: 1rem; }
         
-        .sentiment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-        .sentiment-card { padding: 1.5rem; border: 1px solid var(--border); border-radius: 15px; background: var(--bg-card); }
-        .sent-emoji { font-size: 1.8rem; margin-bottom: 0.75rem; }
-        .sent-label { font-weight: 700; font-size: 1rem; color: var(--text-h1); margin-bottom: 0.4rem; }
-        .sent-desc { font-size: 0.9rem; color: var(--text-body); }
+        .sentiment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        .sentiment-card { padding: 1.25rem; border: 1px solid var(--border); border-radius: 8px; background: #fff; display: flex; flex-direction: column; gap: 0.5rem; }
+        .sent-emoji { font-size: 1.5rem; }
+        .sent-label { font-weight: 600; font-size: 0.95rem; }
+        .sent-desc { font-size: 0.85rem; color: var(--text-mut); }
         
         /* Synthesis Section */
-        .synthesis { background: var(--synthesis-bg); color: #fff; border-radius: 25px; padding: 4rem; margin-top: 5rem; }
-        .synthesis-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 2.5rem; letter-spacing: -0.04em; }
-        .syn-block { margin-bottom: 2rem; font-size: 1.15rem; color: #CBD5E1; padding-left: 2rem; border-left: 3px solid var(--c1); font-weight: 500; }
-        .outlook-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 2.5rem; margin-top: 4rem; }
-        .outlook-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 2rem; color: #38BDF8; text-transform: uppercase; letter-spacing: 0.1em; }
-        .outlook-item { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 1rem; color: #94A3B8; }
-        .outlook-badge { background: var(--c1); color: #fff; padding: 0.3rem 0.7rem; border-radius: 5px; font-size: 0.7rem; font-weight: 800; margin-right: 0.8rem; vertical-align: middle; }
+        .synthesis { background: #0F172A; color: #fff; border-radius: 12px; padding: 3rem; margin-top: 4rem; }
+        .synthesis-title { font-size: 2rem; font-weight: 700; margin-bottom: 2rem; color: #F8FAFC; }
+        .syn-block { margin-bottom: 1.5rem; font-size: 1.05rem; color: #CBD5E1; padding-left: 1.5rem; border-left: 2px solid #334155; }
+        .outlook-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 2rem; margin-top: 3rem; }
+        .outlook-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; color: #38BDF8; }
+        .outlook-item { margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.95rem; color: #94A3B8; }
+        .outlook-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .outlook-badge { background: rgba(255,255,255,0.1); color: #fff; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-right: 0.5rem; text-transform: uppercase; }
         
-        footer { margin-top: 5rem; padding-top: 3rem; border-top: 1px solid var(--border); color: var(--text-mut); font-size: 0.9rem; text-align: center; }
-        .disclaimer { font-size: 0.85rem; color: #94A3B8; background: var(--bg-card-inner); padding: 1.5rem; border-radius: 12px; margin-top: 2.5rem; text-align: left; border: 1px solid var(--border); }
-        .fab { position: fixed; bottom: 3rem; right: 3rem; background: var(--c1); color: #fff; padding: 1.2rem 2.2rem; border-radius: 100px; font-weight: 800; cursor: pointer; box-shadow: 0 15px 35px -5px rgba(8, 145, 178, 0.4); z-index: 999; }
+        /* Footer & Misc */
+        footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--text-mut); font-size: 0.85rem; text-align: center; }
+        .disclaimer { font-size: 0.8rem; color: #94A3B8; background: #F1F5F9; padding: 1rem; border-radius: 6px; margin-top: 2rem; }
+        .fab { position: fixed; bottom: 2rem; right: 2rem; background: #0F172A; color: #fff; padding: 1rem 2rem; border-radius: 999px; font-weight: 600; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: 1px solid #334155; transition: transform 0.2s; }
+        .fab:hover { transform: translateY(-3px); }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div class="sidebar-brand">MCKINSEY LEVEL<br>STRATEGIC ADVISORY</div>
-        
-        <button id="theme-toggle" class="theme-btn">☀️ Light Mode</button>
-
+        <div class="sidebar-brand">Fortune 500<br>Strategic Advisory</div>
         <ul class="sidebar-nav">
-            <li>🔭 Executive Summary</li>
-            <li>⚡ 1. Agent Economics</li>
-            <li>🔬 2. Memory Squeeze</li>
-            <li>🔬 3. Vera Rubin Cycle</li>
-            <li>🔭 4. Google Gemma 4</li>
-            <li>🔬 5. GEN-1 Embodied AI</li>
-            <li style="margin-top: 2.5rem; color: var(--c1); font-weight: 800;">🛰️ Strategic Outlook</li>
+            <li>Macro Overview</li>
+            <li>1. Anthropic & Agent Economics</li>
+            <li>2. The 2026 Memory Squeeze</li>
+            <li>3. Vera Rubin Architecture</li>
+            <li>4. Google Gemma 4</li>
+            <li>5. GEN-1 Embodied AI</li>
+            <li style="margin-top: 2rem; color: #38BDF8;">Closing Synthesis</li>
         </ul>
     </aside>
 
     <main>
         <header>
             <h1>Strategic Artificial Intelligence Technology and Ecosystem Advisory Report</h1>
-            <div class="meta-info">Assessment Window: April 2026 | Fortune 500 Intelligence Stream</div>
+            <div class="meta-info">Date of Assessment: April 6, 2026 | Prepared by: Lead UI/UX Engineer & AI Data Analyst</div>
         </header>
 
         <div class="intro-text">
-            The global artificial intelligence ecosystem has crossed a definitive threshold in the first quarter of 2026, transitioning abruptly from an era of unconstrained, experimental capability scaling into a brutally pragmatic phase of infrastructural consolidation, absolute efficiency prioritization, and ruthless commercialization. Following a historic and unparalleled venture capital influx totaling USD 300 billion in the first quarter alone, the market is demonstrating severe architectural and economic bifurcation. The software layer is undergoing a radical commoditization of foundational intelligence, forcing a strategic pivot toward complex, autonomous agentic workflows and localized edge-deployment efficiency.
+            The global artificial intelligence ecosystem has crossed a definitive threshold in the first quarter of 2026, transitioning abruptly from an era of unconstrained, experimental capability scaling into a brutally pragmatic phase of infrastructural consolidation, absolute efficiency prioritization, and ruthless commercialization. Following a historic and unparalleled venture capital influx totaling USD 300 billion in the first quarter alone—representing nearly seventy percent of the total venture capital deployed globally throughout the entirety of 2025—the market is demonstrating severe architectural and economic bifurcation. The software layer is undergoing a radical commoditization of foundational intelligence, which is actively forcing a strategic pivot toward complex, autonomous agentic workflows and localized edge-deployment efficiency. Simultaneously, this proliferation of autonomous agents has exposed critical, systemic vulnerabilities in operational governance, fundamentally challenging the economic viability of flat-rate application programming interface (API) models offered by frontier laboratories.
+            <br><br>
+            On the physical infrastructure layer, the industry is colliding with absolute thermodynamic and manufacturing realities. An impending capital expenditure crisis is currently manifesting, not necessarily in the logic compute architecture itself, but in severe memory bandwidth shortages and physical thermal dissipation limits. This physical memory wall is radically altering the balance of power among tier-one hardware providers, punishing entities lacking monopolistic supply chain leverage while simultaneously birthing a secondary market for legacy computational capacity. Furthermore, the ecosystem is witnessing the rapid commercialization of physical artificial intelligence, as foundation models finally bridge the simulation-to-reality gap, allowing autonomous robotic systems to enter the public equity markets with multi-billion dollar valuations.
         </div>
 
-        <article class="article" id="art1" style="border-top: 6px solid var(--c1);">
-            <h2 class="article-title">1. Anthropic Claude Code Leak & The Collapse of Flat-Rate Agentic Ecosystems</h2>
+        <article class="article" id="art1" style="border-top: 4px solid var(--c1);">
+            <h2 class="article-title">1. Anthropic Claude Code Leak, Adversa AI Vulnerability Discovery, and the Collapse of Flat-Rate Agentic Ecosystems</h2>
             
             <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">🔭</span> <span class="subsec-label c1">Overview</span></div>
-                <p class="lead-text">Accidental exposure of Claude Code sourcemaps (~512,000 lines) triggered structural security revelations and a massive economic pivot for frontier AI laboratories.</p>
-                <p class="body-text">Vulnerabilities (CVE-2026-33068 & Adversa AI Bypass) coupled with unsustainable compute costs from autonomous frameworks like OpenClaw forced Anthropic to block flat-rate subscriptions for agentic use, mandating pay-as-you-go billing starting April 4, 2026.</p>
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔭</span> <span class="subsec-label c1">Overview</span>
+                </div>
+                <p class="lead-text">The accidental exposure of Anthropic's flagship AI coding agent, Claude Code, has triggered a cascading sequence of security revelations and severe economic shocks, fundamentally altering the commercial viability of autonomous open-source frameworks.</p>
+                <p class="body-text">Initiated by a critical packaging error uploading ~512,000 lines of TypeScript to the public npm registry, independent researchers identified structural flaws in permission enforcement (Adversa AI deny-rule bypass) and configuration loading (CVE-2026-33068). In direct response to both these vulnerabilities and the mathematically unsustainable compute consumption of third-party harnesses like OpenClaw, Anthropic immediately blocked flat-rate API piping, enforcing punitive pay-as-you-go tiers.</p>
             </div>
 
             <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">⚡</span> <span class="subsec-label c1">Strategic Impact</span></div>
-                <div class="metric-row metric-row-4">
-                    <div class="metric-card"><div class="metric-value c1">512K</div><div class="metric-label">Lines Exposed</div></div>
-                    <div class="metric-card"><div class="metric-value c1">$5K</div><div class="metric-label">Daily Agent Cost</div></div>
-                    <div class="metric-card"><div class="metric-value c1">10-50x</div><div class="metric-label">OpEx Inflation</div></div>
-                    <div class="metric-card"><div class="metric-value c1">$100M</div><div class="metric-label">Partner Fund</div></div>
+                <div class="subsec-header">
+                    <span class="subsec-icon">⚡</span> <span class="subsec-label c1">Strategic Impact</span>
                 </div>
-                <div class="impact-box lc1" style="border-left-color: var(--c1);">
-                    <strong>C-Level Directive:</strong> The "Wrapper" model is economically compromised. Pivot toward full-stack agentic platforms owning specialized small-parameter edge models to neutralize vendor pricing power.
+                <div class="metric-row metric-row-4">
+                    <div class="metric-card"><div class="metric-value c1">512K</div><div class="metric-label">Lines Leaked</div></div>
+                    <div class="metric-card"><div class="metric-value c1">>50</div><div class="metric-label">Bypass Subcommands</div></div>
+                    <div class="metric-card"><div class="metric-value c1">$200</div><div class="metric-label">Prev. Flat Rate / Mo</div></div>
+                    <div class="metric-card"><div class="metric-value c1">$5K</div><div class="metric-label">Peak Cost / Day</div></div>
+                </div>
+                <div class="impact-box lc1" style="border-left: 4px solid var(--c1);">
+                    <strong>Business and Market Dynamics:</strong> The wrapper business model is fundamentally compromised. Capital allocators must reassess startups reliant on third-party foundation models, as frontier labs aggressively rotate revenue models toward rigid enterprise procurement to capture application-layer margins.
                 </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label c1">Technical Deep Dive</span> 
-                    <span class="subsec-tag lc1 c1">Permission Enforcement Logic</span>
+                    <span class="subsec-icon">🔬</span> <span class="subsec-label c1">Technical Deep Dive</span> <span class="subsec-tag lc1 c1">Security & Economics</span>
                 </div>
                 <div class="arch-grid">
-                    <div class="arch-chip">TypeScript Sourcemaps</div>
+                    <div class="arch-chip">TypeScript Sourcemap</div>
+                    <div class="arch-chip">NPM Registry</div>
                     <div class="arch-chip">CVE-2026-33068</div>
-                    <div class="arch-chip">Compound Command Pipeline</div>
+                    <div class="arch-chip">Adversa AI Exploit</div>
+                    <div class="arch-chip">Opus 4.6 Inference</div>
                 </div>
                 <table class="info-table">
-                    <tr><th>Vulnerability Threshold</th><td>>50 subcommands triggering silent security bypass</td></tr>
-                    <tr><th>Patched Versions</th><td>v2.1.53 (Config Load) / v2.1.90 (Adversa Bypass)</td></tr>
-                    <tr><th>API Token Pricing</th><td>$15 Input / $75 Output per 1M tokens (Opus 4.6)</td></tr>
+                    <tr><th>Vulnerability Identifiers</th><td>CVE-2026-33068 (patched v2.1.53) & Adversa AI Bypass (patched v2.1.90)</td></tr>
+                    <tr><th>Exploit Threshold</th><td>>50 compound subcommands triggering silent permission bypass</td></tr>
+                    <tr><th>New Pay-As-You-Go Cost</th><td>USD 15 / 1M input tokens; USD 75 / 1M output tokens (Opus 4.6)</td></tr>
                 </table>
                 <div class="chart-wrap"><div id="chart-art1" style="width:100%; height:280px;"></div></div>
             </div>
 
             <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">📋</span> <span class="subsec-label c1">Visual / Evidence</span></div>
+                <div class="subsec-header">
+                    <span class="subsec-icon">📋</span> <span class="subsec-label c1">Visual / Evidence</span>
+                </div>
                 <div class="flow-row">
-                    <div class="flow-step">Agentic Loop Initialized</div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Uncapped Compute Demand</div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step bg-c1">Flat-Rate Subscription Ban</div>
-                </div>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">⚠️</span> <span class="subsec-label c1">Critical View</span></div>
-                <p class="body-text">Unilateral alteration of developer economics highlights severe vendor lock-in risks. Relying on a single closed-source provider for core cognitive infrastructure remains an unacceptable risk for enterprise resilience.</p>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">💬</span> <span class="subsec-label c1">Community Sentiment</span></div>
-                <div class="sentiment-grid">
-                    <div class="sentiment-card"><div class="sent-emoji">📉</div><div class="sent-label">Developer Outrage</div><div class="sent-desc">Frustration over instant 50x operational expense inflation.</div></div>
-                    <div class="sentiment-card"><div class="sent-emoji">🛡️</div><div class="sent-label">Security Alarm</div><div class="sent-desc">CISOs reassessing autonomous agent permission models.</div></div>
-                    <div class="sentiment-card"><div class="sent-emoji">💻</div><div class="sent-label">Edge Migration</div><div class="sent-desc">Surge in local LLM deployment to neutralize API costs.</div></div>
-                </div>
-            </div>
-        </article>
-
-        <article class="article" id="art2" style="border-top: 6px solid var(--c2);">
-            <h2 class="article-title">2. The 2026 AI Memory Squeeze: 30% Hyperscaler CapEx Rotation</h2>
-            
-            <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">🔭</span> <span class="subsec-label c2">Overview</span></div>
-                <p class="lead-text">Memory bandwidth and capacity have become the definitive bottlenecks of the AI revolution, outstripping manufacturing capacity of the Samsung/Hynix/Micron oligopoly.</p>
-                <p class="body-text">SemiAnalysis financial models reveal memory will consume a staggering 30% of total hyperscaler CapEx in 2026, a near four-fold increase from 2024 levels.</p>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">⚡</span> <span class="subsec-label c2">Strategic Impact</span></div>
-                <div class="metric-row metric-row-4">
-                    <div class="metric-card"><div class="metric-value c2">30%</div><div class="metric-label">CapEx Share '26</div></div>
-                    <div class="metric-card"><div class="metric-value c2">>$10</div><div class="metric-label">USD per GB</div></div>
-                    <div class="metric-card"><div class="metric-value c2">+20%</div><div class="metric-label">Server Inflation</div></div>
-                    <div class="metric-card"><div class="metric-value c2">70%</div><div class="metric-label">Global Prod Share</div></div>
-                </div>
-                <div class="impact-box lc2" style="border-left-color: var(--c2);">
-                    <strong>Strategic Pivot:</strong> Secure "VVP" (Very Very Preferred) memory pricing scale immediately. Entities lacking procurement leverage face severe margin compression in H2 2026.
+                    <div class="flow-step">Open-Source Agent<br><small>(e.g., OpenClaw)</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Infinite Execution Loop<br><small>Uncapped Token Generation</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Provider Compute Loss<br><small>Unsustainable Overhead</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step bg-c1">Strict Usage Billing<br><small>API Ban on Frameworks</small></div>
                 </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label c2">Technical Deep Dive</span> 
-                    <span class="subsec-tag lc2 c2">HBM4 Capacitive Scaling</span>
+                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c1">Critical View</span>
                 </div>
-                <div class="arch-grid">
-                    <div class="arch-chip">HBM4 High Bandwidth</div>
-                    <div class="arch-chip">TSV Integration</div>
-                    <div class="arch-chip">Quantization Compression</div>
-                </div>
-                <div class="chart-wrap"><div id="chart-art2" style="width:100%; height:280px;"></div></div>
+                <p class="body-text">This incident shatters the illusion that robust post-training alignment can compensate for basic software engineering failures. Anthropic shipped a massive source map to a public registry due to absent CI checks. Furthermore, overnight alteration of subscription economics highlights extreme vendor lock-in risks associated with proprietary API dependency.</p>
             </div>
 
             <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">📋</span> <span class="subsec-label c2">Visual / Evidence</span></div>
-                <div class="comp-box">
-                    <div class="comp-side">
-                        <div class="comp-title">Logic Scaling (Moore)</div>
-                        <p class="body-text">Steady cost reduction via node shrinks. Currently unconstrained relative to memory.</p>
-                    </div>
-                    <div class="comp-side lc2">
-                        <div class="comp-title">Memory Wall (Physical)</div>
-                        <p class="body-text">Stubborn physical constraints. yield-limited wafer footprint accelerating supply crunch.</p>
-                    </div>
+                <div class="subsec-header">
+                    <span class="subsec-icon">💬</span> <span class="subsec-label c1">Community Sentiment</span>
                 </div>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">⚠️</span> <span class="subsec-label c2">Critical View</span></div>
-                <p class="body-text">Hyperscale CapEx trajectory borders on capital incineration. If software revenue fails to scale with physical memory density costs, a cascading CapEx collapse is imminent.</p>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">💬</span> <span class="subsec-label c2">Community Sentiment</span></div>
                 <div class="sentiment-grid">
-                    <div class="sentiment-card"><div class="sent-emoji">🚨</div><div class="sent-label">Procurement Panic</div><div class="sent-desc">Server manufacturers scrambling for HBM allocation.</div></div>
-                    <div class="sentiment-card"><div class="sent-emoji">📉</div><div class="sent-label">Margin Fears</div><div class="sent-desc">Analysts flagging exposure for secondary accelerator designers.</div></div>
-                    <div class="sentiment-card"><div class="sent-emoji">📈</div><div class="sent-label">Memory Bullish</div><div class="sent-desc">Institutional capital rotating into Micron/SK hynix.</div></div>
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">📉</div>
+                        <div class="sent-label">Developer Outrage</div>
+                        <div class="sent-desc">Independent developers express severe frustration over the instant 10-50x operational expense inflation.</div>
+                    </div>
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">🛡️</div>
+                        <div class="sent-label">Security Alarm</div>
+                        <div class="sent-desc">Enterprise CISOs reassessing third-party AI agents following structural permission bypass revelations.</div>
+                    </div>
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">💻</div>
+                        <div class="sent-label">Local Compute Pivot</div>
+                        <div class="sent-desc">Surge in community migration toward local, small-parameter edge models to neutralize API tollbooths.</div>
+                    </div>
                 </div>
             </div>
         </article>
 
-        <article class="article" id="art3" style="border-top: 6px solid var(--c3);">
-            <h2 class="article-title">3. NVIDIA Vera Rubin Architecture: The $8.8M NVL72 Liquid Cooling Supercycle</h2>
+        <article class="article" id="art2" style="border-top: 4px solid var(--c2);">
+            <h2 class="article-title">2. The 2026 AI Memory Squeeze and the 30 Percent Hyperscaler CapEx Rotation</h2>
             
             <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">🔭</span> <span class="subsec-label c3">Overview</span></div>
-                <p class="lead-text">NVIDIA’s transition to Vera Rubin marks the official end of air-cooled AI supremacy, mandating 100% liquid-cooled infrastructure at the rack scale.</p>
-                <p class="body-text">The R100 GPU delivers 50 PFLOPS inference performance (5x Blackwell), integrated via 260 TB/s NVLink 6 switch fabric.</p>
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔭</span> <span class="subsec-label c2">Overview</span>
+                </div>
+                <p class="lead-text">The global semiconductor supply chain has violently collided with a physical inflection point where memory bandwidth and capacity dictate the pace of AI, forcing a catastrophic market repricing of DRAM and HBM.</p>
+                <p class="body-text">SemiAnalysis projects memory components will consume 30% of total hyperscaler CapEx in 2026, up from 8% in 2024. As context windows expand for real-time inference, demand for HBM4 and LPDDR5X completely outstrips capacity from Samsung, SK hynix, and Micron, fundamentally altering the unit economics of AI data centers.</p>
             </div>
 
             <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">⚡</span> <span class="subsec-label c3">Strategic Impact</span></div>
+                <div class="subsec-header">
+                    <span class="subsec-icon">⚡</span> <span class="subsec-label c2">Strategic Impact</span>
+                </div>
+                <div class="metric-row metric-row-4">
+                    <div class="metric-card"><div class="metric-value c2">30%</div><div class="metric-label">CapEx Share '26</div></div>
+                    <div class="metric-card"><div class="metric-value c2">>$10</div><div class="metric-label">Cost per GB (Q2)</div></div>
+                    <div class="metric-card"><div class="metric-value c2">+20%</div><div class="metric-label">Rack Price Infl.</div></div>
+                    <div class="metric-card"><div class="metric-value c2">70%</div><div class="metric-label">Global Prod Share</div></div>
+                </div>
+                <div class="impact-box lc2" style="border-left: 4px solid var(--c2);">
+                    <strong>Investment Strategy:</strong> Aggressive pivot to capture value in the semiconductor enablement layer. Pure-play memory manufacturers, advanced packaging (TSMC CoWoS), and memory controller IPs present immediate upside. Hardware vendors lacking VVP memory pricing scale face severe margin compression.
+                </div>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔬</span> <span class="subsec-label c2">Technical Deep Dive</span> <span class="subsec-tag lc2 c2">Physical Limitations</span>
+                </div>
+                <div class="arch-grid">
+                    <div class="arch-chip">HBM4 Vertically Stacked</div>
+                    <div class="arch-chip">LPDDR5X</div>
+                    <div class="arch-chip">TSV Integration</div>
+                    <div class="arch-chip">Capacitor Scaling Constraints</div>
+                </div>
+                <table class="info-table">
+                    <tr><th>Memory Share of CapEx (2024)</th><td>~8%</td></tr>
+                    <tr><th>Memory Share of CapEx (2026)</th><td>~30%</td></tr>
+                    <tr><th>LPDDR5X Open Market Pricing</th><td>>USD 10 per GB (Projected Q2 2026)</td></tr>
+                </table>
+                <div class="chart-wrap"><div id="chart-art2" style="width:100%; height:280px;"></div></div>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">📋</span> <span class="subsec-label c2">Visual / Evidence</span>
+                </div>
+                <div class="comp-box">
+                    <div class="comp-side">
+                        <div class="comp-title c2">Logic Compute (Moore's Law)</div>
+                        <p class="body-text" style="font-size:0.9rem;">Benefits from steady node shrinks at TSMC. Predictable cost reductions over time despite increasing transistor density.</p>
+                    </div>
+                    <div class="comp-side lc2">
+                        <div class="comp-title c2">Memory Fabric (Physical Wall)</div>
+                        <p class="body-text" style="font-size:0.9rem;">TSV integration requires massive wafer footprint, yielding far fewer chips. Stubborn physical capacitor limits enforce absolute supply scarcity.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c2">Critical View</span>
+                </div>
+                <p class="body-text">Hyperscalers absorbing these exorbitant memory costs risk massive capital incineration if application-layer software revenue fails to scale proportionately. Furthermore, NVIDIA's monopolistic "Very Very Preferred" pricing acts as a resource capture mechanism, starving emerging hardware competitors.</p>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">💬</span> <span class="subsec-label c2">Community Sentiment</span>
+                </div>
+                <div class="sentiment-grid">
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">🚨</div>
+                        <div class="sent-label">Procurement Panic</div>
+                        <div class="sent-desc">Server manufacturers scrambling to secure HBM allocation through late 2027.</div>
+                    </div>
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">📉</div>
+                        <div class="sent-label">Margin Fears</div>
+                        <div class="sent-desc">Analysts flagging extreme exposure for secondary accelerator designers lacking scale.</div>
+                    </div>
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">📈</div>
+                        <div class="sent-label">Memory Bullishness</div>
+                        <div class="sent-desc">Immediate institutional capital rotation into Micron and SK hynix.</div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="article" id="art3" style="border-top: 4px solid var(--c3);">
+            <h2 class="article-title">3. NVIDIA Vera Rubin Architecture Mass Production Validation and the Liquid Cooling Supercycle</h2>
+            
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔭</span> <span class="subsec-label c3">Overview</span>
+                </div>
+                <p class="lead-text">NVIDIA's Vera Rubin architecture has officially entered scaled production, representing a monumental leap in rack-scale AI density and enforcing a strict liquid cooling supercycle.</p>
+                <p class="body-text">Validated by Foxconn's massive 29.7% YoY sales surge, the Rubin R100 GPU delivers 50 PFLOPS of inference performance (5x Blackwell) and 22 TB/s memory bandwidth. The architecture climaxes in the NVL72 rack system—a $8.8 million, fully liquid-cooled monolith that shifts the engineering paradigm from isolated chips to holistic rack-scale design.</p>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">⚡</span> <span class="subsec-label c3">Strategic Impact</span>
+                </div>
                 <div class="metric-row metric-row-4">
                     <div class="metric-card"><div class="metric-value c3">50</div><div class="metric-label">PFLOPS NVFP4</div></div>
-                    <div class="metric-card"><div class="metric-value c3">22 TB/s</div><div class="metric-label">HBM4 B/W</div></div>
-                    <div class="metric-card"><div class="metric-value c3">$8.8M</div><div class="metric-label">NVL72 Price</div></div>
-                    <div class="metric-card"><div class="metric-value c3">100%</div><div class="metric-label">Liquid-Cooled</div></div>
+                    <div class="metric-card"><div class="metric-value c3">22 TB/s</div><div class="metric-label">HBM4 Bandwidth</div></div>
+                    <div class="metric-card"><div class="metric-value c3">$8.8M</div><div class="metric-label">NVL72 Rack Cost</div></div>
+                    <div class="metric-card"><div class="metric-value c3">260 TB/s</div><div class="metric-label">Scale-Up B/W</div></div>
                 </div>
-                <div class="impact-box lc3" style="border-left-color: var(--c3);">
-                    <strong>Strategic Moat:</strong> Vertical integration of Olympus cores with NVLink 6 renders logic-only challengers obsolete. Cloud providers must buy whole NVIDIA racks or face performance death.
+                <div class="impact-box lc3" style="border-left: 4px solid var(--c3);">
+                    <strong>Infrastructure and Hardware Linkage:</strong> Deployment pushes infrastructure past air-cooling limits. Mandates 100% direct-to-chip liquid cooling, triggering massive secondary supercycles in CapEx for thermal management and power distribution.
                 </div>
             </div>
 
             <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">🔬</span> <span class="subsec-label c3">Technical Deep Dive</span> </div>
-                <div class="arch-grid">
-                    <div class="arch-chip">Vera CPU (Olympus)</div>
-                    <div class="arch-chip">NVLink 6 Switch</div>
-                    <div class="arch-chip">Direct-to-Chip Two-Phase</div>
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔬</span> <span class="subsec-label c3">Technical Deep Dive</span> <span class="subsec-tag lc3 c3">Rack-Scale Engineering</span>
                 </div>
+                <div class="arch-grid">
+                    <div class="arch-chip">R100 GPU (336B Transistors)</div>
+                    <div class="arch-chip">Vera CPU (88 Olympus Cores)</div>
+                    <div class="arch-chip">NVLink 6 Switch</div>
+                    <div class="arch-chip">NVLink-C2C (1.8 TB/s)</div>
+                </div>
+                <table class="info-table">
+                    <tr><th>Vera Rubin NVL72 Rack</th><td>72 GPUs, 36 CPUs, 20.7 TB HBM4 Capacity</td></tr>
+                    <tr><th>Fabrication Node</th><td>TSMC 3nm (N3P)</td></tr>
+                    <tr><th>Performance Jump</th><td>5x inference performance over previous Blackwell generation</td></tr>
+                </table>
                 <div class="chart-wrap"><div id="chart-art3" style="width:100%; height:280px;"></div></div>
             </div>
 
             <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">📋</span> <span class="subsec-label c3">Visual / Evidence</span></div>
+                <div class="subsec-header">
+                    <span class="subsec-icon">📋</span> <span class="subsec-label c3">Visual / Evidence</span>
+                </div>
                 <div class="flow-row">
-                    <div class="flow-step">Blackwell (Transition)</div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Vera Rubin (Unified Logic)</div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step bg-c3">Rack-Scale Inference Dominance</div>
+                    <div class="flow-step">Legacy Air-Cooled DC</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">NVL72 Deployment</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Direct-to-Chip Liquid Cooling</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step bg-c3">Grid Demand Boom</div>
                 </div>
             </div>
 
             <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">⚠️</span> <span class="subsec-label c3">Critical View</span></div>
-                <p class="body-text">Relentless annual release cycles destroy 5-year depreciation models. Blackwell clusters purchased in Q4 '25 may be technologically outclassed before they are fully operational.</p>
+                <div class="subsec-header">
+                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c3">Critical View</span>
+                </div>
+                <p class="body-text">The relentless annual release cadence destroys traditional 3-5 year server depreciation models, turning highly expensive capital assets obsolete in months. Furthermore, grid-level power constraints and lacking retrofitted cooling infra could physically throttle Rubin's market penetration.</p>
             </div>
 
             <div class="subsec">
-                <div class="subsec-header"><span class="subsec-icon">💬</span> <span class="subsec-label c3">Community Sentiment</span></div>
+                <div class="subsec-header">
+                    <span class="subsec-icon">💬</span> <span class="subsec-label c3">Community Sentiment</span>
+                </div>
                 <div class="sentiment-grid">
-                    <div class="sentiment-card"><div class="sent-emoji">👑</div><div class="sent-label">Moat Verified</div><div class="sent-desc">Analysts concede NVIDIA has captured the entire rack value chain.</div></div>
-                    <div class="sentiment-card"><div class="sent-emoji">💧</div><div class="sent-label">Cooling Bull</div><div class="sent-desc">Investment alpha rotating into Vertiv/Advanced Transceivers.</div></div>
-                    <div class="sentiment-card"><div class="sent-emoji">⚡</div><div class="sent-label">Grid Alarm</div><div class="sent-desc">Severe concerns over power grid capacity to sustain NVL72 densification.</div></div>
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">👑</div>
+                        <div class="sent-label">NVIDIA Hegemony</div>
+                        <div class="sent-desc">Market concedes an insurmountable moat due to holistic NVLink switch fabric integration.</div>
+                    </div>
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">💧</div>
+                        <div class="sent-label">Cooling Pivot</div>
+                        <div class="sent-desc">Investors aggressively acquiring secondary derivatives like Vertiv and specialized transceiver makers.</div>
+                    </div>
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">⚡</div>
+                        <div class="sent-label">Power Grid Reality</div>
+                        <div class="sent-desc">Deep concern over physical realization amid Xcel Energy reports of demand outstripping capacity.</div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="article" id="art4" style="border-top: 4px solid var(--c4);">
+            <h2 class="article-title">4. Google Gemma 4 Architecture, TurboQuant Compression, and the Decentralization of Edge Inference</h2>
+            
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔭</span> <span class="subsec-label c4">Overview</span>
+                </div>
+                <p class="lead-text">Google has fundamentally altered the open-source landscape with the Gemma 4 family, utilizing revolutionary TurboQuant memory compression to decentralize frontier-level reasoning to localized edge hardware.</p>
+                <p class="body-text">Directly attacking the KV cache memory bottleneck, TurboQuant reduces memory requirements by 4-6x. Released under Apache 2.0, the Gemma 4 31B Dense model hit #3 on Arena.ai, completely bypassing the massive cloud API dependency by proving intelligence-per-parameter can outcompete brute-force scale.</p>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">⚡</span> <span class="subsec-label c4">Strategic Impact</span>
+                </div>
+                <div class="metric-row metric-row-4">
+                    <div class="metric-card"><div class="metric-value c4">4-6x</div><div class="metric-label">KV Cache Reduction</div></div>
+                    <div class="metric-card"><div class="metric-value c4">31B</div><div class="metric-label">Dense Parameter</div></div>
+                    <div class="metric-card"><div class="metric-value c4">89.2%</div><div class="metric-label">AIME 2024 Score</div></div>
+                    <div class="metric-card"><div class="metric-value c4">256K</div><div class="metric-label">Context Window</div></div>
+                </div>
+                <div class="impact-box lc4" style="border-left: 4px solid var(--c4);">
+                    <strong>Business and Market Dynamics:</strong> Actively undermines the economic justification for massive API fees. Highly strategic wedge against OpenAI and Meta; enterprise AI agents will likely standardize on Google's permissive architecture to ensure data sovereignty.
+                </div>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔬</span> <span class="subsec-label c4">Technical Deep Dive</span> <span class="subsec-tag lc4 c4">Algorithmic Efficiency</span>
+                </div>
+                <div class="arch-grid">
+                    <div class="arch-chip">TurboQuant Compression</div>
+                    <div class="arch-chip">PolarQuant Rotation</div>
+                    <div class="arch-chip">Per-Layer Embeddings (PLE)</div>
+                    <div class="arch-chip">Mixture-of-Experts (MoE)</div>
+                </div>
+                <table class="info-table">
+                    <tr><th>Gemma 4 26B MoE</th><td>25.2B total, 3.8B active parameters, 8/128 experts</td></tr>
+                    <tr><th>Gemma 4 E2B / E4B</th><td>128K context, native mobile ARM execution</td></tr>
+                    <tr><th>Performance Gain</th><td>Up to 8x attention logit speedup on H100</td></tr>
+                </table>
+                <div class="chart-wrap"><div id="chart-art4" style="width:100%; height:280px; display:none;"></div></div>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">📋</span> <span class="subsec-label c4">Visual / Evidence</span>
+                </div>
+                <div class="comp-box">
+                    <div class="comp-side">
+                        <div class="comp-title c4">Proprietary Cloud Model</div>
+                        <p class="body-text" style="font-size:0.9rem;">Brute-force scaling, massive cloud API costs, data privacy concerns, latency inherent in remote transmission.</p>
+                    </div>
+                    <div class="comp-side lc4">
+                        <div class="comp-title c4">Gemma 4 Edge Inference</div>
+                        <p class="body-text" style="font-size:0.9rem;">Localized hardware execution, absolute data sovereignty, bypasses US export computing thresholds, low latency.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c4">Critical View</span>
+                </div>
+                <p class="body-text">Extreme quantization introduces risks of virtually undetectable degradation in complex mathematical logic over long contexts. Furthermore, releasing uncensored autonomous-capable models to run on untraceable local hardware raises severe dual-use national security concerns.</p>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">💬</span> <span class="subsec-label c4">Community Sentiment</span>
+                </div>
+                <div class="sentiment-grid">
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">🔥</div>
+                        <div class="sent-label">Arena Disruption</div>
+                        <div class="sent-desc">Enterprise CIOs rapidly reassessing architectures as local hardware hits API-level performance.</div>
+                    </div>
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">📱</div>
+                        <div class="sent-label">IoT Adoption Boom</div>
+                        <div class="sent-desc">Developers accelerating PLE utilization for native ARM and power-constrained deployments.</div>
+                    </div>
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">⚖️</div>
+                        <div class="sent-label">Regulatory Scrutiny</div>
+                        <div class="sent-desc">Debates intensifying regarding hardware gating for extremely capable open-source weights.</div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="article" id="art5" style="border-top: 4px solid var(--c5);">
+            <h2 class="article-title">5. GEN-1 Embodied Foundation Model and the Capital Validation of Physical AI</h2>
+            
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔭</span> <span class="subsec-label c5">Overview</span>
+                </div>
+                <p class="lead-text">The industry has definitively bridged the simulation-to-reality gap via Generalist AI’s GEN-1, coinciding with macro-financial validation through Unitree Robotics' multi-billion dollar IPO.</p>
+                <p class="body-text">Trained entirely from scratch on 500k hours of real-world human activity via wearables, GEN-1 abandons brittle hard-coded kinematics for a Vision-Language-Action (VLA) architecture utilizing a diffusion transformer. Simultaneously, Unitree targeting a RMB 42 billion post-IPO valuation signals physical AI transitioning from narrative venture to liquid public reality.</p>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">⚡</span> <span class="subsec-label c5">Strategic Impact</span>
+                </div>
+                <div class="metric-row metric-row-4">
+                    <div class="metric-card"><div class="metric-value c5">500K</div><div class="metric-label">Wearable Data Hrs</div></div>
+                    <div class="metric-card"><div class="metric-value c5">1 Hr</div><div class="metric-label">Autonomous Mastery</div></div>
+                    <div class="metric-card"><div class="metric-value c5">42B</div><div class="metric-label">IPO Valuation (RMB)</div></div>
+                    <div class="metric-card"><div class="metric-value c5">+674%</div><div class="metric-label">Net Profit YoY</div></div>
+                </div>
+                <div class="impact-box lc5" style="border-left: 4px solid var(--c5);">
+                    <strong>Technology and Ecosystem Perspective:</strong> Pretraining on passive wearable data generates physical commonsense, divorcing intelligence software from mechanical manufacturing. Creates a new Total Addressable Market addressing severe structural labor shortages.
+                </div>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔬</span> <span class="subsec-label c5">Technical Deep Dive</span> <span class="subsec-tag lc5 c5">VLA Architecture</span>
+                </div>
+                <div class="arch-grid">
+                    <div class="arch-chip">Vision-Language-Action (VLA)</div>
+                    <div class="arch-chip">System 1 Diffusion Transformer</div>
+                    <div class="arch-chip">System 2 Interpreter</div>
+                    <div class="arch-chip">Edge Neural Processing Unit</div>
+                </div>
+                <table class="info-table">
+                    <tr><th>Model Architecture</th><td>VLA Dual-System (Real-time motor actions + linguistic interpretation)</td></tr>
+                    <tr><th>Training Paradigm</th><td>Passive unstructured human wearable data vs teleoperated scripts</td></tr>
+                    <tr><th>Unitree IPO Revenue (2025)</th><td>RMB 1.708 billion (+335.36% YoY)</td></tr>
+                </table>
+                <div class="chart-wrap"><div id="chart-art5" style="width:100%; height:280px; display:none;"></div></div>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">📋</span> <span class="subsec-label c5">Visual / Evidence</span>
+                </div>
+                <div class="flow-row">
+                    <div class="flow-step">Wearable Human Data<br><small>500K Hours</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">VLA Diffusion Model<br><small>Physical Commonsense</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step bg-c5">Agnostic Embodiment<br><small>Industrial Kitting</small></div>
+                </div>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c5">Critical View</span>
+                </div>
+                <p class="body-text">Unprecedented liability and insurance risks arise when deploying unconstrained diffusion transformers near heavy machinery. GEN-1's capabilities remain completely dependent on single-source vendor publications without third-party verification. Furthermore, computing power drain currently limits 24/7 untethered operational uptime.</p>
+            </div>
+
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">💬</span> <span class="subsec-label c5">Community Sentiment</span>
+                </div>
+                <div class="sentiment-grid">
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">🏭</div>
+                        <div class="sent-label">Industrial Validation</div>
+                        <div class="sent-desc">Manufacturing sectors accelerating CapEx toward electro-mechanical actuator integration.</div>
+                    </div>
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">🧐</div>
+                        <div class="sent-label">Efficacy Skepticism</div>
+                        <div class="sent-desc">Calls for independent lab verification before full factory floor deployment approvals.</div>
+                    </div>
+                    <div class="sentiment-card">
+                        <div class="sent-emoji">📈</div>
+                        <div class="sent-label">Capital Realignment</div>
+                        <div class="sent-desc">Institutions pricing robotic labor replacement into 2026 industrial hardware models.</div>
+                    </div>
                 </div>
             </div>
         </article>
 
         <section class="synthesis" id="synthesis">
-            <h2 class="synthesis-title">Strategic Closing Synthesis</h2>
-            <div class="syn-block">01. The convergence of hardware thermal limits and memory bandwidth walls is forcing a fundamental rotation from unconstrained software scaling to rigid architectural efficiency.</div>
-            <div class="syn-block">02. Anthropic’s economic pivot signals the end of VC-subsidized agentic compute. Enterprises must internalize cognitive infra or face unmanageable OpEx inflation.</div>
-            <div class="syn-block">03. NVIDIA’s Rubin cycle accelerates the deprecation of capital assets, mandating liquid-cooled data center retrofits as a non-negotiable requirement for Q3 2026.</div>
-            <div class="syn-block">04. The maturation of Edge AI (Gemma 4) and Physical AI (GEN-1) bifurcates the market: massive centralized training in the cloud vs. highly efficient, decentralized inference at the physical edge.</div>
+            <h2 class="synthesis-title">Closing Synthesis & Trajectory</h2>
+            <div class="syn-block" id="syn-01">
+                01. The convergence of these five strategic events outlines a fundamental, structural restructuring of the artificial intelligence value chain, exposing the hard limits of unconstrained autonomous software scaling against severe economic and physical boundaries.
+            </div>
+            <div class="syn-block" id="syn-02">
+                02. As agentic intelligence transitions to strict usage-based cost structures (Anthropic), capital will violently migrate toward localized, highly efficient open architectures like Google's Gemma 4, leveraging TurboQuant compression to bypass API tollbooths entirely.
+            </div>
+            <div class="syn-block" id="syn-03">
+                03. The physical execution of all models is held hostage by the 2026 memory squeeze. With HBM/DRAM consuming 30% of CapEx, only capitalized giants capable of deploying heavily integrated systems like Vera Rubin will maintain dominance.
+            </div>
+            <div class="syn-block" id="syn-04">
+                04. Simultaneously, the emergence of GEN-1 and Unitree signals AI's monetization vector is aggressively rotating out of the data center and into the physical world, demanding immense secondary investments in edge NPUs and thermal management.
+            </div>
 
             <div class="outlook-box">
-                <h3 class="outlook-title">Anticipated Key Events (12-Month Trajectory)</h3>
-                <div class="outlook-item"><span class="outlook-badge">Q2 2026</span> <strong>Grok 5 Release:</strong> Projected 6-trillion parameter MoE to test extreme HBM limits.</div>
-                <div class="outlook-item"><span class="outlook-badge">AUG 2026</span> <strong>EU AI Act Enforcement:</strong> Mandatory deterministic governance for high-risk agentic workflows.</div>
-                <div class="outlook-item"><span class="outlook-badge">H2 2026</span> <strong>M&A Supercycle:</strong> Hyperscalers to aggressively acquire liquid-cooling and clean energy assets.</div>
+                <h3 class="outlook-title">Anticipated Key Events (Next 1-4 Quarters)</h3>
+                
+                <div class="outlook-item">
+                    <span class="outlook-badge">Q2 2026</span>
+                    <strong>xAI Grok 5 Launch:</strong> The projected 6-trillion-parameter MoE architecture will test extreme memory bandwidth limits, exacerbating the HBM supply crunch and crushing margins for smaller hardware purchasers.
+                </div>
+                <div class="outlook-item">
+                    <span class="outlook-badge">Jun-Aug 2026</span>
+                    <strong>Regulatory Enforcement:</strong> Colorado AI Act and EU AI Act high-risk obligations force enterprises toward localized, deterministic open-source architectures.
+                </div>
+                <div class="outlook-item">
+                    <span class="outlook-badge">Mid-2026</span>
+                    <strong>GPT-5.5 Strategic Pivot:</strong> OpenAI expected to abandon consumer narrative for native agentic tooling, directly combating Anthropic to justify its $852B valuation.
+                </div>
+                <div class="outlook-item">
+                    <span class="outlook-badge">H2 2026</span>
+                    <strong>Power Grid Vulnerability:</strong> Vera Rubin NVL72 deployments expose localized thermal limits, triggering hyperscaler M&A in liquid cooling and dedicated sovereign clean energy.
+                </div>
+                <div class="outlook-item">
+                    <span class="outlook-badge">Late 2026</span>
+                    <strong>Secondary Shadow Market:</strong> As the HBM supply gap relentlessly delays new hardware deliveries through 2027, companies possessing operational Vera Rubin or late-stage Blackwell clusters will command substantial lease premiums, bifurcating the market between compute landlords and compute tenants.
+                </div>
             </div>
         </section>
 
         <footer>
             <div class="disclaimer">
-                <strong>CONFIDENTIAL EXECUTIVE BRIEFING:</strong> This report contains strictly proprietary intelligence meant for C-Level consumption. Data telemetry verified as of April 6, 2026. Global hardware procurement models must be adjusted immediately.
+                <strong>Confidential & Proprietary.</strong> This document contains strictly confidential intelligence intended solely for internal C-level executive consumption. The information is verified as of April 6, 2026, based on global market dynamics and technical telemetry. Do not distribute without authorization.
             </div>
             <br>
-            &copy; 2026 McKinsey-Level Strategic Consulting Firm. All rights reserved.
+            &copy; 2026 Fortune 500 Strategic Advisory. All rights reserved. Prepared in Hwaseong-si, Gyeonggi-do, South Korea.
         </footer>
     </main>
 
-    <div class="fab">Gemini AI Insights</div>
+    <div class="fab">View Gemini Version</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             
-            const getChartColors = (isDark) => ({
-                text: isDark ? '#F8FAFC' : '#1E293B',
-                axis: isDark ? '#475569' : '#94A3B8'
-            });
-
-            const renderCharts = () => {
-                const isDark = document.body.classList.contains('dark');
-                const colors = getChartColors(isDark);
-
-                // Chart 1
-                let chart1 = echarts.init(document.getElementById('chart-art1'), null, {renderer: 'svg'});
-                chart1.setOption({
-                    backgroundColor: 'transparent',
-                    color: ['#0891B2'],
-                    textStyle: { fontFamily: 'Outfit' },
-                    xAxis: { type: 'category', data: ['Flat-Rate', 'Pay-As-You-Go'], axisLine: { lineStyle: { color: colors.axis } } },
-                    yAxis: { type: 'value', splitLine: { show: false }, axisLabel: { color: colors.text } },
-                    series: [{ data: [200, 3000], type: 'bar', barWidth: '40%', itemStyle: { borderRadius: 8 } }]
-                });
-
-                // Chart 2
-                let chart2 = echarts.init(document.getElementById('chart-art2'), null, {renderer: 'svg'});
-                chart2.setOption({
-                    backgroundColor: 'transparent',
-                    color: ['#7C3AED'],
-                    xAxis: { type: 'category', data: ['2024', '2025', '2026(E)'], axisLine: { lineStyle: { color: colors.axis } } },
-                    yAxis: { type: 'value', splitLine: { show: false } },
-                    series: [{ data: [8, 15, 30], type: 'line', smooth: true, areaStyle: { opacity: 0.1 } }]
-                });
-
-                // Chart 3
-                let chart3 = echarts.init(document.getElementById('chart-art3'), null, {renderer: 'svg'});
-                chart3.setOption({
-                    backgroundColor: 'transparent',
-                    color: ['#059669'],
-                    xAxis: { type: 'category', data: ['H100', 'B200', 'R100'], axisLine: { lineStyle: { color: colors.axis } } },
-                    yAxis: { type: 'value', splitLine: { show: false } },
-                    series: [{ data: [4, 10, 50], type: 'bar', barWidth: '40%' }]
-                });
+            const commonOptions = {
+                backgroundColor: 'transparent',
+                textStyle: { fontFamily: 'Outfit, sans-serif' },
+                tooltip: { trigger: 'axis' }
             };
 
-            renderCharts();
+            // Chart 1: Anthropic Economics (Art 1)
+            let chart1 = echarts.init(document.getElementById('chart-art1'), null, {renderer: 'svg'});
+            chart1.setOption({
+                ...commonOptions,
+                color: ['#0891B2'],
+                title: { text: 'Monthly Agentic Compute Cost (USD)', textStyle: { fontSize: 13, color: '#334155' } },
+                xAxis: { type: 'category', data: ['Legacy Flat-Rate', 'Est. Pay-As-You-Go'], splitLine: { show: false }, axisLine: { lineStyle: { color: '#94A3B8' } } },
+                yAxis: { type: 'value', splitLine: { show: false }, axisLabel: { formatter: '${value}' } },
+                series: [{
+                    data: [200, 3000],
+                    type: 'bar',
+                    barWidth: '40%',
+                    itemStyle: { borderRadius: [4, 4, 0, 0] }
+                }]
+            });
 
-            // Theme Switcher
-            const toggle = document.getElementById('theme-toggle');
-            toggle.addEventListener('click', () => {
-                document.body.classList.toggle('dark');
-                const isDark = document.body.classList.contains('dark');
-                toggle.innerHTML = isDark ? '🌙 Dark Mode' : '☀️ Light Mode';
-                renderCharts();
+            // Chart 2: Memory CapEx (Art 2)
+            let chart2 = echarts.init(document.getElementById('chart-art2'), null, {renderer: 'svg'});
+            chart2.setOption({
+                ...commonOptions,
+                color: ['#7C3AED'],
+                title: { text: 'Memory Share of Hyperscaler CapEx (%)', textStyle: { fontSize: 13, color: '#334155' } },
+                xAxis: { type: 'category', data: ['2023', '2024', '2025(E)', '2026(P)'], splitLine: { show: false }, axisLine: { lineStyle: { color: '#94A3B8' } } },
+                yAxis: { type: 'value', splitLine: { show: false }, axisLabel: { formatter: '{value}%' } },
+                series: [{
+                    data: [8, 8, 15, 30],
+                    type: 'line',
+                    smooth: true,
+                    symbolSize: 8,
+                    areaStyle: { opacity: 0.1 }
+                }]
+            });
+
+            // Chart 3: Inference Leap (Art 3)
+            let chart3 = echarts.init(document.getElementById('chart-art3'), null, {renderer: 'svg'});
+            chart3.setOption({
+                ...commonOptions,
+                color: ['#059669'],
+                title: { text: 'Inference Performance Scaling (PFLOPS)', textStyle: { fontSize: 13, color: '#334155' } },
+                xAxis: { type: 'category', data: ['Hopper', 'Blackwell', 'Vera Rubin'], splitLine: { show: false }, axisLine: { lineStyle: { color: '#94A3B8' } } },
+                yAxis: { type: 'value', splitLine: { show: false } },
+                series: [{
+                    data: [4, 10, 50],
+                    type: 'bar',
+                    barWidth: '40%',
+                    itemStyle: { borderRadius: [4, 4, 0, 0] }
+                }]
+            });
+
+            window.addEventListener('resize', function() {
+                chart1.resize();
+                chart2.resize();
+                chart3.resize();
             });
         });
     </script>
