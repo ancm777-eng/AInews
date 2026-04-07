@@ -66,14 +66,20 @@ def get_latest_pro_model(client):
                 if not any(bad in name for bad in bad_keywords):
                     pro_models.append(m.name)
         
-        # Specific check for the known compatible research model
+        # Priority 1: Official Deep Research Model ID
+        for m in pro_models:
+            if "deep-research-pro-preview-12-2025" in m:
+                print("Found official Deep Research model: deep-research-pro-preview-12-2025")
+                return "deep-research-pro-preview-12-2025"
+
+        # Priority 2: Known compatible research model
         for m in pro_models:
             if "2.0-pro-exp-02-05" in m:
                 print("Found compatible Deep Research model: gemini-2.0-pro-exp-02-05")
                 return "gemini-2.0-pro-exp-02-05"
 
         if not pro_models:
-            return "gemini-2.0-pro-exp-02-05"
+            return "deep-research-pro-preview-12-2025" # Official ID fallback
             
         pro_models.sort(reverse=True)
         latest = pro_models[0].replace("models/", "")
