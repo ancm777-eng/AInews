@@ -1,6 +1,7 @@
 import os
 import time
 import argparse
+import re
 from dotenv import load_dotenv
 from google import genai
 import anthropic
@@ -10,6 +11,43 @@ from github_utils import fetch_prompt_from_github
 
 # Load environment variables
 load_dotenv()
+
+def get_recent_archives(days=7):
+    """
+    Reads news content from the data/ directory for the last N days.
+    """
+    archive_data = ""
+    archive_dir = "data"
+    if not os.path.exists(archive_dir):
+        return ""
+    
+    try:
+        # Get list of files and filter by date-like names (YYYY-MM-DD.txt)
+        files = [f for f in os.listdir(archive_dir) if re.match(r'\d{4}-\d{2}-\d{2}\.txt', f)]
+        files.sort(reverse=True) # Most recent first
+        
+        today = datetime.datetime.now()
+        count = 0
+        for filename in files:
+            file_date_str = filename.replace(".txt", "")
+            file_date = datetime.datetime.strptime(file_date_str, "%Y-%m-%d")
+            
+            # Check if within window
+            if (today - file_date).days <= days:
+                file_path = os.path.join(archive_dir, filename)
+                with open(file_path, "r", encoding="utf-8") as f:
+                    archive_data += f"\n--- Report from {file_date_str} ---\n"
+                    archive_data += f.read() + "\n"
+                count = count + 1
+            if count >= days:
+                break
+                
+        if archive_data:
+            return f"\n[REPORTS FROM LAST {days} DAYS - DO NOT REPEAT UNLESS THERE IS NEW PROGRESS]\n{archive_data}\n"
+        return ""
+    except Exception as e:
+        print(f"Warning: Could not read archives: {e}")
+        return ""
 
 def get_latest_pro_model(client):
     """
@@ -139,6 +177,12 @@ def main():
     prompt_content = fetch_prompt_from_github(url)
     
     if prompt_content:
+        # Inject recent archives to avoid duplicates
+        archives = get_recent_archives(days=7)
+        if archives:
+            print("Injecting recent archives for duplicate filtering...")
+            prompt_content = archives + "\n" + prompt_content
+
         # Step 1: Initial Research
         initial_result, first_interaction_id = run_deep_research(prompt_content, args.output, args.agent)
         
