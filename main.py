@@ -27,7 +27,7 @@ def get_recent_archives(days=7):
         files.sort(reverse=True) # Most recent first
         
         today = datetime.datetime.now()
-        count = 0
+        count: int = 0
         for filename in files:
             file_date_str = filename.replace(".txt", "")
             file_date = datetime.datetime.strptime(file_date_str, "%Y-%m-%d")

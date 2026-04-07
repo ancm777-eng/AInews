@@ -1,5 +1,6 @@
 import requests
 import re
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 def get_raw_github_url(url):
     """
@@ -15,13 +16,14 @@ def get_raw_github_url(url):
     raw_url = raw_url.replace("/blob/", "/")
     return raw_url
 
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 def fetch_prompt_from_github(url):
     """
     Fetches the content of a file from GitHub.
     """
     raw_url = get_raw_github_url(url)
     try:
-        response = requests.get(raw_url)
+        response = requests.get(raw_url, timeout=10)
         response.raise_for_status()
         return response.text
     except Exception as e:
