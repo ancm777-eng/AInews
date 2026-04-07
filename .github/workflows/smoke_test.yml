@@ -1,17 +1,25 @@
 name: Smoke Test Pipeline
 
-# 원할 때 수동으로 버튼을 눌러 실행할 수 있도록 설정
 on:
-  workflow_dispatch: 
+  workflow_dispatch: # 수동 실행 버튼
+
+permissions:
+  contents: write
 
 jobs:
   run-test:
     runs-on: ubuntu-latest
+    
+    # 한국 시간 설정
+    env:
+      TZ: Asia/Seoul
 
     steps:
       # 1. 리포지토리의 코드를 가상 환경으로 가져옴
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # 2. 파이썬 환경 설정
       - name: Set up Python
@@ -26,15 +34,16 @@ jobs:
           pip install -r requirements.txt
 
       # 4. API 키를 주입하고 스모크 테스트 실행
+      # [수정] 실행 시 현재 시간을 출력에 포함하도록 설정 (업데이트 확인용)
       - name: Run Smoke Test
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
         run: python test_pipeline.py
 
-      # 5. 생성된 텍스트 파일과 HTML 결과를 압축해서 다운로드할 수 있게 업로드
+      # 5. 생성된 결과물 업로드 (Artifacts)
       - name: Upload Test Results
-        if: always() # 테스트가 실패해도 지금까지 만들어진 파일은 업로드함
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-artifacts
@@ -43,23 +52,20 @@ jobs:
             data/
             index.html
 
-# 결과물을 리포지토리에 직접 업데이트 (Commit & Push)
+      # 6. 결과물을 리포지토리에 직접 업데이트 (Commit & Push)
       - name: Commit and Push results
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 이미지에 있는 trial 폴더, data 폴더, index.html의 변경사항을 추적
+          # 변경사항 추적
           git add trial/ data/ index.html
           
-          # 변경된 파일이 있는지 확인
+          # [수정] 커밋 메시지에 실행 시간을 포함하여 리포지토리에서 바로 보이게 함
           if ! git diff --staged --quiet; then
-            git commit -m "Auto-update AI news results"
-            
-            # (핵심) 깃허브의 최신 상태를 먼저 가져와서 병합 충돌을 방지함
+            git commit -m "Test update: $(date +'%Y-%m-%d %H:%M:%S KST')"
             git pull --rebase origin main
-            
             git push
           else
-            echo "No changes to commit. Skipping push."
+            echo "변경 사항이 없습니다. 테스트 데이터가 이전과 동일할 수 있습니다."
           fi
