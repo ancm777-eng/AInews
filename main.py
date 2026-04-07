@@ -144,7 +144,7 @@ def run_deep_research(prompt, output_file="research_result.md", agent_id=None, p
         return None, None
 
     research_agent = agent_id or os.getenv("RESEARCH_AGENT")
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(api_key=api_key, http_options={'timeout': 60.0})
 
     if not research_agent or research_agent.lower() == "latest-pro":
         # Crucial: Request an 'agent' explicitly for Deep Research, not a generative model
@@ -173,7 +173,13 @@ def run_deep_research(prompt, output_file="research_result.md", agent_id=None, p
         
         start_time = time.time()
         while True:
-            interaction = client.interactions.get(interaction.id)
+            try:
+                interaction = client.interactions.get(interaction.id)
+            except Exception as get_err:
+                print(f"\nWarning: Error polling status ({get_err}), retrying in 30s...")
+                time.sleep(30)
+                continue
+                
             if interaction.status == "completed":
                 print("\nResearch Turn Completed!")
                 # Collect all non-empty text from all outputs
