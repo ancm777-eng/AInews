@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from google import genai
 import anthropic
 from tenacity import retry, stop_after_attempt, wait_exponential
+import datetime
 from github_utils import fetch_prompt_from_github
 
 # Load environment variables
@@ -47,7 +48,7 @@ def get_latest_claude_model(client, flavor="sonnet"):
         return "claude-3-5-sonnet-latest"
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
-def validate_with_claude(content):
+def validate_with_claude(content, custom_prompt="검증해주세요"):
     """
     Validates the research content using Claude.
     """
@@ -59,18 +60,18 @@ def validate_with_claude(content):
     client = anthropic.Anthropic(api_key=api_key)
     model = get_latest_claude_model(client)
     
-    print(f"Starting Claude validation (Model: {model})...")
+    print(f"Starting Claude action (Model: {model}, Prompt: {custom_prompt})...")
     try:
         message = client.messages.create(
             model=model,
-            max_tokens=4096,
+            max_tokens=8192,  # Increased for translation
             messages=[
-                {"role": "user", "content": f"{content}\n\n검증해주세요"}
+                {"role": "user", "content": f"{content}\n\n{custom_prompt}"}
             ]
         )
         return message.content[0].text
     except Exception as e:
-        print(f"Claude validation failed: {e}")
+        print(f"Claude action failed: {e}")
         return None
 
 def run_deep_research(prompt, output_file="research_result.md", agent_id=None, previous_interaction_id=None):
@@ -170,17 +171,36 @@ def main():
                 if refined_result:
                     print(f"Refinement complete. Final result saved to {refined_output}")
                     
-                    # Phase 4: HTML Generation
-                    print("\n--- Phase 4: HTML Generation ---")
-                    html_prompt_url = os.getenv("HTML_PROMPT_URL")
-                    if html_prompt_url:
-                        html_prompt = fetch_prompt_from_github(html_prompt_url)
-                        if html_prompt:
-                            generate_html(refined_result, html_prompt, "index.html")
+                    # --- Phase 4: Claude Audit 2 & English Translation ---
+                    print("\n--- Phase 4: Claude Audit 2 & English Translation ---")
+                    translation_prompt = "검증하고, 검증 피드백을 바탕으로 글의 구조를 유지한 채 최상의 영어 문장으로 최종 수정 및 보완해주세요."
+                    translated_result = validate_with_claude(refined_result, custom_prompt=translation_prompt)
+                    
+                    if translated_result:
+                        # Save to dated file: data/YYYY-MM-DD.txt
+                        today = datetime.datetime.now().strftime("%Y-%m-%d")
+                        archive_file = f"data/{today}.txt"
+                        archive_dir = os.path.dirname(archive_file)
+                        if archive_dir and not os.path.exists(archive_dir):
+                            os.makedirs(archive_dir, exist_ok=True)
+                        
+                        with open(archive_file, "w", encoding="utf-8") as f:
+                            f.write(translated_result)
+                        print(f"Archived translated content to {archive_file}")
+
+                        # --- Phase 5: HTML Generation (based on Phase 4 output) ---
+                        print("\n--- Phase 5: HTML Generation ---")
+                        html_prompt_url = os.getenv("HTML_PROMPT_URL")
+                        if html_prompt_url:
+                            html_prompt = fetch_prompt_from_github(html_prompt_url)
+                            if html_prompt:
+                                generate_html(translated_result, html_prompt, "index.html")
+                            else:
+                                print("Warning: Failed to fetch HTML prompt.")
                         else:
-                            print("Warning: Failed to fetch HTML prompt.")
+                            print("Warning: HTML_PROMPT_URL not set in .env.")
                     else:
-                        print("Warning: HTML_PROMPT_URL not set.")
+                        print("Warning: Phase 4 Translation failed. Skipping HTML generation.")
             else:
                 print("Claude validation skipped.")
     else:
