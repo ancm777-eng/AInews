@@ -76,8 +76,9 @@ def get_latest_pro_model(client, require_agent=False):
             return "deep-research-pro-preview-12-2025"
 
         # Priority 2: Pick Gemini Flash model (best free-tier, google_search compatible)
+        # 3.1 versions are excluded as they seem to have quota/deadline issues in this environment.
         bad_keywords = ["nano", "vision", "latest", "customtools", "experimental",
-                        "deep-research", "live", "tts", "embedding", "imagen", "aqa"]
+                        "deep-research", "live", "tts", "embedding", "imagen", "aqa", "3.1"]
         flash_models = [
             n for n in all_names
             if "gemini" in n.lower() and "flash" in n.lower()
@@ -171,9 +172,8 @@ def run_grounded_research(prompt, output_file="research_result.md"):
 
     from google.genai import types
 
-    # Use a stable model for grounded research to avoid "deadline 1s" issues
-    # gemini-1.5-flash is stable and works well with tools
-    model_id = "gemini-1.5-flash"
+    client = genai.Client(api_key=api_key)
+    model_id = get_latest_pro_model(client, require_agent=False)
 
     client = genai.Client(api_key=api_key)
 
