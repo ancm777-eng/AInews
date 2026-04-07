@@ -79,7 +79,8 @@ def get_latest_pro_model(client, require_agent=False):
         for m in models:
             name = m.name.lower()
             if "gemini" in name and "pro" in name and "vision" not in name:
-                bad_keywords = ["flash", "nano", "banana", "vision", "latest", "preview", "customtools", "experimental", "deep-research"]
+                # Removed "preview" to allow newer versions like 3.1-pro-preview
+                bad_keywords = ["flash", "nano", "banana", "vision", "latest", "customtools", "experimental", "deep-research"]
                 if not any(bad in name for bad in bad_keywords):
                     pro_models.append(m.name)
         
