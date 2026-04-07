@@ -54,44 +54,45 @@ def get_recent_archives(days=7):
         print(f"Warning: Could not read archives: {e}")
         return ""
 
-def get_latest_pro_model(client):
+def get_latest_pro_model(client, require_agent=False):
     """
     Dynamically finds the latest available Gemini Pro model, 
     filtering out internal/preview codenames.
+    If require_agent=True, selects deep-research agents.
+    If require_agent=False, specifically excludes agents and selects generative models.
     """
     try:
         models = client.models.list()
+        
+        # Priority 1: Pick Deep Research Agent (For Phase 1)
+        if require_agent:
+            dr_models = [m.name for m in models if "deep-research-pro" in m.name.lower()]
+            if dr_models:
+                dr_models.sort(reverse=True)
+                latest_dr = dr_models[0].replace("models/", "")
+                print(f"Found latest specialized Deep Research agent: {latest_dr}")
+                return latest_dr
+            return "deep-research-pro-preview-12-2025"
+
+        # Priority 2: Pick Standard Generative Model (For Phase 5 HTML)
         pro_models = []
         for m in models:
             name = m.name.lower()
-            # Only consider gemini-branded pro models
-            if name.startswith("models/gemini-") and "pro" in name:
-                # Exclude internal codenames, flash variants, preview, and non-versioned aliases
-                bad_keywords = ["flash", "nano", "banana", "vision", "latest", "preview", "customtools", "experimental"]
+            if "gemini" in name and "pro" in name and "vision" not in name:
+                bad_keywords = ["flash", "nano", "banana", "vision", "latest", "preview", "customtools", "experimental", "deep-research"]
                 if not any(bad in name for bad in bad_keywords):
                     pro_models.append(m.name)
         
-        # Priority 1: Dynamic Deep Research Model Discovery
-        # Automatically finds and picks the latest based on string sorting (e.g., 2026 > 2025)
-        dr_models = [m.name for m in models if "deep-research-pro" in m.name.lower()]
-        if dr_models:
-            dr_models.sort(reverse=True)
-            latest_dr = dr_models[0].replace("models/", "")
-            print(f"Found latest specialized Deep Research model: {latest_dr}")
-            return latest_dr
-
-        # Priority 2: Standard Gemini Pro models (e.g., 2.5, 3.1)
         if pro_models:
             pro_models.sort(reverse=True)
             latest = pro_models[0].replace("models/", "")
-            print(f"Automatically selected latest Pro model: {latest}")
+            print(f"Automatically selected latest standard Pro model: {latest}")
             return latest
 
-        # Final Fallback
-        return "deep-research-pro-preview-12-2025"
+        return "gemini-2.0-pro-exp-02-05" # Generative fallback
     except Exception as e:
         print(f"Warning: Could not list models automatically: {e}")
-        return "gemini-2.0-pro-exp-02-05"
+        return "deep-research-pro-preview-12-2025" if require_agent else "gemini-2.0-pro-exp-02-05"
 
 def get_latest_claude_model(client, flavor="sonnet"):
     """
@@ -145,7 +146,8 @@ def run_deep_research(prompt, output_file="research_result.md", agent_id=None, p
     client = genai.Client(api_key=api_key)
 
     if not research_agent or research_agent.lower() == "latest-pro":
-        research_agent = get_latest_pro_model(client)
+        # Crucial: Request an 'agent' explicitly for Deep Research, not a generative model
+        research_agent = get_latest_pro_model(client, require_agent=True)
     
     print(f"Starting Gemini Deep Research (Agent: {research_agent}, Continued: {previous_interaction_id is not None})...")
     
