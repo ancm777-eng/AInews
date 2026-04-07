@@ -111,7 +111,8 @@ def validate_with_claude(content, custom_prompt="검증해주세요"):
         print("Warning: CLAUDE_API_KEY not found. Skipping validation.")
         return None
     
-    client = anthropic.Anthropic(api_key=api_key)
+    # Initialize client with a generous timeout for large content
+    client = anthropic.Anthropic(api_key=api_key, timeout=120.0) 
     model = get_latest_claude_model(client)
     
     print(f"Starting Claude action (Model: {model}, Prompt: {custom_prompt})...")
@@ -237,42 +238,45 @@ def main():
                     args.agent, 
                     previous_interaction_id=first_interaction_id
                 )
-                
-                if refined_result:
-                    print(f"Refinement complete. Final result saved to {refined_output}")
-                    
-                    # --- Phase 4: Claude Audit 2 & English Translation ---
-                    print("\n--- Phase 4: Claude Audit 2 & English Translation ---")
-                    translation_prompt = "검증하고, 검증 피드백을 바탕으로 글의 구조를 유지한 채 최상의 영어 문장으로 최종 수정 및 보완해주세요."
-                    translated_result = validate_with_claude(refined_result, custom_prompt=translation_prompt)
-                    
-                    if translated_result:
-                        # Save to dated file: data/YYYY-MM-DD.txt
-                        today = datetime.datetime.now().strftime("%Y-%m-%d")
-                        archive_file = f"data/{today}.txt"
-                        archive_dir = os.path.dirname(archive_file)
-                        if archive_dir and not os.path.exists(archive_dir):
-                            os.makedirs(archive_dir, exist_ok=True)
-                        
-                        with open(archive_file, "w", encoding="utf-8") as f:
-                            f.write(translated_result)
-                        print(f"Archived translated content to {archive_file}")
-
-                        # --- Phase 5: HTML Generation (based on Phase 4 output) ---
-                        print("\n--- Phase 5: HTML Generation ---")
-                        html_prompt_url = os.getenv("HTML_PROMPT_URL")
-                        if html_prompt_url:
-                            html_prompt = fetch_prompt_from_github(html_prompt_url)
-                            if html_prompt:
-                                generate_html(translated_result, html_prompt, "index.html")
-                            else:
-                                print("Warning: Failed to fetch HTML prompt.")
-                        else:
-                            print("Warning: HTML_PROMPT_URL not set in .env.")
-                    else:
-                        print("Warning: Phase 4 Translation failed. Skipping HTML generation.")
             else:
-                print("Claude validation skipped.")
+                print("Claude validation failed or skipped. Using initial research as refined result.")
+                refined_result = initial_result
+                refined_output = args.output
+            
+            if refined_result:
+                # --- Phase 4: Claude Audit 2 & English Translation ---
+                print("\n--- Phase 4: Claude Audit 2 & English Translation ---")
+                translation_prompt = "구조를 유지한 채 최상의 영어 문장으로 최종 수정 및 번역해주세요."
+                translated_result = validate_with_claude(refined_result, custom_prompt=translation_prompt)
+                
+                # If translation also fails, use the refined result (Korean) as a fallback for archival
+                final_content_for_html = translated_result if translated_result else refined_result
+                
+                if final_content_for_html:
+                    # Save to dated file: data/YYYY-MM-DD.txt
+                    today = datetime.datetime.now().strftime("%Y-%m-%d")
+                    archive_file = f"data/{today}.txt"
+                    archive_dir = os.path.dirname(archive_file)
+                    if archive_dir and not os.path.exists(archive_dir):
+                        os.makedirs(archive_dir, exist_ok=True)
+                    
+                    with open(archive_file, "w", encoding="utf-8") as f:
+                        f.write(final_content_for_html)
+                    print(f"Archived content to {archive_file}")
+
+                    # --- Phase 5: HTML Generation ---
+                    print("\n--- Phase 5: HTML Generation ---")
+                    html_prompt_url = os.getenv("HTML_PROMPT_URL")
+                    if html_prompt_url:
+                        html_prompt = fetch_prompt_from_github(html_prompt_url)
+                        if html_prompt:
+                            generate_html(final_content_for_html, html_prompt, "index.html")
+                        else:
+                            print("Warning: Failed to fetch HTML prompt.")
+                    else:
+                        print("Warning: HTML_PROMPT_URL not set in .env.")
+                else:
+                    print("Error: No content available for HTML generation.")
     else:
         print("Failed to fetch prompt.")
 
