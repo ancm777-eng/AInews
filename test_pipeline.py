@@ -6,6 +6,7 @@ Uses ultra-short prompts and minimal max_tokens to keep API cost as close to zer
 import os
 import sys
 import datetime
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -36,7 +37,7 @@ def main():
     if gemini_key:
         from google import genai
         gclient = genai.Client(api_key=gemini_key)
-        # 수정된 main.py의 함수명으로 import
+        # main.py에서 수정된 함수명(get_latest_gemini_model)으로 임포트
         from main import get_latest_gemini_model, run_grounded_research
         
         gemini_agent = get_latest_gemini_model(gclient, require_agent=True)
@@ -64,7 +65,7 @@ def main():
     # ── Phase 1: Grounded Research ───────────────────────────
     print("\n══════ Phase 1: Grounded Research (API Hit) ══════")
     if gemini_key:
-        # Grounding 툴이 켜져 있으므로 웹 검색을 최소화하도록 극단적으로 짧고 명확한 명령 전달
+        # main.py에 추가된 @retry 로직을 통해 503 에러 발생 시 자동 재시도함
         tiny_prompt = "This is an API test. Reply exactly with 'OK' and do nothing else."
         initial_research, _ = run_grounded_research(tiny_prompt, "trial/1.txt")
         
@@ -81,10 +82,9 @@ def main():
     print("\n══════ Phase 2: Claude Validation (API Hit) ══════")
     if claude_key and claude_model:
         try:
-            # max_tokens를 10으로 극단적으로 제한하여 출력 비용 최소화
             msg = cclient.messages.create(
                 model=claude_model, 
-                max_tokens=10,
+                max_tokens=15,
                 messages=[{"role": "user", "content": "Reply exactly with 'VALIDATION_OK'"}]
             )
             feedback = msg.content[0].text.strip()
@@ -92,7 +92,7 @@ def main():
             write_and_verify("trial/feedback.txt", feedback, "Phase 2")
         except Exception as e:
             errors.append(f"Phase 2 Claude error: {e}")
-            print(f"  ❌ Claude error: {e}")
+            print(f"  ❌ Phase 2 error: {e}")
             write_and_verify("trial/feedback.txt", f"ERROR: {e}", "Phase 2 (fallback)")
     else:
         write_and_verify("trial/feedback.txt", "SKIPPED: No Claude API key", "Phase 2 (skipped)")
@@ -100,21 +100,29 @@ def main():
     # ── Phase 3: Gemini Refinement ────────────────────────────
     print("\n══════ Phase 3: Refinement (API Hit) ══════")
     if gemini_key and gemini_model:
-        try:
-            print(f"  Refining with model: {gemini_model}...")
-            # 불필요한 컨텍스트(초기 리서치 내용) 전달을 생략하여 입력 토큰 절약
-            refine_prompt = "This is a test. Reply exactly with 'REF_OK'."
-            response = gclient.models.generate_content(
-                model=gemini_model,
-                contents=[refine_prompt]
-            )
-            refined_result = response.text.strip()
-            print(f"  Gemini responded: {refined_result}")
-            write_and_verify("trial/2.txt", refined_result, "Phase 3")
-        except Exception as e:
-            errors.append(f"Phase 3 Refinement error: {e}")
-            print(f"  ❌ Phase 3 error: {e}")
-            write_and_verify("trial/2.txt", f"ERROR: {e}", "Phase 3 (fallback)")
+        # 503 UNAVAILABLE 방어를 위한 간단한 재시도 루프
+        max_retries = 2
+        refined_result = None
+        for attempt in range(max_retries):
+            try:
+                print(f"  Refining with model: {gemini_model} (Attempt {attempt+1})...")
+                refine_prompt = "This is a test. Reply exactly with 'REF_OK'."
+                response = gclient.models.generate_content(
+                    model=gemini_model,
+                    contents=[refine_prompt]
+                )
+                refined_result = response.text.strip()
+                print(f"  Gemini responded: {refined_result}")
+                write_and_verify("trial/2.txt", refined_result, "Phase 3")
+                break
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    print(f"  ⚠️ Attempt {attempt+1} failed ({e}). Retrying in 10s...")
+                    time.sleep(10)
+                else:
+                    errors.append(f"Phase 3 Refinement error: {e}")
+                    print(f"  ❌ Phase 3 error: {e}")
+                    write_and_verify("trial/2.txt", f"ERROR: {e}", "Phase 3 (fallback)")
     else:
         write_and_verify("trial/2.txt", "SKIPPED: No Gemini API key", "Phase 3 (skipped)")
 
@@ -125,10 +133,9 @@ def main():
     
     if claude_key and claude_model:
         try:
-            # max_tokens=10 제한
             msg = cclient.messages.create(
                 model=claude_model, 
-                max_tokens=10,
+                max_tokens=15,
                 messages=[{"role": "user", "content": "Reply exactly with 'TRANSLATION_OK'"}]
             )
             translation = msg.content[0].text.strip()
@@ -136,7 +143,7 @@ def main():
             write_and_verify(archive_file, translation, "Phase 4")
         except Exception as e:
             errors.append(f"Phase 4 Claude error: {e}")
-            print(f"  ❌ Claude error: {e}")
+            print(f"  ❌ Phase 4 error: {e}")
             write_and_verify(archive_file, f"ERROR: {e}", "Phase 4 (fallback)")
     else:
         write_and_verify(archive_file, "SKIPPED: No Claude API key", "Phase 4 (skipped)")
@@ -145,7 +152,6 @@ def main():
     print("\n══════ Phase 5: HTML Generation (API Hit) ══════")
     if gemini_key and gemini_model:
         try:
-            # HTML 구조를 명시하여 최소한의 토큰만 출력하게 유도
             response = gclient.models.generate_content(
                 model=gemini_model,
                 contents="Output exactly this string: '<html><body>OK</body></html>'"
@@ -160,7 +166,7 @@ def main():
             print(f"  Gemini responded: {html}")
         except Exception as e:
             errors.append(f"Phase 5 Gemini error: {e}")
-            print(f"  ❌ Gemini error: {e}")
+            print(f"  ❌ Phase 5 error: {e}")
             write_and_verify("index.html", f"<html><body>ERROR</body></html>", "Phase 5 (fallback)")
     else:
         write_and_verify("index.html", "<html><body>SKIPPED</body></html>", "Phase 5 (skipped)")
