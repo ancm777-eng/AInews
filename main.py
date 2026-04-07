@@ -171,8 +171,11 @@ def run_grounded_research(prompt, output_file="research_result.md"):
 
     from google.genai import types
 
-    client = genai.Client(api_key=api_key, http_options={'timeout': 300.0})
-    model_id = get_latest_pro_model(client, require_agent=False)
+    # Use a stable model for grounded research to avoid "deadline 1s" issues
+    # gemini-1.5-flash is stable and works well with tools
+    model_id = "gemini-1.5-flash"
+
+    client = genai.Client(api_key=api_key)
 
     print(f"Starting Grounded Research (Model: {model_id}, Tool: google_search)...")
     try:
