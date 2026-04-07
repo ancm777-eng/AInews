@@ -42,3 +42,15 @@ jobs:
             trial/
             data/
             index.html
+
+# 결과물을 리포지토리에 직접 업데이트 (Commit & Push)
+      - name: Commit and Push results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # 이미지에 있는 trial 폴더, data 폴더, index.html의 변경사항을 추적
+          git add trial/ data/ index.html
+          
+          # 변경된 내용이 있을 때만 덮어쓰기(Commit) 후 리포지토리에 업로드(Push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update AI news results" && git push)
