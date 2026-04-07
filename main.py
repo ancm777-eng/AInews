@@ -4,6 +4,7 @@ import argparse
 import re
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 import anthropic
 from tenacity import retry, stop_after_attempt, wait_exponential
 import datetime
@@ -54,18 +55,17 @@ def get_recent_archives(days=7):
         print(f"Warning: Could not read archives: {e}")
         return ""
 
-def get_latest_pro_model(client, require_agent=False):
+def get_latest_gemini_model(client, require_agent=False):
     """
     Dynamically finds the best available Gemini model.
-    If require_agent=True, selects deep-research agents (for old Deep Research path).
-    If require_agent=False, prefers Gemini Flash models (faster, larger free quota,
-    works better with google_search tool) over Pro models.
+    If require_agent=True, selects deep-research agents.
+    If require_agent=False, prefers Gemini Flash models over Pro models.
     """
     try:
         models = client.models.list()
         all_names = [m.name for m in models]
 
-        # Priority 1: Pick Deep Research Agent (for legacy deep-research path)
+        # Priority 1: Pick Deep Research Agent
         if require_agent:
             dr_models = [m.name for m in models if "deep-research-pro" in m.name.lower()]
             if dr_models:
@@ -75,10 +75,9 @@ def get_latest_pro_model(client, require_agent=False):
                 return latest_dr
             return "deep-research-pro-preview-12-2025"
 
-        # Priority 2: Pick Gemini Flash model (best free-tier, google_search compatible)
-        # 3.1 versions are excluded as they seem to have quota/deadline issues in this environment.
+        # Priority 2: Pick Gemini Flash model
         bad_keywords = ["nano", "vision", "latest", "customtools", "experimental",
-                        "deep-research", "live", "tts", "embedding", "imagen", "aqa", "3.1"]
+                        "deep-research", "live", "tts", "embedding", "imagen", "aqa"]
         flash_models = [
             n for n in all_names
             if "gemini" in n.lower() and "flash" in n.lower()
@@ -102,10 +101,10 @@ def get_latest_pro_model(client, require_agent=False):
             print(f"Automatically selected Pro model (Flash not found): {latest}")
             return latest
 
-        return "gemini-2.0-flash"
+        return "gemini-3.0-flash"
     except Exception as e:
         print(f"Warning: Could not list models automatically: {e}")
-        return "deep-research-pro-preview-12-2025" if require_agent else "gemini-2.0-flash"
+        return "deep-research-pro-preview-12-2025" if require_agent else "gemini-3.0-flash"
 
 def get_latest_claude_model(client):
     """
@@ -149,7 +148,6 @@ def validate_with_claude(content, custom_prompt="검증해주세요"):
     model = get_latest_claude_model(client)
     
     print(f"Starting Claude action (Model: {model}, Prompt: {custom_prompt})...")
-    # Removed internal try-except to allow @retry to catch errors
     message = client.messages.create(
         model=model,
         max_tokens=8192,  # Increased for translation
@@ -162,7 +160,6 @@ def validate_with_claude(content, custom_prompt="검증해주세요"):
 def run_grounded_research(prompt, output_file="research_result.md"):
     """
     Phase 1: Performs fast web-grounded research using Google Search tool.
-    Takes ~30s-2min instead of 10-20min compared to Deep Research agent.
     Returns (result_text, None) to maintain the same interface as run_deep_research.
     """
     api_key = os.getenv("GEMINI_API_KEY")
@@ -170,12 +167,8 @@ def run_grounded_research(prompt, output_file="research_result.md"):
         print("Error: GEMINI_API_KEY not found in .env file.")
         return None, None
 
-    from google.genai import types
-
     client = genai.Client(api_key=api_key)
-    model_id = get_latest_pro_model(client, require_agent=False)
-
-    client = genai.Client(api_key=api_key)
+    model_id = get_latest_gemini_model(client, require_agent=False)
 
     print(f"Starting Grounded Research (Model: {model_id}, Tool: google_search)...")
     try:
@@ -210,22 +203,15 @@ def run_deep_research(prompt, output_file="research_result.md", agent_id=None, p
         print("Error: GEMINI_API_KEY not found in .env file.")
         return None, None
 
+    client = genai.Client(api_key=api_key)
     research_agent = agent_id or os.getenv("RESEARCH_AGENT")
     
-    # Use default client initialization to avoid deadline issues in some environments.
-    client_for_listing = genai.Client(api_key=api_key)
-    client = genai.Client(api_key=api_key)
-
     if not research_agent or research_agent.lower() == "latest-pro":
-        # Crucial: Request an 'agent' explicitly for Deep Research, not a generative model
-        research_agent = get_latest_pro_model(client_for_listing, require_agent=True)
-
+        research_agent = get_latest_gemini_model(client, require_agent=True)
     
     print(f"Starting Gemini Deep Research (Agent: {research_agent}, Continued: {previous_interaction_id is not None})...")
     
     try:
-        # Crucial: Deep Research specific IDs are 'agents', while 'gemini-*' IDs are 'models'.
-        # The API errors if the wrong parameter name is used.
         if "deep-research" in research_agent.lower():
             interaction = client.interactions.create(
                 agent=research_agent, 
@@ -253,7 +239,6 @@ def run_deep_research(prompt, output_file="research_result.md", agent_id=None, p
                 
             if interaction.status == "completed":
                 print("\nResearch Turn Completed!")
-                # Collect all non-empty text from all outputs
                 result_text = "\n".join([o.text for o in interaction.outputs if o.text])
                 
                 if not result_text:
@@ -281,7 +266,7 @@ def run_deep_research(prompt, output_file="research_result.md", agent_id=None, p
 def main():
     parser = argparse.ArgumentParser(description="Gemini Deep Research with GitHub Prompt")
     parser.add_argument("--url", help="GitHub URL of the prompt file")
-    parser.add_argument("--agent", help="Gemini Research Agent ID (e.g., gemini-3.1-pro)")
+    parser.add_argument("--agent", help="Gemini Research Agent ID")
     default_output = os.getenv("OUTPUT_FILE") or "trial/1.txt"
     parser.add_argument("--output", default=default_output, help="Output file name")
     
@@ -296,13 +281,12 @@ def main():
     prompt_content = fetch_prompt_from_github(url)
     
     if prompt_content:
-        # Inject recent archives to avoid duplicates
         archives = get_recent_archives(days=7)
         if archives:
             print("Injecting recent archives for duplicate filtering...")
             prompt_content = archives + "\n" + prompt_content
 
-        # Step 1: Initial Research (fast Google Search grounding)
+        # Step 1: Initial Research
         initial_result, _ = run_grounded_research(prompt_content, args.output)
         
         if initial_result:
@@ -319,13 +303,13 @@ def main():
                     f.write(feedback)
                 print(f"Feedback saved to {feedback_file}")
                 
-                # Step 3: Refinement using feedback (fast text-only edit, no new search)
+                # Step 3: Refinement using feedback
                 print("\n--- Phase 3: Gemini Refinement ---")
                 refined_output = os.getenv("REFINED_OUTPUT_FILE") or "trial/2.txt"
                 
                 api_key = os.getenv("GEMINI_API_KEY")
-                client_pro = genai.Client(api_key=api_key)
-                pro_model_id = get_latest_pro_model(client_pro, require_agent=False)
+                client_gemini = genai.Client(api_key=api_key)
+                gemini_model_id = get_latest_gemini_model(client_gemini, require_agent=False)
                 
                 refine_prompt = (
                     f"아래는 AI 뉴스 보고서 원문(Phase 1 리서치 전체 내용)과 검증 피드백입니다.\n\n"
@@ -339,9 +323,9 @@ def main():
                 )
                 
                 try:
-                    print(f"Refining with model: {pro_model_id}...")
-                    refine_response = client_pro.models.generate_content(
-                        model=pro_model_id,
+                    print(f"Refining with model: {gemini_model_id}...")
+                    refine_response = client_gemini.models.generate_content(
+                        model=gemini_model_id,
                         contents=[refine_prompt]
                     )
                     refined_result = refine_response.text
@@ -361,16 +345,14 @@ def main():
                 refined_output = args.output
             
             if refined_result:
-                # --- Phase 4: Claude Audit 2 & English Translation ---
+                # Phase 4: Claude Audit 2 & English Translation
                 print("\n--- Phase 4: Claude Audit 2 & English Translation ---")
                 translation_prompt = "구조를 유지한 채 최상의 영어 문장으로 최종 수정 및 번역해주세요."
                 translated_result = validate_with_claude(refined_result, custom_prompt=translation_prompt)
                 
-                # If translation also fails, use the refined result (Korean) as a fallback for archival
                 final_content_for_html = translated_result if translated_result else refined_result
                 
                 if final_content_for_html:
-                    # Save to dated file: data/YYYY-MM-DD.txt
                     today = datetime.datetime.now().strftime("%Y-%m-%d")
                     archive_file = f"data/{today}.txt"
                     archive_dir = os.path.dirname(archive_file)
@@ -381,7 +363,7 @@ def main():
                         f.write(final_content_for_html)
                     print(f"Archived content to {archive_file}")
 
-                    # --- Phase 5: HTML Generation ---
+                    # Phase 5: HTML Generation
                     print("\n--- Phase 5: HTML Generation ---")
                     html_prompt_url = os.getenv("HTML_PROMPT_URL")
                     if html_prompt_url:
@@ -404,14 +386,13 @@ def main():
 )
 def generate_html(content, prompt, output_file="index.html"):
     """
-    Generates index.html using Gemini Pro.
+    Generates index.html using Gemini.
     """
     api_key = os.getenv("GEMINI_API_KEY")
     client = genai.Client(api_key=api_key)
-    model_id = get_latest_pro_model(client)
+    model_id = get_latest_gemini_model(client)
     
     print(f"Generating HTML using model: {model_id}...")
-    # Removed internal try-except to allow @retry to catch errors
     response = client.models.generate_content(
         model=model_id,
         contents=[f"{prompt}\n{content}"]
