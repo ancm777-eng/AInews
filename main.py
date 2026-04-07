@@ -76,8 +76,9 @@ def get_latest_gemini_model(client, require_agent=False):
             return "deep-research-pro-preview-12-2025"
 
         # Priority 2: Pick Gemini Flash model
+        # 'preview' 키워드 추가하여 503 에러가 잦은 불안정한 프리뷰 모델 배제
         bad_keywords = ["nano", "vision", "latest", "customtools", "experimental",
-                        "deep-research", "live", "tts", "embedding", "imagen", "aqa"]
+                        "deep-research", "live", "tts", "embedding", "imagen", "aqa", "preview"]
         flash_models = [
             n for n in all_names
             if "gemini" in n.lower() and "flash" in n.lower()
@@ -157,6 +158,11 @@ def validate_with_claude(content, custom_prompt="검증해주세요"):
     )
     return message.content[0].text
 
+@retry(
+    stop=stop_after_attempt(3), # 최대 3번까지 재시도
+    wait=wait_exponential(multiplier=2, min=10, max=60), # 실패할 때마다 10초, 20초, 40초 대기
+    retry_error_callback=return_none_on_error
+)
 def run_grounded_research(prompt, output_file="research_result.md"):
     """
     Phase 1: Performs fast web-grounded research using Google Search tool.
@@ -195,9 +201,15 @@ def run_grounded_research(prompt, output_file="research_result.md"):
         return result_text, None
     except Exception as e:
         print(f"An error occurred during grounded research: {e}")
-        return None, None
+        raise e  # @retry 가 잡아서 재시도할 수 있도록 에러를 다시 던집니다.
 
+@retry(
+    stop=stop_after_attempt(3), 
+    wait=wait_exponential(multiplier=2, min=10, max=60), 
+    retry_error_callback=return_none_on_error
+)
 def run_deep_research(prompt, output_file="research_result.md", agent_id=None, previous_interaction_id=None):
+    
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key or api_key == "YOUR_API_KEY_HERE":
         print("Error: GEMINI_API_KEY not found in .env file.")
@@ -261,7 +273,7 @@ def run_deep_research(prompt, output_file="research_result.md", agent_id=None, p
                 time.sleep(10)
     except Exception as e:
         print(f"An error occurred during API interaction: {e}")
-        return None, None
+        raise e
 
 def main():
     parser = argparse.ArgumentParser(description="Gemini Deep Research with GitHub Prompt")
@@ -271,14 +283,23 @@ def main():
     parser.add_argument("--output", default=default_output, help="Output file name")
     
     args = parser.parse_args()
-    url = args.url or os.getenv("PROMPT_URL")
     
-    if not url:
-        print("Required: --url <GitHub_Prompt_URL> or set PROMPT_URL in .env")
-        return
-
-    print(f"Using prompt from: {url}")
-    prompt_content = fetch_prompt_from_github(url)
+    # 1. 뉴스 프롬프트 가져오기 (URL 우선, 없으면 로컬 파일)
+    url = args.url or os.getenv("PROMPT_URL")
+    prompt_content = None
+    
+    if url:
+        print(f"Using prompt from URL: {url}")
+        prompt_content = fetch_prompt_from_github(url)
+    else:
+        local_news_path = "prompt/news.txt"
+        if os.path.exists(local_news_path):
+            print(f"Using local prompt file: {local_news_path}")
+            with open(local_news_path, "r", encoding="utf-8") as f:
+                prompt_content = f.read()
+        else:
+            print("Error: No PROMPT_URL set and no local prompt/news.txt found.")
+            return
     
     if prompt_content:
         archives = get_recent_archives(days=7)
@@ -286,7 +307,7 @@ def main():
             print("Injecting recent archives for duplicate filtering...")
             prompt_content = archives + "\n" + prompt_content
 
-        # Step 1: Initial Research
+        # Step 1: Initial Research (자동 재시도 로직 적용됨)
         initial_result, _ = run_grounded_research(prompt_content, args.output)
         
         if initial_result:
@@ -303,7 +324,7 @@ def main():
                     f.write(feedback)
                 print(f"Feedback saved to {feedback_file}")
                 
-                # Step 3: Refinement using feedback
+                # Step 3: Refinement using feedback (503 방어 루프 적용)
                 print("\n--- Phase 3: Gemini Refinement ---")
                 refined_output = os.getenv("REFINED_OUTPUT_FILE") or "trial/2.txt"
                 
@@ -322,23 +343,34 @@ def main():
                     f"4. 원문의 구조(섹션, 마크다운 형식)를 그대로 유지하세요."
                 )
                 
-                try:
-                    print(f"Refining with model: {gemini_model_id}...")
-                    refine_response = client_gemini.models.generate_content(
-                        model=gemini_model_id,
-                        contents=[refine_prompt]
-                    )
-                    refined_result = refine_response.text
-                    
-                    refined_dir = os.path.dirname(refined_output)
-                    if refined_dir and not os.path.exists(refined_dir):
-                        os.makedirs(refined_dir, exist_ok=True)
-                    with open(refined_output, "w", encoding="utf-8") as f:
-                        f.write(refined_result)
-                    print(f"Refinement complete. Saved to {refined_output} (Total length: {len(refined_result)})")
-                except Exception as e:
-                    print(f"Warning: Refinement failed ({e}). Using initial research as fallback.")
-                    refined_result = initial_result
+                max_retries = 3
+                refined_result = None
+                
+                for attempt in range(max_retries):
+                    try:
+                        print(f"Refining with model: {gemini_model_id} (Attempt {attempt + 1}/{max_retries})...")
+                        refine_response = client_gemini.models.generate_content(
+                            model=gemini_model_id,
+                            contents=[refine_prompt]
+                        )
+                        refined_result = refine_response.text
+                        
+                        refined_dir = os.path.dirname(refined_output)
+                        if refined_dir and not os.path.exists(refined_dir):
+                            os.makedirs(refined_dir, exist_ok=True)
+                        with open(refined_output, "w", encoding="utf-8") as f:
+                            f.write(refined_result)
+                        print(f"Refinement complete. Saved to {refined_output} (Total length: {len(refined_result)})")
+                        break # 성공 시 루프 탈출
+                        
+                    except Exception as e:
+                        print(f"Warning: Refinement attempt {attempt + 1} failed ({e}).")
+                        if attempt < max_retries - 1:
+                            print("Sleeping for 20 seconds before retrying...")
+                            time.sleep(20) # 20초 대기 후 재시도
+                        else:
+                            print("All refinement attempts failed. Using initial research as fallback.")
+                            refined_result = initial_result
             else:
                 print("Claude validation failed or skipped. Using initial research as refined result.")
                 refined_result = initial_result
@@ -365,17 +397,29 @@ def main():
 
                     # Phase 5: HTML Generation
                     print("\n--- Phase 5: HTML Generation ---")
+                    
+                    # HTML 프롬프트 가져오기 (URL 우선, 없으면 로컬 파일)
                     html_prompt_url = os.getenv("HTML_PROMPT_URL")
+                    html_prompt = None
+                    
                     if html_prompt_url:
+                        print(f"Using HTML prompt from URL: {html_prompt_url}")
                         html_prompt = fetch_prompt_from_github(html_prompt_url)
-                        if html_prompt:
-                            generate_html(final_content_for_html, html_prompt, "index.html")
-                        else:
-                            print("Warning: Failed to fetch HTML prompt.")
                     else:
-                        print("Warning: HTML_PROMPT_URL not set in .env.")
+                        local_html_path = "prompt/html.txt"
+                        if os.path.exists(local_html_path):
+                            print(f"Using local HTML prompt file: {local_html_path}")
+                            with open(local_html_path, "r", encoding="utf-8") as f:
+                                html_prompt = f.read()
+                        else:
+                            print("Warning: HTML prompt source not found.")
+                            
+                    if html_prompt:
+                        generate_html(final_content_for_html, html_prompt, "index.html")
+                    else:
+                        print("Error: No content available for HTML generation.")
                 else:
-                    print("Error: No content available for HTML generation.")
+                    print("Error: No content available for translation/archiving.")
     else:
         print("Failed to fetch prompt.")
 
