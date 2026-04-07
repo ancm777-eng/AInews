@@ -12,6 +12,11 @@ from github_utils import fetch_prompt_from_github
 # Load environment variables
 load_dotenv()
 
+def return_none_on_error(retry_state):
+    """Callback for tenacity when all retry attempts fail."""
+    print(f"\nAction ultimately failed after {retry_state.attempt_number} attempts: {retry_state.outcome.exception()}")
+    return None
+
 def get_recent_archives(days=7):
     """
     Reads news content from the data/ directory for the last N days.
@@ -101,7 +106,11 @@ def get_latest_claude_model(client, flavor="sonnet"):
         print(f"Warning: Claude model selection failed: {e}")
         return "claude-3-5-sonnet-latest"
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
+@retry(
+    stop=stop_after_attempt(3), 
+    wait=wait_exponential(multiplier=1, min=4, max=10),
+    retry_error_callback=return_none_on_error
+)
 def validate_with_claude(content, custom_prompt="검증해주세요"):
     """
     Validates the research content using Claude.
@@ -116,18 +125,15 @@ def validate_with_claude(content, custom_prompt="검증해주세요"):
     model = get_latest_claude_model(client)
     
     print(f"Starting Claude action (Model: {model}, Prompt: {custom_prompt})...")
-    try:
-        message = client.messages.create(
-            model=model,
-            max_tokens=8192,  # Increased for translation
-            messages=[
-                {"role": "user", "content": f"{content}\n\n{custom_prompt}"}
-            ]
-        )
-        return message.content[0].text
-    except Exception as e:
-        print(f"Claude action failed: {e}")
-        return None
+    # Removed internal try-except to allow @retry to catch errors
+    message = client.messages.create(
+        model=model,
+        max_tokens=8192,  # Increased for translation
+        messages=[
+            {"role": "user", "content": f"{content}\n\n{custom_prompt}"}
+        ]
+    )
+    return message.content[0].text
 
 def run_deep_research(prompt, output_file="research_result.md", agent_id=None, previous_interaction_id=None):
     api_key = os.getenv("GEMINI_API_KEY")
@@ -280,7 +286,11 @@ def main():
     else:
         print("Failed to fetch prompt.")
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
+@retry(
+    stop=stop_after_attempt(3), 
+    wait=wait_exponential(multiplier=1, min=4, max=10),
+    retry_error_callback=return_none_on_error
+)
 def generate_html(content, prompt, output_file="index.html"):
     """
     Generates index.html using Gemini Pro.
@@ -290,22 +300,20 @@ def generate_html(content, prompt, output_file="index.html"):
     model_id = get_latest_pro_model(client)
     
     print(f"Generating HTML using model: {model_id}...")
-    try:
-        response = client.models.generate_content(
-            model=model_id,
-            contents=[f"{prompt}\n{content}"]
-        )
-        html_content = response.text
-        if "```html" in html_content:
-            html_content = html_content.split("```html")[1].split("```")[0].strip()
-        elif "```" in html_content:
-            html_content = html_content.split("```")[1].split("```")[0].strip()
-            
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(html_content)
-        print(f"HTML generation complete. Saved to {output_file}")
-    except Exception as e:
-        print(f"HTML generation failed: {e}")
+    # Removed internal try-except to allow @retry to catch errors
+    response = client.models.generate_content(
+        model=model_id,
+        contents=[f"{prompt}\n{content}"]
+    )
+    html_content = response.text
+    if "```html" in html_content:
+        html_content = html_content.split("```html")[1].split("```")[0].strip()
+    elif "```" in html_content:
+        html_content = html_content.split("```")[1].split("```")[0].strip()
+        
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    print(f"HTML generation complete. Saved to {output_file}")
 
 if __name__ == "__main__":
     main()
