@@ -1,4 +1,5 @@
 import os
+<<<<<<< HEAD
 # ✅ [수정 1] 구/deprecated 패키지 → 새 패키지로 교체
 from google import genai
 from google.genai import types
@@ -454,3 +455,262 @@ if __name__ == "__main__":
     print("✅ 4단계 완료 (index_gemini.html 저장됨)")
 
     print("\n🎉 모든 프로세스 완료! 생성된 파일들을 확인해주세요.")
+=======
+import time
+import argparse
+from dotenv import load_dotenv
+from google import genai
+import anthropic
+from tenacity import retry, stop_after_attempt, wait_exponential
+from github_utils import fetch_prompt_from_github
+
+# Load environment variables
+load_dotenv()
+
+def get_latest_pro_model(client):
+    """
+    Dynamically finds the latest available Gemini Pro model.
+    """
+    try:
+        models = client.models.list()
+        pro_models = []
+        for m in models:
+            # Look for "pro" in the name, excluding flash or other variants
+            if "pro" in m.name.lower() and "flash" not in m.name.lower():
+                pro_models.append(m.name)
+        
+        if not pro_models:
+            return "gemini-3.1-pro" # Fallback to a known latest
+            
+        # Sort by version number if possible (e.g., gemini-3.1-pro -> 3.1)
+        # For simplicity, we'll sort alphabetically descending which usually works for versioned names
+        pro_models.sort(reverse=True)
+        
+        # Most APIs use the format 'models/name' or 'name'. 
+        # For Interactions API it might need to be just 'name' or a specific agent ID.
+        latest = pro_models[0].replace("models/", "")
+        print(f"Automatically selected latest Pro model: {latest}")
+        return latest
+    except Exception as e:
+        print(f"Warning: Could not list models automatically: {e}")
+        return "gemini-3.1-pro"
+
+def get_latest_claude_model(client, flavor="sonnet"):
+    """
+    Dynamically finds the latest available Claude Sonnet model.
+    """
+    try:
+        # Anthropic doesn't have a simple list() like Gemini in the same way,
+        # but they use -latest aliases. However, to find versioned names:
+        # We can try to list but usually latest aliases are preferred.
+        # For 2026, we know sonnet-4-6 is latest.
+        # I'll implement a fallback to 'claude-3-5-sonnet-latest' or 'claude-3-7-sonnet-latest'
+        
+        # Check environment variable first
+        env_model = os.getenv("CLAUDE_MODEL")
+        if env_model and env_model != "latest-sonnet":
+            return env_model
+
+        # Default fallback for Sonoma if anything fails
+        return "claude-3-5-sonnet-latest" 
+    except Exception as e:
+        print(f"Warning: Claude model selection failed: {e}")
+        return "claude-3-5-sonnet-latest"
+
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
+def validate_with_claude(content):
+    """
+    Validates the research content using Claude.
+    """
+    api_key = os.getenv("CLAUDE_API_KEY")
+    if not api_key:
+        print("Warning: CLAUDE_API_KEY not found. Skipping validation.")
+        return None
+    
+    client = anthropic.Anthropic(api_key=api_key)
+    model = get_latest_claude_model(client)
+    
+    print(f"Starting Claude validation (Model: {model})...")
+    try:
+        message = client.messages.create(
+            model=model,
+            max_tokens=4096,
+            messages=[
+                {"role": "user", "content": f"{content}\n\n검증해주세요"}
+            ]
+        )
+        return message.content[0].text
+    except Exception as e:
+        print(f"Claude validation failed: {e}")
+        return None
+
+def run_deep_research(prompt, output_file="research_result.md", agent_id=None, previous_interaction_id=None):
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key or api_key == "YOUR_API_KEY_HERE":
+        print("Error: GEMINI_API_KEY not found in .env file.")
+        return None, None
+
+    # Use specified agent, or from env, or auto-discover
+    research_agent = agent_id or os.getenv("RESEARCH_AGENT")
+    
+    client = genai.Client(api_key=api_key)
+
+    if not research_agent or research_agent.lower() == "latest-pro":
+        research_agent = get_latest_pro_model(client)
+    
+    # If continuing, we don't necessarily need the agent ID if previous_interaction_id handles it, 
+    # but the API usually requires it or infers it.
+    print(f"Starting Gemini Deep Research (Agent: {research_agent}, Continued: {previous_interaction_id is not None})...")
+    
+    try:
+        # Start the research task in the background
+        interaction = client.interactions.create(
+            agent=research_agent, 
+            input=prompt, 
+            background=True,
+            previous_interaction_id=previous_interaction_id
+        )
+        print(f"Interaction ID: {interaction.id}")
+        
+        # Polling mechanism
+        start_time = time.time()
+        while True:
+            interaction = client.interactions.get(interaction.id)
+            
+            if interaction.status == "completed":
+                print("\nResearch Turn Completed!")
+                result_text = interaction.outputs[-1].text
+                
+                # Ensure the output directory exists
+                output_dir = os.path.dirname(output_file)
+                if output_dir and not os.path.exists(output_dir):
+                    os.makedirs(output_dir, exist_ok=True)
+                
+                with open(output_file, "w", encoding="utf-8") as f:
+                    f.write(result_text)
+                
+                print(f"Results saved to {output_file}")
+                return result_text, interaction.id
+            
+            elif interaction.status == "failed":
+                print(f"\nResearch failed: {interaction.error}")
+                return None, interaction.id
+            
+            else:
+                elapsed = int(time.time() - start_time)
+                print(f"\rStatus: {interaction.status} (Elapsed: {elapsed}s)...", end="", flush=True)
+                time.sleep(10)
+                
+    except Exception as e:
+        print(f"An error occurred during API interaction: {e}")
+        return None, None
+
+def main():
+    parser = argparse.ArgumentParser(description="Gemini Deep Research with GitHub Prompt")
+    parser.add_argument("--url", help="GitHub URL of the prompt file")
+    parser.add_argument("--agent", help="Gemini Research Agent ID (e.g., gemini-3.1-pro)")
+    # Check for output path in env or default to trial/1.txt
+    default_output = os.getenv("OUTPUT_FILE") or "trial/1.txt"
+    parser.add_argument("--output", default=default_output, help="Output file name")
+    
+    args = parser.parse_args()
+    
+    # Check for URL in argument first, then in environment variables
+    url = args.url or os.getenv("PROMPT_URL")
+    
+    if not url:
+        print("Required: --url <GitHub_Prompt_URL> or set PROMPT_URL in .env")
+        print("Example: py main.py --url https://raw.githubusercontent.com/user/repo/main/prompt.txt")
+        return
+
+    print(f"Using prompt from: {url}")
+    prompt_content = fetch_prompt_from_github(url)
+    
+    if prompt_content:
+        # Step 1: Initial Research
+        initial_result, first_interaction_id = run_deep_research(prompt_content, args.output, args.agent)
+        
+        if initial_result and first_interaction_id:
+            # Step 2: Claude Validation
+            print("\n--- Phase 2: Claude Validation ---")
+            feedback = validate_with_claude(initial_result)
+            
+            if feedback:
+                # Save feedback to file
+                feedback_file = os.getenv("FEEDBACK_FILE") or "trial/feedback.txt"
+                feedback_dir = os.path.dirname(feedback_file)
+                if feedback_dir and not os.path.exists(feedback_dir):
+                    os.makedirs(feedback_dir, exist_ok=True)
+                    
+                with open(feedback_file, "w", encoding="utf-8") as f:
+                    f.write(feedback)
+                print(f"Feedback saved to {feedback_file}")
+                
+                # Step 3: Refinement using feedback
+                print("\n--- Phase 3: Gemini Refinement ---")
+                refine_prompt = f"다음은 작성된 내용에 대한 검증 피드백입니다. 이 내용을 바탕으로 최종적으로 수정 및 보완해주세요:\n\n{feedback}"
+                
+                # Use refined output file path
+                refined_output = os.getenv("REFINED_OUTPUT_FILE") or "trial/2.txt"
+                
+                refined_result, _ = run_deep_research(
+                    refine_prompt, 
+                    refined_output, 
+                    args.agent, 
+                    previous_interaction_id=first_interaction_id
+                )
+                
+                if refined_result:
+                    print(f"Refinement complete. Final result saved to {refined_output}")
+                    
+                    # --- NEW Phase 4: HTML Generation ---
+                    print("\n--- Phase 4: HTML Generation ---")
+                    html_prompt_url = os.getenv("HTML_PROMPT_URL")
+                    if html_prompt_url:
+                        html_prompt = fetch_prompt_from_github(html_prompt_url)
+                        if html_prompt:
+                            generate_html(refined_result, html_prompt, "index.html")
+                        else:
+                            print("Warning: Failed to fetch HTML prompt. Skipping HTML generation.")
+                    else:
+                        print("Warning: HTML_PROMPT_URL not set in .env. Skipping HTML generation.")
+            else:
+                print("Claude validation skipped or failed. Refinement phase skipped.")
+    else:
+        print("Failed to fetch prompt. Exiting.")
+
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
+def generate_html(content, prompt, output_file="index.html"):
+    """
+    Generates index.html using Gemini Pro based on the refined content and template prompt.
+    """
+    api_key = os.getenv("GEMINI_API_KEY")
+    client = genai.Client(api_key=api_key)
+    
+    # Use latest pro model (standard, not necessarily research agent)
+    model_id = get_latest_pro_model(client)
+    
+    print(f"Generating HTML using model: {model_id}...")
+    try:
+        response = client.models.generate_content(
+            model=model_id,
+            contents=[f"{prompt}\n{content}"]
+        )
+        
+        html_content = response.text
+        # Optional: Basic cleanup if model wraps in ```html ... ```
+        if "```html" in html_content:
+            html_content = html_content.split("```html")[1].split("```")[0].strip()
+        elif "```" in html_content:
+            html_content = html_content.split("```")[1].split("```")[0].strip()
+            
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(html_content)
+        
+        print(f"HTML generation complete. Saved to {output_file}")
+    except Exception as e:
+        print(f"HTML generation failed: {e}")
+
+if __name__ == "__main__":
+    main()
+>>>>>>> c3d06b6 (feat: complete autonomous 4-stage research pipeline)
