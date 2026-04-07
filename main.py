@@ -61,8 +61,8 @@ def get_latest_pro_model(client):
             name = m.name.lower()
             # Only consider gemini-branded pro models
             if name.startswith("models/gemini-") and "pro" in name:
-                # Exclude internal codenames or flash/nano variants
-                if not any(bad in name for bad in ["flash", "nano", "banana", "vision"]):
+                # Exclude internal codenames, flash variants, and non-versioned aliases
+                if not any(bad in name for bad in ["flash", "nano", "banana", "vision", "latest"]):
                     pro_models.append(m.name)
         
         if not pro_models:
