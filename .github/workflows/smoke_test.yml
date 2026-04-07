@@ -52,5 +52,14 @@ jobs:
           # 이미지에 있는 trial 폴더, data 폴더, index.html의 변경사항을 추적
           git add trial/ data/ index.html
           
-          # 변경된 내용이 있을 때만 덮어쓰기(Commit) 후 리포지토리에 업로드(Push)
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update AI news results" && git push)
+          # 변경된 파일이 있는지 확인
+          if ! git diff --staged --quiet; then
+            git commit -m "Auto-update AI news results"
+            
+            # (핵심) 깃허브의 최신 상태를 먼저 가져와서 병합 충돌을 방지함
+            git pull --rebase origin main
+            
+            git push
+          else
+            echo "No changes to commit. Skipping push."
+          fi
