@@ -66,25 +66,24 @@ def get_latest_pro_model(client):
                 if not any(bad in name for bad in bad_keywords):
                     pro_models.append(m.name)
         
-        # Priority 1: Official Deep Research Model ID
-        for m in pro_models:
-            if "deep-research-pro-preview-12-2025" in m:
-                print("Found official Deep Research model: deep-research-pro-preview-12-2025")
-                return "deep-research-pro-preview-12-2025"
+        # Priority 1: Dynamic Deep Research Model Discovery
+        # Automatically finds and picks the latest based on string sorting (e.g., 2026 > 2025)
+        dr_models = [m.name for m in models if "deep-research-pro" in m.name.lower()]
+        if dr_models:
+            dr_models.sort(reverse=True)
+            latest_dr = dr_models[0].replace("models/", "")
+            print(f"Found latest specialized Deep Research model: {latest_dr}")
+            return latest_dr
 
-        # Priority 2: Known compatible research model
-        for m in pro_models:
-            if "2.0-pro-exp-02-05" in m:
-                print("Found compatible Deep Research model: gemini-2.0-pro-exp-02-05")
-                return "gemini-2.0-pro-exp-02-05"
+        # Priority 2: Standard Gemini Pro models (e.g., 2.5, 3.1)
+        if pro_models:
+            pro_models.sort(reverse=True)
+            latest = pro_models[0].replace("models/", "")
+            print(f"Automatically selected latest Pro model: {latest}")
+            return latest
 
-        if not pro_models:
-            return "deep-research-pro-preview-12-2025" # Official ID fallback
-            
-        pro_models.sort(reverse=True)
-        latest = pro_models[0].replace("models/", "")
-        print(f"Automatically selected model: {latest}")
-        return latest
+        # Final Fallback
+        return "deep-research-pro-preview-12-2025"
     except Exception as e:
         print(f"Warning: Could not list models automatically: {e}")
         return "gemini-2.0-pro-exp-02-05"
