@@ -66,13 +66,18 @@ def get_latest_pro_model(client):
                 if not any(bad in name for bad in bad_keywords):
                     pro_models.append(m.name)
         
+        # Specific check for the known compatible research model
+        for m in pro_models:
+            if "2.0-pro-exp-02-05" in m:
+                print("Found compatible Deep Research model: gemini-2.0-pro-exp-02-05")
+                return "gemini-2.0-pro-exp-02-05"
+
         if not pro_models:
-            # Fallback to a known research-capable model if auto-discovery fails
             return "gemini-2.0-pro-exp-02-05"
             
         pro_models.sort(reverse=True)
         latest = pro_models[0].replace("models/", "")
-        print(f"Automatically selected latest Pro model: {latest}")
+        print(f"Automatically selected model: {latest}")
         return latest
     except Exception as e:
         print(f"Warning: Could not list models automatically: {e}")
