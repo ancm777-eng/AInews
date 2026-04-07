@@ -17,7 +17,7 @@ def test_claude_minimal():
         # Extremely small prompt to minimize token cost (1-2 tokens)
         print("Sending 1-word request to Claude...")
         message = client.messages.create(
-            model="claude-3-5-sonnet-latest",
+            model="claude-3-5-sonnet-20241022",
             max_tokens=10,
             messages=[
                 {"role": "user", "content": "Hi"}
