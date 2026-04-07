@@ -154,11 +154,16 @@ def run_deep_research(prompt, output_file="research_result.md", agent_id=None, p
         return None, None
 
     research_agent = agent_id or os.getenv("RESEARCH_AGENT")
-    client = genai.Client(api_key=api_key, http_options={'timeout': 300.0})
+    
+    # Use separate clients: fast timeout for model listing, NO timeout for interactions.
+    # The experimental interactions API ignores http_options timeout - it must be unset.
+    client_for_listing = genai.Client(api_key=api_key, http_options={'timeout': 120.0})
+    client = genai.Client(api_key=api_key, http_options={'timeout': None})
 
     if not research_agent or research_agent.lower() == "latest-pro":
         # Crucial: Request an 'agent' explicitly for Deep Research, not a generative model
-        research_agent = get_latest_pro_model(client, require_agent=True)
+        research_agent = get_latest_pro_model(client_for_listing, require_agent=True)
+
     
     print(f"Starting Gemini Deep Research (Agent: {research_agent}, Continued: {previous_interaction_id is not None})...")
     
