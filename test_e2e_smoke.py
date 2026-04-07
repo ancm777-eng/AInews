@@ -34,8 +34,8 @@ def main():
     gemini_agent = gemini_model = None
     if gemini_key:
         from google import genai
-        gclient = genai.Client(api_key=gemini_key, http_options={'timeout': 120.0})
-        from main import get_latest_pro_model
+        gclient = genai.Client(api_key=gemini_key)
+        from main import get_latest_pro_model, run_grounded_research
         gemini_agent = get_latest_pro_model(gclient, require_agent=True)
         gemini_model = get_latest_pro_model(gclient, require_agent=False)
         print(f"  🔬 Deep Research Agent : {gemini_agent}")
@@ -57,10 +57,17 @@ def main():
         errors.append("CLAUDE_API_KEY not set")
         print("  ❌ CLAUDE_API_KEY not set")
 
-    # ── Phase 1: Deep Research (SKIPPED - uses dummy) ─────────
-    print("\n══════ Phase 1: Deep Research (Dummy) ══════")
-    dummy_research = "# AI News Research Report\n\nThis is a smoke test dummy report for pipeline validation.\n\n## Key Findings\n1. Pipeline smoke test executed successfully.\n2. Model discovery verified.\n3. File output validated."
-    write_and_verify("trial/1.txt", dummy_research, "Phase 1")
+    # ── Phase 1: Grounded Research (Optimized) ───────────────
+    print("\n══════ Phase 1: Grounded Research (Optimized) ══════")
+    if gemini_key:
+        # Use a very simple query for smoke test
+        initial_research, _ = run_grounded_research("Recent AI news in one sentence for smoke test", "trial/1.txt")
+        if not initial_research:
+            initial_research = "ERROR: Grounded research failed"
+            errors.append("Phase 1 Grounded Research failed")
+    else:
+        initial_research = "# AI News Research Report (Dummy)\nSkipped due to missing API key."
+        write_and_verify("trial/1.txt", initial_research, "Phase 1 (skipped)")
 
     # ── Phase 2: Claude Validation ────────────────────────────
     print("\n══════ Phase 2: Claude Validation ══════")
@@ -80,9 +87,32 @@ def main():
     else:
         write_and_verify("trial/feedback.txt", "SKIPPED: No Claude API key", "Phase 2 (skipped)")
 
-    # ── Phase 3: Gemini Refinement (SKIPPED - uses dummy) ─────
-    print("\n══════ Phase 3: Refinement (Dummy) ══════")
-    write_and_verify("trial/2.txt", "Refined content based on feedback.\n" + dummy_research, "Phase 3")
+    # ── Phase 3: Gemini Refinement (Optimized) ────────────────
+    print("\n══════ Phase 3: Refinement (Optimized) ══════")
+    feedback_from_stage = ""
+    if os.path.exists("trial/feedback.txt"):
+        with open("trial/feedback.txt", "r", encoding="utf-8") as f:
+            feedback_from_stage = f.read()
+
+    if gemini_key and gemini_model:
+        try:
+            print(f"  Refining with model: {gemini_model}...")
+            refine_prompt = (
+                f"Below is a report and feedback. Update the report to include 'REF_OK'.\n\n"
+                f"[Report]\n{initial_research}\n\n[Feedback]\n{feedback_from_stage}"
+            )
+            response = gclient.models.generate_content(
+                model=gemini_model,
+                contents=[refine_prompt]
+            )
+            refined_result = response.text
+            write_and_verify("trial/2.txt", refined_result, "Phase 3")
+        except Exception as e:
+            errors.append(f"Phase 3 Refinement error: {e}")
+            print(f"  ❌ Phase 3 error: {e}")
+            write_and_verify("trial/2.txt", f"ERROR: {e}", "Phase 3 (fallback)")
+    else:
+        write_and_verify("trial/2.txt", "SKIPPED: No Gemini API key", "Phase 3 (skipped)")
 
     # ── Phase 4: Claude Translation ───────────────────────────
     print("\n══════ Phase 4: Claude Translation ══════")
