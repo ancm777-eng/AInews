@@ -143,12 +143,22 @@ def run_deep_research(prompt, output_file="research_result.md", agent_id=None, p
     print(f"Starting Gemini Deep Research (Agent: {research_agent}, Continued: {previous_interaction_id is not None})...")
     
     try:
-        interaction = client.interactions.create(
-            model=research_agent, 
-            input=prompt, 
-            background=True,
-            previous_interaction_id=previous_interaction_id
-        )
+        # Crucial: Deep Research specific IDs are 'agents', while 'gemini-*' IDs are 'models'.
+        # The API errors if the wrong parameter name is used.
+        if "deep-research" in research_agent.lower():
+            interaction = client.interactions.create(
+                agent=research_agent, 
+                input=prompt, 
+                background=True,
+                previous_interaction_id=previous_interaction_id
+            )
+        else:
+            interaction = client.interactions.create(
+                model=research_agent, 
+                input=prompt, 
+                background=True,
+                previous_interaction_id=previous_interaction_id
+            )
         print(f"Interaction ID: {interaction.id}")
         
         start_time = time.time()
