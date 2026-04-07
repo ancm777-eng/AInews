@@ -173,13 +173,19 @@ def run_deep_research(prompt, output_file="research_result.md", agent_id=None, p
             interaction = client.interactions.get(interaction.id)
             if interaction.status == "completed":
                 print("\nResearch Turn Completed!")
-                result_text = interaction.outputs[-1].text
+                # Collect all non-empty text from all outputs
+                result_text = "\n".join([o.text for o in interaction.outputs if o.text])
+                
+                if not result_text:
+                    print("Warning: API returned completed status but no text outputs were found.")
+                    result_text = "No content returned from research agent."
+
                 output_dir = os.path.dirname(output_file)
                 if output_dir and not os.path.exists(output_dir):
                     os.makedirs(output_dir, exist_ok=True)
                 with open(output_file, "w", encoding="utf-8") as f:
                     f.write(result_text)
-                print(f"Results saved to {output_file}")
+                print(f"Results saved to {output_file} (Total length: {len(result_text)})")
                 return result_text, interaction.id
             elif interaction.status == "failed":
                 print(f"\nResearch failed: {interaction.error}")
