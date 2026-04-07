@@ -21,7 +21,7 @@ def test_claude_via_requests():
     }
     
     payload = {
-        "model": "claude-3-5-sonnet-20241022",
+        "model": "claude-4-6-sonnet-latest",
         "max_tokens": 10,
         "messages": [
             {"role": "user", "content": "Hi"}

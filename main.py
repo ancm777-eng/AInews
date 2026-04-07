@@ -103,10 +103,10 @@ def get_latest_claude_model(client, flavor="sonnet"):
         env_model = os.getenv("CLAUDE_MODEL")
         if env_model and env_model != "latest-sonnet":
             return env_model
-        return "claude-3-5-sonnet-20241022" 
+        return "claude-4-6-sonnet-latest" 
     except Exception as e:
         print(f"Warning: Claude model selection failed: {e}")
-        return "claude-3-5-sonnet-20241022"
+        return "claude-4-6-sonnet-latest"
 
 @retry(
     stop=stop_after_attempt(3), 
