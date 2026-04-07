@@ -51,18 +51,23 @@ def get_recent_archives(days=7):
 
 def get_latest_pro_model(client):
     """
-    Dynamically finds the latest available Gemini Pro model.
+    Dynamically finds the latest available Gemini Pro model, 
+    filtering out internal/preview codenames.
     """
     try:
         models = client.models.list()
         pro_models = []
         for m in models:
-            # Look for "pro" in the name, excluding flash or other variants
-            if "pro" in m.name.lower() and "flash" not in m.name.lower():
-                pro_models.append(m.name)
+            name = m.name.lower()
+            # Only consider gemini-branded pro models
+            if name.startswith("models/gemini-") and "pro" in name:
+                # Exclude internal codenames or flash/nano variants
+                if not any(bad in name for bad in ["flash", "nano", "banana", "vision"]):
+                    pro_models.append(m.name)
         
         if not pro_models:
-            return "gemini-3.1-pro" # Fallback to a known latest
+            # Fallback to a known research-capable model if auto-discovery fails
+            return "gemini-2.0-pro-exp-02-05"
             
         pro_models.sort(reverse=True)
         latest = pro_models[0].replace("models/", "")
@@ -70,7 +75,7 @@ def get_latest_pro_model(client):
         return latest
     except Exception as e:
         print(f"Warning: Could not list models automatically: {e}")
-        return "gemini-3.1-pro"
+        return "gemini-2.0-pro-exp-02-05"
 
 def get_latest_claude_model(client, flavor="sonnet"):
     """
