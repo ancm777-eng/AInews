@@ -134,7 +134,7 @@ def run_deep_research(prompt, output_file="research_result.md", agent_id=None, p
     
     try:
         interaction = client.interactions.create(
-            agent=research_agent, 
+            model=research_agent, 
             input=prompt, 
             background=True,
             previous_interaction_id=previous_interaction_id
