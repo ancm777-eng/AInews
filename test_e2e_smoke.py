@@ -34,7 +34,7 @@ def main():
     gemini_agent = gemini_model = None
     if gemini_key:
         from google import genai
-        gclient = genai.Client(api_key=gemini_key, http_options={'timeout': 60.0})
+        gclient = genai.Client(api_key=gemini_key, http_options={'timeout': 120.0})
         from main import get_latest_pro_model
         gemini_agent = get_latest_pro_model(gclient, require_agent=True)
         gemini_model = get_latest_pro_model(gclient, require_agent=False)

@@ -154,7 +154,7 @@ def run_deep_research(prompt, output_file="research_result.md", agent_id=None, p
         return None, None
 
     research_agent = agent_id or os.getenv("RESEARCH_AGENT")
-    client = genai.Client(api_key=api_key, http_options={'timeout': 60.0})
+    client = genai.Client(api_key=api_key, http_options={'timeout': 300.0})
 
     if not research_agent or research_agent.lower() == "latest-pro":
         # Crucial: Request an 'agent' explicitly for Deep Research, not a generative model
@@ -321,7 +321,7 @@ def generate_html(content, prompt, output_file="index.html"):
     Generates index.html using Gemini Pro.
     """
     api_key = os.getenv("GEMINI_API_KEY")
-    client = genai.Client(api_key=api_key, http_options={'timeout': 60.0})
+    client = genai.Client(api_key=api_key, http_options={'timeout': 120.0})
     model_id = get_latest_pro_model(client)
     
     print(f"Generating HTML using model: {model_id}...")
