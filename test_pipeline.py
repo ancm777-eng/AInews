@@ -11,6 +11,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# 실행 시점의 시간을 전역 변수로 설정 (업데이트 확인용)
+CURRENT_KST = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 def ensure_dir(filepath):
     d = os.path.dirname(filepath)
     if d and not os.path.exists(d):
@@ -18,15 +21,18 @@ def ensure_dir(filepath):
 
 def write_and_verify(filepath, content, phase_name):
     ensure_dir(filepath)
+    # 내용 뒤에 실행 시간을 붙여서 파일이 실제로 바뀌었는지 확인 가능하게 함
+    final_content = f"{content}\n(Generated at: {CURRENT_KST})"
     with open(filepath, "w", encoding="utf-8") as f:
-        f.write(content)
+        f.write(final_content)
     size = os.path.getsize(filepath)
     print(f"  ✅ {phase_name}: wrote {filepath} ({size} bytes)")
     return size > 0
 
 def main():
     errors = []
-    print("🚀 Starting API Connected Smoke Test (Cost Minimized Mode)")
+    print(f"🚀 Starting API Connected Smoke Test (Cost Minimized Mode)")
+    print(f"⏰ Test Time: {CURRENT_KST}")
 
     # ── Phase 0: Model Discovery ──────────────────────────────
     print("\n══════ Phase 0: Model Discovery ══════")
@@ -37,7 +43,7 @@ def main():
     if gemini_key:
         from google import genai
         gclient = genai.Client(api_key=gemini_key)
-        # main.py에서 수정된 함수명(get_latest_gemini_model)으로 임포트
+        # main.py에서 수정된 함수명으로 import
         from main import get_latest_gemini_model, run_grounded_research
         
         gemini_agent = get_latest_gemini_model(gclient, require_agent=True)
@@ -65,8 +71,8 @@ def main():
     # ── Phase 1: Grounded Research ───────────────────────────
     print("\n══════ Phase 1: Grounded Research (API Hit) ══════")
     if gemini_key:
-        # main.py에 추가된 @retry 로직을 통해 503 에러 발생 시 자동 재시도함
-        tiny_prompt = "This is an API test. Reply exactly with 'OK' and do nothing else."
+        # 응답 자체에 시간이 포함되도록 유도하여 내용 변화 보장
+        tiny_prompt = f"This is an API test at {CURRENT_KST}. Reply exactly with 'OK' and do nothing else."
         initial_research, _ = run_grounded_research(tiny_prompt, "trial/1.txt")
         
         if not initial_research:
@@ -74,6 +80,8 @@ def main():
             errors.append("Phase 1 Grounded Research failed")
         else:
             print(f"  Gemini responded: {initial_research.strip()}")
+            # write_and_verify를 호출하여 시간에 따른 내용 변화 저장
+            write_and_verify("trial/1.txt", initial_research.strip(), "Phase 1")
     else:
         initial_research = "Skipped"
         write_and_verify("trial/1.txt", initial_research, "Phase 1 (skipped)")
@@ -84,8 +92,8 @@ def main():
         try:
             msg = cclient.messages.create(
                 model=claude_model, 
-                max_tokens=15,
-                messages=[{"role": "user", "content": "Reply exactly with 'VALIDATION_OK'"}]
+                max_tokens=20,
+                messages=[{"role": "user", "content": f"Reply exactly with 'VALIDATION_OK at {CURRENT_KST}'"}]
             )
             feedback = msg.content[0].text.strip()
             print(f"  Claude responded: {feedback}")
@@ -100,13 +108,12 @@ def main():
     # ── Phase 3: Gemini Refinement ────────────────────────────
     print("\n══════ Phase 3: Refinement (API Hit) ══════")
     if gemini_key and gemini_model:
-        # 503 UNAVAILABLE 방어를 위한 간단한 재시도 루프
         max_retries = 2
         refined_result = None
         for attempt in range(max_retries):
             try:
                 print(f"  Refining with model: {gemini_model} (Attempt {attempt+1})...")
-                refine_prompt = "This is a test. Reply exactly with 'REF_OK'."
+                refine_prompt = f"This is a test at {CURRENT_KST}. Reply exactly with 'REF_OK'."
                 response = gclient.models.generate_content(
                     model=gemini_model,
                     contents=[refine_prompt]
@@ -135,8 +142,8 @@ def main():
         try:
             msg = cclient.messages.create(
                 model=claude_model, 
-                max_tokens=15,
-                messages=[{"role": "user", "content": "Reply exactly with 'TRANSLATION_OK'"}]
+                max_tokens=20,
+                messages=[{"role": "user", "content": f"Reply exactly with 'TRANSLATION_OK at {CURRENT_KST}'"}]
             )
             translation = msg.content[0].text.strip()
             print(f"  Claude responded: {translation}")
@@ -154,7 +161,7 @@ def main():
         try:
             response = gclient.models.generate_content(
                 model=gemini_model,
-                contents="Output exactly this string: '<html><body>OK</body></html>'"
+                contents=f"Output exactly this string: '<html><body>OK at {CURRENT_KST}</body></html>'"
             )
             html = response.text.strip()
             if "```html" in html:
@@ -167,7 +174,7 @@ def main():
         except Exception as e:
             errors.append(f"Phase 5 Gemini error: {e}")
             print(f"  ❌ Phase 5 error: {e}")
-            write_and_verify("index.html", f"<html><body>ERROR</body></html>", "Phase 5 (fallback)")
+            write_and_verify("index.html", f"<html><body>ERROR at {CURRENT_KST}</body></html>", "Phase 5 (fallback)")
     else:
         write_and_verify("index.html", "<html><body>SKIPPED</body></html>", "Phase 5 (skipped)")
 
