@@ -90,23 +90,33 @@ def get_latest_pro_model(client, require_agent=False):
             print(f"Automatically selected latest standard Pro model: {latest}")
             return latest
 
-        return "gemini-2.0-pro-exp-02-05" # Generative fallback
+        return "gemini-2.5-pro"
     except Exception as e:
         print(f"Warning: Could not list models automatically: {e}")
-        return "deep-research-pro-preview-12-2025" if require_agent else "gemini-2.0-pro-exp-02-05"
+        return "deep-research-pro-preview-12-2025" if require_agent else "gemini-2.5-pro"
 
-def get_latest_claude_model(client, flavor="sonnet"):
+def get_latest_claude_model(client):
     """
-    Dynamically finds the latest available Claude Sonnet model.
+    Dynamically finds the latest available Claude Sonnet model
+    by querying the Anthropic models API.
     """
     try:
         env_model = os.getenv("CLAUDE_MODEL")
         if env_model and env_model != "latest-sonnet":
             return env_model
-        return "claude-4-6-sonnet-latest" 
+        # Dynamic discovery via API
+        models_page = client.models.list(limit=100)
+        sonnet_models = [m.id for m in models_page.data if "sonnet" in m.id.lower()]
+        if sonnet_models:
+            sonnet_models.sort(reverse=True)
+            latest = sonnet_models[0]
+            print(f"Discovered latest Claude Sonnet model: {latest}")
+            return latest
+        print("Warning: No Sonnet models found via API, using fallback.")
+        return "claude-sonnet-4-20250514"
     except Exception as e:
-        print(f"Warning: Claude model selection failed: {e}")
-        return "claude-4-6-sonnet-latest"
+        print(f"Warning: Claude model discovery failed ({e}), using fallback.")
+        return "claude-sonnet-4-20250514"
 
 @retry(
     stop=stop_after_attempt(3), 
