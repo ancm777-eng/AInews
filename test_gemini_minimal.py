@@ -11,7 +11,7 @@ def test_gemini_discovery_and_conn():
         print("Error: GEMINI_API_KEY not found in env")
         return
 
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(api_key=api_key, http_options={'timeout': 60.0})
     
     print("--- Gemini Model Discovery Test ---")
     # 1. Test Agent Discovery (Phase 1 logic)

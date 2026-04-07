@@ -103,10 +103,10 @@ def get_latest_claude_model(client, flavor="sonnet"):
         env_model = os.getenv("CLAUDE_MODEL")
         if env_model and env_model != "latest-sonnet":
             return env_model
-        return "claude-3-5-sonnet-latest" 
+        return "claude-3-5-sonnet-20241022" 
     except Exception as e:
         print(f"Warning: Claude model selection failed: {e}")
-        return "claude-3-5-sonnet-latest"
+        return "claude-3-5-sonnet-20241022"
 
 @retry(
     stop=stop_after_attempt(3), 
@@ -311,7 +311,7 @@ def generate_html(content, prompt, output_file="index.html"):
     Generates index.html using Gemini Pro.
     """
     api_key = os.getenv("GEMINI_API_KEY")
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(api_key=api_key, http_options={'timeout': 60.0})
     model_id = get_latest_pro_model(client)
     
     print(f"Generating HTML using model: {model_id}...")
