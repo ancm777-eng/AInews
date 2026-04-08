@@ -13,10 +13,12 @@ permissions:
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
+    timeout-minutes: 30 # 메인 파이프라인 무한 대기 방지 (비용 보호)
     
-    # [수정 사항] 이 작업 내의 모든 단계를 한국 시간 기준으로 설정
+    # 이 작업 내의 모든 단계를 한국 시간 기준으로 설정하고 Node.js 경고 해결
     env:
       TZ: Asia/Seoul
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true" 
 
     steps:
       # 1. 리포지토리 코드를 가상 환경으로 가져옴
@@ -47,8 +49,20 @@ jobs:
           HTML_PROMPT_URL: ${{ secrets.HTML_PROMPT_URL }}
         run: python main.py
 
-      # 5. 결과물을 내 리포지토리에 저장 (내용이 바뀐 경우만)
+      # 5. 실행 결과물 아티팩트 업로드 (디버깅용)
+      - name: Upload Pipeline Results
+        if: always() # 스크립트 에러 발생 시에도 생성된 파일들 보존
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-news-artifacts
+          path: |
+            trial/
+            data/
+            index.html
+
+      # 6. 결과물을 내 리포지토리에 저장 (내용이 바뀐 경우만)
       - name: Commit and Push results
+        if: always() # 503 에러 등 스크립트 중단 시에도 확보된 파일 무조건 푸시
         run: |
           # Git 사용자 설정
           git config --global user.name "github-actions[bot]"
@@ -59,7 +73,7 @@ jobs:
           
           # 변경사항이 있는 경우만 커밋 및 푸시
           if ! git diff --staged --quiet; then
-            git commit -m "Auto-update AI news results ($(date +'%Y-%m-%d %H:%M'))"
+            git commit -m "Auto-update AI news results ($(date +'%Y-%m-%d %H:%M KST'))"
             
             # 다른 작업과 충돌 방지를 위해 최신본 합치기 후 업로드
             git pull --rebase origin main
