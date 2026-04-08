@@ -118,7 +118,7 @@ def run_claude_chat(client, model, messages):
 
 @retry(
     stop=stop_after_attempt(2), 
-    wait=wait_exponential(multiplier=2, min=10, max=30), # 타임아웃/503 발생 시 바로 때리지 않고 10~30초 쉬었다가 재시도
+    wait=wait_exponential(multiplier=2, min=10, max=30), # 타임아웃 발생 시 10~30초 쉬었다가 재시도
     retry_error_callback=return_none_on_error
 )
 def run_grounded_research(client, model_id, prompt, output_file="research_result.md"):
@@ -161,7 +161,7 @@ def main():
         print("Missing GEMINI_API_KEY")
         sys.exit(1)
 
-    # ⭐️ 타임아웃 한도를 150초로 넉넉히 주어 무한 대기는 막되, 무거운 웹 검색은 기다려줌
+    # 타임아웃 한도를 150초로 넉넉히 주어 무거운 검색도 기다려줌
     g_client = genai.Client(api_key=g_api_key, http_options={'timeout': 150.0})
     g_model = get_latest_gemini_model(g_client)
     
@@ -184,13 +184,13 @@ def main():
                 print("Prompt source not found.")
                 sys.exit(1)
 
-    # KST 시간 주입 및 오버라이드 룰 적용
+    # 🔥 [수정됨] KST 시간 주입 및 오버라이드 룰 강제 적용
     current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
     system_instr = (
         f"[🔥 SYSTEM OVERRIDE & ALERT: 매우 중요한 지시사항 🔥]\n"
         f"1. 현재 한국 표준시(KST)는 {current_kst} 입니다. 이를 '오늘(TODAY)'의 기준으로 삼으십시오.\n"
-        f"2. 사용자의 프롬프트 원문에 있는 '쿼리 0: today's date 검색' 및 '날짜 확인 실패 시 Briefing aborted 출력' 규칙을 **완벽하게 무시**하십시오. 시스템이 이미 날짜를 제공했으므로 절대 중단해서는 안 됩니다. 즉시 1번 쿼리(최신 AI 뉴스 리서치)부터 시작하십시오.\n"
-        f"3. 문장 내 인라인 LaTeX 사용은 절대 금지하며, 수식이나 변수는 굵은 글씨 또는 일반 텍스트로만 표기하십시오.\n\n"
+        f"2. 사용자의 프롬프트 원문에 있는 '쿼리 0: today's date 검색' 및 '날짜 확인 실패 시 Briefing aborted 출력' 규칙을 **완벽하게 무시**하십시오. 시스템이 이미 날짜를 제공했으므로 절대 중단해서는 안 됩니다. 즉시 최신 AI 뉴스 리서치부터 시작하십시오.\n"
+        f"3. 문장 내 인라인 LaTeX($) 사용은 절대 금지하며, 수식이나 변수(예: v, x, n)는 굵은 글씨 또는 일반 텍스트로만 표기하십시오.\n\n"
     )
     prompt_content = system_instr + get_recent_archives(7) + prompt_content
 
@@ -199,7 +199,7 @@ def main():
     
     if not research_output:
         print("❌ API 서버 과부하 또는 오류로 리서치 실패. 워크플로우를 즉시 종료하여 비용을 보호합니다.")
-        sys.exit(1) # 에러 코드를 발생시켜 GitHub Actions 스케줄러가 재시도하게 함
+        sys.exit(1)
         
     initial_result, gemini_chat = research_output
 
@@ -227,6 +227,7 @@ def main():
             "3. 인라인 LaTeX 사용 절대 금지\n4. 기존 섹션 구조 유지"
         )
         
+        # 🔥 [수정됨] Phase 3에도 서버 통신 끊김(Server disconnected) 방어용 재시도 로직 추가
         max_retries = 3
         for attempt in range(max_retries):
             try:
