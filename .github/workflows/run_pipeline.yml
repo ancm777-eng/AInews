@@ -40,14 +40,27 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 4. API 키를 주입하고 실제 메인 파이프라인(main.py) 실행
+      # 4. API 키를 주입하고 실제 메인 파이프라인(main.py) 실행 (자동 재시도 로직 추가)
       - name: Run Main Pipeline
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           PROMPT_URL: ${{ secrets.PROMPT_URL }}
           HTML_PROMPT_URL: ${{ secrets.HTML_PROMPT_URL }}
-        run: python main.py
+        run: |
+          max_retries=5
+          attempt=0
+          until python main.py; do
+            exit_code=$?
+            attempt=$((attempt + 1))
+            if [ $attempt -lt $max_retries ]; then
+              echo "🚨 API 503 에러 등 실행 실패 (Exit code: $exit_code). 60초 대기 후 재시도합니다... (Attempt $((attempt + 1))/$max_retries)"
+              sleep 60
+            else
+              echo "❌ 총 $max_retries 번의 시도가 모두 실패했습니다."
+              exit $exit_code
+            fi
+          done
 
       # 5. 실행 결과물 아티팩트 업로드 (디버깅용)
       - name: Upload Pipeline Results
@@ -59,6 +72,7 @@ jobs:
             trial/
             data/
             index.html
+            run_status.txt
 
       # 6. 결과물을 내 리포지토리에 저장 (내용이 바뀐 경우만)
       - name: Commit and Push results
@@ -68,8 +82,11 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
+          # 파이프라인 실행 시간을 기록하는 상태 파일 생성 (무조건 커밋 발생용)
+          echo "Last Pipeline Run: $(date +'%Y-%m-%d %H:%M:%S KST')" > run_status.txt
+          
           # 변경된 폴더와 파일 추가
-          git add trial/ data/ index.html
+          git add trial/ data/ index.html run_status.txt
           
           # 변경사항이 있는 경우만 커밋 및 푸시
           if ! git diff --staged --quiet; then
