@@ -1,5 +1,6 @@
 import os
 import time
+import sys
 import argparse
 import re
 import datetime
@@ -57,7 +58,7 @@ def get_latest_gemini_model(client):
         models = client.models.list()
         all_names = [m.name for m in models]
         bad_keywords = ["flash", "nano", "vision", "latest", "customtools", "experimental",
-                        "deep-research", "live", "tts", "embedding", "imagen", "aqa", "preview"]
+                        "deep-research", "live", "tts", "embedding", "imagen", "aqa"]
         
         pro_models = [
             n for n in all_names
@@ -104,8 +105,8 @@ def run_claude_chat(client, model, messages):
     return message.content[0].text
 
 @retry(
-    stop=stop_after_attempt(3), 
-    wait=wait_exponential(multiplier=2, min=10, max=60),
+    stop=stop_after_attempt(2), # 비용 방어를 위해 재시도 횟수 축소
+    wait=wait_exponential(multiplier=1, min=2, max=5),
     retry_error_callback=return_none_on_error
 )
 def run_grounded_research(client, model_id, prompt, output_file="research_result.md"):
@@ -116,14 +117,14 @@ def run_grounded_research(client, model_id, prompt, output_file="research_result
             model=model_id,
             config=types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())],
-                temperature=0.1, # 리서치 정확도를 위해 낮은 온도 설정
+                temperature=0.1,
             )
         )
         response = chat.send_message(prompt)
         result_text = response.text
 
         if not result_text:
-            return None, chat
+            return None
 
         os.makedirs(os.path.dirname(output_file), exist_ok=True) if os.path.dirname(output_file) else None
         with open(output_file, "w", encoding="utf-8") as f:
@@ -146,7 +147,7 @@ def main():
     
     if not g_api_key:
         print("Missing GEMINI_API_KEY")
-        return
+        sys.exit(1)
 
     g_client = genai.Client(api_key=g_api_key)
     g_model = get_latest_gemini_model(g_client)
@@ -159,10 +160,14 @@ def main():
     if url:
         prompt_content = fetch_prompt_from_github(url)
     else:
-        with open("prompt/news.txt", "r", encoding="utf-8") as f:
-            prompt_content = f.read()
+        try:
+            with open("prompt/news.txt", "r", encoding="utf-8") as f:
+                prompt_content = f.read()
+        except FileNotFoundError:
+            print("Prompt source not found.")
+            sys.exit(1)
 
-    # KST 시간 및 아카이브 주입
+    # KST 시간 및 아카이브 주입 + 기호 표기 규칙 강제
     current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
     system_instr = (
         f"[SYSTEM ALERT: 현재 한국 표준시(KST)는 {current_kst}입니다. "
@@ -171,11 +176,13 @@ def main():
     )
     prompt_content = system_instr + get_recent_archives(7) + prompt_content
 
-    # Phase 1: Grounded Research
+    # Phase 1: Grounded Research (Fail-Fast 및 Unpack 방어 적용)
     research_output = run_grounded_research(g_client, g_model, prompt_content, args.output)
+    
     if not research_output:
-        print("Failed to get initial research due to API limit.")
-        return
+        print("❌ API 서버 과부하 또는 오류로 리서치 실패. 워크플로우를 즉시 종료하여 비용을 보호합니다.")
+        sys.exit(1) # 에러 코드를 발생시켜 GitHub Actions 스케줄러가 재시도하게 함
+        
     initial_result, gemini_chat = research_output
 
     # Phase 2: Claude Validation
@@ -219,7 +226,7 @@ def main():
         })
         final_content = run_claude_chat(c_client, c_model, claude_messages)
 
-    # Archive and HTML Generation
+    # Archive saving
     today_str = datetime.datetime.now().strftime("%Y-%m-%d")
     os.makedirs("data", exist_ok=True)
     with open(f"data/{today_str}.txt", "w", encoding="utf-8") as f:
@@ -227,16 +234,21 @@ def main():
 
     # Phase 5: HTML Generation
     print("\n--- Phase 5: HTML Generation ---")
-    html_prompt = fetch_prompt_from_github(os.getenv("HTML_PROMPT_URL"))
-    response = g_client.models.generate_content(
-        model=g_model,
-        contents=[f"{html_prompt}\n\n{final_content}"]
-    )
-    html_code = response.text
-    if "```html" in html_code:
-        html_code = html_code.split("```html")[1].split("```")[0].strip()
-    with open("index.html", "w", encoding="utf-8") as f:
-        f.write(html_code)
+    html_prompt_url = os.getenv("HTML_PROMPT_URL")
+    if html_prompt_url:
+        html_prompt = fetch_prompt_from_github(html_prompt_url)
+        response = g_client.models.generate_content(
+            model=g_model,
+            contents=[f"{html_prompt}\n\n{final_content}"]
+        )
+        html_code = response.text
+        if "```html" in html_code:
+            html_code = html_code.split("```html")[1].split("```")[0].strip()
+        elif "```" in html_code:
+            html_code = html_code.split("```")[1].split("```")[0].strip()
+        with open("index.html", "w", encoding="utf-8") as f:
+            f.write(html_code)
+    
     print("Pipeline finished successfully.")
 
 if __name__ == "__main__":
