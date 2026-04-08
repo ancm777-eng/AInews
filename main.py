@@ -1,3 +1,4 @@
+```python
 import os
 import time
 import sys
@@ -61,18 +62,15 @@ def get_latest_gemini_model(client):
         models = client.models.list()
         all_names = [m.name for m in models]
         
-        # 3.x 모델이 exp/preview 태그 때문에 걸러지는 현상을 방지하기 위해 필터 완화
         bad_keywords = ["flash", "nano", "vision", "latest", "customtools", 
                         "deep-research", "live", "tts", "embedding", "imagen", "aqa"]
         
-        # 1. 안정적인 3.0-pro 모델이 API 목록에 있는지 최우선 확인
         for name in all_names:
             if "gemini-3.0-pro" in name.lower() and not any(bad in name.lower() for bad in bad_keywords):
                 target = name.replace("models/", "")
                 print(f"Automatically selected Gemini Pro model: {target}")
                 return target
         
-        # 2. 3.0-pro가 없다면 전체 Pro 모델 중 알파벳/버전 역순으로 동적 탐색
         pro_models = [
             n for n in all_names
             if "gemini" in n.lower() and "pro" in n.lower()
@@ -85,7 +83,7 @@ def get_latest_gemini_model(client):
             print(f"Automatically selected Gemini Pro model: {latest}")
             return latest
             
-        return "gemini-3.0-pro" # 최후의 Fallback을 3.0-pro로 고정
+        return "gemini-3.0-pro"
     except Exception as e:
         print(f"Warning: Gemini model discovery failed ({e}), using default Pro.")
         return "gemini-3.0-pro"
@@ -119,8 +117,8 @@ def run_claude_chat(client, model, messages):
     return message.content[0].text
 
 @retry(
-    stop=stop_after_attempt(2), # 비용 방어를 위해 재시도 횟수 축소
-    wait=wait_exponential(multiplier=1, min=2, max=5),
+    stop=stop_after_attempt(2), 
+    wait=wait_exponential(multiplier=2, min=10, max=30), # 타임아웃/503 발생 시 바로 때리지 않고 10~30초 쉬었다가 재시도
     retry_error_callback=return_none_on_error
 )
 def run_grounded_research(client, model_id, prompt, output_file="research_result.md"):
@@ -163,11 +161,11 @@ def main():
         print("Missing GEMINI_API_KEY")
         sys.exit(1)
 
-    # 무한 대기 방지를 위해 API 클라이언트에 60초 타임아웃 강제 설정
-    g_client = genai.Client(api_key=g_api_key, http_options={'timeout': 60.0})
+    # ⭐️ 타임아웃 한도를 150초로 넉넉히 주어 무한 대기는 막되, 무거운 웹 검색은 기다려줌
+    g_client = genai.Client(api_key=g_api_key, http_options={'timeout': 150.0})
     g_model = get_latest_gemini_model(g_client)
     
-    c_client = anthropic.Anthropic(api_key=c_api_key, timeout=60.0) if c_api_key else None
+    c_client = anthropic.Anthropic(api_key=c_api_key, timeout=120.0) if c_api_key else None
     c_model = get_latest_claude_model(c_client) if c_client else None
 
     # 2. 프롬프트 준비
@@ -186,7 +184,7 @@ def main():
                 print("Prompt source not found.")
                 sys.exit(1)
 
-    # KST 시간 및 아카이브 주입 + 기호 표기 규칙 강제
+    # KST 시간 주입 및 오버라이드 룰 적용
     current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
     system_instr = (
         f"[🔥 SYSTEM OVERRIDE & ALERT: 매우 중요한 지시사항 🔥]\n"
@@ -229,7 +227,6 @@ def main():
             "3. 인라인 LaTeX 사용 절대 금지\n4. 기존 섹션 구조 유지"
         )
         
-        # Phase 3에도 서버 통신 끊김(Server disconnected) 방어용 재시도 로직 추가
         max_retries = 3
         for attempt in range(max_retries):
             try:
@@ -270,7 +267,6 @@ def main():
     if html_prompt_url:
         html_prompt_content = fetch_prompt_from_github(html_prompt_url)
     else:
-        # URL이 비어있을 경우 로컬 파일에서 읽어오기 (Fallback 로직 추가)
         try:
             with open("prompt/html.txt", "r", encoding="utf-8") as f:
                 html_prompt_content = f.read()
@@ -305,3 +301,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+```
