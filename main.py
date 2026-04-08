@@ -175,15 +175,19 @@ def main():
             with open("prompt/news.txt", "r", encoding="utf-8") as f:
                 prompt_content = f.read()
         except FileNotFoundError:
-            print("Prompt source not found.")
-            sys.exit(1)
+            try:
+                with open("news.txt", "r", encoding="utf-8") as f:
+                    prompt_content = f.read()
+            except FileNotFoundError:
+                print("Prompt source not found.")
+                sys.exit(1)
 
     # KST 시간 및 아카이브 주입 + 기호 표기 규칙 강제
     current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
     system_instr = (
         f"[SYSTEM ALERT: 현재 한국 표준시(KST)는 {current_kst}입니다. "
         "모든 분석과 날짜 판단의 기준은 KST를 따르십시오. "
-        "문장 내 인라인 LaTeX($) 사용은 절대 금지하며, 기호는 굵은 글씨 또는 일반 텍스트로만 표기하십시오.]\n\n"
+        "문장 내 인라인 LaTeX 사용은 절대 금지하며, 기호는 굵은 글씨 또는 일반 텍스트로만 표기하십시오.]\n\n"
     )
     prompt_content = system_instr + get_recent_archives(7) + prompt_content
 
@@ -217,7 +221,7 @@ def main():
         refine_prompt = (
             "위 피드백을 반영하여 최종본을 작성하십시오.\n"
             "1. 대화 내 정보만 활용\n2. 오류 항목 삭제 및 신규 항목 보충\n"
-            "3. 인라인 LaTeX($) 사용 절대 금지\n4. 기존 섹션 구조 유지"
+            "3. 인라인 LaTeX 사용 절대 금지\n4. 기존 섹션 구조 유지"
         )
         try:
             response = gemini_chat.send_message(refine_prompt)
@@ -246,21 +250,43 @@ def main():
     # Phase 5: HTML Generation
     print("\n--- Phase 5: HTML Generation ---")
     html_prompt_url = os.getenv("HTML_PROMPT_URL")
-    if html_prompt_url:
-        html_prompt = fetch_prompt_from_github(html_prompt_url)
-        response = g_client.models.generate_content(
-            model=g_model,
-            contents=[f"{html_prompt}\n\n{final_content}"]
-        )
-        html_code = response.text
-        if "```html" in html_code:
-            html_code = html_code.split("```html")[1].split("```")[0].strip()
-        elif "```" in html_code:
-            html_code = html_code.split("```")[1].split("```")[0].strip()
-        with open("index.html", "w", encoding="utf-8") as f:
-            f.write(html_code)
+    html_prompt_content = ""
     
-    print("Pipeline finished successfully.")
+    if html_prompt_url:
+        html_prompt_content = fetch_prompt_from_github(html_prompt_url)
+    else:
+        # URL이 비어있을 경우 로컬 파일에서 읽어오기 (Fallback 로직 추가)
+        try:
+            with open("prompt/html.txt", "r", encoding="utf-8") as f:
+                html_prompt_content = f.read()
+        except FileNotFoundError:
+            try:
+                with open("html.txt", "r", encoding="utf-8") as f:
+                    html_prompt_content = f.read()
+            except FileNotFoundError:
+                print("⚠️ HTML prompt source not found. Skipping generation.")
+
+    if html_prompt_content:
+        print(f"Generating HTML using model: {g_model}...")
+        try:
+            response = g_client.models.generate_content(
+                model=g_model,
+                contents=[f"{html_prompt_content}\n\n{final_content}"]
+            )
+            html_code = response.text
+            if "```html" in html_code:
+                html_code = html_code.split("```html")[1].split("```")[0].strip()
+            elif "```" in html_code:
+                html_code = html_code.split("```")[1].split("```")[0].strip()
+            with open("index.html", "w", encoding="utf-8") as f:
+                f.write(html_code)
+            print("✅ index.html saved successfully.")
+        except Exception as e:
+            print(f"❌ HTML Generation failed: {e}")
+    else:
+        print("❌ No HTML prompt available. index.html was not generated.")
+    
+    print("\nPipeline finished successfully.")
 
 if __name__ == "__main__":
     main()
