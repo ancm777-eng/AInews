@@ -1,62 +1,70 @@
-"""
-Client Closed 이슈를 방지하기 위해 클라이언트 생성을 함수 내부가 아닌 
-테스트 메인 루프에서 관리하도록 수정된 스모크 테스트입니다.
-"""
-import os
-import sys
-import datetime
-from dotenv import load_dotenv
-from google import genai
-import anthropic
-from main import get_latest_gemini_model, get_latest_claude_model
+name: Smoke Test Pipeline
 
-load_dotenv()
-CURRENT_KST = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+on:
+  workflow_dispatch:
 
-def main():
-    print(f"🚀 Starting API Smoke Test at {CURRENT_KST}")
-    
-    g_key = os.getenv("GEMINI_API_KEY")
-    c_key = os.getenv("CLAUDE_API_KEY")
-    
-    if not g_key:
-        print("❌ GEMINI_API_KEY is missing")
-        sys.exit(1)
+permissions:
+  contents: write
 
-    # 클라이언트 사전 생성 (재사용)
-    g_client = genai.Client(api_key=g_key)
-    c_client = anthropic.Anthropic(api_key=c_key) if c_key else None
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Seoul
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true" # Node.js 20 Deprecated 경고 해결을 위한 강제 설정
 
-    # 1. 모델 탐색 테스트
-    g_model = get_latest_gemini_model(g_client)
-    print(f"  ✅ Gemini Model: {g_model}")
-    
-    if c_client:
-        c_model = get_latest_claude_model(c_client)
-        print(f"  ✅ Claude Model: {c_model}")
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # 최신 버전 유지
+        with:
+          fetch-depth: 0
 
-    # 2. 최소 비용 연결 테스트 (Phase 1 & 3 세션 유지)
-    print("\n--- Testing Gemini Session ---")
-    chat = g_client.chats.create(model=g_model)
-    res1 = chat.send_message("Reply 'P1'")
-    print(f"  P1 Response: {res1.text.strip()}")
-    
-    res2 = chat.send_message("Reply 'P3' if you remember P1")
-    print(f"  P3 Response: {res2.text.strip()}")
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
-    # 3. Claude 문맥 유지 테스트
-    if c_client:
-        print("\n--- Testing Claude Context ---")
-        msgs = [{"role": "user", "content": "Reply 'C2'"}]
-        c_res1 = c_client.messages.create(model=c_model, max_tokens=10, messages=msgs)
-        print(f"  C2 Response: {c_res1.content[0].text.strip()}")
-        
-        msgs.append({"role": "assistant", "content": c_res1.content[0].text})
-        msgs.append({"role": "user", "content": "Reply 'C4' if context exists"})
-        c_res2 = c_client.messages.create(model=c_model, max_tokens=10, messages=msgs)
-        print(f"  C4 Response: {c_res2.content[0].text.strip()}")
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    print("\n🎉 Smoke test passed: API and Session logic verified.")
+      - name: Run Smoke Test
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+        run: python test_pipeline.py
 
-if __name__ == "__main__":
-    main()
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4 # v4로 업데이트하여 Node.js 경고 해결
+        with:
+          name: smoke-test-artifacts
+          path: |
+            trial/
+            data/
+            index.html
+            test_status.txt
+
+      # 결과물 리포지토리 자동 업데이트(Commit & Push)
+      - name: Commit and Push results
+        if: always() # 스크립트 실행 중 503 에러가 발생해도 결과를 무조건 푸시
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # ⭐️ 업데이트 확인을 무조건 보장하기 위한 더미 시간 파일 생성
+          echo "Last Smoke Test Run: $(date +'%Y-%m-%d %H:%M:%S KST')" > test_status.txt
+          
+          # 변경사항 추적 (test_status.txt 포함)
+          git add trial/ data/ index.html test_status.txt
+          
+          # 커밋 메시지에 실행 시간을 포함하여 리포지토리에서 바로 보이게 함
+          if ! git diff --staged --quiet; then
+            git commit -m "Test update: $(date +'%Y-%m-%d %H:%M:%S KST')"
+            git pull --rebase origin main
+            git push
+          else
+            echo "변경 사항이 없습니다."
+          fi
