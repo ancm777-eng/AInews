@@ -4,8 +4,11 @@ name: Run AI News Pipeline
 on:
   workflow_dispatch: # 수동 실행 버튼
   schedule:
-    # 한국 시간(KST) 오전 7시 실행 (UTC 기준 이전 날짜 오후 10시)
-    - cron: '0 22 * * *'
+    # KST 오전 7시부터 오후 12시(정오)까지 매 15분 간격으로 트리거
+    # (UTC 기준 22, 23, 0, 1, 2, 3시의 0, 15, 30, 45분)
+    # 503 에러 발생 시 서버를 종료하고 15분 뒤 완전히 새롭게 시도합니다.
+    # 단 한 번이라도 성공하면, 이후 남은 시간대(15분 간격)는 1초 만에 즉시 스킵됩니다.
+    - cron: '*/15 22,23,0,1,2,3 * * *'
 
 permissions:
   contents: write
@@ -21,50 +24,49 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true" 
 
     steps:
-      # 1. 리포지토리 코드를 가상 환경으로 가져옴
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           # Push 충돌 방지를 위해 전체 히스토리를 가져옴
           fetch-depth: 0
 
-      # 2. 파이썬 환경 설정
+      # ⭐️ 핵심: 오늘 날짜의 리포트가 이미 있다면, 파이프라인 전체를 스킵 (비용 0)
+      - name: Check if already completed today
+        id: check
+        run: |
+          TODAY=$(date +'%Y-%m-%d')
+          if [ -f "data/$TODAY.txt" ]; then
+            echo "✅ 오늘($TODAY)자 리포트가 이미 생성되어 있습니다. 불필요한 실행과 비용 소모를 막기 위해 건너뜁니다."
+            echo "SKIP_RUN=true" >> $GITHUB_ENV
+          else
+            echo "🚀 오늘자 리포트가 없습니다. 파이프라인을 시작합니다."
+            echo "SKIP_RUN=false" >> $GITHUB_ENV
+          fi
+
       - name: Set up Python
+        if: env.SKIP_RUN == 'false'
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      # 3. 필요한 패키지 설치
       - name: Install dependencies
+        if: env.SKIP_RUN == 'false'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 4. API 키를 주입하고 실제 메인 파이프라인(main.py) 실행 (자동 재시도 로직 추가)
+      # 스크립트 내부의 무한 반복 대기를 지우고, 깔끔하게 1회만 시도
       - name: Run Main Pipeline
+        if: env.SKIP_RUN == 'false'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           PROMPT_URL: ${{ secrets.PROMPT_URL }}
           HTML_PROMPT_URL: ${{ secrets.HTML_PROMPT_URL }}
-        run: |
-          max_retries=5
-          attempt=0
-          until python main.py; do
-            exit_code=$?
-            attempt=$((attempt + 1))
-            if [ $attempt -lt $max_retries ]; then
-              echo "🚨 API 503 에러 등 실행 실패 (Exit code: $exit_code). 60초 대기 후 재시도합니다... (Attempt $((attempt + 1))/$max_retries)"
-              sleep 60
-            else
-              echo "❌ 총 $max_retries 번의 시도가 모두 실패했습니다."
-              exit $exit_code
-            fi
-          done
+        run: python main.py
 
-      # 5. 실행 결과물 아티팩트 업로드 (디버깅용)
       - name: Upload Pipeline Results
-        if: always() # 스크립트 에러 발생 시에도 생성된 파일들 보존
+        if: always() && env.SKIP_RUN == 'false'
         uses: actions/upload-artifact@v4
         with:
           name: ai-news-artifacts
@@ -72,18 +74,17 @@ jobs:
             trial/
             data/
             index.html
-            run_status.txt
 
-      # 6. 결과물을 내 리포지토리에 저장 (내용이 바뀐 경우만)
+      # 503 에러로 스크립트가 중단되어도 지금까지 남은 흔적(run_status 등)을 강제 커밋
       - name: Commit and Push results
-        if: always() # 503 에러 등 스크립트 중단 시에도 확보된 파일 무조건 푸시
+        if: always() && env.SKIP_RUN == 'false'
         run: |
           # Git 사용자 설정
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 파이프라인 실행 시간을 기록하는 상태 파일 생성 (무조건 커밋 발생용)
-          echo "Last Pipeline Run: $(date +'%Y-%m-%d %H:%M:%S KST')" > run_status.txt
+          # 파이프라인 실행 시도를 기록하는 상태 파일 생성 (실패 시에도 무조건 커밋 발생)
+          echo "Last Pipeline Run Attempt: $(date +'%Y-%m-%d %H:%M:%S KST')" > run_status.txt
           
           # 변경된 폴더와 파일 추가
           git add trial/ data/ index.html run_status.txt
