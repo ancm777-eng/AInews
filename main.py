@@ -185,9 +185,10 @@ def main():
     # KST 시간 및 아카이브 주입 + 기호 표기 규칙 강제
     current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
     system_instr = (
-        f"[SYSTEM ALERT: 현재 한국 표준시(KST)는 {current_kst}입니다. "
-        "모든 분석과 날짜 판단의 기준은 KST를 따르십시오. "
-        "문장 내 인라인 LaTeX 사용은 절대 금지하며, 기호는 굵은 글씨 또는 일반 텍스트로만 표기하십시오.]\n\n"
+        f"[🔥 SYSTEM OVERRIDE & ALERT: 매우 중요한 지시사항 🔥]\n"
+        f"1. 현재 한국 표준시(KST)는 {current_kst} 입니다. 이를 '오늘(TODAY)'의 기준으로 삼으십시오.\n"
+        f"2. 사용자의 프롬프트 원문에 있는 '쿼리 0: today's date 검색' 및 '날짜 확인 실패 시 Briefing aborted 출력' 규칙을 **완벽하게 무시**하십시오. 시스템이 이미 날짜를 제공했으므로 절대 중단해서는 안 됩니다. 즉시 1번 쿼리(최신 AI 뉴스 리서치)부터 시작하십시오.\n"
+        f"3. 문장 내 인라인 LaTeX 사용은 절대 금지하며, 수식이나 변수는 굵은 글씨 또는 일반 텍스트로만 표기하십시오.\n\n"
     )
     prompt_content = system_instr + get_recent_archives(7) + prompt_content
 
@@ -223,13 +224,23 @@ def main():
             "1. 대화 내 정보만 활용\n2. 오류 항목 삭제 및 신규 항목 보충\n"
             "3. 인라인 LaTeX 사용 절대 금지\n4. 기존 섹션 구조 유지"
         )
-        try:
-            response = gemini_chat.send_message(refine_prompt)
-            refined_result = response.text
-            with open("trial/2.txt", "w", encoding="utf-8") as f:
-                f.write(refined_result)
-        except Exception as e:
-            print(f"Refinement failed: {e}. Using initial result.")
+        
+        # Phase 3에도 서버 통신 끊김(Server disconnected) 방어용 재시도 로직 추가
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = gemini_chat.send_message(refine_prompt)
+                refined_result = response.text
+                with open("trial/2.txt", "w", encoding="utf-8") as f:
+                    f.write(refined_result)
+                print("✅ Refinement complete.")
+                break
+            except Exception as e:
+                print(f"⚠️ Refinement attempt {attempt + 1} failed: {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(10)
+                else:
+                    print("❌ All refinement attempts failed. Using initial result.")
 
     # Phase 4: Claude Translation (Session Maintained)
     final_content = refined_result
