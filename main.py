@@ -11,6 +11,9 @@ import anthropic
 from tenacity import retry, stop_after_attempt, wait_exponential
 from github_utils import fetch_prompt_from_github
 
+# 실시간 로그 출력을 위한 설정 (GitHub Actions에서 로그가 멈춰보이는 현상 방지)
+sys.stdout.reconfigure(line_buffering=True)
+
 # 환경 변수 로드
 load_dotenv()
 
@@ -160,10 +163,11 @@ def main():
         print("Missing GEMINI_API_KEY")
         sys.exit(1)
 
-    g_client = genai.Client(api_key=g_api_key)
+    # 무한 대기 방지를 위해 API 클라이언트에 60초 타임아웃 강제 설정
+    g_client = genai.Client(api_key=g_api_key, http_options={'timeout': 60.0})
     g_model = get_latest_gemini_model(g_client)
     
-    c_client = anthropic.Anthropic(api_key=c_api_key) if c_api_key else None
+    c_client = anthropic.Anthropic(api_key=c_api_key, timeout=60.0) if c_api_key else None
     c_model = get_latest_claude_model(c_client) if c_client else None
 
     # 2. 프롬프트 준비
