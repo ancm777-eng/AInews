@@ -75,14 +75,14 @@ def get_latest_gemini_model(client):
             and not any(bad in n.lower() for bad in bad_keywords)
         ]
         
-            if pro_models:
-                pro_models.sort(reverse=True)
-                latest = pro_models[0].replace("models/", "")
-                print(f"Automatically selected latest Pro model: {latest}")
-                return latest
+        if pro_models:
+            pro_models.sort(reverse=True)
+            latest = pro_models[0].replace("models/", "")
+            print(f"Automatically selected latest Pro model: {latest}")
+            return latest
 
-            # Fallback: API 조회 실패 시 현재 최신 플래그십 모델로 대체
-            return "gemini-3.1-pro-preview"
+        # Fallback: API 조회 실패 시 현재 최신 플래그십 모델로 대체
+        return "gemini-3.1-pro-preview"
     except Exception as e:
         print(f"Warning: Could not list models automatically: {e}")
         return "gemini-3.1-pro-preview"
@@ -199,6 +199,11 @@ def main():
             return
     
     if prompt_content:
+        # [수정] AI가 GMT로 착각하지 않도록 파이썬 환경의 현재 KST 시간을 프롬프트 최상단에 주입합니다.
+        current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
+        time_injection = f"[SYSTEM ALERT: 현재 한국 표준시(KST)는 {current_kst} 입니다. 이를 '오늘(TODAY)'의 기준으로 삼고, 모든 결과물의 날짜와 시간은 반드시 KST 기준으로 작성하십시오.]\n\n"
+        prompt_content = time_injection + prompt_content
+
         archives = get_recent_archives(days=7)
         if archives:
             print("Injecting recent archives for duplicate filtering...")
@@ -227,7 +232,7 @@ def main():
                 claude_messages = [
                     {
                         "role": "user", 
-                        "content": f"다음은 작성된 AI 뉴스 리서치 초안입니다.\n\n[초안]\n{initial_result}\n\n이 초안에 대해 엄격하게 검증해주세요."
+                        "content": f"다음은 작성된 AI 뉴스 리서치 초안입니다.\n\n[초안]\n{initial_result}\n\n이 초안에 대해 엄격하게 검증해주세요. (기준 시간은 명시된 한국 시간을 따릅니다)"
                     }
                 ]
                 
@@ -256,7 +261,7 @@ def main():
                     f"[피드백]\n{feedback}\n\n"
                     f"지시사항:\n"
                     f"1. 추가 인터넷 검색 없이 기존 대화(네가 작성한 원문) 안의 정보만 사용하세요.\n"
-                    f"2. 피드백을 반영하여 날짜·사실이 불확실하거나 오류가 있는 뉴스 항목은 삭제하세요.\n"
+                    f"2. 피드백을 반영하여 날짜·사실이 불확실하거나 오류가 있는 뉴스 항목은 삭제하세요. (시간은 항상 한국 표준시 유지)\n"
                     f"3. 삭제로 항목이 부족해지면, 초안 작성 시 확보했던 정보 중 주요 뉴스로 다루지 않은 다른 내용을 찾아 새 항목으로 채우세요.\n"
                     f"4. 처음 요구했던 구조(섹션, 마크다운 형식)를 그대로 유지하여 최종본을 작성하세요."
                 )
