@@ -55,57 +55,37 @@ def get_recent_archives(days=7):
         print(f"Warning: Could not read archives: {e}")
         return ""
 
-def get_latest_gemini_model(client, require_agent=False):
+def get_latest_gemini_model(client):
     """
-    Dynamically finds the best available Gemini model.
-    If require_agent=True, selects deep-research agents.
-    If require_agent=False, prefers Gemini Flash models over Pro models.
+    Dynamically finds the best available Gemini Pro model.
+    Deep Research agents and Flash models are completely excluded.
     """
     try:
         models = client.models.list()
         all_names = [m.name for m in models]
 
-        # Priority 1: Pick Deep Research Agent
-        if require_agent:
-            dr_models = [m.name for m in models if "deep-research-pro" in m.name.lower()]
-            if dr_models:
-                dr_models.sort(reverse=True)
-                latest_dr = dr_models[0].replace("models/", "")
-                print(f"Found latest specialized Deep Research agent: {latest_dr}")
-                return latest_dr
-            return "deep-research-pro-preview-12-2025"
-
-        # Priority 2: Pick Gemini Flash model
-        # 'preview' 키워드 추가하여 503 에러가 잦은 불안정한 프리뷰 모델 배제
-        bad_keywords = ["nano", "vision", "latest", "customtools", "experimental",
+        # 불안정하거나 목적에 맞지 않는 모델 키워드 배제
+        bad_keywords = ["flash", "nano", "vision", "latest", "customtools", "experimental",
                         "deep-research", "live", "tts", "embedding", "imagen", "aqa", "preview"]
-        flash_models = [
-            n for n in all_names
-            if "gemini" in n.lower() and "flash" in n.lower()
-            and not any(bad in n.lower() for bad in bad_keywords)
-        ]
-        if flash_models:
-            flash_models.sort(reverse=True)
-            latest = flash_models[0].replace("models/", "")
-            print(f"Automatically selected latest Flash model: {latest}")
-            return latest
-
-        # Fallback to any Pro model
+        
+        # Pro 모델 검색
         pro_models = [
             n for n in all_names
             if "gemini" in n.lower() and "pro" in n.lower()
-            and not any(bad in n.lower() for bad in bad_keywords + ["flash", "deep-research"])
+            and not any(bad in n.lower() for bad in bad_keywords)
         ]
-        if pro_models:
-            pro_models.sort(reverse=True)
-            latest = pro_models[0].replace("models/", "")
-            print(f"Automatically selected Pro model (Flash not found): {latest}")
-            return latest
+        
+            if pro_models:
+                pro_models.sort(reverse=True)
+                latest = pro_models[0].replace("models/", "")
+                print(f"Automatically selected latest Pro model: {latest}")
+                return latest
 
-        return "gemini-3.0-flash"
+            # Fallback: API 조회 실패 시 현재 최신 플래그십 모델로 대체
+            return "gemini-3.1-pro-preview"
     except Exception as e:
         print(f"Warning: Could not list models automatically: {e}")
-        return "deep-research-pro-preview-12-2025" if require_agent else "gemini-3.0-flash"
+        return "gemini-3.1-pro-preview"
 
 def get_latest_claude_model(client):
     """
@@ -135,38 +115,27 @@ def get_latest_claude_model(client):
     wait=wait_exponential(multiplier=1, min=4, max=10),
     retry_error_callback=return_none_on_error
 )
-def validate_with_claude(content, custom_prompt="검증해주세요"):
+def run_claude_chat(client, model, messages):
     """
-    Validates the research content using Claude.
+    Executes a chat completion with Claude, retaining the provided message history.
     """
-    api_key = os.getenv("CLAUDE_API_KEY")
-    if not api_key:
-        print("Warning: CLAUDE_API_KEY not found. Skipping validation.")
-        return None
-    
-    # Initialize client with a generous timeout for large content
-    client = anthropic.Anthropic(api_key=api_key, timeout=120.0) 
-    model = get_latest_claude_model(client)
-    
-    print(f"Starting Claude action (Model: {model}, Prompt: {custom_prompt})...")
+    print(f"Starting Claude action (Model: {model})...")
     message = client.messages.create(
         model=model,
-        max_tokens=8192,  # Increased for translation
-        messages=[
-            {"role": "user", "content": f"{content}\n\n{custom_prompt}"}
-        ]
+        max_tokens=8192,
+        messages=messages
     )
     return message.content[0].text
 
 @retry(
-    stop=stop_after_attempt(3), # 최대 3번까지 재시도
-    wait=wait_exponential(multiplier=2, min=10, max=60), # 실패할 때마다 10초, 20초, 40초 대기
+    stop=stop_after_attempt(3), 
+    wait=wait_exponential(multiplier=2, min=10, max=60),
     retry_error_callback=return_none_on_error
 )
 def run_grounded_research(prompt, output_file="research_result.md"):
     """
-    Phase 1: Performs fast web-grounded research using Google Search tool.
-    Returns (result_text, None) to maintain the same interface as run_deep_research.
+    Phase 1: Performs web-grounded research using Google Search tool with the Pro model.
+    Returns (result_text, chat_session) to maintain the chat context for Phase 3.
     """
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key or api_key == "YOUR_API_KEY_HERE":
@@ -174,23 +143,24 @@ def run_grounded_research(prompt, output_file="research_result.md"):
         return None, None
 
     client = genai.Client(api_key=api_key)
-    model_id = get_latest_gemini_model(client, require_agent=False)
+    model_id = get_latest_gemini_model(client)
 
     print(f"Starting Grounded Research (Model: {model_id}, Tool: google_search)...")
     try:
-        response = client.models.generate_content(
+        # Chat Session 생성하여 문맥 유지 및 Google Search 도구 장착
+        chat = client.chats.create(
             model=model_id,
-            contents=[prompt],
             config=types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())],
-                temperature=1.0,
+                temperature=0.7, # Pro 모델에 맞게 온도를 약간 안정적으로 조정
             )
         )
+        response = chat.send_message(prompt)
         result_text = response.text
 
         if not result_text:
             print("Warning: Empty response from grounded research.")
-            return None, None
+            return None, chat
 
         output_dir = os.path.dirname(output_file)
         if output_dir and not os.path.exists(output_dir):
@@ -198,93 +168,20 @@ def run_grounded_research(prompt, output_file="research_result.md"):
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(result_text)
         print(f"Grounded research complete. Saved to {output_file} (Total length: {len(result_text)})")
-        return result_text, None
+        
+        return result_text, chat
     except Exception as e:
         print(f"An error occurred during grounded research: {e}")
-        raise e  # @retry 가 잡아서 재시도할 수 있도록 에러를 다시 던집니다.
-
-@retry(
-    stop=stop_after_attempt(3), 
-    wait=wait_exponential(multiplier=2, min=10, max=60), 
-    retry_error_callback=return_none_on_error
-)
-def run_deep_research(prompt, output_file="research_result.md", agent_id=None, previous_interaction_id=None):
-    
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key or api_key == "YOUR_API_KEY_HERE":
-        print("Error: GEMINI_API_KEY not found in .env file.")
-        return None, None
-
-    client = genai.Client(api_key=api_key)
-    research_agent = agent_id or os.getenv("RESEARCH_AGENT")
-    
-    if not research_agent or research_agent.lower() == "latest-pro":
-        research_agent = get_latest_gemini_model(client, require_agent=True)
-    
-    print(f"Starting Gemini Deep Research (Agent: {research_agent}, Continued: {previous_interaction_id is not None})...")
-    
-    try:
-        if "deep-research" in research_agent.lower():
-            interaction = client.interactions.create(
-                agent=research_agent, 
-                input=prompt, 
-                background=True,
-                previous_interaction_id=previous_interaction_id
-            )
-        else:
-            interaction = client.interactions.create(
-                model=research_agent, 
-                input=prompt, 
-                background=True,
-                previous_interaction_id=previous_interaction_id
-            )
-        print(f"Interaction ID: {interaction.id}")
-        
-        start_time = time.time()
-        while True:
-            try:
-                interaction = client.interactions.get(interaction.id)
-            except Exception as get_err:
-                print(f"\nWarning: Error polling status ({get_err}), retrying in 30s...")
-                time.sleep(30)
-                continue
-                
-            if interaction.status == "completed":
-                print("\nResearch Turn Completed!")
-                result_text = "\n".join([o.text for o in interaction.outputs if o.text])
-                
-                if not result_text:
-                    print("Warning: API returned completed status but no text outputs were found.")
-                    result_text = "No content returned from research agent."
-
-                output_dir = os.path.dirname(output_file)
-                if output_dir and not os.path.exists(output_dir):
-                    os.makedirs(output_dir, exist_ok=True)
-                with open(output_file, "w", encoding="utf-8") as f:
-                    f.write(result_text)
-                print(f"Results saved to {output_file} (Total length: {len(result_text)})")
-                return result_text, interaction.id
-            elif interaction.status == "failed":
-                print(f"\nResearch failed: {interaction.error}")
-                return None, interaction.id
-            else:
-                elapsed = int(time.time() - start_time)
-                print(f"\rStatus: {interaction.status} (Elapsed: {elapsed}s)...", end="", flush=True)
-                time.sleep(10)
-    except Exception as e:
-        print(f"An error occurred during API interaction: {e}")
-        raise e
+        raise e  
 
 def main():
-    parser = argparse.ArgumentParser(description="Gemini Deep Research with GitHub Prompt")
+    parser = argparse.ArgumentParser(description="AI News Pipeline with Gemini Pro & Claude Context")
     parser.add_argument("--url", help="GitHub URL of the prompt file")
-    parser.add_argument("--agent", help="Gemini Research Agent ID")
     default_output = os.getenv("OUTPUT_FILE") or "trial/1.txt"
     parser.add_argument("--output", default=default_output, help="Output file name")
     
     args = parser.parse_args()
     
-    # 1. 뉴스 프롬프트 가져오기 (URL 우선, 없으면 로컬 파일)
     url = args.url or os.getenv("PROMPT_URL")
     prompt_content = None
     
@@ -307,13 +204,37 @@ def main():
             print("Injecting recent archives for duplicate filtering...")
             prompt_content = archives + "\n" + prompt_content
 
-        # Step 1: Initial Research (자동 재시도 로직 적용됨)
-        initial_result, _ = run_grounded_research(prompt_content, args.output)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # Phase 1: Initial Research (Gemini Pro Chat Session 시작)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        initial_result, gemini_chat = run_grounded_research(prompt_content, args.output)
         
         if initial_result:
-            # Step 2: Claude Validation
+            # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            # Phase 2: Claude Validation (Claude Chat Context 시작)
+            # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             print("\n--- Phase 2: Claude Validation ---")
-            feedback = validate_with_claude(initial_result)
+            
+            claude_api_key = os.getenv("CLAUDE_API_KEY")
+            if not claude_api_key:
+                print("Warning: CLAUDE_API_KEY not found. Skipping validation.")
+                feedback = None
+            else:
+                cclient = anthropic.Anthropic(api_key=claude_api_key, timeout=120.0) 
+                claude_model = get_latest_claude_model(cclient)
+                
+                # Claude 대화 이력 배열
+                claude_messages = [
+                    {
+                        "role": "user", 
+                        "content": f"다음은 작성된 AI 뉴스 리서치 초안입니다.\n\n[초안]\n{initial_result}\n\n이 초안에 대해 엄격하게 검증해주세요."
+                    }
+                ]
+                
+                feedback = run_claude_chat(cclient, claude_model, claude_messages)
+                
+                if feedback:
+                    claude_messages.append({"role": "assistant", "content": feedback})
             
             if feedback:
                 feedback_file = os.getenv("FEEDBACK_FILE") or "trial/feedback.txt"
@@ -324,23 +245,20 @@ def main():
                     f.write(feedback)
                 print(f"Feedback saved to {feedback_file}")
                 
-                # Step 3: Refinement using feedback (503 방어 루프 적용)
+                # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                # Phase 3: Gemini Refinement (Gemini Pro 채팅 세션 유지)
+                # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                 print("\n--- Phase 3: Gemini Refinement ---")
                 refined_output = os.getenv("REFINED_OUTPUT_FILE") or "trial/2.txt"
                 
-                api_key = os.getenv("GEMINI_API_KEY")
-                client_gemini = genai.Client(api_key=api_key)
-                gemini_model_id = get_latest_gemini_model(client_gemini, require_agent=False)
-                
                 refine_prompt = (
-                    f"아래는 AI 뉴스 보고서 원문(Phase 1 리서치 전체 내용)과 검증 피드백입니다.\n\n"
-                    f"[원문]\n{initial_result}\n\n"
+                    f"방금 네가 작성한 리서치 초안에 대해 다음과 같은 검증 피드백이 도착했어.\n\n"
                     f"[피드백]\n{feedback}\n\n"
                     f"지시사항:\n"
-                    f"1. 추가 인터넷 검색 없이 '원문' 안의 정보만 사용하세요.\n"
-                    f"2. 날짜·사실이 불확실하거나 오류가 있는 뉴스 항목은 삭제하세요.\n"
-                    f"3. 삭제로 항목이 부족해지면, 원문에서 언급됐지만 주요 뉴스로 다루지 않은 다른 내용을 찾아 새 항목으로 채우세요. 원문에는 최종 보고서보다 훨씬 많은 소스가 담겨 있습니다.\n"
-                    f"4. 원문의 구조(섹션, 마크다운 형식)를 그대로 유지하세요."
+                    f"1. 추가 인터넷 검색 없이 기존 대화(네가 작성한 원문) 안의 정보만 사용하세요.\n"
+                    f"2. 피드백을 반영하여 날짜·사실이 불확실하거나 오류가 있는 뉴스 항목은 삭제하세요.\n"
+                    f"3. 삭제로 항목이 부족해지면, 초안 작성 시 확보했던 정보 중 주요 뉴스로 다루지 않은 다른 내용을 찾아 새 항목으로 채우세요.\n"
+                    f"4. 처음 요구했던 구조(섹션, 마크다운 형식)를 그대로 유지하여 최종본을 작성하세요."
                 )
                 
                 max_retries = 3
@@ -348,11 +266,8 @@ def main():
                 
                 for attempt in range(max_retries):
                     try:
-                        print(f"Refining with model: {gemini_model_id} (Attempt {attempt + 1}/{max_retries})...")
-                        refine_response = client_gemini.models.generate_content(
-                            model=gemini_model_id,
-                            contents=[refine_prompt]
-                        )
+                        print(f"Refining with Gemini Chat Session (Attempt {attempt + 1}/{max_retries})...")
+                        refine_response = gemini_chat.send_message(refine_prompt)
                         refined_result = refine_response.text
                         
                         refined_dir = os.path.dirname(refined_output)
@@ -361,13 +276,13 @@ def main():
                         with open(refined_output, "w", encoding="utf-8") as f:
                             f.write(refined_result)
                         print(f"Refinement complete. Saved to {refined_output} (Total length: {len(refined_result)})")
-                        break # 성공 시 루프 탈출
+                        break
                         
                     except Exception as e:
                         print(f"Warning: Refinement attempt {attempt + 1} failed ({e}).")
                         if attempt < max_retries - 1:
                             print("Sleeping for 20 seconds before retrying...")
-                            time.sleep(20) # 20초 대기 후 재시도
+                            time.sleep(20)
                         else:
                             print("All refinement attempts failed. Using initial research as fallback.")
                             refined_result = initial_result
@@ -377,11 +292,20 @@ def main():
                 refined_output = args.output
             
             if refined_result:
-                # Phase 4: Claude Audit 2 & English Translation
+                # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                # Phase 4: Claude Audit 2 & English Translation (대화 이력 이어가기)
+                # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                 print("\n--- Phase 4: Claude Audit 2 & English Translation ---")
-                translation_prompt = "구조를 유지한 채 최상의 영어 문장으로 최종 수정 및 번역해주세요."
-                translated_result = validate_with_claude(refined_result, custom_prompt=translation_prompt)
                 
+                if feedback and claude_api_key:
+                    claude_messages.append({
+                        "role": "user", 
+                        "content": f"다음은 당신의 피드백을 반영하여 새롭게 업데이트된 최종 AI 뉴스 보고서입니다.\n\n[수정된 최종본]\n{refined_result}\n\n초기 초안의 검증 내역과 이 최종본을 바탕으로, 기존 구조를 완벽히 유지한 채 최상의 영어 비즈니스 문장으로 최종 번역을 수행해주세요."
+                    })
+                    translated_result = run_claude_chat(cclient, claude_model, claude_messages)
+                else:
+                    translated_result = None
+
                 final_content_for_html = translated_result if translated_result else refined_result
                 
                 if final_content_for_html:
@@ -395,10 +319,11 @@ def main():
                         f.write(final_content_for_html)
                     print(f"Archived content to {archive_file}")
 
+                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                     # Phase 5: HTML Generation
+                    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                     print("\n--- Phase 5: HTML Generation ---")
                     
-                    # HTML 프롬프트 가져오기 (URL 우선, 없으면 로컬 파일)
                     html_prompt_url = os.getenv("HTML_PROMPT_URL")
                     html_prompt = None
                     
@@ -430,7 +355,7 @@ def main():
 )
 def generate_html(content, prompt, output_file="index.html"):
     """
-    Generates index.html using Gemini.
+    Generates index.html using Gemini Pro.
     """
     api_key = os.getenv("GEMINI_API_KEY")
     client = genai.Client(api_key=api_key)
