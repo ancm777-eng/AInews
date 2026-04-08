@@ -172,11 +172,11 @@ def main():
     prompt_content = system_instr + get_recent_archives(7) + prompt_content
 
     # Phase 1: Grounded Research
-    initial_result, gemini_chat = run_grounded_research(g_client, g_model, prompt_content, args.output)
-    
-    if not initial_result:
-        print("Failed to get initial research.")
+    research_output = run_grounded_research(g_client, g_model, prompt_content, args.output)
+    if not research_output:
+        print("Failed to get initial research due to API limit.")
         return
+    initial_result, gemini_chat = research_output
 
     # Phase 2: Claude Validation
     feedback = None
