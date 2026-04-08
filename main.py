@@ -53,13 +53,23 @@ def get_recent_archives(days=7):
         return ""
 
 def get_latest_gemini_model(client):
-    """최신 Gemini Pro 모델 동적 탐색 (Flash/Deep Research 제외)"""
+    """최신 Gemini Pro 모델 동적 탐색 (3.0-pro 우선)"""
     try:
         models = client.models.list()
         all_names = [m.name for m in models]
-        bad_keywords = ["flash", "nano", "vision", "latest", "customtools", "experimental",
+        
+        # 3.x 모델이 exp/preview 태그 때문에 걸러지는 현상을 방지하기 위해 필터 완화
+        bad_keywords = ["flash", "nano", "vision", "latest", "customtools", 
                         "deep-research", "live", "tts", "embedding", "imagen", "aqa"]
         
+        # 1. 안정적인 3.0-pro 모델이 API 목록에 있는지 최우선 확인
+        for name in all_names:
+            if "gemini-3.0-pro" in name.lower() and not any(bad in name.lower() for bad in bad_keywords):
+                target = name.replace("models/", "")
+                print(f"Automatically selected Gemini Pro model: {target}")
+                return target
+        
+        # 2. 3.0-pro가 없다면 전체 Pro 모델 중 알파벳/버전 역순으로 동적 탐색
         pro_models = [
             n for n in all_names
             if "gemini" in n.lower() and "pro" in n.lower()
@@ -71,10 +81,11 @@ def get_latest_gemini_model(client):
             latest = pro_models[0].replace("models/", "")
             print(f"Automatically selected Gemini Pro model: {latest}")
             return latest
-        return "gemini-2.0-pro-exp-02-05" # Fallback
+            
+        return "gemini-3.0-pro" # 최후의 Fallback을 3.0-pro로 고정
     except Exception as e:
         print(f"Warning: Gemini model discovery failed ({e}), using default Pro.")
-        return "gemini-2.0-pro-exp-02-05"
+        return "gemini-3.0-pro"
 
 def get_latest_claude_model(client):
     """최신 Claude Sonnet 모델 동적 탐색"""
