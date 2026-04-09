@@ -57,24 +57,28 @@ def get_recent_archives(days=7):
         return ""
 
 def get_latest_gemini_model(client):
-    """최신 Gemini Pro 모델 동적 탐색 (3.0-pro 우선)"""
+    """최신 Gemini Pro 모델 동적 탐색 (불안정한 버전을 피하고 3.0-pro 우선)"""
     try:
         models = client.models.list()
         all_names = [m.name for m in models]
         
+        # preview나 불안정한 버전들을 최대한 배제
         bad_keywords = ["flash", "nano", "vision", "latest", "customtools", 
                         "deep-research", "live", "tts", "embedding", "imagen", "aqa"]
         
+        # 1. 3.0-pro 우선 탐색
         for name in all_names:
             if "gemini-3.0-pro" in name.lower() and not any(bad in name.lower() for bad in bad_keywords):
                 target = name.replace("models/", "")
                 print(f"Automatically selected Gemini Pro model: {target}")
                 return target
         
+        # 2. 3.0-pro가 없을 경우, preview나 exp 태그가 붙은 모델(예: 3.1-pro-preview)을 걸러내고 정식 모델 찾기
+        strict_bad_keywords = bad_keywords + ["preview", "exp"]
         pro_models = [
             n for n in all_names
             if "gemini" in n.lower() and "pro" in n.lower()
-            and not any(bad in n.lower() for bad in bad_keywords)
+            and not any(bad in n.lower() for bad in strict_bad_keywords)
         ]
         
         if pro_models:
@@ -118,7 +122,7 @@ def run_claude_chat(client, model, messages):
 
 @retry(
     stop=stop_after_attempt(2), 
-    wait=wait_exponential(multiplier=2, min=10, max=30), # 타임아웃 발생 시 10~30초 쉬었다가 재시도
+    wait=wait_exponential(multiplier=2, min=10, max=30), # 타임아웃 발생 시 10~30초 대기 후 재시도
     retry_error_callback=return_none_on_error
 )
 def run_grounded_research(client, model_id, prompt, output_file="research_result.md"):
@@ -184,17 +188,17 @@ def main():
                 print("Prompt source not found.")
                 sys.exit(1)
 
-    # 🔥 [수정됨] KST 시간 주입 및 오버라이드 룰 강제 적용
+    # 🔥 KST 시간 주입 및 오버라이드 룰 강제 적용
     current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
     system_instr = (
         f"[🔥 SYSTEM OVERRIDE & ALERT: 매우 중요한 지시사항 🔥]\n"
         f"1. 현재 한국 표준시(KST)는 {current_kst} 입니다. 이를 '오늘(TODAY)'의 기준으로 삼으십시오.\n"
         f"2. 사용자의 프롬프트 원문에 있는 '쿼리 0: today's date 검색' 및 '날짜 확인 실패 시 Briefing aborted 출력' 규칙을 **완벽하게 무시**하십시오. 시스템이 이미 날짜를 제공했으므로 절대 중단해서는 안 됩니다. 즉시 최신 AI 뉴스 리서치부터 시작하십시오.\n"
-        f"3. 문장 내 인라인 LaTeX($) 사용은 절대 금지하며, 수식이나 변수(예: v, x, n)는 굵은 글씨 또는 일반 텍스트로만 표기하십시오.\n\n"
+        f"3. 문장 내 인라인 LaTeX 사용은 절대 금지하며, 수식이나 변수(예: v, x, n)는 굵은 글씨 또는 일반 텍스트로만 표기하십시오.\n\n"
     )
     prompt_content = system_instr + get_recent_archives(7) + prompt_content
 
-    # Phase 1: Grounded Research (Fail-Fast 및 Unpack 방어 적용)
+    # Phase 1: Grounded Research
     research_output = run_grounded_research(g_client, g_model, prompt_content, args.output)
     
     if not research_output:
@@ -227,7 +231,7 @@ def main():
             "3. 인라인 LaTeX 사용 절대 금지\n4. 기존 섹션 구조 유지"
         )
         
-        # 🔥 [수정됨] Phase 3에도 서버 통신 끊김(Server disconnected) 방어용 재시도 로직 추가
+        # 서버 통신 끊김(Server disconnected) 방어용 재시도 로직
         max_retries = 3
         for attempt in range(max_retries):
             try:
@@ -280,21 +284,29 @@ def main():
 
     if html_prompt_content:
         print(f"Generating HTML using model: {g_model}...")
-        try:
-            response = g_client.models.generate_content(
-                model=g_model,
-                contents=[f"{html_prompt_content}\n\n{final_content}"]
-            )
-            html_code = response.text
-            if "```html" in html_code:
-                html_code = html_code.split("```html")[1].split("```")[0].strip()
-            elif "```" in html_code:
-                html_code = html_code.split("```")[1].split("```")[0].strip()
-            with open("index.html", "w", encoding="utf-8") as f:
-                f.write(html_code)
-            print("✅ index.html saved successfully.")
-        except Exception as e:
-            print(f"❌ HTML Generation failed: {e}")
+        # 🔥 Phase 5에도 끊김(Server disconnected) 방어용 재시도 로직 강제 추가
+        max_html_retries = 3
+        for attempt in range(max_html_retries):
+            try:
+                response = g_client.models.generate_content(
+                    model=g_model,
+                    contents=[f"{html_prompt_content}\n\n{final_content}"]
+                )
+                html_code = response.text
+                if "```html" in html_code:
+                    html_code = html_code.split("```html")[1].split("```")[0].strip()
+                elif "```" in html_code:
+                    html_code = html_code.split("```")[1].split("```")[0].strip()
+                with open("index.html", "w", encoding="utf-8") as f:
+                    f.write(html_code)
+                print("✅ index.html saved successfully.")
+                break
+            except Exception as e:
+                print(f"⚠️ HTML Generation attempt {attempt + 1} failed: {e}")
+                if attempt < max_html_retries - 1:
+                    time.sleep(10)
+                else:
+                    print("❌ HTML Generation failed completely after all attempts.")
     else:
         print("❌ No HTML prompt available. index.html was not generated.")
     
