@@ -1,4 +1,3 @@
-```python
 import os
 import time
 import sys
@@ -27,19 +26,19 @@ def get_recent_archives(days=7):
     """중복 필터링을 위해 최근 N일간의 리포트를 읽어옴"""
     archive_data = ""
     archive_dir = "data"
+
     if not os.path.exists(archive_dir):
         return ""
-    
+
     try:
         files = [f for f in os.listdir(archive_dir) if re.match(r'\d{4}-\d{2}-\d{2}\.txt', f)]
         files.sort(reverse=True)
-        
         today = datetime.datetime.now()
         count = 0
+
         for filename in files:
             file_date_str = filename.replace(".txt", "")
             file_date = datetime.datetime.strptime(file_date_str, "%Y-%m-%d")
-            
             if (today - file_date).days <= days:
                 file_path = os.path.join(archive_dir, filename)
                 with open(file_path, "r", encoding="utf-8") as f:
@@ -48,49 +47,55 @@ def get_recent_archives(days=7):
                 count += 1
             if count >= days:
                 break
-                
+
         if archive_data:
             return f"\n[REPORTS FROM LAST {days} DAYS - DO NOT REPEAT UNLESS THERE IS NEW PROGRESS]\n{archive_data}\n"
         return ""
+
     except Exception as e:
         print(f"Warning: Could not read archives: {e}")
         return ""
 
 def get_latest_gemini_model(client):
-    """최신 Gemini Pro 모델 동적 탐색 (불안정한 버전을 피하고 3.0-pro 우선)"""
+    """최신 Gemini Pro 모델 동적 탐색 (2.5-pro 우선)"""
+    # ✅ 수정: fallback을 실제 존재하는 stable 모델명으로 변경
+    FALLBACK_MODEL = "gemini-2.5-pro-preview-03-25"
+
     try:
         models = client.models.list()
         all_names = [m.name for m in models]
-        
-        # preview나 불안정한 버전들을 최대한 배제
-        bad_keywords = ["flash", "nano", "vision", "latest", "customtools", 
+
+        bad_keywords = ["flash", "nano", "vision", "latest", "customtools",
                         "deep-research", "live", "tts", "embedding", "imagen", "aqa"]
-        
-        # 1. 3.0-pro 우선 탐색
+
+        # 1. 2.5-pro 우선 탐색 (✅ 수정: 3.0-pro → 2.5-pro)
         for name in all_names:
-            if "gemini-3.0-pro" in name.lower() and not any(bad in name.lower() for bad in bad_keywords):
+            if "gemini-2.5-pro" in name.lower() and not any(bad in name.lower() for bad in bad_keywords):
                 target = name.replace("models/", "")
                 print(f"Automatically selected Gemini Pro model: {target}")
                 return target
-        
-        # 2. 3.0-pro가 없을 경우, preview나 exp 태그가 붙은 모델을 걸러내고 정식 모델 찾기
+
+        # 2. strict 필터로 정식 pro 모델 탐색
         strict_bad_keywords = bad_keywords + ["preview", "exp"]
         pro_models = [
             n for n in all_names
             if "gemini" in n.lower() and "pro" in n.lower()
             and not any(bad in n.lower() for bad in strict_bad_keywords)
         ]
-        
+
         if pro_models:
             pro_models.sort(reverse=True)
             latest = pro_models[0].replace("models/", "")
             print(f"Automatically selected Gemini Pro model: {latest}")
             return latest
-            
-        return "gemini-3.0-pro"
+
+        print(f"Warning: No suitable model found in list, using fallback: {FALLBACK_MODEL}")
+        return FALLBACK_MODEL
+
     except Exception as e:
+        # ✅ 수정: fallback 모델명을 실제 존재하는 이름으로 변경
         print(f"Warning: Gemini model discovery failed ({e}), using default Pro.")
-        return "gemini-3.0-pro"
+        return FALLBACK_MODEL
 
 def get_latest_claude_model(client):
     """최신 Claude Sonnet 모델 동적 탐색"""
@@ -106,7 +111,7 @@ def get_latest_claude_model(client):
         return "claude-3-5-sonnet-20241022"
 
 @retry(
-    stop=stop_after_attempt(3), 
+    stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=4, max=10),
     retry_error_callback=return_none_on_error
 )
@@ -121,8 +126,8 @@ def run_claude_chat(client, model, messages):
     return message.content[0].text
 
 @retry(
-    stop=stop_after_attempt(2), 
-    wait=wait_exponential(multiplier=2, min=10, max=30), # 타임아웃 발생 시 10~30초 대기 후 재시도
+    stop=stop_after_attempt(2),
+    wait=wait_exponential(multiplier=2, min=10, max=30),
     retry_error_callback=return_none_on_error
 )
 def run_grounded_research(client, model_id, prompt, output_file="research_result.md"):
@@ -136,6 +141,7 @@ def run_grounded_research(client, model_id, prompt, output_file="research_result
                 temperature=0.1,
             )
         )
+
         response = chat.send_message(prompt)
         result_text = response.text
 
@@ -143,10 +149,13 @@ def run_grounded_research(client, model_id, prompt, output_file="research_result
             return None
 
         os.makedirs(os.path.dirname(output_file), exist_ok=True) if os.path.dirname(output_file) else None
+
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(result_text)
+
         print(f"Phase 1 complete. Saved to {output_file}")
         return result_text, chat
+
     except Exception as e:
         print(f"Error in Phase 1: {e}")
         raise e
@@ -160,20 +169,20 @@ def main():
     # 1. API 클라이언트 초기화
     g_api_key = os.getenv("GEMINI_API_KEY")
     c_api_key = os.getenv("CLAUDE_API_KEY")
-    
+
     if not g_api_key:
         print("Missing GEMINI_API_KEY")
         sys.exit(1)
 
-    # 타임아웃 150초로 무거운 검색 대기 (무한 로딩 방지)
     g_client = genai.Client(api_key=g_api_key, http_options={'timeout': 150.0})
     g_model = get_latest_gemini_model(g_client)
-    
+
     c_client = anthropic.Anthropic(api_key=c_api_key, timeout=120.0) if c_api_key else None
     c_model = get_latest_claude_model(c_client) if c_client else None
 
     # 2. 프롬프트 준비
     url = args.url or os.getenv("PROMPT_URL")
+
     if url:
         prompt_content = fetch_prompt_from_github(url)
     else:
@@ -188,34 +197,37 @@ def main():
                 print("Prompt source not found.")
                 sys.exit(1)
 
-    # 🔥 KST 시간 주입 및 기호 규칙 완벽 적용 (Overriden rules)
+    # 🔥 KST 시간 주입 및 기호 규칙 완벽 적용
     current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
     system_instr = (
         f"[🔥 SYSTEM OVERRIDE & ALERT: 매우 중요한 지시사항 🔥]\n"
         f"1. 현재 한국 표준시(KST)는 {current_kst} 입니다. 이를 '오늘(TODAY)'의 기준으로 삼으십시오.\n"
         f"2. 사용자의 프롬프트 원문에 있는 '쿼리 0: today's date 검색' 및 '날짜 확인 실패 시 Briefing aborted 출력' 규칙을 **완벽하게 무시**하십시오. 시스템이 이미 날짜를 제공했으므로 절대 중단해서는 안 됩니다. 즉시 최신 AI 뉴스 리서치부터 시작하십시오.\n"
-        f"3. 문장 내 인라인 LaTeX($) 사용은 절대 금지하며, 수식이나 문장 중간의 기호/벡터/변수(예: v, w, x는 굵은 글씨, 일반 변수 x, y, n은 일반 텍스트)는 반드시 지정된 텍스트 포맷으로만 표기하십시오.\n\n"
+        f"3. 문장 내 인라인 LaTeX($) 사용은 절대 금지하며, 수식이나 문장 중간의 기호/벡터/변수는 반드시 지정된 텍스트 포맷으로만 표기하십시오.\n\n"
     )
+
     prompt_content = system_instr + get_recent_archives(7) + prompt_content
 
     # Phase 1: Grounded Research
     research_output = run_grounded_research(g_client, g_model, prompt_content, args.output)
-    
+
     if not research_output:
         print("❌ API 서버 과부하 또는 오류로 리서치 실패. 워크플로우를 즉시 종료하여 비용을 보호합니다.")
         sys.exit(1)
-        
+
     initial_result, gemini_chat = research_output
 
     # Phase 2: Claude Validation
     feedback = None
     claude_messages = []
+
     if c_client:
         print("\n--- Phase 2: Claude Validation ---")
         claude_messages = [
             {"role": "user", "content": f"다음 AI 뉴스 초안의 사실 관계와 KST 기준 시간 윈도우를 검증하십시오.\n\n[초안]\n{initial_result}"}
         ]
         feedback = run_claude_chat(c_client, c_model, claude_messages)
+
         if feedback:
             claude_messages.append({"role": "assistant", "content": feedback})
             with open("trial/feedback.txt", "w", encoding="utf-8") as f:
@@ -223,6 +235,7 @@ def main():
 
     # Phase 3: Gemini Refinement (Session Maintained)
     refined_result = initial_result
+
     if feedback:
         print("\n--- Phase 3: Gemini Refinement ---")
         refine_prompt = (
@@ -230,8 +243,7 @@ def main():
             "1. 대화 내 정보만 활용\n2. 오류 항목 삭제 및 신규 항목 보충\n"
             "3. 인라인 LaTeX($) 사용 절대 금지 (수식/변수는 일반 텍스트나 굵은 글씨 사용)\n4. 기존 섹션 구조 유지"
         )
-        
-        # 🔥 서버 끊김(Server disconnected) 발생 시 3번까지 재시도하는 강력한 로직
+
         max_retries = 3
         for attempt in range(max_retries):
             try:
@@ -250,10 +262,11 @@ def main():
 
     # Phase 4: Claude Translation (Session Maintained)
     final_content = refined_result
+
     if c_client and feedback:
         print("\n--- Phase 4: Claude Translation ---")
         claude_messages.append({
-            "role": "user", 
+            "role": "user",
             "content": "수정된 최종본을 바탕으로 기존 구조를 완벽히 유지한 최상의 비즈니스 영어 보고서로 번역하십시오."
         })
         final_content = run_claude_chat(c_client, c_model, claude_messages)
@@ -268,7 +281,7 @@ def main():
     print("\n--- Phase 5: HTML Generation ---")
     html_prompt_url = os.getenv("HTML_PROMPT_URL")
     html_prompt_content = ""
-    
+
     if html_prompt_url:
         html_prompt_content = fetch_prompt_from_github(html_prompt_url)
     else:
@@ -284,7 +297,7 @@ def main():
 
     if html_prompt_content:
         print(f"Generating HTML using model: {g_model}...")
-        # 🔥 Phase 5에도 끊김(Server disconnected) 방어용 재시도 로직 추가
+
         max_html_retries = 3
         for attempt in range(max_html_retries):
             try:
@@ -293,14 +306,18 @@ def main():
                     contents=[f"{html_prompt_content}\n\n{final_content}"]
                 )
                 html_code = response.text
+
                 if "```html" in html_code:
                     html_code = html_code.split("```html")[1].split("```")[0].strip()
                 elif "```" in html_code:
                     html_code = html_code.split("```")[1].split("```")[0].strip()
+
                 with open("index.html", "w", encoding="utf-8") as f:
                     f.write(html_code)
+
                 print("✅ index.html saved successfully.")
                 break
+
             except Exception as e:
                 print(f"⚠️ HTML Generation attempt {attempt + 1} failed: {e}")
                 if attempt < max_html_retries - 1:
@@ -309,11 +326,8 @@ def main():
                     print("❌ HTML Generation failed completely after all attempts.")
     else:
         print("❌ No HTML prompt available. index.html was not generated.")
-    
+
     print("\nPipeline finished successfully.")
 
 if __name__ == "__main__":
     main()
-
-
-```
