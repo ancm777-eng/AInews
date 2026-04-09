@@ -73,7 +73,7 @@ def get_latest_gemini_model(client):
                 print(f"Automatically selected Gemini Pro model: {target}")
                 return target
         
-        # 2. 3.0-pro가 없을 경우, preview나 exp 태그가 붙은 모델(예: 3.1-pro-preview)을 걸러내고 정식 모델 찾기
+        # 2. 3.0-pro가 없을 경우, preview나 exp 태그가 붙은 모델을 걸러내고 정식 모델 찾기
         strict_bad_keywords = bad_keywords + ["preview", "exp"]
         pro_models = [
             n for n in all_names
@@ -165,7 +165,7 @@ def main():
         print("Missing GEMINI_API_KEY")
         sys.exit(1)
 
-    # 타임아웃 한도를 150초로 넉넉히 주어 무거운 검색도 기다려줌
+    # 타임아웃 150초로 무거운 검색 대기 (무한 로딩 방지)
     g_client = genai.Client(api_key=g_api_key, http_options={'timeout': 150.0})
     g_model = get_latest_gemini_model(g_client)
     
@@ -188,13 +188,13 @@ def main():
                 print("Prompt source not found.")
                 sys.exit(1)
 
-    # 🔥 KST 시간 주입 및 오버라이드 룰 강제 적용
+    # 🔥 KST 시간 주입 및 기호 규칙 완벽 적용 (Overriden rules)
     current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
     system_instr = (
         f"[🔥 SYSTEM OVERRIDE & ALERT: 매우 중요한 지시사항 🔥]\n"
         f"1. 현재 한국 표준시(KST)는 {current_kst} 입니다. 이를 '오늘(TODAY)'의 기준으로 삼으십시오.\n"
         f"2. 사용자의 프롬프트 원문에 있는 '쿼리 0: today's date 검색' 및 '날짜 확인 실패 시 Briefing aborted 출력' 규칙을 **완벽하게 무시**하십시오. 시스템이 이미 날짜를 제공했으므로 절대 중단해서는 안 됩니다. 즉시 최신 AI 뉴스 리서치부터 시작하십시오.\n"
-        f"3. 문장 내 인라인 LaTeX 사용은 절대 금지하며, 수식이나 변수(예: v, x, n)는 굵은 글씨 또는 일반 텍스트로만 표기하십시오.\n\n"
+        f"3. 문장 내 인라인 LaTeX($) 사용은 절대 금지하며, 수식이나 문장 중간의 기호/벡터/변수(예: v, w, x는 굵은 글씨, 일반 변수 x, y, n은 일반 텍스트)는 반드시 지정된 텍스트 포맷으로만 표기하십시오.\n\n"
     )
     prompt_content = system_instr + get_recent_archives(7) + prompt_content
 
@@ -228,10 +228,10 @@ def main():
         refine_prompt = (
             "위 피드백을 반영하여 최종본을 작성하십시오.\n"
             "1. 대화 내 정보만 활용\n2. 오류 항목 삭제 및 신규 항목 보충\n"
-            "3. 인라인 LaTeX 사용 절대 금지\n4. 기존 섹션 구조 유지"
+            "3. 인라인 LaTeX($) 사용 절대 금지 (수식/변수는 일반 텍스트나 굵은 글씨 사용)\n4. 기존 섹션 구조 유지"
         )
         
-        # 서버 통신 끊김(Server disconnected) 방어용 재시도 로직
+        # 🔥 서버 끊김(Server disconnected) 발생 시 3번까지 재시도하는 강력한 로직
         max_retries = 3
         for attempt in range(max_retries):
             try:
@@ -284,7 +284,7 @@ def main():
 
     if html_prompt_content:
         print(f"Generating HTML using model: {g_model}...")
-        # 🔥 Phase 5에도 끊김(Server disconnected) 방어용 재시도 로직 강제 추가
+        # 🔥 Phase 5에도 끊김(Server disconnected) 방어용 재시도 로직 추가
         max_html_retries = 3
         for attempt in range(max_html_retries):
             try:
