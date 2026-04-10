@@ -169,6 +169,43 @@ def main():
     )
     prompt_content = prompt_content + override_instr
 
+    # ---------------------------------------------------------
+    # [신규 추가 로직] ref.txt 확인 및 멀티 타겟 프롬프트 주입
+    # ---------------------------------------------------------
+    ref_content = ""
+    ref_count = 0
+    if os.path.exists("ref.txt"):
+        try:
+            with open("ref.txt", "r", encoding="utf-8") as f:
+                # 빈 줄을 제외하고 각 줄을 읽어 리스트로 만듭니다.
+                ref_lines = [line.strip() for line in f.readlines() if line.strip()]
+                if ref_lines:
+                    # AI가 읽기 쉽게 불릿 포인트 형태로 결합합니다.
+                    ref_content = "\n".join(f"▶ {line}" for line in ref_lines)
+                    ref_count = len(ref_lines)
+        except Exception as e:
+            print(f"Warning: Could not read ref.txt: {e}")
+
+    if ref_content:
+        # 5개 중에 몇 개를 자율적으로 찾을지 계산합니다. (최소 0개)
+        auto_count = max(0, 5 - ref_count)
+        
+        ref_instr = (
+            f"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"[🎯 MANDATORY TARGET NEWS (최우선 반영 지시)]\n"
+            f"사용자가 오늘 특별히 다음 **{ref_count}개**의 주제/사건에 대한 분석을 요청했습니다:\n"
+            f"{ref_content}\n\n"
+            f"지시사항: 당신이 선정하는 최종 5개의 주요 뉴스 중, **위 요청된 {ref_count}개의 주제를 빠짐없이 각각 다루는 최신 뉴스를 무조건 포함**시키십시오. "
+            f"그리고 나머지 **{auto_count}개**의 뉴스는 산업 전체에 가장 큰 파급력을 미칠 핵심 뉴스로 당신이 직접 발굴하여 총 5개를 맞추십시오.\n"
+            f"(단, 요청된 주제가 5개를 넘어가더라도 최종 리포트는 반드시 가장 중요한 5개의 뉴스만으로 압축해서 구성해야 합니다.)\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        )
+        prompt_content += ref_instr
+        print(f"🎯 ref.txt에서 {ref_count}개의 타겟 주제를 확인하여 프롬프트에 주입했습니다.")
+    else:
+        print("ℹ️ ref.txt 파일이 없거나 비어있어 기본 탐색 모드로 진행합니다.")
+    # ---------------------------------------------------------
+
     # Phase 1: Grounded Research
     research_output = run_grounded_research(g_client, g_model, prompt_content, args.output)
     if not research_output:
