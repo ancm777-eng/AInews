@@ -258,11 +258,12 @@ def main():
     os.makedirs("data", exist_ok=True)
     with open(f"data/{today_str}.txt", "w", encoding="utf-8") as f: f.write(final_content)
 
-    # Phase 5: HTML Generation
+        # Phase 5: HTML Generation
     print("\n--- Phase 5: HTML Generation ---")
     html_prompt_url = os.getenv("HTML_PROMPT_URL")
     html_prompt_content = ""
-    if html_prompt_url: html_prompt_content = fetch_prompt_from_github(html_prompt_url)
+    if html_prompt_url: 
+        html_prompt_content = fetch_prompt_from_github(html_prompt_url)
     else:
         try:
             with open("prompt/html.txt", "r", encoding="utf-8") as f: html_prompt_content = f.read()
@@ -278,7 +279,23 @@ def main():
             try:
                 response = g_client.models.generate_content(model=g_model, contents=[f"{html_prompt_content}\n\n{final_content}"])
                 html_code = response.text
-                if "
+                
+                # Markdown 코드 블록(```html)이 섞여 나올 경우를 대비한 텍스트 정제 로직
+                if "```html" in html_code:
+                    html_code = html_code.split("```html")[1].split("```")[0].strip()
+                elif "```" in html_code:
+                    html_code = html_code.split("```")[1].strip()
 
-
-```
+                # 최종 index.html 파일 저장
+                with open("index.html", "w", encoding="utf-8") as f: 
+                    f.write(html_code)
+                    
+                print("✅ HTML generation complete. Saved to index.html")
+                break
+                
+            except Exception as e:
+                print(f"⚠️ Phase 5 attempt {attempt + 1} failed: {e}")
+                if attempt < max_html_retries - 1: 
+                    time.sleep(15)
+                else: 
+                    print("❌ All HTML generation attempts failed.")
