@@ -258,7 +258,7 @@ def main():
     os.makedirs("data", exist_ok=True)
     with open(f"data/{today_str}.txt", "w", encoding="utf-8") as f: f.write(final_content)
 
-        # Phase 5: HTML Generation
+    # Phase 5: HTML Generation
     print("\n--- Phase 5: HTML Generation ---")
     html_prompt_url = os.getenv("HTML_PROMPT_URL")
     html_prompt_content = ""
@@ -299,3 +299,8 @@ def main():
                     time.sleep(15)
                 else: 
                     print("❌ All HTML generation attempts failed.")
+
+if __name__ == "__main__":
+    main()
+
+```
