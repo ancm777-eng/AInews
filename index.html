@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Strategic AI Briefing</title>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28"></script>
@@ -64,10 +65,22 @@
         .theme-toggle-btn { background: #334155; color: #fff; border: 1px solid #475569; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
         .theme-toggle-btn:hover { background: #475569; }
 
-        main { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; }
+        /* ── PC 가독성: 본문 최대 너비 제한 ── */
+        .container, main, .article, section {
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        main { margin: 2rem auto; padding: 0 1.5rem; }
         .report-header { text-align: center; margin-bottom: 3rem; }
         .report-header h2 { font-size: 2.25rem; margin-bottom: 0.5rem; }
         .report-header p { color: var(--text-secondary); font-size: 1.1rem; }
+
+        /* TOC Styles */
+        .toc { display: flex; justify-content: center; gap: 10px; margin: 0 auto 3rem; max-width: 900px; flex-wrap: wrap; }
+        .toc a { background: var(--surface-color); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; text-decoration: none; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 500; transition: background 0.2s; white-space: nowrap; }
+        .toc a:hover { background: var(--border-color); }
 
         .article { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 2.5rem; margin-bottom: 3rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .article-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 2rem; }
@@ -102,7 +115,8 @@
         .arch-chip { flex: 1; min-width: 200px; background: var(--bg-color); border-radius: 6px; padding: 1rem; border: 1px dashed var(--border-color); }
         .arch-chip strong { display: block; margin-bottom: 0.25rem; }
         
-        .info-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: 0.9rem; }
+        .table-scroll-wrap { width: 100%; overflow-x: auto; margin-top: 1.5rem; }
+        .info-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         .info-table th, .info-table td { padding: 1rem; border: 1px solid var(--border-color); text-align: left; }
         .info-table th { background-color: var(--bg-color); font-weight: 600; }
 
@@ -118,7 +132,7 @@
         .sentiment-card .label { font-weight: 600; margin-bottom: 0.25rem; display: block; }
         .sentiment-card .desc { font-size: 0.85rem; color: var(--text-secondary); }
 
-        .synthesis { background: var(--header-bg); color: #f8fafc; padding: 3rem; border-radius: 12px; margin-top: 4rem; }
+        .synthesis { background: var(--header-bg); color: #f8fafc; padding: 3rem; border-radius: 12px; margin-top: 4rem; margin-bottom: 4rem; }
         .synthesis h2 { font-size: 2rem; margin-bottom: 2rem; border-bottom: 1px solid #334155; padding-bottom: 1rem; }
         .syn-block { margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.8; color: #cbd5e1; }
         .outlook-box { background: #0f172a; border-left: 4px solid #38bdf8; padding: 2rem; border-radius: 0 8px 8px 0; margin-top: 3rem; }
@@ -126,66 +140,112 @@
         .outlook-item { margin-bottom: 1rem; font-size: 0.95rem; color: #94a3b8; }
         .outlook-item strong { color: #38bdf8; }
 
-        /* 📱 강력한 모바일 반응형 강제 적용 (768px 이하 화면) - 이 코드를 반드시 마지막에 포함할 것 */
+        #to-top { position: fixed; bottom: 30px; right: 30px; background: var(--c1); color: #fff; border: none; border-radius: 8px; padding: 12px 20px; font-size: 1rem; font-weight: 600; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; transition: background 0.3s, transform 0.2s; }
+        #to-top:hover { background: #1d4ed8; transform: translateY(-2px); }
+
+        /* 📱 모바일 반응형 강제 적용 (768px 이하) — 이 코드를 반드시 마지막에 포함할 것 */
         @media screen and (max-width: 768px) {
-            /* 1. 기본 레이아웃 여백 최소화 및 폰트 최적화 */
-            body { 
-                font-size: 15px !important; /* 모바일 가독성을 위해 살짝 조절 */
-                line-height: 1.6 !important; 
-                padding: 5px !important; /* 화면 양옆 여백을 극단적으로 줄임 */
+            /* 1. 기본 레이아웃: 적절한 여백과 폰트 */
+            body {
+                font-size: 15px !important;
+                line-height: 1.7 !important;
+                padding: 0 !important;
                 margin: 0 !important;
-                overflow-x: hidden !important; 
-            }
-            
-            /* 2. 단어가 한 줄에 하나씩 끊기는 현상(3번째 사진) 해결 */
-            * { 
-                box-sizing: border-box !important; 
-                word-break: normal !important; /* 영단어 중간에 무리하게 끊기지 않도록 수정 */
-                overflow-wrap: anywhere !important; /* 긴 단어만 어쩔 수 없을 때 줄바꿈 */
+                overflow-x: hidden !important;
             }
 
-            /* 3. 모든 컨테이너와 카드의 불필요한 좌우 여백 제거 */
+            /* 2. 노치/홈 인디케이터 대응 (iPhone safe area) */
+            .container, main {
+                padding-left: max(16px, env(safe-area-inset-left)) !important;
+                padding-right: max(16px, env(safe-area-inset-right)) !important;
+                padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+            }
+
+            /* 3. 영단어 줄바꿈: 중간 절단 방지, 긴 단어만 허용 */
+            * {
+                box-sizing: border-box !important;
+                word-break: normal !important;
+                overflow-wrap: anywhere !important;
+            }
+
+            /* 4. 컨테이너·카드 좌우 여백 정리 */
             .article, .subsec, .impact-box, .syn-block, .outlook-item {
                 width: 100% !important;
                 margin-left: 0 !important;
                 margin-right: 0 !important;
-                padding: 12px 8px !important; /* 내부 여백을 줄여 텍스트 공간 확보 */
+                padding: 14px 16px !important;
             }
 
-            /* 4. 그리드 요소를 1열로 세로 배치 */
-            .metric-row, .metric-row-4, .flow-row, .sentiment-grid, .arch-grid, .article-grid { 
-                display: flex !important; 
-                flex-direction: column !important; 
-                width: 100% !important; 
-                gap: 12px !important; 
+            /* 5. 그리드 → 1열 세로 배치 */
+            .metric-row, .metric-row-4, .flow-row, .sentiment-grid, .arch-grid, .article-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                gap: 12px !important;
             }
 
-            .metric-card, .sentiment-card, .arch-chip { 
-                width: 100% !important; 
+            .metric-card, .sentiment-card, .arch-chip {
+                width: 100% !important;
             }
 
-            /* 5. 표(Table) 가독성 해결 (2번째 사진) */
-            /* 표가 화면 밖으로 나가지 않도록 가로 스크롤 허용 및 폰트 축소 */
-            .info-table {
+            /* 6. 표: 컨테이너만 가로 스크롤, 셀 내부는 줄바꿈 허용 */
+            .table-scroll-wrap {
                 display: block !important;
                 width: 100% !important;
-                overflow-x: auto !important; /* 표가 넓으면 좌우로 스크롤되도록 설정 */
-                white-space: nowrap !important; /* 표 안의 텍스트가 줄바꿈되지 않고 가로로 유지되게 함 */
-                font-size: 13px !important; /* 표 안의 글씨를 작게 하여 한눈에 들어오게 함 */
-            }
-            
-            .info-table th, .info-table td {
-                padding: 8px !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
             }
 
-            /* 6. 차트 크기 조정 */
-            .chart-wrap > div { 
-                width: 100% !important; 
-                height: 250px !important; 
+            .info-table {
+                width: 100% !important;
+                font-size: 13px !important;
+                white-space: normal !important; /* ← 기존 nowrap 제거: 셀 내 줄바꿈 허용 */
+                min-width: 480px; /* 표가 너무 좁아지지 않도록 최소 너비 유지 */
             }
-            
-            h1, h2, h3, .subsec-label { 
-                font-size: 1.1rem !important; 
+
+            .info-table th, .info-table td {
+                padding: 8px 10px !important;
+            }
+
+            /* 7. 차트 크기 */
+            .chart-wrap > div {
+                width: 100% !important;
+                height: 240px !important;
+            }
+
+            /* 8. 제목 계층 유지 (동일 크기 방지) */
+            h1 { font-size: 1.4rem !important; }
+            h2 { font-size: 1.2rem !important; }
+            h3 { font-size: 1.05rem !important; }
+            .subsec-label { font-size: 1.0rem !important; }
+
+            /* 9. 터치 타겟 크기 보장 (버튼·링크 최소 44px) */
+            button, a, .toc a {
+                min-height: 44px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+            }
+
+            /* 10. TOC 칩 가로 스크롤 */
+            .toc {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                gap: 8px !important;
+                padding: 8px 16px !important;
+                -webkit-overflow-scrolling: touch !important;
+                justify-content: flex-start;
+            }
+
+            .toc a {
+                white-space: nowrap !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* 11. "맨 위로" 버튼 위치 조정 (홈바 영향 방지) */
+            #to-top {
+                bottom: max(24px, env(safe-area-inset-bottom)) !important;
+                right: 16px !important;
             }
         }
     </style>
@@ -194,7 +254,7 @@
 
     <div class="top-bar">
         <h1>McKinsey/BCG Strat-Tech Group</h1>
-        <button id="theme-toggle" class="theme-toggle-btn">다크모드로</button>
+        <button id="theme-toggle" class="theme-toggle-btn">🌙 다크모드로</button>
     </div>
 
     <main>
@@ -203,11 +263,20 @@
             <p>Global Artificial Intelligence Ecosystem and Structural Paradigm Shifts | Assessment Date: April 12, 2026</p>
         </div>
 
+        <nav class="toc">
+            <a href="#art1">1. Anthropic Custom Silicon</a>
+            <a href="#art2">2. American AI Exports</a>
+            <a href="#art3">3. Advanced Packaging Bottleneck</a>
+            <a href="#art4">4. Harvard Cascade Decoder</a>
+            <a href="#art5">5. State-Level AI Regulation</a>
+            <a href="#synthesis">Synthesis</a>
+        </nav>
+
         <div class="article-title" style="border: none; font-size:1.1rem; color: var(--text-secondary); text-align: justify; margin-bottom: 3rem;">
             <strong>Executive Prologue:</strong> The global artificial intelligence ecosystem is undergoing a phase of intense structural consolidation and geopolitical realignment. The period of unrestrained software capability scaling is being superseded by an era defined by absolute physical constraints, sovereign industrial policy, and the weaponization of the hardware supply chain. The strategic events of the past 72 hours reveal an industry grappling with the immense capital and energy requirements of its own ambition. Frontier labs are now openly exploring vertical integration into custom silicon design to escape the monopolistic pressures of the merchant GPU market. Concurrently, national governments are formalizing AI as a critical instrument of statecraft, establishing sovereign funds and aggressive export promotion regimes to secure geopolitical advantage. This transition is not without friction; the very technologies driving this revolution are simultaneously creating unprecedented cybersecurity risks and forcing a global legislative scramble to impose order on a rapidly evolving technological landscape. This report isolates the five most consequential developments, providing actionable foresight into the shifting paradigms of technology, infrastructure, and capital allocation.
         </div>
 
-        <article class="article">
+        <article class="article" id="art1">
             <h3 class="article-title">1. Anthropic Explores Custom Silicon Development, Signaling Full-Stack AI Realignment</h3>
             <div class="metadata">
                 <span><strong>Source:</strong> Reuters</span>
@@ -263,28 +332,30 @@
                         <strong>Comparative Focus</strong> Singularly focused on large-scale LLM reasoning inference, distinct from Google TPU (general) or Meta MTIA (recommendation).
                     </div>
                 </div>
-                <table class="info-table">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Development Stage</td>
-                            <td>Early exploratory phase. No formal team or final design committed.</td>
-                        </tr>
-                        <tr>
-                            <td>Alternative Dependency</td>
-                            <td>3.5 GW of Google TPU compute capacity secured from 2027 via Google/Broadcom deal.</td>
-                        </tr>
-                        <tr>
-                            <td>Target Optimization</td>
-                            <td>Larger on-chip SRAM for KV-caching; highly specific tensor operation acceleration.</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-scroll-wrap">
+                    <table class="info-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Development Stage</td>
+                                <td>Early exploratory phase. No formal team or final design committed.</td>
+                            </tr>
+                            <tr>
+                                <td>Alternative Dependency</td>
+                                <td>3.5 GW of Google TPU compute capacity secured from 2027 via Google/Broadcom deal.</td>
+                            </tr>
+                            <tr>
+                                <td>Target Optimization</td>
+                                <td>Larger on-chip SRAM for KV-caching; highly specific tensor operation acceleration.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div class="chart-wrap"><div id="chart-art1" style="width:100%; height:280px;"></div></div>
             </div>
 
@@ -332,7 +403,7 @@
             </div>
         </article>
 
-        <article class="article">
+        <article class="article" id="art2">
             <h3 class="article-title">2. U.S. Commerce Department Formalizes "American AI" Export Promotion Program</h3>
             <div class="metadata">
                 <span><strong>Source:</strong> U.S. Dept. of Commerce / Federal Register</span>
@@ -378,28 +449,30 @@
                         <strong>Eligible Tech Stack</strong> Hardware (silicon, servers), Storage, Cloud services, Models, Cybersecurity, and App-layer software.
                     </div>
                 </div>
-                <table class="info-table">
-                    <thead>
-                        <tr>
-                            <th>Criterion</th>
-                            <th>Detail</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Evaluation Authority</td>
-                            <td>Secretary of Commerce, in consultation with Secretaries of State, Defense, Energy, and OSTP Director.</td>
-                        </tr>
-                        <tr>
-                            <td>Compliance</td>
-                            <td>Must comply with U.S. export controls and outbound investment regulations.</td>
-                        </tr>
-                        <tr>
-                            <td>Exclusions</td>
-                            <td>Open-weight models from entities incorporated in/majority-owned by countries of concern are explicitly excluded.</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-scroll-wrap">
+                    <table class="info-table">
+                        <thead>
+                            <tr>
+                                <th>Criterion</th>
+                                <th>Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Evaluation Authority</td>
+                                <td>Secretary of Commerce, in consultation with Secretaries of State, Defense, Energy, and OSTP Director.</td>
+                            </tr>
+                            <tr>
+                                <td>Compliance</td>
+                                <td>Must comply with U.S. export controls and outbound investment regulations.</td>
+                            </tr>
+                            <tr>
+                                <td>Exclusions</td>
+                                <td>Open-weight models from entities incorporated in/majority-owned by countries of concern are explicitly excluded.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="subsec">
@@ -446,7 +519,7 @@
             </div>
         </article>
 
-        <article class="article">
+        <article class="article" id="art3">
             <h3 class="article-title">3. Advanced Packaging Emerges as the Defining AI Hardware Bottleneck of 2026</h3>
             <div class="metadata">
                 <span><strong>Source:</strong> CNBC, DigiTimes, Tom's Hardware</span>
@@ -539,7 +612,7 @@
             </div>
         </article>
 
-        <article class="article">
+        <article class="article" id="art4">
             <h3 class="article-title">4. Harvard's "Cascade" AI Decoder Triggers Waterfall Effect in Quantum Error Correction</h3>
             <div class="metadata">
                 <span><strong>Source:</strong> arXiv (Preprint), Quantum Insider</span>
@@ -585,28 +658,30 @@
                         <strong>Latency</strong> Single-shot latency in microseconds, achieving real-time correction required by neutral-atom systems.
                     </div>
                 </div>
-                <table class="info-table">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Detail</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Benchmark Scope</td>
-                            <td>Surface codes and quantum LDPC codes tested with confidence calibration.</td>
-                        </tr>
-                        <tr>
-                            <td>Trade-offs</td>
-                            <td>Lacks formal theoretical guarantees; heavily dependent on training data quality; smaller variants perform poorly.</td>
-                        </tr>
-                        <tr>
-                            <td>Development Stage</td>
-                            <td>Preprint (arXiv); pending peer-review and independent replication.</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-scroll-wrap">
+                    <table class="info-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Benchmark Scope</td>
+                                <td>Surface codes and quantum LDPC codes tested with confidence calibration.</td>
+                            </tr>
+                            <tr>
+                                <td>Trade-offs</td>
+                                <td>Lacks formal theoretical guarantees; heavily dependent on training data quality; smaller variants perform poorly.</td>
+                            </tr>
+                            <tr>
+                                <td>Development Stage</td>
+                                <td>Preprint (arXiv); pending peer-review and independent replication.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="subsec">
@@ -653,7 +728,7 @@
             </div>
         </article>
 
-        <article class="article">
+        <article class="article" id="art5">
             <h3 class="article-title">5. State-Level AI Regulation Accelerates, Creating Fractured U.S. Compliance Landscape</h3>
             <div class="metadata">
                 <span><strong>Source:</strong> Transparency Coalition, Multistate.ai</span>
@@ -688,37 +763,39 @@
                 <div class="subsec-header">
                     <span class="subsec-icon">🔬</span> <span class="subsec-label cN c5">Technical Deep Dive</span> <span class="subsec-tag lcN c5">Legislative Footprint</span>
                 </div>
-                <table class="info-table">
-                    <thead>
-                        <tr>
-                            <th>State / Bill</th>
-                            <th>Target Scope</th>
-                            <th>Current Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Maine LD 2082</td>
-                            <td>Prohibits clinical AI in mental health therapy.</td>
-                            <td>Sent to governor (April 8)</td>
-                        </tr>
-                        <tr>
-                            <td>Maine LD 2162</td>
-                            <td>Regulates child access to AI chatbots/companions.</td>
-                            <td>Under Senate consideration</td>
-                        </tr>
-                        <tr>
-                            <td>Missouri HB 2372</td>
-                            <td>Omnibus bill blocking therapy chatbots ($10k fine).</td>
-                            <td>In Senate committee</td>
-                        </tr>
-                        <tr>
-                            <td>Georgia SB 540 & 444</td>
-                            <td>Chatbot child safety & Prohibits sole-AI insurance decisions.</td>
-                            <td>Awaiting governor action</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-scroll-wrap">
+                    <table class="info-table">
+                        <thead>
+                            <tr>
+                                <th>State / Bill</th>
+                                <th>Target Scope</th>
+                                <th>Current Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Maine LD 2082</td>
+                                <td>Prohibits clinical AI in mental health therapy.</td>
+                                <td>Sent to governor (April 8)</td>
+                            </tr>
+                            <tr>
+                                <td>Maine LD 2162</td>
+                                <td>Regulates child access to AI chatbots/companions.</td>
+                                <td>Under Senate consideration</td>
+                            </tr>
+                            <tr>
+                                <td>Missouri HB 2372</td>
+                                <td>Omnibus bill blocking therapy chatbots ($10k fine).</td>
+                                <td>In Senate committee</td>
+                            </tr>
+                            <tr>
+                                <td>Georgia SB 540 & 444</td>
+                                <td>Chatbot child safety & Prohibits sole-AI insurance decisions.</td>
+                                <td>Awaiting governor action</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div class="chart-wrap"><div id="chart-art5" style="width:100%; height:280px;"></div></div>
             </div>
 
@@ -792,25 +869,50 @@
 
     </main>
 
+    <button id="to-top">↑ Top</button>
+
     <script>
         // Dark/Light Theme Toggle Logic
         const themeBtn = document.getElementById('theme-toggle');
         const htmlElement = document.documentElement;
         
+        function updateBtnText(theme) {
+            if(theme === 'dark') {
+                themeBtn.textContent = '☀️ 라이트모드로';
+            } else {
+                themeBtn.textContent = '🌙 다크모드로';
+            }
+        }
+
         // Respect system preference initially
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             htmlElement.setAttribute('data-theme', 'dark');
-            themeBtn.textContent = '라이트모드로';
+            updateBtnText('dark');
+        } else {
+            updateBtnText('light');
         }
 
         themeBtn.addEventListener('click', () => {
             if(htmlElement.getAttribute('data-theme') === 'light') {
                 htmlElement.setAttribute('data-theme', 'dark');
-                themeBtn.textContent = '라이트모드로';
+                updateBtnText('dark');
             } else {
                 htmlElement.setAttribute('data-theme', 'light');
-                themeBtn.textContent = '다크모드로';
+                updateBtnText('light');
             }
+        });
+
+        // Back to Top Button Logic
+        const toTopBtn = document.getElementById('to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                toTopBtn.style.display = 'flex';
+            } else {
+                toTopBtn.style.display = 'none';
+            }
+        });
+        toTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
         // Initialize ECharts with SVG Renderer per Tufte's Rules
@@ -863,7 +965,7 @@
                 xAxis: { type: 'value', axisLine: { show: false }, splitLine: { show: false } },
                 yAxis: { type: 'category', data: ['All of 2024', 'By March 2026'], axisLine: { lineStyle: { color: '#94a3b8' } } },
                 series: [{
-                    data: [1200, 1561], // 2024 approximation to show contrast as text stated it surpassed 2024 total
+                    data: [1200, 1561],
                     type: 'bar',
                     itemStyle: { color: '#dc2626', borderRadius: [0,4,4,0] },
                     label: { show: true, position: 'right' }
