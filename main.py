@@ -49,23 +49,23 @@ def get_latest_gemini_model(client):
     try:
         models = client.models.list()
         all_names = [m.name for m in models]
-        
-        bad_keywords = ["flash", "nano", "vision", "latest", "customtools", "deep-research", 
+
+        bad_keywords = ["flash", "nano", "vision", "latest", "customtools", "deep-research",
                         "live", "tts", "embedding", "imagen", "aqa", "preview", "exp"]
-        
+
         pro_models = [
-            n for n in all_names 
-            if "gemini" in n.lower() and "pro" in n.lower() 
+            n for n in all_names
+            if "gemini" in n.lower() and "pro" in n.lower()
             and not any(bad in n.lower() for bad in bad_keywords)
         ]
-        
+
         if pro_models:
             pro_models.sort(key=lambda x: tuple(int(num) for num in re.findall(r'\d+', x)), reverse=True)
             latest = pro_models[0].replace("models/", "")
             print(f"Automatically selected Gemini Pro model: {latest}")
             return latest
-        
-        return "gemini-3.0-pro" 
+
+        return "gemini-3.0-pro"
     except Exception as e:
         print(f"Warning: Gemini model discovery failed, using fallback.")
         return "gemini-3.0-pro"
@@ -74,29 +74,32 @@ def get_latest_claude_model(client):
     try:
         models_page = client.models.list(limit=50)
         sonnet_models = [m.id for m in models_page.data if "sonnet" in m.id.lower()]
-        
+
         if sonnet_models:
             sonnet_models.sort(key=lambda x: tuple(int(num) for num in re.findall(r'\d+', x)), reverse=True)
             target = sonnet_models[0]
             print(f"Automatically selected Claude model: {target}")
             return target
-            
-        return "claude-sonnet-4-6" 
+
+        return "claude-sonnet-4-6"
     except Exception as e:
         print(f"Warning: Claude model discovery failed, using fallback.")
         return "claude-sonnet-4-6"
 
+# ✅ FIX: system 파라미터 추가 — Phase 2/4에서 날짜 및 역할 주입 가능
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10), retry_error_callback=return_none_on_error)
-def run_claude_chat(client, model, messages):
-    message = client.messages.create(model=model, max_tokens=8192, messages=messages)
+def run_claude_chat(client, model, messages, system=None):
+    kwargs = dict(model=model, max_tokens=8192, messages=messages)
+    if system:
+        kwargs["system"] = system
+    message = client.messages.create(**kwargs)
     return message.content[0].text
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=2, min=10, max=30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, prompt, output_file="research_result.md"):
     try:
         current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
-        
-        # ⭐️ 딥 리서치 에뮬레이터: 시스템 최상위 권한(System Instruction)으로 프롬프트의 Abort 로직을 강제 무력화
+
         sys_instruction = (
             f"You are a top-tier AI Tech & Business Analyst. "
             f"Current KST Time: {current_kst}. "
@@ -114,7 +117,7 @@ def run_grounded_research(client, model_id, prompt, output_file="research_result
             config=types.GenerateContentConfig(
                 system_instruction=sys_instruction,
                 tools=[types.Tool(google_search=types.GoogleSearch())],
-                temperature=0.4 # Snippet 기반의 RAG에서는 창의성을 약간 올려주어야 분석이 풍부해집니다.
+                temperature=0.4
             )
         )
         result_text = response.text
@@ -138,11 +141,11 @@ def main():
 
     g_client = genai.Client(api_key=g_api_key)
     g_model = get_latest_gemini_model(g_client)
-    
+
     c_client = anthropic.Anthropic(api_key=c_api_key, timeout=120.0) if c_api_key else None
     c_model = get_latest_claude_model(c_client) if c_client else None
 
-    # 원본 news.txt 로드 (수정 불필요)
+    # 원본 news.txt 로드
     url = args.url or os.getenv("PROMPT_URL")
     if url:
         prompt_content = fetch_prompt_from_github(url)
@@ -192,33 +195,57 @@ def main():
     print("\n--- Phase 1: Grounded Research ---")
     print(f"Starting Grounded Research (Model: {g_model})...")
     p1_start = time.time()
-    
+
     initial_result = run_grounded_research(g_client, g_model, prompt_content, args.output)
-    
+
     if not initial_result:
         print("❌ API 서버 과부하로 리서치 실패. 워크플로우를 즉시 종료합니다.")
         sys.exit(1)
-        
+
     p1_time = time.time() - p1_start
     print(f"✅ Phase 1 complete. Saved to {args.output} (Time: {p1_time:.2f}s)")
 
     # ---------------------------------------------------------
     # Phase 2: Claude Validation
+    # ✅ FIX: system prompt에 오늘 날짜를 명시적으로 주입
+    #         → Claude가 학습 데이터 기준 날짜(2024년 말)로 오판하여
+    #           Gemini 검색 결과(2026년 뉴스)를 "미래 가상 문서"로
+    #           잘못 판정하는 버그를 방지
     # ---------------------------------------------------------
     feedback = None
-    claude_messages = []
     if c_client:
         print("\n--- Phase 2: Claude Validation ---")
         print(f"Starting Claude action (Model: {c_model})...")
         p2_start = time.time()
-        
-        claude_messages = [{"role": "user", "content": f"다음 AI 뉴스 초안의 사실 관계와 KST 기준 시간 윈도우를 검증하십시오.\n\n[초안]\n{initial_result}"}]
-        feedback = run_claude_chat(c_client, c_model, claude_messages)
-        
+
+        current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
+
+        # ✅ Claude에게 현재 날짜와 역할을 system 레벨에서 명시
+        p2_system = (
+            f"Today's actual date and time is {current_kst}. "
+            f"You are a fact-checker for an AI infrastructure intelligence briefing. "
+            f"The draft was produced by a separate AI agent using real-time Google Search as of today. "
+            f"Therefore, all dates and events in the draft referencing {datetime.datetime.now().strftime('%Y')} "
+            f"are CURRENT, not future or fictional. "
+            f"Do NOT flag any {datetime.datetime.now().strftime('%Y')} dates as hypothetical or as future scenarios. "
+            f"Your task is to identify factual inaccuracies, unverifiable claims, hallucinated figures, "
+            f"and incorrect event/publication date attributions. "
+            f"Respond in Korean."
+        )
+
+        p2_messages = [{
+            "role": "user",
+            "content": (
+                f"다음 AI 뉴스 초안의 사실 관계와 KST 기준 시간 윈도우를 검증하십시오.\n\n"
+                f"[초안]\n{initial_result}"
+            )
+        }]
+
+        feedback = run_claude_chat(c_client, c_model, p2_messages, system=p2_system)
+
         if feedback:
-            claude_messages.append({"role": "assistant", "content": feedback})
             with open("trial/feedback.txt", "w", encoding="utf-8") as f: f.write(feedback)
-            
+
         p2_time = time.time() - p2_start
         print(f"✅ Phase 2 complete. Saved to trial/feedback.txt (Time: {p2_time:.2f}s)")
 
@@ -230,13 +257,13 @@ def main():
         print("\n--- Phase 3: Gemini Refinement ---")
         print(f"Starting Refinement (Model: {g_model})...")
         p3_start = time.time()
-        
+
         refine_prompt = (
             "위 피드백을 반영하여 최종본을 작성하십시오.\n"
             "1. 대화 내 정보만 활용\n2. 오류 항목 삭제 및 신규 항목 보충\n"
             "3. 모든 답변에서 인라인 수식 기호 절대 금지 (벡터는 굵은 글씨, 일반 변수는 일반 텍스트 표기)\n4. 기존 섹션 구조 유지"
         )
-        
+
         max_retries = 3
         for attempt in range(max_retries):
             try:
@@ -247,40 +274,62 @@ def main():
                     f"[Instruction]\n{refine_prompt}"
                 ]
                 response = g_client.models.generate_content(
-                    model=g_model, 
+                    model=g_model,
                     contents=contents,
                     config=types.GenerateContentConfig(temperature=0.1)
                 )
                 refined_result = response.text
                 with open("trial/2.txt", "w", encoding="utf-8") as f: f.write(refined_result)
-                
+
                 p3_time = time.time() - p3_start
                 print(f"✅ Phase 3 complete. Saved to trial/2.txt (Time: {p3_time:.2f}s)")
                 break
             except Exception as e:
                 print(f"⚠️ Phase 3 attempt {attempt + 1} failed: {e}")
-                if attempt < max_retries - 1: 
+                if attempt < max_retries - 1:
                     time.sleep(15)
-                else: 
+                else:
                     print("❌ All refinement attempts failed. Using initial result.")
                     p3_time = time.time() - p3_start
                     print(f"✅ Phase 3 finished with errors. (Time: {p3_time:.2f}s)")
 
     # ---------------------------------------------------------
     # Phase 4: Claude Translation
+    # ✅ FIX: 누적된 대화 이력(Phase 1 + Phase 2) 전달 제거
+    #         → 기존 코드는 claude_messages에 initial_result(Phase 1 전체)와
+    #           feedback(Phase 2 전체)을 모두 누적한 채 refined_result(Phase 3 전체)까지
+    #           추가하여 컨텍스트가 폭증, 6분 이상 처리 후 GitHub Actions 타임아웃 발생
+    #         → Phase 4 전용 단일 요청으로 교체: refined_result만 전달
     # ---------------------------------------------------------
     final_content = refined_result
     if c_client and feedback:
         print("\n--- Phase 4: Claude Translation ---")
         print(f"Starting Claude action (Model: {c_model})...")
         p4_start = time.time()
-        
-        claude_messages.append({
-            "role": "user", 
-            "content": f"다음은 피드백을 반영하여 생성된 수정된 최종본입니다. 이 내용을 바탕으로 기존 구조를 완벽히 유지한 최상의 비즈니스 영어 보고서로 번역하십시오.\n\n[수정된 최종본]\n{refined_result}"
-        })
-        final_content = run_claude_chat(c_client, c_model, claude_messages)
-        
+
+        current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
+
+        # ✅ Phase 4 전용 system prompt: 번역 역할과 날짜만 명시, 누적 대화 없음
+        p4_system = (
+            f"Today's actual date and time is {current_kst}. "
+            f"You are a professional technical translator specializing in AI infrastructure and business intelligence. "
+            f"Translate the provided Korean/mixed-language AI briefing into polished, executive-level business English. "
+            f"Rules: preserve all section headers, data tables, URLs, and numerical figures exactly as-is. "
+            f"Output only the translated report with no commentary, preamble, or explanatory notes."
+        )
+
+        # ✅ refined_result만 단독으로 전달 — 이전 Phase의 컨텍스트 일절 미포함
+        p4_messages = [{
+            "role": "user",
+            "content": (
+                f"Translate the following final AI infrastructure briefing into professional business English. "
+                f"Preserve all structure, section headers, metadata fields, and numerical data exactly.\n\n"
+                f"[FINAL DRAFT — {current_kst}]\n{refined_result}"
+            )
+        }]
+
+        final_content = run_claude_chat(c_client, c_model, p4_messages, system=p4_system)
+
         p4_time = time.time() - p4_start
         print(f"✅ Phase 4 complete. (Time: {p4_time:.2f}s)")
 
@@ -294,10 +343,10 @@ def main():
     # ---------------------------------------------------------
     print("\n--- Phase 5: HTML Generation ---")
     p5_start = time.time()
-    
+
     html_prompt_url = os.getenv("HTML_PROMPT_URL")
     html_prompt_content = ""
-    if html_prompt_url: 
+    if html_prompt_url:
         html_prompt_content = fetch_prompt_from_github(html_prompt_url)
     else:
         try:
@@ -313,28 +362,28 @@ def main():
         for attempt in range(max_html_retries):
             try:
                 response = g_client.models.generate_content(
-                    model=g_model, 
+                    model=g_model,
                     contents=[f"{html_prompt_content}\n\n{final_content}"]
                 )
                 html_code = response.text
-                
+
                 if "```html" in html_code:
                     html_code = html_code.split("```html")[1].split("```")[0].strip()
                 elif "```" in html_code:
                     html_code = html_code.split("```")[1].strip()
 
-                with open("index.html", "w", encoding="utf-8") as f: 
+                with open("index.html", "w", encoding="utf-8") as f:
                     f.write(html_code)
-                    
+
                 p5_time = time.time() - p5_start
                 print(f"✅ Phase 5 complete. Saved to index.html (Time: {p5_time:.2f}s)")
                 break
-                
+
             except Exception as e:
                 print(f"⚠️ Phase 5 attempt {attempt + 1} failed: {e}")
-                if attempt < max_html_retries - 1: 
+                if attempt < max_html_retries - 1:
                     time.sleep(15)
-                else: 
+                else:
                     print("❌ All HTML generation attempts failed.")
                     p5_time = time.time() - p5_start
                     print(f"✅ Phase 5 finished with errors. (Time: {p5_time:.2f}s)")
