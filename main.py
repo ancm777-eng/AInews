@@ -46,16 +46,10 @@ def get_recent_archives(days=7):
         return ""
 
 def get_latest_gemini_model(client):
-    """
-    미래 확장형 모델 탐색기:
-    모델명에서 숫자(버전)를 추출하여 가장 높은 숫자의 정식 Pro 버전을 자동으로 선택합니다.
-    (preview 등 불안정한 버전은 제외)
-    """
     try:
         models = client.models.list()
         all_names = [m.name for m in models]
         
-        # 불안정한 preview, exp 및 경량화(flash/nano) 버전 무조건 배제
         bad_keywords = ["flash", "nano", "vision", "latest", "customtools", "deep-research", 
                         "live", "tts", "embedding", "imagen", "aqa", "preview", "exp"]
         
@@ -66,10 +60,9 @@ def get_latest_gemini_model(client):
         ]
         
         if pro_models:
-            # 예: 'gemini-3.1-pro' -> (3, 1) 로 변환하여 내림차순 정렬 (가장 높은 숫자가 1등)
             pro_models.sort(key=lambda x: tuple(int(num) for num in re.findall(r'\d+', x)), reverse=True)
             latest = pro_models[0].replace("models/", "")
-            print(f"Automatically selected Gemini Pro model (by semantic version): {latest}")
+            print(f"Automatically selected Gemini Pro model: {latest}")
             return latest
         
         return "gemini-3.0-pro" # Fallback
@@ -78,19 +71,14 @@ def get_latest_gemini_model(client):
         return "gemini-3.0-pro"
 
 def get_latest_claude_model(client):
-    """
-    미래 확장형 모델 탐색기:
-    Claude 모델명에서 숫자를 추출하여 가장 높은 버전을 자동으로 선택합니다.
-    """
     try:
         models_page = client.models.list(limit=50)
         sonnet_models = [m.id for m in models_page.data if "sonnet" in m.id.lower()]
         
         if sonnet_models:
-            # 예: 'claude-sonnet-4-6' -> (4, 6) 로 변환하여 가장 높은 숫자가 1등으로 오게 정렬
             sonnet_models.sort(key=lambda x: tuple(int(num) for num in re.findall(r'\d+', x)), reverse=True)
             target = sonnet_models[0]
-            print(f"Automatically selected Claude model (by semantic version): {target}")
+            print(f"Automatically selected Claude model: {target}")
             return target
             
         return "claude-sonnet-4-6" # Fallback
@@ -104,18 +92,25 @@ def run_claude_chat(client, model, messages):
     message = client.messages.create(model=model, max_tokens=8192, messages=messages)
     return message.content[0].text
 
-@retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=2, min=10, max=30), retry_error_callback=return_none_on_error)
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=2, min=10, max=30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, prompt, output_file="research_result.md"):
     print(f"Starting Grounded Research (Model: {model_id})...")
     try:
-        chat = client.chats.create(model=model_id, config=types.GenerateContentConfig(tools=[types.Tool(google_search=types.GoogleSearch())], temperature=0.1))
-        response = chat.send_message(prompt)
+        # 채팅 세션(Chats) 대신 안정적인 단발성 요청(generate_content) 사용
+        response = client.models.generate_content(
+            model=model_id,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                tools=[types.Tool(google_search=types.GoogleSearch())],
+                temperature=0.1
+            )
+        )
         result_text = response.text
         if not result_text: return None
         os.makedirs(os.path.dirname(output_file), exist_ok=True) if os.path.dirname(output_file) else None
         with open(output_file, "w", encoding="utf-8") as f: f.write(result_text)
         print(f"Phase 1 complete. Saved to {output_file}")
-        return result_text, chat
+        return result_text
     except Exception as e:
         print(f"Error in Phase 1: {e}")
         raise e
@@ -130,12 +125,13 @@ def main():
     c_api_key = os.getenv("CLAUDE_API_KEY")
     if not g_api_key: sys.exit(1)
 
-    g_client = genai.Client(api_key=g_api_key, http_options={'timeout': 150.0})
+    # 네트워크 타임아웃 오류를 방지하기 위해 SDK 기본 설정에 온전히 맡김
+    g_client = genai.Client(api_key=g_api_key)
     g_model = get_latest_gemini_model(g_client)
+    
     c_client = anthropic.Anthropic(api_key=c_api_key, timeout=120.0) if c_api_key else None
     c_model = get_latest_claude_model(c_client) if c_client else None
 
-    # 프롬프트 로드
     url = args.url or os.getenv("PROMPT_URL")
     if url:
         prompt_content = fetch_prompt_from_github(url)
@@ -148,7 +144,6 @@ def main():
             except FileNotFoundError:
                 sys.exit(1)
 
-    # 파업 조항 정규식 청소
     prompt_content = re.sub(r"가장 먼저 다음 검색을.*?Briefing aborted\.", "", prompt_content, flags=re.DOTALL | re.IGNORECASE)
     prompt_content = prompt_content.replace("\"SYSTEM STATUS: Unable to confirm today's date. Briefing aborted.\"", "")
 
@@ -156,7 +151,6 @@ def main():
     if archive_text:
         prompt_content = archive_text + "\n" + prompt_content
 
-    # 명확한 오버라이드 지시 및 표기 규칙 주입
     current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
     override_instr = (
         f"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
@@ -168,27 +162,20 @@ def main():
     )
     prompt_content = prompt_content + override_instr
 
-    # ---------------------------------------------------------
-    # [신규 추가 로직] ref.txt 확인 및 멀티 타겟 프롬프트 주입
-    # ---------------------------------------------------------
     ref_content = ""
     ref_count = 0
     if os.path.exists("ref.txt"):
         try:
             with open("ref.txt", "r", encoding="utf-8") as f:
-                # 빈 줄을 제외하고 각 줄을 읽어 리스트로 만듭니다.
                 ref_lines = [line.strip() for line in f.readlines() if line.strip()]
                 if ref_lines:
-                    # AI가 읽기 쉽게 불릿 포인트 형태로 결합합니다.
                     ref_content = "\n".join(f"▶ {line}" for line in ref_lines)
                     ref_count = len(ref_lines)
         except Exception as e:
             print(f"Warning: Could not read ref.txt: {e}")
 
     if ref_content:
-        # 5개 중에 몇 개를 자율적으로 찾을지 계산합니다. (최소 0개)
         auto_count = max(0, 5 - ref_count)
-        
         ref_instr = (
             f"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             f"[🎯 MANDATORY TARGET NEWS (최우선 반영 지시)]\n"
@@ -203,14 +190,12 @@ def main():
         print(f"🎯 ref.txt에서 {ref_count}개의 타겟 주제를 확인하여 프롬프트에 주입했습니다.")
     else:
         print("ℹ️ ref.txt 파일이 없거나 비어있어 기본 탐색 모드로 진행합니다.")
-    # ---------------------------------------------------------
 
     # Phase 1: Grounded Research
-    research_output = run_grounded_research(g_client, g_model, prompt_content, args.output)
-    if not research_output:
+    initial_result = run_grounded_research(g_client, g_model, prompt_content, args.output)
+    if not initial_result:
         print("❌ API 서버 과부하로 리서치 실패. 워크플로우를 즉시 종료합니다.")
         sys.exit(1)
-    initial_result, gemini_chat = research_output
 
     # Phase 2: Claude Validation
     feedback = None
@@ -236,13 +221,24 @@ def main():
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                response = gemini_chat.send_message(refine_prompt)
+                # 상태 유지가 필요 없는 리스트 전송 방식으로 변경
+                contents = [
+                    f"[Original Prompt]\n{prompt_content}\n\n",
+                    f"[Initial Draft]\n{initial_result}\n\n",
+                    f"[Feedback to Apply]\n{feedback}\n\n",
+                    f"[Instruction]\n{refine_prompt}"
+                ]
+                response = g_client.models.generate_content(
+                    model=g_model, 
+                    contents=contents,
+                    config=types.GenerateContentConfig(temperature=0.1)
+                )
                 refined_result = response.text
                 with open("trial/2.txt", "w", encoding="utf-8") as f: f.write(refined_result)
                 print("✅ Refinement complete.")
                 break
             except Exception as e:
-                print(f"⚠️ Phase 3 attempt {attempt + 1} failed (Server Disconnected): {e}")
+                print(f"⚠️ Phase 3 attempt {attempt + 1} failed: {e}")
                 if attempt < max_retries - 1: time.sleep(15)
                 else: print("❌ All refinement attempts failed. Using initial result.")
 
@@ -279,13 +275,11 @@ def main():
                 response = g_client.models.generate_content(model=g_model, contents=[f"{html_prompt_content}\n\n{final_content}"])
                 html_code = response.text
                 
-                # Markdown 코드 블록(```html)이 섞여 나올 경우를 대비한 텍스트 정제 로직
                 if "```html" in html_code:
                     html_code = html_code.split("```html")[1].split("```")[0].strip()
                 elif "```" in html_code:
                     html_code = html_code.split("```")[1].strip()
 
-                # 최종 index.html 파일 저장
                 with open("index.html", "w", encoding="utf-8") as f: 
                     f.write(html_code)
                     
