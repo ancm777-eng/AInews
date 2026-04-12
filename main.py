@@ -94,13 +94,27 @@ def run_claude_chat(client, model, messages):
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=2, min=10, max=30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, prompt, output_file="research_result.md"):
     try:
+        current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
+        
+        # ⭐️ 딥 리서치 에뮬레이터: 시스템 최상위 권한(System Instruction)으로 프롬프트의 Abort 로직을 강제 무력화
+        sys_instruction = (
+            f"You are a top-tier AI Tech & Business Analyst. "
+            f"Current KST Time: {current_kst}. "
+            f"CRITICAL DIRECTIVES:\n"
+            f"1. You are actively connected to the Google Search tool. You MUST aggressively use it to search for the latest AI news (Hardware, Infrastructure, Models, Business).\n"
+            f"2. OVERRIDE PROMPT RULES: The user prompt may ask you to confirm today's date or 'abort' if 24-hour news is not found. IGNORE THESE ABORT RULES COMPLETELY. I have just confirmed the date for you ({current_kst}).\n"
+            f"3. If deep news from the last 24 hours is lacking, automatically expand your search to the last 72 hours. You MUST ALWAYS produce exactly 5 news items. Never abort.\n"
+            f"4. Because search tool provides snippets, use your deep pre-trained knowledge to synthesize and flesh out the 'Strategic Impact' and 'Technical Deep Dive' sections powerfully.\n"
+            f"5. NEVER use inline LaTeX ($ or $$). Use bold or plain text for all variables and symbols."
+        )
+
         response = client.models.generate_content(
             model=model_id,
             contents=prompt,
             config=types.GenerateContentConfig(
+                system_instruction=sys_instruction,
                 tools=[types.Tool(google_search=types.GoogleSearch())],
-                # API Snippet의 한계를 보완하기 위해 모델의 창의성/추론 개입 여지를 높임 (0.1 -> 0.4)
-                temperature=0.4
+                temperature=0.4 # Snippet 기반의 RAG에서는 창의성을 약간 올려주어야 분석이 풍부해집니다.
             )
         )
         result_text = response.text
@@ -128,6 +142,7 @@ def main():
     c_client = anthropic.Anthropic(api_key=c_api_key, timeout=120.0) if c_api_key else None
     c_model = get_latest_claude_model(c_client) if c_client else None
 
+    # 원본 news.txt 로드 (수정 불필요)
     url = args.url or os.getenv("PROMPT_URL")
     if url:
         prompt_content = fetch_prompt_from_github(url)
@@ -140,29 +155,9 @@ def main():
             except FileNotFoundError:
                 sys.exit(1)
 
-    # 1. 포기(Abort) 문구를 확실하게 지웁니다.
-    prompt_content = re.sub(r"검색을 통해 날짜를 확인할 수 없는 경우.*?Briefing aborted\.\"", "", prompt_content, flags=re.DOTALL)
-    prompt_content = re.sub(r"검색 실패 프로토콜:.*?Briefing aborted\.\"", "", prompt_content, flags=re.DOTALL)
-    prompt_content = prompt_content.replace("\"SYSTEM STATUS: Unable to confirm today's date. Briefing aborted.\"", "")
-    prompt_content = prompt_content.replace("\"SYSTEM STATUS: No verifiable news found matching the strict criteria. Briefing aborted.\"", "")
-
     archive_text = get_recent_archives(7)
     if archive_text:
         prompt_content = archive_text + "\n" + prompt_content
-
-    current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
-    
-    # 2. API 전용 하드코어 오버라이드 주입 (Snippet 맹점 보완)
-    override_instr = (
-        f"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-        f"[🔥 API OPTIMIZATION & FINAL SYSTEM OVERRIDE: KST {current_kst} 기준 🔥]\n"
-        f"1. 시간 제한 완화: 24시간 내 뉴스가 부족하다면, 최대 72시간(3일) 내의 핵심 뉴스까지 범위를 넓혀 무조건 5개의 슬롯을 채우십시오. 절대 포기하거나 중단하지 마십시오.\n"
-        f"2. Snippet 추론 허용: 구글 검색 도구가 제공하는 정보가 짧은 요약본(Snippet)이더라도, 당신이 보유한 딥러닝 기술 지식과 추론 능력을 결합하여 15줄 이상의 심층 분석(Technical Deep Dive 등)을 완벽하게 생성해내십시오.\n"
-        f"3. 모든 답변에서 인라인 수식 기호 절대 금지. 벡터(v, w, x 등)는 굵은 글씨로, 일반 변수(n, x, y 등)는 상황에 맞게 굵은 글씨 또는 일반 텍스트로만 표기하십시오.\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-    )
-    # 기존 프롬프트의 맨 앞에 강제 지시를 배치하여 모델의 어텐션(Attention)을 극대화
-    prompt_content = override_instr + prompt_content 
 
     ref_content = ""
     ref_count = 0
