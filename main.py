@@ -142,7 +142,8 @@ def main():
     g_client = genai.Client(api_key=g_api_key)
     g_model = get_latest_gemini_model(g_client)
 
-    c_client = anthropic.Anthropic(api_key=c_api_key, timeout=120.0) if c_api_key else None
+    # ✅ FIX: Anthropic 내부 max_retries를 0으로 설정하여 tenacity와 중첩되어 엄청난 타임아웃(18분)이 발생하는 것을 방지
+    c_client = anthropic.Anthropic(api_key=c_api_key, timeout=120.0, max_retries=0) if c_api_key else None
     c_model = get_latest_claude_model(c_client) if c_client else None
 
     # 원본 news.txt 로드
