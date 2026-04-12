@@ -295,11 +295,6 @@ def main():
 
     # ---------------------------------------------------------
     # Phase 4: Claude Translation
-    # ✅ FIX: 누적된 대화 이력(Phase 1 + Phase 2) 전달 제거
-    #         → 기존 코드는 claude_messages에 initial_result(Phase 1 전체)와
-    #           feedback(Phase 2 전체)을 모두 누적한 채 refined_result(Phase 3 전체)까지
-    #           추가하여 컨텍스트가 폭증, 6분 이상 처리 후 GitHub Actions 타임아웃 발생
-    #         → Phase 4 전용 단일 요청으로 교체: refined_result만 전달
     # ---------------------------------------------------------
     final_content = refined_result
     if c_client and feedback:
@@ -309,26 +304,33 @@ def main():
 
         current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
 
-        # ✅ Phase 4 전용 system prompt: 번역 역할과 날짜만 명시, 누적 대화 없음
+        # ✅ FIX: Claude에게 현재 문서가 본인(Claude)의 Phase 2 피드백을 바탕으로 수정/보완된 최종본임을 명시
         p4_system = (
             f"Today's actual date and time is {current_kst}. "
             f"You are a professional technical translator specializing in AI infrastructure and business intelligence. "
-            f"Translate the provided Korean/mixed-language AI briefing into polished, executive-level business English. "
+            f"Context: The text provided has already been heavily refined and corrected based on the QA feedback you provided earlier. "
+            f"Your current task is STRICTLY to translate this finalized Korean/mixed-language AI briefing into polished, executive-level business English. "
             f"Rules: preserve all section headers, data tables, URLs, and numerical figures exactly as-is. "
             f"Output only the translated report with no commentary, preamble, or explanatory notes."
         )
 
-        # ✅ refined_result만 단독으로 전달 — 이전 Phase의 컨텍스트 일절 미포함
         p4_messages = [{
             "role": "user",
             "content": (
-                f"Translate the following final AI infrastructure briefing into professional business English. "
+                f"This is the final draft that has been successfully updated and corrected based on your previous QA feedback. "
+                f"Please translate the following final AI infrastructure briefing into professional business English. "
                 f"Preserve all structure, section headers, metadata fields, and numerical data exactly.\n\n"
-                f"[FINAL DRAFT — {current_kst}]\n{refined_result}"
+                f"[FINAL DRAFT (Refined based on your QA) — {current_kst}]\n{refined_result}"
             )
         }]
 
-        final_content = run_claude_chat(c_client, c_model, p4_messages, system=p4_system)
+        translated = run_claude_chat(c_client, c_model, p4_messages, system=p4_system)
+        
+        # ✅ FIX: Claude가 타임아웃 등으로 인해 None을 리턴했을 때 스크립트가 죽지 않게 예외 처리
+        if translated:
+            final_content = translated
+        else:
+            print("⚠️ Claude translation timed out or failed. Falling back to Phase 3 Gemini result.")
 
         p4_time = time.time() - p4_start
         print(f"✅ Phase 4 complete. (Time: {p4_time:.2f}s)")
@@ -336,7 +338,13 @@ def main():
     # 데이터 저장
     today_str = datetime.datetime.now().strftime("%Y-%m-%d")
     os.makedirs("data", exist_ok=True)
-    with open(f"data/{today_str}.txt", "w", encoding="utf-8") as f: f.write(final_content)
+    
+    # ✅ FIX: final_content가 반드시 문자열(Str)인지 최종 보장
+    if not final_content:
+        final_content = refined_result or initial_result
+        
+    with open(f"data/{today_str}.txt", "w", encoding="utf-8") as f: 
+        f.write(final_content)
 
     # ---------------------------------------------------------
     # Phase 5: HTML Generation
