@@ -86,14 +86,19 @@ def get_latest_claude_model(client):
         print(f"Warning: Claude model discovery failed, using fallback.")
         return "claude-sonnet-4-6"
 
-# ✅ FIX: system 파라미터 추가 — Phase 2/4에서 날짜 및 역할 주입 가능
+# ✅ [내 Fix] system 파라미터 + web_search 옵션 유지
+# ✅ [내 Fix] web_search 사용 시 multi-block 응답에서 text만 추출하도록 처리
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10), retry_error_callback=return_none_on_error)
-def run_claude_chat(client, model, messages, system=None):
+def run_claude_chat(client, model, messages, system=None, use_web_search=False):
     kwargs = dict(model=model, max_tokens=8192, messages=messages)
     if system:
         kwargs["system"] = system
+    if use_web_search:
+        kwargs["tools"] = [{"type": "web_search_20250305", "name": "web_search"}]
     message = client.messages.create(**kwargs)
-    return message.content[0].text
+    # web_search 사용 시 tool_use 블록이 섞이므로 text 블록만 추출
+    text_blocks = [b.text for b in message.content if hasattr(b, "text")]
+    return "\n".join(text_blocks) if text_blocks else None
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=2, min=10, max=30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, prompt, output_file="research_result.md"):
@@ -142,26 +147,29 @@ def main():
     g_client = genai.Client(api_key=g_api_key)
     g_model = get_latest_gemini_model(g_client)
 
-    # ✅ FIX: Anthropic 내부 max_retries를 0으로 설정하여 tenacity와 중첩되어 엄청난 타임아웃(18분)이 발생하는 것을 방지
+    # ✅ [원본 Fix] max_retries=0: tenacity와 중첩 타임아웃(18분) 방지
     c_client = anthropic.Anthropic(api_key=c_api_key, timeout=120.0, max_retries=0) if c_api_key else None
     c_model = get_latest_claude_model(c_client) if c_client else None
 
-    # 원본 news.txt 로드
+    # ✅ [Gemini Fix] base_prompt와 phase1_prompt 분리
+    # base_prompt_content: 순수 규칙/지시만 포함 → Phase 3/4에 전달
+    # phase1_prompt_content: 아카이브 포함 → Phase 1에만 전달
     url = args.url or os.getenv("PROMPT_URL")
+    base_prompt_content = ""
     if url:
-        prompt_content = fetch_prompt_from_github(url)
+        base_prompt_content = fetch_prompt_from_github(url)
     else:
         try:
-            with open("prompt/news.txt", "r", encoding="utf-8") as f: prompt_content = f.read()
+            with open("prompt/news.txt", "r", encoding="utf-8") as f: base_prompt_content = f.read()
         except FileNotFoundError:
             try:
-                with open("news.txt", "r", encoding="utf-8") as f: prompt_content = f.read()
+                with open("news.txt", "r", encoding="utf-8") as f: base_prompt_content = f.read()
             except FileNotFoundError:
                 sys.exit(1)
 
     archive_text = get_recent_archives(7)
-    if archive_text:
-        prompt_content = archive_text + "\n" + prompt_content
+    # Phase 1 전용: 중복 방지 아카이브 포함
+    phase1_prompt_content = (archive_text + "\n" + base_prompt_content) if archive_text else base_prompt_content
 
     ref_content = ""
     ref_count = 0
@@ -185,7 +193,8 @@ def main():
             f"지시사항: 최종 5개의 주요 뉴스 중, 위 요청된 {ref_count}개의 주제를 빠짐없이 포함하고 나머지 {auto_count}개는 직접 발굴하십시오.\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
         )
-        prompt_content += ref_instr
+        phase1_prompt_content += ref_instr
+        base_prompt_content += ref_instr  # ref는 Phase 3용 base에도 포함
         print(f"🎯 ref.txt에서 {ref_count}개의 타겟 주제를 확인하여 프롬프트에 주입했습니다.")
     else:
         print("ℹ️ ref.txt 파일이 없거나 비어있어 기본 탐색 모드로 진행합니다.")
@@ -197,10 +206,11 @@ def main():
     print(f"Starting Grounded Research (Model: {g_model})...")
     p1_start = time.time()
 
-    initial_result = run_grounded_research(g_client, g_model, prompt_content, args.output)
+    # Phase 1은 아카이브가 포함된 phase1_prompt_content 사용
+    initial_result = run_grounded_research(g_client, g_model, phase1_prompt_content, args.output)
 
     if not initial_result:
-        print("❌ API 서버 과부하로 리서치 실패. 워크플로우를 즉시 종료합니다.")
+        print("❌ Phase 1 failed. Exiting.")
         sys.exit(1)
 
     p1_time = time.time() - p1_start
@@ -208,12 +218,12 @@ def main():
 
     # ---------------------------------------------------------
     # Phase 2: Claude Validation
-    # ✅ FIX: system prompt에 오늘 날짜를 명시적으로 주입
-    #         → Claude가 학습 데이터 기준 날짜(2024년 말)로 오판하여
-    #           Gemini 검색 결과(2026년 뉴스)를 "미래 가상 문서"로
-    #           잘못 판정하는 버그를 방지
+    # ✅ [내 Fix] use_web_search=True: 실시간 검색으로 2026년 신규 사건 검증 가능
+    # ✅ [Gemini Fix] guardrail 프롬프트: 설령 웹 검색 결과가 없더라도 단정적 삭제 지시 방지
+    # ✅ [원본 Fix] system 파라미터로 날짜/역할 주입
     # ---------------------------------------------------------
     feedback = None
+    claude_messages = []
     if c_client:
         print("\n--- Phase 2: Claude Validation ---")
         print(f"Starting Claude action (Model: {c_model})...")
@@ -221,30 +231,39 @@ def main():
 
         current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
 
-        # ✅ Claude에게 현재 날짜와 역할을 system 레벨에서 명시
         p2_system = (
             f"Today's actual date and time is {current_kst}. "
             f"You are a fact-checker for an AI infrastructure intelligence briefing. "
             f"The draft was produced by a separate AI agent using real-time Google Search as of today. "
             f"Therefore, all dates and events in the draft referencing {datetime.datetime.now().strftime('%Y')} "
             f"are CURRENT, not future or fictional. "
-            f"Do NOT flag any {datetime.datetime.now().strftime('%Y')} dates as hypothetical or as future scenarios. "
-            f"Your task is to identify factual inaccuracies, unverifiable claims, hallucinated figures, "
-            f"and incorrect event/publication date attributions. "
+            f"Do NOT flag any {datetime.datetime.now().strftime('%Y')} dates as hypothetical or future scenarios. "
+            f"You have access to the web_search tool — use it aggressively to verify company names, "
+            f"product specs, statistics, and URLs before forming any judgment. "
+            f"Only flag an item as an error after attempting a web search and finding a clear contradiction. "
             f"Respond in Korean."
         )
 
-        p2_messages = [{
-            "role": "user",
-            "content": (
-                f"다음 AI 뉴스 초안의 사실 관계와 KST 기준 시간 윈도우를 검증하십시오.\n\n"
-                f"[초안]\n{initial_result}"
-            )
-        }]
+        # ✅ [Gemini Fix] guardrail: 웹 검색으로 확인 안 되는 항목을 환각으로 단정하지 말도록 명시
+        p2_user_prompt = (
+            f"다음 AI 뉴스 초안의 사실 관계와 KST 기준 시간 윈도우를 검증하십시오.\n\n"
+            f"[검증 지침]\n"
+            f"- web_search 툴을 적극 사용하여 각 항목의 기업명, 제품명, 통계 수치, URL을 검색 후 판단하십시오.\n"
+            f"- 검색 결과가 없다는 이유만으로 '환각(Hallucination)'이라고 단정하지 마십시오. "
+            f"검색으로 명확한 반증을 찾았을 때만 오류로 지적하십시오.\n"
+            f"- 오류가 없는 항목은 논리의 비약, 전략적 분석의 깊이 부족, 아키텍처 설명의 모호함, "
+            f"양식 누락 등 품질 관점에서 건설적인 보완을 제안하십시오.\n\n"
+            f"[초안]\n{initial_result}"
+        )
 
-        feedback = run_claude_chat(c_client, c_model, p2_messages, system=p2_system)
+        claude_messages = [{"role": "user", "content": p2_user_prompt}]
+
+        # ✅ [내 Fix] use_web_search=True로 Claude가 직접 실시간 검색 수행
+        feedback = run_claude_chat(c_client, c_model, claude_messages,
+                                   system=p2_system, use_web_search=True)
 
         if feedback:
+            claude_messages.append({"role": "assistant", "content": feedback})
             with open("trial/feedback.txt", "w", encoding="utf-8") as f: f.write(feedback)
 
         p2_time = time.time() - p2_start
@@ -252,6 +271,8 @@ def main():
 
     # ---------------------------------------------------------
     # Phase 3: Gemini Refinement
+    # ✅ [Gemini Fix] base_prompt_content 사용: 아카이브 제거로 어제 기사 복사 방지
+    # ✅ [두 Fix 합산] refine_prompt: 삭제 지시에도 항목 유지 + 지적된 부분만 수정
     # ---------------------------------------------------------
     refined_result = initial_result
     if feedback:
@@ -260,16 +281,20 @@ def main():
         p3_start = time.time()
 
         refine_prompt = (
-            "위 피드백을 반영하여 최종본을 작성하십시오.\n"
-            "1. 대화 내 정보만 활용\n2. 오류 항목 삭제 및 신규 항목 보충\n"
-            "3. 모든 답변에서 인라인 수식 기호 절대 금지 (벡터는 굵은 글씨, 일반 변수는 일반 텍스트 표기)\n4. 기존 섹션 구조 유지"
+            "위 피드백을 반영하여 [Initial Draft]를 다듬어 최종본을 작성하십시오.\n"
+            "1. [Initial Draft]의 5개 뉴스 항목 구조를 기본으로 유지할 것. "
+            "피드백이 특정 항목을 삭제하라고 하더라도, 완전히 제거하지 말고 해당 오류 부분만 수정·보강하여 유지하십시오.\n"
+            "2. 피드백에서 지적되지 않은 항목은 원문 그대로 유지하십시오. 불필요한 재작성을 금지합니다.\n"
+            "3. 인라인 수식 기호($ 또는 $$) 절대 사용 금지. 벡터는 굵은 글씨, 변수는 일반 텍스트.\n"
+            "4. 기존 섹션 구조(Overview, Strategic Impact, Technical Deep Dive 등)를 정확히 유지하십시오."
         )
 
         max_retries = 3
         for attempt in range(max_retries):
             try:
+                # ✅ [Gemini Fix] base_prompt_content: 아카이브 없는 순수 규칙만 전달
                 contents = [
-                    f"[Original Prompt]\n{prompt_content}\n\n",
+                    f"[Original Rules]\n{base_prompt_content}\n\n",
                     f"[Initial Draft]\n{initial_result}\n\n",
                     f"[Feedback to Apply]\n{feedback}\n\n",
                     f"[Instruction]\n{refine_prompt}"
@@ -296,6 +321,9 @@ def main():
 
     # ---------------------------------------------------------
     # Phase 4: Claude Translation
+    # ✅ [Gemini Fix] multi-turn 히스토리: Claude가 자신의 Phase 2 피드백 맥락을 유지한 채 번역
+    # ✅ [원본 Fix] system 파라미터로 번역 역할 명시
+    # ✅ [원본 Fix] translated가 None이면 refined_result로 fallback
     # ---------------------------------------------------------
     final_content = refined_result
     if c_client and feedback:
@@ -305,17 +333,17 @@ def main():
 
         current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
 
-        # ✅ FIX: Claude에게 현재 문서가 본인(Claude)의 Phase 2 피드백을 바탕으로 수정/보완된 최종본임을 명시
         p4_system = (
             f"Today's actual date and time is {current_kst}. "
             f"You are a professional technical translator specializing in AI infrastructure and business intelligence. "
-            f"Context: The text provided has already been heavily refined and corrected based on the QA feedback you provided earlier. "
-            f"Your current task is STRICTLY to translate this finalized Korean/mixed-language AI briefing into polished, executive-level business English. "
+            f"Context: The text provided has already been refined and corrected based on the QA feedback you provided earlier. "
+            f"Your current task is STRICTLY to translate this finalized AI briefing into polished, executive-level business English. "
             f"Rules: preserve all section headers, data tables, URLs, and numerical figures exactly as-is. "
             f"Output only the translated report with no commentary, preamble, or explanatory notes."
         )
 
-        p4_messages = [{
+        # ✅ [Gemini Fix] Phase 2 대화 히스토리에 이어서 append → Claude가 자신의 이전 피드백을 인지한 채 번역
+        claude_messages.append({
             "role": "user",
             "content": (
                 f"This is the final draft that has been successfully updated and corrected based on your previous QA feedback. "
@@ -323,11 +351,11 @@ def main():
                 f"Preserve all structure, section headers, metadata fields, and numerical data exactly.\n\n"
                 f"[FINAL DRAFT (Refined based on your QA) — {current_kst}]\n{refined_result}"
             )
-        }]
+        })
 
-        translated = run_claude_chat(c_client, c_model, p4_messages, system=p4_system)
-        
-        # ✅ FIX: Claude가 타임아웃 등으로 인해 None을 리턴했을 때 스크립트가 죽지 않게 예외 처리
+        translated = run_claude_chat(c_client, c_model, claude_messages, system=p4_system)
+
+        # ✅ [원본 Fix] None 리턴 시 refined_result로 fallback
         if translated:
             final_content = translated
         else:
@@ -339,12 +367,12 @@ def main():
     # 데이터 저장
     today_str = datetime.datetime.now().strftime("%Y-%m-%d")
     os.makedirs("data", exist_ok=True)
-    
-    # ✅ FIX: final_content가 반드시 문자열(Str)인지 최종 보장
+
+    # ✅ [원본 Fix] final_content가 None/빈 값일 경우 최종 안전망
     if not final_content:
         final_content = refined_result or initial_result
-        
-    with open(f"data/{today_str}.txt", "w", encoding="utf-8") as f: 
+
+    with open(f"data/{today_str}.txt", "w", encoding="utf-8") as f:
         f.write(final_content)
 
     # ---------------------------------------------------------
