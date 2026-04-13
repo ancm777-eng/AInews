@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -23,47 +22,123 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
+        /* ── CSS Variables for Theming ── */
         :root {
-            /* Light Theme */
-            --bg-color: #f8fafc;
+            --bg-color: #f8f9fa;
             --surface-color: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --border-color: #e2e8f0;
-            --header-bg: #1e293b;
+            --text-main: #1a1a1a;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --header-bg: rgba(255, 255, 255, 0.95);
             
-            /* Thematic Colors for Articles */
-            --c1: #2563eb; --lc1: #eff6ff; /* Blue */
-            --c2: #059669; --lc2: #ecfdf5; /* Green */
-            --c3: #d97706; --lc3: #fffbeb; /* Amber */
-            --c4: #7c3aed; --lc4: #f5f3ff; /* Purple */
-            --c5: #dc2626; --lc5: #fef2f2; /* Red */
+            --c1: #2563eb; --lc1: #eff6ff;
+            --c2: #ea580c; --lc2: #fff7ed;
+            --c3: #059669; --lc3: #ecfdf5;
+            --c4: #7c3aed; --lc4: #f5f3ff;
+            --c5: #dc2626; --lc5: #fef2f2;
         }
 
         [data-theme="dark"] {
-            --bg-color: #0f172a;
-            --surface-color: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --border-color: #334155;
-            --header-bg: #020617;
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+            --header-bg: rgba(30, 30, 30, 0.95);
             
-            --lc1: rgba(37, 99, 235, 0.1);
-            --lc2: rgba(5, 150, 105, 0.1);
-            --lc3: rgba(217, 119, 6, 0.1);
-            --lc4: rgba(124, 58, 237, 0.1);
-            --lc5: rgba(220, 38, 38, 0.1);
+            --c1: #60a5fa; --lc1: rgba(37, 99, 235, 0.15);
+            --c2: #fb923c; --lc2: rgba(234, 88, 12, 0.15);
+            --c3: #34d399; --lc3: rgba(5, 150, 105, 0.15);
+            --c4: #a78bfa; --lc4: rgba(124, 58, 237, 0.15);
+            --c5: #f87171; --lc5: rgba(220, 38, 38, 0.15);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-primary); line-height: 1.7; transition: background-color 0.3s, color 0.3s; }
-        
-        .top-bar { display: flex; justify-content: space-between; align-items: center; background-color: var(--header-bg); padding: 1rem 2rem; color: #fff; }
-        .top-bar h1 { font-size: 1.25rem; font-weight: 600; letter-spacing: 0.5px; }
-        .theme-toggle-btn { background: #334155; color: #fff; border: 1px solid #475569; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
-        .theme-toggle-btn:hover { background: #475569; }
+        /* ── Base Styles ── */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        h1, h2, h3, h4 {
+            color: var(--text-main);
+            margin-top: 0;
+        }
+
+        /* ── Top Navigation & Actions ── */
+        header {
+            background-color: var(--header-bg);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-top h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        #theme-toggle {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        #theme-toggle:hover {
+            filter: brightness(0.95);
+        }
+
+        .toc {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .toc::-webkit-scrollbar { height: 4px; }
+        .toc::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
+        .toc a {
+            text-decoration: none;
+            color: var(--text-main);
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .toc a:hover {
+            background: var(--border-color);
+        }
 
         /* ── PC 가독성: 본문 최대 너비 제한 ── */
         .container, main, .article, section {
@@ -72,76 +147,262 @@
             margin-right: auto;
         }
 
-        main { margin: 2rem auto; padding: 0 1.5rem; }
-        .report-header { text-align: center; margin-bottom: 3rem; }
-        .report-header h2 { font-size: 2.25rem; margin-bottom: 0.5rem; }
-        .report-header p { color: var(--text-secondary); font-size: 1.1rem; }
+        main {
+            padding: 40px 20px;
+        }
 
-        /* TOC Styles */
-        .toc { display: flex; justify-content: center; gap: 10px; margin: 0 auto 3rem; max-width: 900px; flex-wrap: wrap; }
-        .toc a { background: var(--surface-color); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; text-decoration: none; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 500; transition: background 0.2s; white-space: nowrap; }
-        .toc a:hover { background: var(--border-color); }
+        /* ── Article Layout ── */
+        .article {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
 
-        .article { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 2.5rem; margin-bottom: 3rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .article-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 2rem; }
-        .metadata { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
-        .metadata span { background: var(--border-color); padding: 0.25rem 0.75rem; border-radius: 20px; color: var(--text-primary); }
+        .article-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            line-height: 1.3;
+        }
 
-        .subsec { margin-bottom: 2.5rem; }
-        .subsec-header { display: flex; align-items: center; margin-bottom: 1rem; gap: 0.75rem; }
-        .subsec-icon { font-size: 1.5rem; }
-        .subsec-label { font-size: 1.25rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .subsec-tag { font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600; }
-
-        .cN.c1 { color: var(--c1); } .lcN.c1 { background-color: var(--lc1); color: var(--c1); border-color: var(--c1); }
-        .cN.c2 { color: var(--c2); } .lcN.c2 { background-color: var(--lc2); color: var(--c2); border-color: var(--c2); }
-        .cN.c3 { color: var(--c3); } .lcN.c3 { background-color: var(--lc3); color: var(--c3); border-color: var(--c3); }
-        .cN.c4 { color: var(--c4); } .lcN.c4 { background-color: var(--lc4); color: var(--c4); border-color: var(--c4); }
-        .cN.c5 { color: var(--c5); } .lcN.c5 { background-color: var(--lc5); color: var(--c5); border-color: var(--c5); }
-
-        .lead-text { font-size: 1.1rem; font-weight: 500; color: var(--text-primary); margin-bottom: 1rem; }
-        .body-text { color: var(--text-secondary); margin-bottom: 1rem; text-align: justify; }
-
-        .impact-box { padding: 1.5rem; border-radius: 0 8px 8px 0; margin-bottom: 1.5rem; }
-        .impact-list { margin-left: 1.5rem; color: var(--text-secondary); }
-        .impact-list li { margin-bottom: 0.5rem; }
+        .subsec {
+            margin-bottom: 32px;
+        }
         
-        .metric-row { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-        .metric-card { flex: 1; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; text-align: center; }
-        .metric-card h4 { font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.5rem; }
-        .metric-card .value { font-size: 2rem; font-weight: 700; color: var(--text-primary); }
+        .subsec:last-child {
+            margin-bottom: 0;
+        }
 
-        .arch-grid { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-        .arch-chip { flex: 1; min-width: 200px; background: var(--bg-color); border-radius: 6px; padding: 1rem; border: 1px dashed var(--border-color); }
-        .arch-chip strong { display: block; margin-bottom: 0.25rem; }
+        .subsec-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            font-size: 1.15rem;
+        }
+
+        .subsec-icon { font-size: 1.3rem; }
         
-        .table-scroll-wrap { width: 100%; overflow-x: auto; margin-top: 1.5rem; }
-        .info-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .info-table th, .info-table td { padding: 1rem; border: 1px solid var(--border-color); text-align: left; }
-        .info-table th { background-color: var(--bg-color); font-weight: 600; }
+        .subsec-tag {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-left: auto;
+        }
 
-        .chart-wrap { margin-top: 2rem; padding: 1rem; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; }
+        /* Color classes for text and background */
+        .c1 { color: var(--c1); } .lc1 { background-color: var(--lc1); }
+        .c2 { color: var(--c2); } .lc2 { background-color: var(--lc2); }
+        .c3 { color: var(--c3); } .lc3 { background-color: var(--lc3); }
+        .c4 { color: var(--c4); } .lc4 { background-color: var(--lc4); }
+        .c5 { color: var(--c5); } .lc5 { background-color: var(--lc5); }
 
-        .flow-row { display: flex; align-items: center; justify-content: space-between; background: var(--bg-color); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); gap: 1rem; }
-        .flow-step { flex: 1; text-align: center; padding: 1rem; background: var(--surface-color); border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 0.9rem; }
-        .flow-arrow { font-size: 1.5rem; color: var(--text-secondary); }
+        .lead-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
 
-        .sentiment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-        .sentiment-card { background: var(--bg-color); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); }
-        .sentiment-card .emoji { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
-        .sentiment-card .label { font-weight: 600; margin-bottom: 0.25rem; display: block; }
-        .sentiment-card .desc { font-size: 0.85rem; color: var(--text-secondary); }
+        .body-text, p {
+            color: var(--text-main);
+            opacity: 0.9;
+        }
 
-        .synthesis { background: var(--header-bg); color: #f8fafc; padding: 3rem; border-radius: 12px; margin-top: 4rem; margin-bottom: 4rem; }
-        .synthesis h2 { font-size: 2rem; margin-bottom: 2rem; border-bottom: 1px solid #334155; padding-bottom: 1rem; }
-        .syn-block { margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.8; color: #cbd5e1; }
-        .outlook-box { background: #0f172a; border-left: 4px solid #38bdf8; padding: 2rem; border-radius: 0 8px 8px 0; margin-top: 3rem; }
-        .outlook-box h3 { margin-bottom: 1rem; color: #e2e8f0; }
-        .outlook-item { margin-bottom: 1rem; font-size: 0.95rem; color: #94a3b8; }
-        .outlook-item strong { color: #38bdf8; }
+        /* ── Strategic Impact ── */
+        .impact-box {
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+        }
 
-        #to-top { position: fixed; bottom: 30px; right: 30px; background: var(--c1); color: #fff; border: none; border-radius: 8px; padding: 12px 20px; font-size: 1rem; font-weight: 600; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; transition: background 0.3s, transform 0.2s; }
-        #to-top:hover { background: #1d4ed8; transform: translateY(-2px); }
+        .impact-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .impact-list li {
+            margin-bottom: 12px;
+        }
+
+        .metric-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* ── Technical Deep Dive ── */
+        .arch-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .arch-chip {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .table-scroll-wrap {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .info-table th, .info-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .info-table th {
+            background-color: var(--bg-color);
+            font-weight: 600;
+        }
+
+        .info-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .chart-wrap {
+            margin-top: 24px;
+            padding: 16px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        /* ── Evolution & Timeline ── */
+        .flow-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 8px 0;
+        }
+
+        .flow-step {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .flow-arrow {
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        /* ── Community Sentiment ── */
+        .sentiment-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .sentiment-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sentiment-emoji { font-size: 1.5rem; }
+        .sentiment-label { font-weight: 700; font-size: 0.95rem; }
+        .sentiment-desc { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* ── Closing Synthesis ── */
+        .synthesis {
+            background: var(--surface-color);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 60px;
+        }
+
+        .synthesis h2 {
+            font-size: 1.75rem;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .syn-block {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .syn-num {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--border-color);
+            min-width: 40px;
+        }
+
+        .outlook-box {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 24px;
+            margin-top: 32px;
+            border-left: 4px solid var(--text-main);
+        }
+
+        .outlook-item {
+            margin-bottom: 16px;
+        }
+        
+        .outlook-item:last-child { margin-bottom: 0; }
+
+        /* ── Back to Top ── */
+        #to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--text-main);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 24px;
+            padding: 10px 20px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        #to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
 
         /* 📱 모바일 반응형 강제 적용 (768px 이하) — 이 코드를 반드시 마지막에 포함할 것 */
         @media screen and (max-width: 768px) {
@@ -234,7 +495,6 @@
                 gap: 8px !important;
                 padding: 8px 16px !important;
                 -webkit-overflow-scrolling: touch !important;
-                justify-content: flex-start;
             }
 
             .toc a {
@@ -252,432 +512,401 @@
 </head>
 <body>
 
-    <div class="top-bar">
-        <h1>McKinsey/BCG Strat-Tech Group</h1>
-        <button id="theme-toggle" class="theme-toggle-btn">🌙 다크모드로</button>
-    </div>
-
-    <main>
-        <div class="report-header">
-            <h2>Strategic Intelligence Report</h2>
-            <p>Global Artificial Intelligence Ecosystem and Structural Paradigm Shifts | Assessment Date: April 12, 2026</p>
+    <header>
+        <div class="header-top container">
+            <h1>Strategic AI Briefing</h1>
+            <button id="theme-toggle">🌙 다크모드로</button>
         </div>
-
-        <nav class="toc">
-            <a href="#art1">1. Anthropic Custom Silicon</a>
-            <a href="#art2">2. American AI Exports</a>
-            <a href="#art3">3. Advanced Packaging Bottleneck</a>
-            <a href="#art4">4. Harvard Cascade Decoder</a>
-            <a href="#art5">5. State-Level AI Regulation</a>
+        <nav class="toc container">
+            <a href="#art1">1. Data Center Revolt</a>
+            <a href="#art2">2. Amazon Trainium</a>
+            <a href="#art3">3. Terafab Initiative</a>
+            <a href="#art4">4. UALink 2.0</a>
+            <a href="#art5">5. Enterprise AI ROI Gap</a>
             <a href="#synthesis">Synthesis</a>
         </nav>
+    </header>
 
-        <div class="article-title" style="border: none; font-size:1.1rem; color: var(--text-secondary); text-align: justify; margin-bottom: 3rem;">
-            <strong>Executive Prologue:</strong> The global artificial intelligence ecosystem is undergoing a phase of intense structural consolidation and geopolitical realignment. The period of unrestrained software capability scaling is being superseded by an era defined by absolute physical constraints, sovereign industrial policy, and the weaponization of the hardware supply chain. The strategic events of the past 72 hours reveal an industry grappling with the immense capital and energy requirements of its own ambition. Frontier labs are now openly exploring vertical integration into custom silicon design to escape the monopolistic pressures of the merchant GPU market. Concurrently, national governments are formalizing AI as a critical instrument of statecraft, establishing sovereign funds and aggressive export promotion regimes to secure geopolitical advantage. This transition is not without friction; the very technologies driving this revolution are simultaneously creating unprecedented cybersecurity risks and forcing a global legislative scramble to impose order on a rapidly evolving technological landscape. This report isolates the five most consequential developments, providing actionable foresight into the shifting paradigms of technology, infrastructure, and capital allocation.
-        </div>
-
+    <main>
         <article class="article" id="art1">
-            <h3 class="article-title">1. Anthropic Explores Custom Silicon Development, Signaling Full-Stack AI Realignment</h3>
-            <div class="metadata">
-                <span><strong>Source:</strong> Reuters</span>
-                <span><strong>Event Date:</strong> 2026-04-10</span>
-                <span><strong>Focus:</strong> Hardware</span>
-                <span><strong>Paradigm:</strong> Infrastructure</span>
+            <h2 class="article-title">1. The Great Stalling 2.0: Data Center Revolt Intensifies, Threatening AI Buildout</h2>
+            
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔭</span> <span class="subsec-label c1">Overview</span>
+                </div>
+                <p class="lead-text">The AI infrastructure buildout is facing a new and formidable bottleneck: organized, widespread public opposition.</p>
+                <p class="body-text">Reporting from April 10-11 has quantified a dramatic escalation in local resistance to data center construction, moving beyond power grid limitations into the realm of political and social revolt. An analysis of public records and media reports indicates a significant trend of communities across the United States officially rejecting or implementing restrictive moratoriums on new data center projects since the beginning of 2026. This velocity of public backlash is reportedly unprecedented for industrial projects of this type. The opposition is driven by a convergence of concerns over soaring electricity prices for residents, massive water consumption in drought-prone areas, persistent noise pollution from cooling systems, and a growing perception that generous tax incentives benefit large corporations without providing proportional local employment or economic value. This grassroots movement is having a material impact on national capacity, with a Bloomberg report from April 10th estimating that a substantial portion—potentially between one-third and one-half—of all US data centers planned for 2026 are now likely to be delayed or cancelled entirely. Of a planned multi-gigawatt expansion of new capacity, only a fraction is currently under active construction, stranding billions in allocated capital.</p>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label cN c1">Overview</span>
+                    <span class="subsec-icon">⚡</span> <span class="subsec-label c1">Strategic Impact</span>
                 </div>
-                <p class="lead-text">The artificial intelligence hardware ecosystem is facing a potential restructuring as Reuters reported on April 10, citing three sources familiar with the matter, that frontier research lab Anthropic is actively exploring the development of its own custom AI accelerator chips.</p>
-                <p class="body-text">Critically, the plans remain in early stages: no dedicated engineering team has been formally assembled, no specific chip design has been selected, and the company has not made a formal commitment to the project, retaining the option to continue purchasing chips from external vendors. This strategic consideration nonetheless marks a significant escalation in the trend of large-scale AI companies pursuing vertical integration to mitigate their extreme dependence on a limited number of external GPU vendors. The economic logic is compelling: Anthropic's run-rate revenue has surpassed $30 billion, more than tripling from approximately $9 billion at the end of 2025, creating both the financial capacity and the operational incentive to consider in-house chip development. By bringing silicon design in-house, Anthropic would aim to create processors hyper-optimized for the specific computational patterns of its Claude model architecture, potentially yielding improvements in performance-per-watt and lowering the staggering operational costs associated with large-scale inference. This move would mirror the established custom silicon strategies of competitors like Google (TPU), Amazon (Trainium/Inferentia), and Meta, reflecting a broader industry realization that true competitive advantage at the frontier lies not just in algorithmic innovation, but in full-stack control from the physical hardware layer to the application layer. Notably, just days before the Reuters report, Anthropic signed a long-term deal with Google and Broadcom that will give it access to approximately 3.5 gigawatts of TPU-based compute capacity from 2027, signaling a parallel strategy of securing external supply while evaluating proprietary silicon.</p>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label cN c1">Strategic Impact</span>
-                </div>
-                <div class="metric-row">
-                    <div class="metric-card">
-                        <h4>Anthropic Run-Rate Revenue</h4>
-                        <div class="value" style="color: var(--c1)">$30B</div>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Secured Compute Capacity</h4>
-                        <div class="value" style="color: var(--c1)">3.5 GW</div>
-                    </div>
-                </div>
-                <div class="impact-box lcN c1" style="border-left:4px solid var(--c1)">
+                <div class="impact-box lc1" style="border-left:4px solid var(--c1)">
                     <ul class="impact-list">
-                        <li><strong>Technology and Ecosystem Perspective:</strong> A successful custom chip from Anthropic would further fragment the AI hardware market, weakening the monolithic dominance of incumbent GPU providers. It would force the software ecosystem to adapt to another proprietary hardware architecture, increasing the importance of hardware-agnostic compiler frameworks that can abstract away silicon-specific complexities.</li>
-                        <li><strong>Business and Market Dynamics:</strong> This signals a new phase of capital-intensive competition where leading AI labs must become vertically integrated technology companies. The immense investment required — industry estimates put development costs for a competitive AI accelerator in the hundreds of millions to over one billion dollars when software co-design, fabrication ramp, and ecosystem tooling are included — raises the barrier to entry for new frontier model startups, consolidating power among the most heavily capitalized players.</li>
-                        <li><strong>Infrastructure and Hardware Linkage:</strong> An Anthropic chip would be purpose-built to accelerate the specific types of tensor operations and memory access patterns most common in its model architectures. This could drive a trend toward architecturally segregated AI compute clusters within data centers, highly efficient for Claude-based workloads but potentially less flexible for third-party models.</li>
-                        <li><strong>Investment Strategy:</strong> Capital allocation must recognize that the AI value chain is consolidating vertically. Investment should target the foundational enablers of custom silicon: electronic design automation (EDA) software companies, advanced packaging providers, and silicon IP licensors. Broadcom's central position — already a chip design partner for both OpenAI and Anthropic — validates its role as a primary beneficiary of this structural shift.</li>
+                        <li><strong>Technology and Ecosystem Perspective:</strong> This physical deployment bottleneck forces a strategic pivot in software development toward extreme efficiency. The assumption of near-infinite, cheap cloud inference is breaking down. This will accelerate research and adoption of highly quantized models, compact architectures, and edge computing solutions that can deliver AI capabilities without relying on new hyperscale facilities.</li>
+                        <li><strong>Business and Market Dynamics:</strong> Data center operators with existing, permitted facilities and secured power-purchase agreements now possess a near-monopolistic pricing advantage. The value of "powered land" with pre-approved zoning has skyrocketed. This creates a new class of distressed assets: projects stalled in permitting, and a premium on companies skilled in navigating complex local zoning and community engagement.</li>
+                        <li><strong>Infrastructure and Hardware Linkage:</strong> The inability to build new facilities means existing data centers must be retrofitted for higher density, accelerating the demand for advanced liquid cooling and power distribution units that can handle next-generation hardware within legacy footprints. It also puts immense pressure on hyperscalers to build their own "behind-the-meter" power generation, further isolating them from public infrastructure.</li>
+                        <li><strong>Investment Strategy:</strong> Capital must be redirected from speculative data center REITs without secured permits toward the "picks and shovels" of densification: manufacturers of liquid cooling, high-density power shelves, and software for optimizing energy consumption in existing facilities. Firms specializing in environmental permitting and community relations for industrial projects are now a critical part of the AI value chain.</li>
                     </ul>
                 </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label cN c1">Technical Deep Dive</span> <span class="subsec-tag lcN c1">Custom Silicon Architecture</span>
+                    <span class="subsec-icon">🔬</span> <span class="subsec-label c1">Technical Deep Dive</span> <span class="subsec-tag lc1 c1">Data Center Sustainability</span>
                 </div>
                 <div class="arch-grid">
-                    <div class="arch-chip">
-                        <strong>Core Strategic Driver</strong> Reduce reliance on external GPUs, lower inference costs, and optimize performance-per-watt for proprietary architectures.
-                    </div>
-                    <div class="arch-chip">
-                        <strong>Architectural Goal</strong> Design a processor where on-chip memory hierarchy, compute layout, and interconnects map to Claude data flow.
-                    </div>
-                    <div class="arch-chip">
-                        <strong>Comparative Focus</strong> Singularly focused on large-scale LLM reasoning inference, distinct from Google TPU (general) or Meta MTIA (recommendation).
-                    </div>
+                    <div class="arch-chip">Community Opposition Vectors</div>
+                    <div class="arch-chip">Power & Water Constraints</div>
+                    <div class="arch-chip">Facility Densification</div>
                 </div>
                 <div class="table-scroll-wrap">
                     <table class="info-table">
                         <thead>
                             <tr>
-                                <th>Parameter</th>
-                                <th>Description</th>
+                                <th>Constraint Driver</th>
+                                <th>Quantitative Impact</th>
+                                <th>Industry Mitigation Strategy</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Development Stage</td>
-                                <td>Early exploratory phase. No formal team or final design committed.</td>
+                                <td>Power Consumption & Grid Instability</td>
+                                <td>Up to 50% of planned 2026 capacity delayed/cancelled</td>
+                                <td>Private off-grid power plants (behind-the-meter)</td>
                             </tr>
                             <tr>
-                                <td>Alternative Dependency</td>
-                                <td>3.5 GW of Google TPU compute capacity secured from 2027 via Google/Broadcom deal.</td>
+                                <td>Water Usage & Noise Pollution</td>
+                                <td>Stringent environmental impact reviews</td>
+                                <td>Advanced liquid cooling retrofitting for high density</td>
                             </tr>
                             <tr>
-                                <td>Target Optimization</td>
-                                <td>Larger on-chip SRAM for KV-caching; highly specific tensor operation acceleration.</td>
+                                <td>Lack of Local Economic Value</td>
+                                <td>Citizen-led referendums blocking tax incentives</td>
+                                <td>Pivot to less populated regions, edge computing</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="chart-wrap"><div id="chart-art1" style="width:100%; height:280px;"></div></div>
+                <div class="chart-wrap">
+                    <div id="chart-art1" style="width:100%; height:280px;"></div>
+                </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label cN c1">Evolution & Timeline</span>
+                    <span class="subsec-icon">⏳</span> <span class="subsec-label c1">Evolution & Timeline</span>
                 </div>
                 <div class="flow-row">
-                    <div class="flow-step">Commodity GPU Reliance<br><small>(High OPEX, vendor lock-in)</small></div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Hybrid Compute Deals<br><small>(Securing TPU/ASIC supply via Cloud partners)</small></div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Vertical Integration<br><small>(Full stack hardware-software co-design)</small></div>
+                    <div class="flow-step">Unrestrained AI Scaling</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Grid & Resource Bottlenecks</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Organized Community Backlash</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Regulatory Moratoriums</div>
                 </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label cN c1">Critical View</span>
+                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c1">Critical View</span>
                 </div>
-                <p class="body-text">The path to custom silicon is extraordinarily expensive and fraught with execution risk. Designing, validating, and fabricating a competitive AI accelerator can cost well over one billion dollars and take several years — a timeline during which underlying model architectures may evolve significantly, risking hardware obsolescence before a chip reaches production. Furthermore, Anthropic would be competing for scarce advanced packaging and fabrication capacity at TSMC against established giants like Apple, NVIDIA, and Google, who command immense volume and preferential access. The preliminary nature of these plans — no team, no design, no commitment — means this remains a strategic option rather than an announced program, and market reactions pricing in imminent disruption to the GPU supply chain are premature.</p>
+                <p>The industry has fundamentally misjudged the political and social dimensions of its physical expansion. By framing data centers as abstract "cloud" infrastructure, technology companies have failed to build the necessary social license to operate within communities. The current backlash is not a temporary hurdle but a structural shift in the political economy of AI infrastructure. Unless the industry can create a new value proposition for local communities—such as using waste heat for district heating or making direct investments in local grids—it will face a permanent state of attrition, where the pace of AI progress is dictated not by innovation but by the outcomes of contentious zoning board meetings.</p>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label cN c1">Community Sentiment</span>
+                    <span class="subsec-icon">💬</span> <span class="subsec-label c1">Community Sentiment</span>
                 </div>
                 <div class="sentiment-grid">
                     <div class="sentiment-card">
-                        <span class="emoji">📈</span>
-                        <span class="label">Investor Optimism</span>
-                        <span class="desc">Markets view vertical integration as the ultimate path to margin expansion and moat building.</span>
+                        <div class="sentiment-emoji">😡</div>
+                        <div class="sentiment-label">Frustrated</div>
+                        <div class="sentiment-desc">Local residents resisting high electricity prices and resource drain.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="emoji">🤔</span>
-                        <span class="label">Engineering Skepticism</span>
-                        <span class="desc">Hardware engineers note the extreme difficulty of beating merchant silicon without decades of deep IP.</span>
+                        <div class="sentiment-emoji">😰</div>
+                        <div class="sentiment-label">Anxious</div>
+                        <div class="sentiment-desc">Investors worried about stranded capital and delayed returns.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="emoji">🛡️</span>
-                        <span class="label">Strategic Hedging</span>
-                        <span class="desc">The consensus aligns on treating this leak as a strategic negotiating lever against current GPU vendors.</span>
+                        <div class="sentiment-emoji">💡</div>
+                        <div class="sentiment-label">Adapting</div>
+                        <div class="sentiment-desc">Engineers pivoting to extreme quantization and edge solutions.</div>
                     </div>
                 </div>
             </div>
         </article>
 
         <article class="article" id="art2">
-            <h3 class="article-title">2. U.S. Commerce Department Formalizes "American AI" Export Promotion Program</h3>
-            <div class="metadata">
-                <span><strong>Source:</strong> U.S. Dept. of Commerce / Federal Register</span>
-                <span><strong>Event Date:</strong> 2026-04-01</span>
-                <span><strong>Focus:</strong> Hardware & Software</span>
-                <span><strong>Paradigm:</strong> Ecosystem / Regulation</span>
+            <h2 class="article-title">2. Amazon Signals Intent to Sell Trainium Chips, Challenging NVIDIA's Merchant Silicon Dominance</h2>
+            
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔭</span> <span class="subsec-label c2">Overview</span>
+                </div>
+                <p class="lead-text">The AI accelerator market is poised for a seismic disruption as Amazon CEO Andy Jassy signaled on April 10 that the company may begin selling its proprietary Trainium AI chips directly to third-party customers.</p>
+                <p class="body-text">This move would represent a monumental strategy shift, transforming Amazon from solely a consumer of its own custom silicon within AWS into a direct merchant competitor to NVIDIA, AMD, and Intel. For years, Amazon's Trainium (for training) and Inferentia (for inference) chips have provided a cost-performance advantage for workloads running on AWS, but have remained a captive capability. By potentially opening this hardware to the broader market, Amazon would leverage its immense scale, deep experience in workload optimization, and established cloud ecosystem to enter the multi-hundred-billion-dollar AI hardware market. The business unit responsible for this custom silicon is already estimated to be a multi-billion-dollar operation based on internal consumption and cost savings, indicating a mature, scaled production and software ecosystem ready for external commercialization.</p>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label cN c2">Overview</span>
+                    <span class="subsec-icon">⚡</span> <span class="subsec-label c2">Strategic Impact</span>
                 </div>
-                <p class="lead-text">The United States government has taken a decisive step in formalizing artificial intelligence as a key instrument of foreign and economic policy, with the U.S. Department of Commerce's International Trade Administration opening a 90-day Call for Proposals under the American AI Exports Program on April 1, 2026.</p>
-                <p class="body-text">The program, established pursuant to President Trump's Executive Order 14320 "Promoting the Export of the American AI Technology Stack," invites U.S. industry-led consortia to submit proposals to deliver full-stack American AI technology packages to international partners, with applications accepted through June 30, 2026, at AIexports.gov. The program encompasses the full value chain of AI technology — from AI-optimized computer hardware, servers, and accelerators, to data center storage, models, cybersecurity measures, and industry-specific applications — positioning the U.S. government as an active commercial intermediary in the global deployment of American AI infrastructure. Designated consortia will receive significant federal support, including priority government advocacy, expedited export license reviews, interagency coordination, and access to federal financing tools through the Export-Import Bank, the U.S. International Development Finance Corporation, and the State Department. Secretary of Commerce Howard Lutnick framed the initiative explicitly in terms of national security and geopolitical competition, stating the goal is to ensure the future of global AI infrastructure is built on American technology, standards, and values. The program has two tracks: Pre-set Consortia, which maintain standing full-stack offerings for ongoing global deployment, and On-demand Consortia, assembled in response to specific program-identified opportunities.</p>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label cN c2">Strategic Impact</span>
-                </div>
-                <div class="impact-box lcN c2" style="border-left:4px solid var(--c2)">
+                <div class="impact-box lc2" style="border-left:4px solid var(--c2)">
                     <ul class="impact-list">
-                        <li><strong>Technology and Ecosystem Perspective:</strong> By actively promoting full-stack American AI solutions — from silicon to application layer — the program creates strong incentives for international partners to adopt U.S.-aligned hardware architectures and software standards. This could accelerate the bifurcation of the global AI ecosystem into U.S.-aligned and China-aligned technology stacks, with the hardware layer becoming the primary point of geopolitical contestation.</li>
-                        <li><strong>Business and Market Dynamics:</strong> U.S. AI companies participating in designated consortia gain a government-backed commercial advantage in competing for sovereign AI contracts globally. This represents a significant structural subsidy for the U.S. AI industry, particularly for full-stack providers that can offer compute, models, and security services as an integrated package.</li>
-                        <li><strong>Infrastructure and Hardware Linkage:</strong> The requirement for full-stack packages including AI-optimized hardware means that chip manufacturers, advanced packaging providers, and data center infrastructure companies become direct beneficiaries of the program. Export control compliance requirements embedded in the program will also shape which hardware architectures can be offered in which markets, reinforcing the strategic importance of U.S.-manufactured AI silicon.</li>
-                        <li><strong>Investment Strategy:</strong> Capital should flow toward companies with the capability to assemble and deliver end-to-end AI stacks to sovereign clients: hyperscale cloud providers, U.S.-based AI chip designers, and enterprise software companies with government-grade security certifications. The program also creates a new category of geopolitical risk premium for non-U.S. AI infrastructure providers operating in allied markets.</li>
+                        <li><strong>Technology and Ecosystem Perspective:</strong> The entry of another major, well-capitalized player into the merchant silicon market would accelerate the fragmentation of the hardware ecosystem. It would force the software layer, particularly compiler and orchestration frameworks, to more robustly support a new hardware architecture, further strengthening the case for open, hardware-agnostic platforms and weakening the lock-in of proprietary stacks like CUDA.</li>
+                        <li><strong>Business and Market Dynamics:</strong> An Amazon merchant chip business would be an existential threat to smaller AI hardware startups and a significant challenge to AMD and Intel. Amazon could bundle its chips with AWS credits and deep integration into its vast suite of services, creating a compelling value proposition that pure-play hardware vendors cannot match. This would create a three-way race at the high end between NVIDIA, Amazon, and Google/Broadcom's TPU ecosystem.</li>
+                        <li><strong>Infrastructure and Hardware Linkage:</strong> This move validates the thesis that at hyperscale, the most efficient path forward is custom silicon. It also implies that Amazon has achieved a level of manufacturing scale and yield with its partners where it can satisfy its own massive internal demand and still have excess capacity to serve the external market, a feat that requires billions in forward-looking supply chain commitments.</li>
+                        <li><strong>Investment Strategy:</strong> This development places downward pressure on the long-term valuation multiples of incumbent GPU providers, as it signals the arrival of a formidable new competitor with a fundamentally different business model (bundling hardware with cloud services). Investment should target the enablers of this trend: advanced packaging providers, EDA software companies, and IP licensors who benefit from *any* custom silicon program, regardless of the end vendor.</li>
                     </ul>
                 </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label cN c2">Technical Deep Dive</span> <span class="subsec-tag lcN c2">Consortia Framework</span>
+                    <span class="subsec-icon">🔬</span> <span class="subsec-label c2">Technical Deep Dive</span> <span class="subsec-tag lc2 c2">Merchant Silicon</span>
                 </div>
                 <div class="arch-grid">
-                    <div class="arch-chip">
-                        <strong>Pre-set Consortia</strong> Standing global offerings across the full AI stack ready for ongoing sovereign deployment.
-                    </div>
-                    <div class="arch-chip">
-                        <strong>On-demand Consortia</strong> Custom-assembled ad-hoc groups responding to specific program-identified international opportunities.
-                    </div>
-                    <div class="arch-chip">
-                        <strong>Eligible Tech Stack</strong> Hardware (silicon, servers), Storage, Cloud services, Models, Cybersecurity, and App-layer software.
-                    </div>
+                    <div class="arch-chip">Trainium (Training ASIC)</div>
+                    <div class="arch-chip">Inferentia (Inference ASIC)</div>
+                    <div class="arch-chip">Hardware-Cloud Bundling</div>
                 </div>
                 <div class="table-scroll-wrap">
                     <table class="info-table">
                         <thead>
                             <tr>
-                                <th>Criterion</th>
-                                <th>Detail</th>
+                                <th>Core Technology</th>
+                                <th>Current Status</th>
+                                <th>Competitive Advantage</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Evaluation Authority</td>
-                                <td>Secretary of Commerce, in consultation with Secretaries of State, Defense, Energy, and OSTP Director.</td>
+                                <td>Amazon Trainium & Inferentia</td>
+                                <td>Captive internal use -> Signaling merchant availability</td>
+                                <td>Deep integration with AWS stack (SageMaker, Bedrock)</td>
                             </tr>
                             <tr>
-                                <td>Compliance</td>
-                                <td>Must comply with U.S. export controls and outbound investment regulations.</td>
-                            </tr>
-                            <tr>
-                                <td>Exclusions</td>
-                                <td>Open-weight models from entities incorporated in/majority-owned by countries of concern are explicitly excluded.</td>
+                                <td>Custom Silicon Scale</td>
+                                <td>Multi-billion-dollar internal operation equivalent</td>
+                                <td>Battle-hardened performance data from mass deployment</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                <div class="chart-wrap">
+                    <div id="chart-art2" style="width:100%; height:280px;"></div>
+                </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label cN c2">Evolution & Timeline</span>
+                    <span class="subsec-icon">⏳</span> <span class="subsec-label c2">Evolution & Timeline</span>
                 </div>
                 <div class="flow-row">
-                    <div class="flow-step">Export Restrictions<br><small>(Limiting technology outflow to rivals)</small></div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Domestic Subsidies<br><small>(CHIPS Act, internal capability building)</small></div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Active Statecraft<br><small>(State-backed export of full-stack AI to allies)</small></div>
+                    <div class="flow-step">Internal AWS Optimization</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Captive Silicon Maturity</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Scale & Excess Capacity</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Merchant Market Entry</div>
                 </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label cN c2">Critical View</span>
+                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c2">Critical View</span>
                 </div>
-                <p class="body-text">The program's structure raises important questions about the coherence of U.S. export policy. The same administration that is promoting AI exports is simultaneously maintaining and in some cases tightening export controls on the advanced semiconductors that underpin those AI systems. This creates a potential paradox where the government is marketing American AI stacks to allies while restricting the transfer of the hardware components those stacks require. Furthermore, the program's reliance on industry-led consortia means that the government is effectively outsourcing the definition of the "American AI stack" to the largest incumbents, potentially entrenching NVIDIA, Google, and Amazon as the de facto gatekeepers of U.S. AI diplomacy and foreclosing opportunities for smaller innovators.</p>
+                <p>The transition from an internal supplier to a merchant vendor is fraught with challenges. Amazon would need to build a massive hardware sales and support organization, a fundamentally different business motion than selling cloud services. Furthermore, it would be competing for enterprise customers against its own cloud offerings, creating significant channel conflict. Other companies may be hesitant to become dependent on a hardware supplier that is also their primary cloud competitor. While the technological capability is proven, the commercial and strategic viability of this pivot remains a significant, unproven execution risk.</p>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label cN c2">Community Sentiment</span>
+                    <span class="subsec-icon">💬</span> <span class="subsec-label c2">Community Sentiment</span>
                 </div>
                 <div class="sentiment-grid">
                     <div class="sentiment-card">
-                        <span class="emoji">🇺🇸</span>
-                        <span class="label">Incumbent Support</span>
-                        <span class="desc">Major defense and tech contractors welcome the fast-tracked diplomatic leverage for sovereign deals.</span>
+                        <div class="sentiment-emoji">😲</div>
+                        <div class="sentiment-label">Surprised</div>
+                        <div class="sentiment-desc">Industry observers shocked by the aggressive hardware pivot.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="emoji">⚖️</span>
-                        <span class="label">Startup Anxiety</span>
-                        <span class="desc">Smaller AI firms fear being locked out of international deals dominated by mega-consortia.</span>
+                        <div class="sentiment-emoji">⚔️</div>
+                        <div class="sentiment-label">Competitive</div>
+                        <div class="sentiment-desc">Incumbents forced to re-evaluate their moat against hyperscalers.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="emoji">🌐</span>
-                        <span class="label">Geopolitical Tension</span>
-                        <span class="desc">Allied nations show mixed reactions, wary of absolute vendor lock-in to the U.S. technology ecosystem.</span>
+                        <div class="sentiment-emoji">🤔</div>
+                        <div class="sentiment-label">Curious</div>
+                        <div class="sentiment-desc">Enterprise customers weighing vendor lock-in risks vs AWS bundling benefits.</div>
                     </div>
                 </div>
             </div>
         </article>
 
         <article class="article" id="art3">
-            <h3 class="article-title">3. Advanced Packaging Emerges as the Defining AI Hardware Bottleneck of 2026</h3>
-            <div class="metadata">
-                <span><strong>Source:</strong> CNBC, DigiTimes, Tom's Hardware</span>
-                <span><strong>Event Date:</strong> 2026-04-08</span>
-                <span><strong>Focus:</strong> Hardware</span>
-                <span><strong>Paradigm:</strong> Infrastructure</span>
+            <h2 class="article-title">3. Intel Joins Elon Musk's "Terafab" Initiative, a Visionary AI Compute Project</h2>
+            
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔭</span> <span class="subsec-label c3">Overview</span>
+                </div>
+                <p class="lead-text">The scale of ambition in the AI hardware race has been fundamentally redefined with the announcement on April 10 of the "Terafab" initiative, a joint venture between Intel and Elon Musk's portfolio of companies (Tesla, SpaceX, xAI).</p>
+                <p class="body-text">The project's stated goal is to build a new semiconductor fabrication facility in Austin, Texas, targeting an annual production capacity of one terawatt (1 TW) of AI and robotics compute. This visionary figure represents a multi-order-of-magnitude increase over current global AI compute production, signaling an industrial-scale effort to solve the compute scarcity problem. Intel will contribute its most advanced process technology, including the 18A node and advanced packaging solutions like Foveros and EMIB, to refactor silicon manufacturing for this unprecedented scale. The fab will produce custom chips designed for the immense data processing needs of AI, autonomous systems for Tesla vehicles, and the satellite communications infrastructure for SpaceX.</p>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label cN c3">Overview</span>
+                    <span class="subsec-icon">⚡</span> <span class="subsec-label c3">Strategic Impact</span>
                 </div>
-                <p class="lead-text">A convergence of industry reporting published in the first week of April has placed advanced packaging — specifically TSMC's Chip on Wafer on Substrate (CoWoS) technology — at the center of the AI hardware supply crisis, crystallizing a bottleneck that is now structurally constraining the deployment of next-generation AI accelerators globally.</p>
-                <p class="body-text">TSMC's North America packaging solutions head Paul Rousseau disclosed in a rare interview with CNBC that CoWoS capacity is growing at an 80% compound annual growth rate, a figure that underscores both the extraordinary demand and the significant capital required to meet it. Despite this expansion, the supply-demand imbalance remains acute: NVIDIA has reserved a majority of TSMC's most advanced CoWoS capacity — including the newest CoWoS-L variant required for Blackwell-class GPUs — reportedly securing over 60% of total output for the 2026 fiscal year, leaving second-tier ASIC vendors and hyperscaler custom silicon programs competing for the remainder. The geographic concentration of this capacity in Taiwan further compounds systemic risk; Q1 2026 estimates put Taiwan's share of global advanced packaging capacity at approximately 45%, with South Korea at 20% and China at 15%, leaving the U.S. and Europe with structurally insufficient domestic alternatives. As a result, companies unable to secure TSMC CoWoS slots are increasingly turning to Intel's EMIB and Foveros packaging technologies, with TrendForce reporting that Intel has already begun packaging customer designs originally scoped for TSMC CoWoS.</p>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label cN c3">Strategic Impact</span>
-                </div>
-                <div class="impact-box lcN c3" style="border-left:4px solid var(--c3)">
+                <div class="impact-box lc3" style="border-left:4px solid var(--c3)">
                     <ul class="impact-list">
-                        <li><strong>Technology and Ecosystem Perspective:</strong> Advanced packaging has effectively become as difficult and capital-intensive as wafer fabrication itself, representing a new dimension of Moore's Law continuation. The transition to CoWoS-L for multi-die architectures introduces new yield challenges — particularly managing warpage during heat cycles and maintaining signal integrity across large interposers — that make packaging expertise a core differentiator, not a commodity assembly step.</li>
-                        <li><strong>Business and Market Dynamics:</strong> The CoWoS constraint has created a clear hierarchy in the semiconductor market where access to packaging capacity is as strategically valuable as access to leading-edge fabrication nodes. Companies that have secured forward capacity allocations — primarily NVIDIA and the large hyperscalers — have a structural advantage over challengers that cannot get into the queue. This dynamic is accelerating consolidation and raising barriers to entry for new AI chip designs.</li>
-                        <li><strong>Infrastructure and Hardware Linkage:</strong> The bottleneck is directly limiting the pace at which next-generation AI accelerators can reach data centers. HBM4 integration in late 2026 and 2027 will require even more precise packaging techniques as memory stacks move to 12-layer and 16-layer configurations, sustaining the pressure on packaging capacity and capital investment through the end of the decade.</li>
-                        <li><strong>Investment Strategy:</strong> The packaging constraint validates investment in OSATs (Outsourced Semiconductor Assembly and Test companies) with advanced packaging capabilities, particularly those building U.S.-based facilities aligned with CHIPS Act incentives. ASE Group, which reports advanced packaging sales doubling in 2026, and Amkor Technology, which is building a major facility in Peoria, Arizona as a primary TSMC packaging partner, are the most direct beneficiaries of this structural shift.</li>
+                        <li><strong>Technology and Ecosystem Perspective:</strong> A terawatt-scale fab, if realized, would fundamentally change the economics of AI. It could create a compute surplus, driving down the cost of training and inference and potentially commoditizing access to frontier-level AI. It represents the ultimate expression of vertical integration, with a single consortium controlling everything from the process node technology to the end applications in cars, rockets, and AI models.</li>
+                        <li><strong>Business and Market Dynamics:</strong> This alliance creates a powerful new "Sovereign AI" bloc, independent of traditional hyperscalers and merchant GPU providers. For Intel, it is a monumental strategic victory, securing a massive-volume anchor customer for its foundry services (IFS) and positioning its 18A process as the foundation for one of the world's most ambitious technology projects. It puts immense pressure on other foundries like TSMC and Samsung to secure similarly scaled long-term commitments.</li>
+                        <li><strong>Infrastructure and Hardware Linkage:</strong> The energy requirements for a fab of this scale are astronomical, likely requiring multiple gigawatts of dedicated power, equivalent to a large city. The project's success is as much an energy and civil engineering challenge as it is a semiconductor manufacturing one. It will necessitate the co-development of dedicated power plants and a completely localized supply chain for strategic materials.</li>
+                        <li><strong>Investment Strategy:</strong> This validates massive, long-term investment in the foundational elements of semiconductor manufacturing: producers of EUV lithography equipment (like ASML), specialized chemical and gas suppliers, and manufacturers of wafer handling and metrology equipment. It also signals a major investment opportunity in the energy infrastructure and industrial real estate sectors in central Texas.</li>
                     </ul>
                 </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label cN c3">Technical Deep Dive</span> <span class="subsec-tag lcN c3">CoWoS & Multi-die Fab</span>
+                    <span class="subsec-icon">🔬</span> <span class="subsec-label c3">Technical Deep Dive</span> <span class="subsec-tag lc3 c3">Terawatt Scale Foundry</span>
                 </div>
                 <div class="arch-grid">
-                    <div class="arch-chip">
-                        <strong>CoWoS Core Tech</strong> 2.5D packaging placing HBM directly adjacent to compute dies via high-density interposer to eliminate memory wall.
-                    </div>
-                    <div class="arch-chip">
-                        <strong>Variants</strong> CoWoS-S (Silicon interposer) vs CoWoS-L (Organic/glass interposer for larger multi-die designs, poses warpage challenges).
-                    </div>
-                    <div class="arch-chip">
-                        <strong>Alternatives</strong> Intel EMIB (die-to-die without full interposer cost) and Foveros (vertical stacking TSVs).
-                    </div>
+                    <div class="arch-chip">Intel 18A Node</div>
+                    <div class="arch-chip">Foveros / EMIB 3D Packaging</div>
+                    <div class="arch-chip">1 TW Compute Target</div>
                 </div>
-                <div class="chart-wrap"><div id="chart-art3" style="width:100%; height:280px;"></div></div>
+                <div class="table-scroll-wrap">
+                    <table class="info-table">
+                        <thead>
+                            <tr>
+                                <th>Project Vector</th>
+                                <th>Technical Details</th>
+                                <th>Target Applications</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Key Partners</td>
+                                <td>Intel, Tesla, SpaceX, xAI</td>
+                                <td>AI training/inference, Autonomous Driving, Satellites</td>
+                            </tr>
+                            <tr>
+                                <td>Scale & Location</td>
+                                <td>1 Terawatt (TW) annual capacity in Austin, Texas</td>
+                                <td>Vertical Integration across multiple Musk companies</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label cN c3">Evolution & Timeline</span>
+                    <span class="subsec-icon">⏳</span> <span class="subsec-label c3">Evolution & Timeline</span>
                 </div>
                 <div class="flow-row">
-                    <div class="flow-step">Monolithic Dies<br><small>(Constrained by reticle limits)</small></div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Chiplet Disaggregation<br><small>(Splitting compute and memory)</small></div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Advanced Packaging (CoWoS)<br><small>(High-bandwidth interconnects as the new fab bottleneck)</small></div>
+                    <div class="flow-step">Gigawatt Fabs</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Compute Scarcity Crisis</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Sovereign AI Blocs</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Terawatt Infrastructure</div>
                 </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label cN c3">Critical View</span>
+                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c3">Critical View</span>
                 </div>
-                <p class="body-text">The 80% CAGR in CoWoS capacity growth is an impressive headline figure, but it masks a fundamental asymmetry: demand for AI compute is growing faster than any linear capacity expansion can address. The geographic concentration of advanced packaging in Taiwan — despite TSMC's Arizona expansion — means that geopolitical disruption remains a single-point-of-failure risk for the entire global AI hardware supply chain. NVIDIA's dominant pre-booking of capacity also raises competitive concerns: smaller AI chip designers and emerging custom silicon programs may find it structurally impossible to access sufficient packaging capacity to achieve competitive scale, effectively cementing NVIDIA's market position through supply chain control rather than product merit alone.</p>
+                <p>The "terawatt" production target, while visionary, borders on the speculative and should be viewed with extreme caution. The capital expenditure required for such a facility would likely be in the hundreds of billions of dollars, and the technical and logistical hurdles are immense. The project is entirely dependent on the flawless execution of Intel's 18A process at a scale that has never been attempted. Any delays or yield issues in Intel's core technology roadmap would have catastrophic consequences for the project's timeline and financial viability. This announcement may be more of a strategic declaration of intent designed to secure government subsidies and talent than a concrete, fully-funded engineering plan.</p>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label cN c3">Community Sentiment</span>
+                    <span class="subsec-icon">💬</span> <span class="subsec-label c3">Community Sentiment</span>
                 </div>
                 <div class="sentiment-grid">
                     <div class="sentiment-card">
-                        <span class="emoji">🏭</span>
-                        <span class="label">Supply Chain Panic</span>
-                        <span class="desc">Hardware vendors are scrambling to qualify alternate OSATs as TSMC wait times balloon.</span>
+                        <div class="sentiment-emoji">🤯</div>
+                        <div class="sentiment-label">Mind-blown</div>
+                        <div class="sentiment-desc">Tech enthusiasts marveling at the sheer unprecedented scale.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="emoji">👑</span>
-                        <span class="label">NVIDIA Dominance</span>
-                        <span class="desc">Widespread industry resignation regarding NVIDIA's monopolization of premier CoWoS-L lines.</span>
+                        <div class="sentiment-emoji">🧐</div>
+                        <div class="sentiment-label">Skeptical</div>
+                        <div class="sentiment-desc">Financial analysts questioning CapEx reality and execution risks.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="emoji">💡</span>
-                        <span class="label">Intel Foundry Hope</span>
-                        <span class="desc">A cautious optimism surrounds Intel's packaging capabilities serving as a viable overflow release valve.</span>
+                        <div class="sentiment-emoji">👷</div>
+                        <div class="sentiment-label">Ready</div>
+                        <div class="sentiment-desc">Supply chain partners bracing for massive infrastructure contracts.</div>
                     </div>
                 </div>
             </div>
         </article>
 
         <article class="article" id="art4">
-            <h3 class="article-title">4. Harvard's "Cascade" AI Decoder Triggers Waterfall Effect in Quantum Error Correction</h3>
-            <div class="metadata">
-                <span><strong>Source:</strong> arXiv (Preprint), Quantum Insider</span>
-                <span><strong>Event Date:</strong> 2026-04-11</span>
-                <span><strong>Focus:</strong> Hardware & Software</span>
-                <span><strong>Paradigm:</strong> Architecture</span>
+            <h2 class="article-title">4. AMD Spearheads UALink 2.0, Forging an Open Standard to Break NVIDIA's Interconnect Monopoly</h2>
+            
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔭</span> <span class="subsec-label c4">Overview</span>
+                </div>
+                <p class="lead-text">In a direct strategic assault on NVIDIA's highly profitable and proprietary NVLink interconnect, AMD has joined the Ultra Accelerator Link (UALink) Consortium to ratify the 2.0 specification for an open, industry-standard AI interconnect.</p>
+                <p class="body-text">This initiative represents a formal alliance of major technology companies aiming to create a high-performance, open alternative for connecting GPUs and AI accelerators within a server node. By creating a standardized, royalty-free interconnect, the consortium seeks to break the vendor lock-in that forces customers to use an all-NVIDIA solution for high-performance scale-up systems. The UALink 2.0 specification is designed to compete directly with NVIDIA's NVLink on bandwidth and latency, enabling customers to build heterogeneous systems with accelerators from multiple vendors (e.g., AMD, Intel, and others) that can communicate seamlessly.</p>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label cN c4">Overview</span>
+                    <span class="subsec-icon">⚡</span> <span class="subsec-label c4">Strategic Impact</span>
                 </div>
-                <p class="lead-text">Researchers at Harvard University published a preprint on April 11 on arXiv reporting the development of a convolutional neural network-based quantum error decoder called Cascade, which they claim can reduce logical error rates by up to 17 times compared to widely used decoding techniques while operating at speeds compatible with real-time quantum correction.</p>
-                <p class="body-text">The most significant finding is what the team describes as the "waterfall effect" in error correction: conventional models assume that logical error rates improve at a steady, predictable pace as systems scale. The Harvard team found that once error rates drop below a certain threshold using Cascade, they begin to fall far more steeply than predicted — an exponential improvement that suggests the massive physical qubit counts previously assumed necessary for fault-tolerant quantum computing may be significantly overestimated. In benchmark tests across multiple quantum code types, including surface codes and quantum low-density parity-check (LDPC) codes, the model achieved throughput improvements of up to 100,000 times faster than standard techniques depending on configuration, with single-shot latency measured in microseconds — already compatible with several leading quantum hardware platforms including trapped-ion and neutral-atom systems. The system also produces well-calibrated confidence estimates, enabling it to flag uncertain corrections and potentially reducing the overhead of repeat-until-success operations. It is critical to note that this work is a preprint and has not yet undergone peer review; the results, while striking, require independent validation before they can be considered established science.</p>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label cN c4">Strategic Impact</span>
-                </div>
-                <div class="impact-box lcN c4" style="border-left:4px solid var(--c4)">
+                <div class="impact-box lc4" style="border-left:4px solid var(--c4)">
                     <ul class="impact-list">
-                        <li><strong>Technology and Ecosystem Perspective:</strong> If validated, Cascade's waterfall effect could materially accelerate the timeline to fault-tolerant quantum computing by reducing the physical qubit overhead required for reliable logical qubits. This would represent a paradigm shift in quantum roadmaps across the industry, as current hardware development plans are calibrated to qubit counts that may prove to be significant overestimates.</li>
-                        <li><strong>Business and Market Dynamics:</strong> An AI-driven breakthrough in quantum error correction demonstrates a powerful meta-pattern: AI is no longer just an application layer but a foundational tool for accelerating progress in adjacent deep-tech frontiers. This validates increased investment in hybrid AI-quantum research programs and creates a competitive advantage for organizations that have the AI infrastructure to develop and deploy sophisticated neural decoders.</li>
-                        <li><strong>Infrastructure and Hardware Linkage:</strong> Real-time AI-based decoding at the microsecond scale requires significant classical compute co-located with quantum hardware. This creates a new demand vector for specialized low-latency AI inference hardware integrated directly into quantum control systems — a niche that NVIDIA, with its NVAQC accelerated quantum research center, and custom ASIC developers are already positioning to serve.</li>
-                        <li><strong>Investment Strategy:</strong> This development validates investment in hybrid quantum-classical computing startups that are building AI-first approaches to error correction. It also strengthens the investment case for post-quantum cryptography companies, as any acceleration in the timeline to fault-tolerant quantum computing increases the urgency of migrating current encryption standards.</li>
+                        <li><strong>Technology and Ecosystem Perspective:</strong> The success of UALink would fundamentally commoditize the high-speed interconnect layer, one of the most critical components for scaling AI training performance. It would shift the basis of competition from proprietary, closed ecosystems to performance-on-open-standards, benefiting the entire software ecosystem by promoting interoperability and hardware choice.</li>
+                        <li><strong>Business and Market Dynamics:</strong> This is a direct challenge to a key pillar of NVIDIA's economic moat. A widely adopted UALink standard would erode NVIDIA's ability to command a premium for its full-stack solution and would significantly improve the competitive positioning of AMD's Instinct accelerators and Intel's Gaudi chips. It allows customers to avoid being locked into a single vendor's roadmap and pricing structure.</li>
+                        <li><strong>Infrastructure and Hardware Linkage:</strong> UALink enables the creation of more modular and flexible server designs. System integrators and hyperscalers could design motherboards and chassis that support UALink-compliant accelerators from any vendor, fostering a more competitive and resilient supply chain. This would accelerate innovation in server architecture as designers are no longer constrained by a single company's proprietary form factors.</li>
+                        <li><strong>Investment Strategy:</strong> This move strengthens the investment case for all of NVIDIA's competitors in the AI accelerator space, particularly AMD and Intel. It also creates opportunities for companies that manufacture the physical components of interconnects, such as retimers, cables, and connectors, who would benefit from a larger, standardized market. Investors should view this as a material long-term risk to NVIDIA's margin structure in the data center segment.</li>
                     </ul>
                 </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label cN c4">Technical Deep Dive</span> <span class="subsec-tag lcN c4">Quantum CNN Decoders</span>
+                    <span class="subsec-icon">🔬</span> <span class="subsec-label c4">Technical Deep Dive</span> <span class="subsec-tag lc4 c4">Open Interconnect Standard</span>
                 </div>
                 <div class="arch-grid">
-                    <div class="arch-chip">
-                        <strong>Core Architecture</strong> Cascade uses a CNN that maps to quantum code geometry, learning noise patterns via data instead of fixed rules.
-                    </div>
-                    <div class="arch-chip">
-                        <strong>Performance</strong> Up to 17x reduction in logical error rates and up to 100,000x throughput improvement over standard methods.
-                    </div>
-                    <div class="arch-chip">
-                        <strong>Latency</strong> Single-shot latency in microseconds, achieving real-time correction required by neutral-atom systems.
-                    </div>
+                    <div class="arch-chip">UALink 2.0 Protocol</div>
+                    <div class="arch-chip">Royalty-Free Open Alternative</div>
+                    <div class="arch-chip">Scale-Up Connectivity</div>
                 </div>
                 <div class="table-scroll-wrap">
                     <table class="info-table">
                         <thead>
                             <tr>
-                                <th>Parameter</th>
-                                <th>Detail</th>
+                                <th>Consortium Details</th>
+                                <th>Technology Specification</th>
+                                <th>Strategic Goal</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Benchmark Scope</td>
-                                <td>Surface codes and quantum LDPC codes tested with confidence calibration.</td>
+                                <td>Promoter Group: AMD, Intel, etc.</td>
+                                <td>High-bandwidth, low-latency cross-accelerator link</td>
+                                <td>Commoditize high-speed scale-up interconnects</td>
                             </tr>
                             <tr>
-                                <td>Trade-offs</td>
-                                <td>Lacks formal theoretical guarantees; heavily dependent on training data quality; smaller variants perform poorly.</td>
-                            </tr>
-                            <tr>
-                                <td>Development Stage</td>
-                                <td>Preprint (arXiv); pending peer-review and independent replication.</td>
+                                <td>Target Use Case</td>
+                                <td>Heterogeneous systems (multiple vendors in one node)</td>
+                                <td>Erode NVIDIA NVLink full-stack premium</td>
                             </tr>
                         </tbody>
                     </table>
@@ -686,158 +915,163 @@
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label cN c4">Evolution & Timeline</span>
+                    <span class="subsec-icon">⏳</span> <span class="subsec-label c4">Evolution & Timeline</span>
                 </div>
                 <div class="flow-row">
-                    <div class="flow-step">Rule-based Decoders<br><small>(Slow, massive physical qubit overhead)</small></div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Machine Learning Exploration<br><small>(High latency, offline correction only)</small></div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Cascade Neural Decoder<br><small>(Microsecond latency, "Waterfall" exponential scaling)</small></div>
+                    <div class="flow-step">Proprietary NVLink Dominance</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Vendor Lock-in Pain</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Consortium Formation</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">UALink 2.0 Ratification</div>
                 </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label cN c4">Critical View</span>
+                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c4">Critical View</span>
                 </div>
-                <p class="body-text">The 100,000x throughput improvement figure demands significant scrutiny. This figure is configuration-dependent and represents an upper-bound benchmark rather than a typical operational result. More fundamentally, the work is an arXiv preprint — the same venue where many impressive-sounding quantum computing claims have failed to survive peer review. The reliance on machine learning introduces a class of failure modes absent from traditional decoders: distribution shift between training and deployment environments, adversarial noise patterns that the network was not trained on, and the absence of provable correctness guarantees. Before this work influences hardware roadmaps or investment decisions, independent replication on multiple physical quantum hardware platforms is essential.</p>
+                <p>While the strategic logic is sound, creating and driving adoption of a new hardware standard is a monumental undertaking. NVIDIA's NVLink is a mature, battle-tested technology with deep integration into its CUDA software stack. UALink must not only match its performance but also build a robust software and validation ecosystem to convince risk-averse enterprise and hyperscale customers to switch. NVIDIA will likely use its market power to create incentives for customers to stick with its proprietary solution, potentially through bundling and deep discounts, making the path to widespread adoption for UALink a significant uphill battle.</p>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label cN c4">Community Sentiment</span>
+                    <span class="subsec-icon">💬</span> <span class="subsec-label c4">Community Sentiment</span>
                 </div>
                 <div class="sentiment-grid">
                     <div class="sentiment-card">
-                        <span class="emoji">⚛️</span>
-                        <span class="label">Physics Community Hype</span>
-                        <span class="desc">A mix of extreme excitement over algorithmic scaling and caution regarding preprint status.</span>
+                        <div class="sentiment-emoji">🤝</div>
+                        <div class="sentiment-label">Collaborative</div>
+                        <div class="sentiment-desc">Consortium partners aligning to share R&D burden.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="emoji">📉</span>
-                        <span class="label">Hardware Roadmap Reassessment</span>
-                        <span class="desc">Firms are quietly running internal simulations to see if physical qubit counts can be safely reduced.</span>
+                        <div class="sentiment-emoji">🛡️</div>
+                        <div class="sentiment-label">Defensive</div>
+                        <div class="sentiment-desc">NVIDIA reinforcing its moat with software integration.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="emoji">🔐</span>
-                        <span class="label">Security Alarm</span>
-                        <span class="desc">Cryptographers view any acceleration of quantum fault-tolerance as an urgent signal to enforce post-quantum standards.</span>
+                        <div class="sentiment-emoji">📈</div>
+                        <div class="sentiment-label">Bullish</div>
+                        <div class="sentiment-desc">Competitors seeing a clear path to breaking the monopoly.</div>
                     </div>
                 </div>
             </div>
         </article>
 
         <article class="article" id="art5">
-            <h3 class="article-title">5. State-Level AI Regulation Accelerates, Creating Fractured U.S. Compliance Landscape</h3>
-            <div class="metadata">
-                <span><strong>Source:</strong> Transparency Coalition, Multistate.ai</span>
-                <span><strong>Event Date:</strong> 2026-04-10</span>
-                <span><strong>Focus:</strong> Software</span>
-                <span><strong>Paradigm:</strong> Regulation</span>
+            <h2 class="article-title">5. The Enterprise AI "Reality Gap": Surveys Reveal Widespread Adoption Masking Deep Strategic Failure</h2>
+            
+            <div class="subsec">
+                <div class="subsec-header">
+                    <span class="subsec-icon">🔭</span> <span class="subsec-label c5">Overview</span>
+                </div>
+                <p class="lead-text">A convergence of major enterprise surveys released around April 11 reveals a profound and widening gap between the massive capital being invested in AI and the realization of tangible business value, signaling a critical "reality gap" in the enterprise AI market.</p>
+                <p class="body-text">A KPMG global survey found that while three out of four leaders will prioritize AI investment despite economic uncertainty, only a small fraction are seeing clear returns. Similarly, a comprehensive survey by Writer found that 79% of organizations face significant challenges in adopting AI, with a stunning 75% of executives admitting their company's AI strategy is "more for show" than actual guidance. This disconnect is creating severe internal friction, with 54% of C-suite executives stating that AI adoption is "tearing their company apart". The core issue is a failure to move beyond isolated productivity gains to systemic business transformation. While individual employees report productivity gains, only 29% of organizations see significant ROI, and 48% call their adoption efforts a "massive disappointment".</p>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label cN c5">Overview</span>
+                    <span class="subsec-icon">⚡</span> <span class="subsec-label c5">Strategic Impact</span>
                 </div>
-                <p class="lead-text">The United States is rapidly developing a complex and fragmented regulatory landscape for artificial intelligence, as a sustained wave of state-level legislative activity is creating a patchwork of compliance obligations in the absence of a comprehensive federal framework.</p>
-                <p class="body-text">As of the Transparency Coalition's April 10 legislative update, confirmed legislative actions include Maine's LD 2082 — which would prohibit the clinical use of AI in mental health therapy while permitting administrative applications, and was approved by both legislative chambers on April 7 and sent to the governor on April 8 — and Missouri's HB 2372, an omnibus health care bill that includes a therapy chatbot ban covering therapy services, psychotherapy, and mental health diagnosis, with a $10,000 first-violation penalty, approved by the full House on April 2 and now in the Senate Committee on Families, Seniors and Health. In Georgia, Governor Brian Kemp is weighing SB 540, a chatbot disclosure and child safety bill, and SB 444, which prohibits insurance coverage decisions from being based solely on AI systems. The scale of the broader legislative wave is striking: as of March 2026, lawmakers in 45 states have introduced 1,561 AI-related bills, already surpassing the total introduced in all of 2024. This surge occurs in direct tension with the Trump administration's December 2025 executive order proposing federal preemption of state AI laws deemed to impose undue burdens on AI development, a conflict that will ultimately require judicial resolution.</p>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label cN c5">Strategic Impact</span>
-                </div>
-                <div class="impact-box lcN c5" style="border-left:4px solid var(--c5)">
+                <div class="impact-box lc5" style="border-left:4px solid var(--c5)">
                     <ul class="impact-list">
-                        <li><strong>Technology and Ecosystem Perspective:</strong> A fragmented regulatory environment forces developers to build geofenced AI models and applications where features and safety guardrails change dynamically based on the user's location. This adds significant technical overhead, stifles seamless deployment of uniform AI services, and creates a structural preference for model architectures that support fine-grained, region-specific policy controls.</li>
-                        <li><strong>Business and Market Dynamics:</strong> The absence of federal preemption creates a growing market for legal and compliance technology platforms that can help enterprises track and adhere to dozens of disparate state-level AI laws. For large companies, compliance costs will rise significantly; for smaller startups, the burden may effectively restrict operations to less-regulated states, producing an uneven competitive landscape that further entrenches the largest incumbents.</li>
-                        <li><strong>Infrastructure and Hardware Linkage:</strong> State-specific data residency and processing requirements may create pressure for more localized data center infrastructure, potentially moderating the trend toward hyperscale centralization and driving investment in smaller, jurisdictionally defined compute clusters.</li>
-                        <li><strong>Investment Strategy:</strong> Capital should be directed toward AI governance, risk, and compliance (GRC) platforms capable of automatically auditing AI systems against multiple state regulations and documenting compliance. Investors should apply heightened scrutiny to startups whose business models rely on unregulated collection and use of personal data, as these represent the primary targets of emerging state-level restrictions.</li>
+                        <li><strong>Technology and Ecosystem Perspective:</strong> The focus is shifting from the capabilities of the foundation models themselves to the governance, integration, and workflow-redesign platforms that surround them. The technology is no longer the bottleneck; the organization's ability to absorb and operationalize it is. This creates a massive market opportunity for AI governance, risk, and compliance (GRC) platforms and specialized consulting services.</li>
+                        <li><strong>Business and Market Dynamics:</strong> A bifurcation is occurring between "AI Leaders" and the rest of the market. The KPMG report notes a widening performance gap between organizations treating AI as an enterprise-wide transformation versus those simply bolting it onto existing processes. This suggests a "winner-take-most" dynamic where companies that successfully integrate AI will achieve compounding competitive advantages, while laggards will see their massive investments yield minimal returns.</li>
+                        <li><strong>Infrastructure and Hardware Linkage:</strong> The lack of clear ROI will inevitably lead to greater scrutiny of AI-related CapEx. CFOs will begin to demand clearer business cases for multi-million dollar GPU cluster purchases, potentially slowing the pace of hardware procurement. This will force cloud providers and hardware vendors to shift their sales narrative from raw performance to total cost of ownership (TCO) and demonstrable ROI.</li>
+                        <li><strong>Investment Strategy:</strong> Capital should pivot from pure-play model providers to the enterprise enablement layer. Companies providing tools for AI observability, governance, security, and workflow integration are solving the most acute pain point for enterprises today. The survey data strongly suggests that the next wave of value creation will come not from building better models, but from building the systems that allow enterprises to actually *use* them effectively and safely.</li>
                     </ul>
                 </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label cN c5">Technical Deep Dive</span> <span class="subsec-tag lcN c5">Legislative Footprint</span>
+                    <span class="subsec-icon">🔬</span> <span class="subsec-label c5">Technical Deep Dive</span> <span class="subsec-tag lc5 c5">ROI Disconnect</span>
+                </div>
+                <div class="arch-grid">
+                    <div class="arch-chip">Governance & Compliance (GRC)</div>
+                    <div class="arch-chip">Workflow Integration</div>
+                    <div class="arch-chip">Systemic Transformation</div>
                 </div>
                 <div class="table-scroll-wrap">
                     <table class="info-table">
                         <thead>
                             <tr>
-                                <th>State / Bill</th>
-                                <th>Target Scope</th>
-                                <th>Current Status</th>
+                                <th>Survey Metric / Finding</th>
+                                <th>Percentage (%)</th>
+                                <th>Strategic Implication</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Maine LD 2082</td>
-                                <td>Prohibits clinical AI in mental health therapy.</td>
-                                <td>Sent to governor (April 8)</td>
+                                <td>Executives admitting strategy is "more for show"</td>
+                                <td>75%</td>
+                                <td>High risk of an AI bubble driven by FOMO, not fundamentals.</td>
                             </tr>
                             <tr>
-                                <td>Maine LD 2162</td>
-                                <td>Regulates child access to AI chatbots/companions.</td>
-                                <td>Under Senate consideration</td>
+                                <td>Organizations facing major adoption challenges</td>
+                                <td>79%</td>
+                                <td>Market pivot required towards AI observability and integration tools.</td>
                             </tr>
                             <tr>
-                                <td>Missouri HB 2372</td>
-                                <td>Omnibus bill blocking therapy chatbots ($10k fine).</td>
-                                <td>In Senate committee</td>
+                                <td>C-suite saying AI is "tearing company apart"</td>
+                                <td>54%</td>
+                                <td>Severe cultural and operational friction needing change management.</td>
                             </tr>
                             <tr>
-                                <td>Georgia SB 540 & 444</td>
-                                <td>Chatbot child safety & Prohibits sole-AI insurance decisions.</td>
-                                <td>Awaiting governor action</td>
+                                <td>Organizations seeing significant ROI</td>
+                                <td>Only 29%</td>
+                                <td>CFO scrutiny on future CapEx and GPU hardware procurement.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="chart-wrap"><div id="chart-art5" style="width:100%; height:280px;"></div></div>
+                <div class="chart-wrap">
+                    <div id="chart-art5" style="width:100%; height:280px;"></div>
+                </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label cN c5">Evolution & Timeline</span>
+                    <span class="subsec-icon">⏳</span> <span class="subsec-label c5">Evolution & Timeline</span>
                 </div>
                 <div class="flow-row">
-                    <div class="flow-step">Federal Gridlock<br><small>(Failure to pass comprehensive national AI act)</small></div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step">State Legislative Boom<br><small>(1,561 state bills introduced in Q1 2026)</small></div>
-                    <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Preemption Conflict<br><small>(Dec 2025 Executive Order vs Enacted State Laws in courts)</small></div>
+                    <div class="flow-step">Initial Hype Cycle</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Massive CapEx Commitments</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Isolated Productivity</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">The "Reality Gap" (ROI Missing)</div>
                 </div>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label cN c5">Critical View</span>
+                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c5">Critical View</span>
                 </div>
-                <p class="body-text">The state-by-state approach to AI regulation creates a legal environment that disproportionately benefits the largest technology companies, which have the resources to maintain large compliance teams, while potentially foreclosing opportunities for smaller, innovative startups that cannot absorb the cost of navigating contradictory and overlapping legal requirements. The irony is that well-intentioned consumer protection legislation may accelerate the market consolidation it implicitly seeks to counter. Meanwhile, the federal preemption battle remains unresolved: courts have not yet ruled on whether the executive order has the authority to override enacted state laws, and the outcome of that litigation will define the structure of U.S. AI regulation for years to come.</p>
+                <p>The current phase of "invest at all costs" is unsustainable and driven more by competitive anxiety than by clear-headed strategy. The admission that strategies are "for show" is a damning indictment of corporate leadership, suggesting that many are simply throwing money at the problem without a coherent plan. This creates a significant risk of an "AI bubble," where valuations are based on adoption metrics rather than on revenue and profit. If the ROI problem is not solved, the market could face a painful correction as boards and investors lose patience with a technology that consumes vast resources while failing to deliver on its financial promises.</p>
             </div>
 
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label cN c5">Community Sentiment</span>
+                    <span class="subsec-icon">💬</span> <span class="subsec-label c5">Community Sentiment</span>
                 </div>
                 <div class="sentiment-grid">
                     <div class="sentiment-card">
-                        <span class="emoji">⚖️</span>
-                        <span class="label">Legal Boon</span>
-                        <span class="desc">Law firms and GRC compliance startups view the fractured landscape as an immediate massive revenue driver.</span>
+                        <div class="sentiment-emoji">😞</div>
+                        <div class="sentiment-label">Disappointed</div>
+                        <div class="sentiment-desc">48% of organizations calling adoption efforts a massive disappointment.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="emoji">🤬</span>
-                        <span class="label">Developer Frustration</span>
-                        <span class="desc">Engineers detest the technical debt required to build dynamic, geofenced algorithmic constraints.</span>
+                        <div class="sentiment-emoji">💸</div>
+                        <div class="sentiment-label">Stressed</div>
+                        <div class="sentiment-desc">CFOs struggling to justify multi-million dollar GPU and SaaS bills.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="emoji">🏛️</span>
-                        <span class="label">Constitutional Anticipation</span>
-                        <span class="desc">Industry observers are universally preparing for a Supreme Court showdown over the scope of federal preemption.</span>
+                        <div class="sentiment-emoji">🛠️</div>
+                        <div class="sentiment-label">Pivoting</div>
+                        <div class="sentiment-desc">Strategists redirecting focus from models to workflow integration and GRC.</div>
                     </div>
                 </div>
             </div>
@@ -847,23 +1081,41 @@
             <h2>Summary & Forward-Looking Outlook</h2>
             
             <div class="syn-block">
-                <strong>01.</strong> The artificial intelligence sector is undergoing a fundamental realignment driven by the collision of exponential software ambition with the absolute constraints of the physical world and the strategic imperatives of national governments. The past 72 hours have illuminated this transition with stark clarity across five interconnected developments. The strategic calculus of frontier AI labs is shifting, as evidenced by Anthropic's early-stage exploration of custom silicon — a signal that vertical integration and control over the full hardware-to-software stack are becoming prerequisites for survival and competitive differentiation at the frontier, even if the commitment remains tentative. This inward turn by corporations is mirrored by the outward-facing industrial policy of nations: the U.S. government's formalization of the American AI Exports Program transforms AI from a commercial product into an explicit instrument of foreign policy, aiming to embed U.S.-aligned technology deep into the global digital infrastructure of allied nations.
+                <div class="syn-num">01</div>
+                <div>
+                    <strong>Report Summary:</strong><br>
+                    The artificial intelligence sector is undergoing a painful but necessary maturation, where the boundless optimism of software is colliding with the unforgiving constraints of the physical world and the complexities of enterprise integration. The past 72 hours have starkly illuminated this transition. At the most foundational layer, the AI industry's physical footprint is now so large that it is generating its own opposition, with a growing grassroots revolt against data center construction threatening the very ground upon which future progress is built.
+                </div>
             </div>
             
             <div class="syn-block">
-                <strong>02.</strong> Both of these grand strategies are entirely dependent on a fragile physical supply chain. The emergence of advanced packaging as the defining AI hardware bottleneck of 2026 reveals a critical single point of failure concentrated in a handful of facilities in Taiwan, granting immense structural power to gatekeepers like TSMC and creating systemic risk that no amount of software innovation can fully offset. In response to these physical limitations, innovation is being forced into the realm of pure algorithmic efficiency: Harvard's Cascade decoder — if its preprint results survive peer review — demonstrates a powerful new paradigm where AI is used not just as an application but as a foundational tool to accelerate other deep-tech frontiers, potentially compressing the timeline to fault-tolerant quantum computing.
+                <div class="syn-num">02</div>
+                <div>
+                    This infrastructure scarcity is forcing a strategic battle at the hardware layer. We are witnessing the genesis of powerful new alliances and competitive threats: Amazon is preparing to weaponize its custom silicon program against the open market, while an audacious "Terafab" consortium led by Intel and Elon Musk aims to redefine the scale of manufacturing itself. Simultaneously, a counter-movement led by AMD and the UALink consortium is fighting to break the proprietary hardware monopolies with open standards.
+                </div>
             </div>
             
             <div class="syn-block">
-                <strong>03.</strong> Finally, this entire technological explosion is unfolding within a chaotic and unresolved legal vacuum, where the rapid proliferation of state-level AI regulations across the U.S. is creating a fractured compliance landscape that threatens to stifle innovation while simultaneously entrenching the market power of the largest incumbents.
+                <div class="syn-num">03</div>
+                <div>
+                    Above this turbulent physical layer, the enterprise software world is facing a crisis of value. New data reveals a chasm between universal AI adoption and the actual realization of business impact, with a majority of leaders admitting their strategies are performative. This "reality gap" signals the end of the initial hype cycle and the beginning of a long, difficult phase focused on governance, workflow integration, and proving tangible ROI. In aggregate, the power in the AI ecosystem is shifting from those who can simply build the largest model to those who can navigate community politics, secure a resilient supply chain, create an open and defensible hardware ecosystem, and translate algorithmic potential into profitable business processes.
+                </div>
             </div>
 
             <div class="outlook-box">
-                <h3>Anticipated Key Events (Next 1 Quarter to 1 Year)</h3>
-                <div class="outlook-item"><strong>[Industry Consensus]</strong> Expect at least one additional major AI foundation model company beyond Google, Meta, and Anthropic to announce a formal custom ASIC development program by end of 2026, as the economic and supply chain pressures of relying on merchant silicon become structurally unsustainable at frontier scale.</div>
-                <div class="outlook-item"><strong>[Confirmed Schedule]</strong> The American AI Exports Program Call for Proposals closes June 30, 2026; the first designated consortia announcements and their implications for U.S. AI diplomacy in Indo-Pacific and European markets will define the near-term geopolitical trajectory of AI infrastructure deployment.</div>
-                <div class="outlook-item"><strong>[Established Knowledge Base]</strong> The EU AI Act's most stringent obligations for high-risk systems become fully enforceable in August 2026, triggering a global compliance scramble and likely producing the first major enforcement actions against non-compliant AI systems operating in European markets — with significant secondary effects on U.S. companies navigating conflicting federal and state regulatory frameworks simultaneously.</div>
-                <div class="outlook-item"><strong>[Speculative]</strong> If the Cascade decoder results are independently replicated in peer review, expect a rapid surge in government and venture capital funding into hybrid quantum-classical computing programs, alongside an accelerated investment cycle in post-quantum cryptography as the perceived timeline to cryptographically relevant quantum computers shortens.</div>
+                <div class="outlook-item">
+                    <strong>Anticipated Key Events (Next 1 Quarter to 1 Year):</strong><br>
+                    - <strong>[Industry Consensus]</strong> Expect a major hyperscaler, likely Amazon or Google, to officially launch a merchant silicon offering by the end of 2026. This will trigger a price war in the inference chip market and force NVIDIA to compete on both performance and its ability to integrate with broader cloud service ecosystems.
+                </div>
+                <div class="outlook-item">
+                    - <strong>[Established Knowledge Base]</strong> The UALink 2.0 specification will likely be finalized by Q4 2026, with the first server prototypes from major OEMs featuring the open interconnect standard appearing in early 2027. This will be a critical test of the open ecosystem's ability to challenge NVIDIA's NVLink dominance.
+                </div>
+                <div class="outlook-item">
+                    - <strong>[Speculative]</strong> The "Terafab" announcement will catalyze a new wave of government-backed semiconductor initiatives. Expect the U.S. and E.U. to respond with expanded CHIPS Act-style funding and streamlined permitting for "strategic fab" projects to prevent a private consortium from creating a single point of failure/control in next-generation compute.
+                </div>
+                <div class="outlook-item">
+                    - <strong>[Based on Established Trends]</strong> The enterprise "reality gap" will lead to a wave of consolidation in the AI startup market. Companies offering simple "wrappers" around foundation model APIs will struggle to survive, while those providing robust governance, security, and ROI-measurement tools will become prime acquisition targets for major enterprise software vendors.
+                </div>
             </div>
         </section>
 
@@ -872,114 +1124,107 @@
     <button id="to-top">↑ Top</button>
 
     <script>
-        // Dark/Light Theme Toggle Logic
+        // ── Theme Toggle Logic ──
         const themeBtn = document.getElementById('theme-toggle');
-        const htmlElement = document.documentElement;
+        const htmlDoc = document.documentElement;
         
-        function updateBtnText(theme) {
-            if(theme === 'dark') {
-                themeBtn.textContent = '☀️ 라이트모드로';
-            } else {
-                themeBtn.textContent = '🌙 다크모드로';
-            }
-        }
-
-        // Respect system preference initially
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            htmlElement.setAttribute('data-theme', 'dark');
-            updateBtnText('dark');
-        } else {
-            updateBtnText('light');
-        }
+        let isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        htmlDoc.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        themeBtn.textContent = isDark ? '☀️ 라이트모드로' : '🌙 다크모드로';
 
         themeBtn.addEventListener('click', () => {
-            if(htmlElement.getAttribute('data-theme') === 'light') {
-                htmlElement.setAttribute('data-theme', 'dark');
-                updateBtnText('dark');
-            } else {
-                htmlElement.setAttribute('data-theme', 'light');
-                updateBtnText('light');
-            }
+            isDark = !isDark;
+            htmlDoc.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            themeBtn.textContent = isDark ? '☀️ 라이트모드로' : '🌙 다크모드로';
+            // Re-render charts for theme update
+            chart1.resize(); chart2.resize(); chart5.resize();
         });
 
-        // Back to Top Button Logic
+        // ── Scroll To Top Logic ──
         const toTopBtn = document.getElementById('to-top');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 300) {
-                toTopBtn.style.display = 'flex';
+                toTopBtn.classList.add('visible');
             } else {
-                toTopBtn.style.display = 'none';
+                toTopBtn.classList.remove('visible');
             }
         });
         toTopBtn.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Initialize ECharts with SVG Renderer per Tufte's Rules
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            // Chart 1: Anthropic Revenue (Article 1)
-            const chart1 = echarts.init(document.getElementById('chart-art1'), null, {renderer: 'svg'});
-            chart1.setOption({
-                title: { text: 'Anthropic Run-Rate Revenue ($B)', left: 'center', textStyle: { fontWeight: 'normal', fontSize: 14 } },
-                tooltip: { trigger: 'axis' },
-                xAxis: { type: 'category', data: ['End of 2025', 'April 2026'], axisLine: { lineStyle: { color: '#94a3b8' } } },
-                yAxis: { type: 'value', axisLine: { show: false }, splitLine: { lineStyle: { type: 'dashed', color: '#e2e8f0' } } },
-                series: [{
-                    data: [9, 30],
-                    type: 'bar',
-                    barWidth: '40%',
-                    itemStyle: { color: '#2563eb', borderRadius: [4,4,0,0] },
-                    label: { show: true, position: 'top', formatter: '${c}B' }
-                }],
-                backgroundColor: 'transparent'
-            });
-
-            // Chart 2: Global Advanced Packaging Capacity (Article 3)
-            const chart3 = echarts.init(document.getElementById('chart-art3'), null, {renderer: 'svg'});
-            chart3.setOption({
-                title: { text: 'Q1 2026 Global Advanced Packaging Capacity Share', left: 'center', textStyle: { fontWeight: 'normal', fontSize: 14 } },
-                tooltip: { trigger: 'item', formatter: '{b}: {d}%' },
-                legend: { bottom: '0%', left: 'center' },
-                series: [{
+        // ── ECharts Initialization (SVG Renderer strictly enforced) ──
+        
+        // Chart 1: Data Center 2026 Capacity Risk
+        var chart1 = echarts.init(document.getElementById('chart-art1'), null, {renderer: 'svg'});
+        var option1 = {
+            title: { text: '2026 US Data Center Capacity Risk', left: 'center', textStyle: { fontSize: 14, color: '#6b7280' } },
+            tooltip: { trigger: 'item' },
+            series: [
+                {
+                    name: 'Capacity Status',
                     type: 'pie',
                     radius: ['40%', '70%'],
-                    avoidLabelOverlap: false,
-                    itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
-                    label: { show: false },
+                    itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+                    label: { show: true, formatter: '{b}: {d}%' },
                     data: [
-                        { value: 45, name: 'Taiwan', itemStyle: {color: '#d97706'} },
-                        { value: 20, name: 'South Korea', itemStyle: {color: '#fbbf24'} },
-                        { value: 15, name: 'China', itemStyle: {color: '#fcd34d'} },
-                        { value: 20, name: 'U.S. / Europe / Rest', itemStyle: {color: '#e2e8f0'} }
+                        { value: 50, name: 'At Risk / Delayed', itemStyle: { color: '#dc2626' } },
+                        { value: 50, name: 'On Track', itemStyle: { color: '#2563eb' } }
                     ]
-                }],
-                backgroundColor: 'transparent'
-            });
+                }
+            ]
+        };
+        chart1.setOption(option1);
 
-            // Chart 3: AI Legislative Surge (Article 5)
-            const chart5 = echarts.init(document.getElementById('chart-art5'), null, {renderer: 'svg'});
-            chart5.setOption({
-                title: { text: 'U.S. State-Level AI Bills Introduced', left: 'center', textStyle: { fontWeight: 'normal', fontSize: 14 } },
-                tooltip: { trigger: 'axis' },
-                xAxis: { type: 'value', axisLine: { show: false }, splitLine: { show: false } },
-                yAxis: { type: 'category', data: ['All of 2024', 'By March 2026'], axisLine: { lineStyle: { color: '#94a3b8' } } },
-                series: [{
-                    data: [1200, 1561],
+        // Chart 2: Merchant Silicon Ecosystem (Conceptual Revenue/Margin comparison)
+        var chart2 = echarts.init(document.getElementById('chart-art2'), null, {renderer: 'svg'});
+        var option2 = {
+            title: { text: 'Projected AI Merchant Hardware Disruption (Index)', left: 'center', textStyle: { fontSize: 14, color: '#6b7280' } },
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: { type: 'value' },
+            yAxis: { type: 'category', data: ['Proprietary Incumbents', 'Hyperscaler Entry (Amazon)', 'Open Standard Ecosystem'] },
+            series: [
+                {
+                    name: 'Disruption Potential',
                     type: 'bar',
-                    itemStyle: { color: '#dc2626', borderRadius: [0,4,4,0] },
-                    label: { show: true, position: 'right' }
-                }],
-                grid: { left: '20%', right: '15%', top: '20%', bottom: '10%' },
-                backgroundColor: 'transparent'
-            });
+                    itemStyle: { color: '#ea580c', borderRadius: [0, 4, 4, 0] },
+                    data: [30, 85, 75]
+                }
+            ]
+        };
+        chart2.setOption(option2);
 
-            // Resize charts on window resize
-            window.addEventListener('resize', () => {
-                chart1.resize();
-                chart3.resize();
-                chart5.resize();
-            });
+        // Chart 5: Enterprise AI Reality Gap
+        var chart5 = echarts.init(document.getElementById('chart-art5'), null, {renderer: 'svg'});
+        var option5 = {
+            title: { text: 'Enterprise AI Survey Metrics (Writer / KPMG)', left: 'center', textStyle: { fontSize: 14, color: '#6b7280' } },
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            grid: { left: '3%', right: '8%', bottom: '3%', containLabel: true },
+            xAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value}%' } },
+            yAxis: { type: 'category', data: ['Significant ROI', 'Tearing Company Apart', 'Strategy "For Show"', 'Facing Adoption Challenges'], axisLabel: { interval: 0 } },
+            series: [
+                {
+                    name: 'Percentage of Executives',
+                    type: 'bar',
+                    label: { show: true, position: 'right', formatter: '{c}%' },
+                    itemStyle: {
+                        color: function(params) {
+                            var colorList = ['#059669', '#dc2626', '#f59e0b', '#2563eb'];
+                            return colorList[params.dataIndex];
+                        },
+                        borderRadius: [0, 4, 4, 0]
+                    },
+                    data: [29, 54, 75, 79]
+                }
+            ]
+        };
+        chart5.setOption(option5);
+
+        window.addEventListener('resize', function() {
+            chart1.resize();
+            chart2.resize();
+            chart5.resize();
         });
     </script>
 </body>
