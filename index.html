@@ -1,1231 +1,694 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strategic AI Briefing</title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-NEQ3MVRM28');
-    </script>
-    <script type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "vxfeininbx");
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
-
-    <style>
-        /* ── CSS Variables for Theming ── */
-        :root {
-            --bg-color: #f8f9fa;
-            --surface-color: #ffffff;
-            --text-main: #1a1a1a;
-            --text-muted: #6b7280;
-            --border-color: #e5e7eb;
-            --header-bg: rgba(255, 255, 255, 0.95);
-            
-            --c1: #2563eb; --lc1: #eff6ff;
-            --c2: #ea580c; --lc2: #fff7ed;
-            --c3: #059669; --lc3: #ecfdf5;
-            --c4: #7c3aed; --lc4: #f5f3ff;
-            --c5: #dc2626; --lc5: #fef2f2;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #121212;
-            --surface-color: #1e1e1e;
-            --text-main: #e5e7eb;
-            --text-muted: #9ca3af;
-            --border-color: #374151;
-            --header-bg: rgba(30, 30, 30, 0.95);
-            
-            --c1: #60a5fa; --lc1: rgba(37, 99, 235, 0.15);
-            --c2: #fb923c; --lc2: rgba(234, 88, 12, 0.15);
-            --c3: #34d399; --lc3: rgba(5, 150, 105, 0.15);
-            --c4: #a78bfa; --lc4: rgba(124, 58, 237, 0.15);
-            --c5: #f87171; --lc5: rgba(220, 38, 38, 0.15);
-        }
-
-        /* ── Base Styles ── */
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        h1, h2, h3, h4 {
-            color: var(--text-main);
-            margin-top: 0;
-        }
-
-        /* ── Top Navigation & Actions ── */
-        header {
-            background-color: var(--header-bg);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-top h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        #theme-toggle {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 8px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-
-        #theme-toggle:hover {
-            filter: brightness(0.95);
-        }
-
-        .toc {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .toc::-webkit-scrollbar { height: 4px; }
-        .toc::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-
-        .toc a {
-            text-decoration: none;
-            color: var(--text-main);
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .toc a:hover {
-            background: var(--border-color);
-        }
-
-        /* ── PC 가독성: 본문 최대 너비 제한 ── */
-        .container, main, .article, section {
-            max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        main {
-            padding: 40px 20px;
-        }
-
-        /* ── Article Layout ── */
-        .article {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 32px;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .article-title {
-            font-size: 1.75rem;
-            font-weight: 800;
-            margin-bottom: 24px;
-            line-height: 1.3;
-        }
-
-        .subsec {
-            margin-bottom: 32px;
-        }
-        
-        .subsec:last-child {
-            margin-bottom: 0;
-        }
-
-        .subsec-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-            font-weight: 700;
-            font-size: 1.15rem;
-        }
-
-        .subsec-icon { font-size: 1.3rem; }
-        
-        .subsec-tag {
-            font-size: 0.75rem;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: 600;
-            margin-left: auto;
-        }
-
-        /* Color classes for text and background */
-        .c1 { color: var(--c1); } .lc1 { background-color: var(--lc1); }
-        .c2 { color: var(--c2); } .lc2 { background-color: var(--lc2); }
-        .c3 { color: var(--c3); } .lc3 { background-color: var(--lc3); }
-        .c4 { color: var(--c4); } .lc4 { background-color: var(--lc4); }
-        .c5 { color: var(--c5); } .lc5 { background-color: var(--lc5); }
-
-        .lead-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .body-text, p {
-            color: var(--text-main);
-            opacity: 0.9;
-        }
-
-        /* ── Strategic Impact ── */
-        .impact-box {
-            padding: 20px;
-            border-radius: 0 8px 8px 0;
-            margin: 16px 0;
-        }
-
-        .impact-list {
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        .impact-list li {
-            margin-bottom: 12px;
-        }
-
-        .metric-card {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 16px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        /* ── Technical Deep Dive ── */
-        .arch-grid {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .arch-chip {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .table-scroll-wrap {
-            width: 100%;
-            overflow-x: auto;
-            margin-bottom: 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
-
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        .info-table th, .info-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.9rem;
-        }
-
-        .info-table th {
-            background-color: var(--bg-color);
-            font-weight: 600;
-        }
-
-        .info-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .chart-wrap {
-            margin-top: 24px;
-            padding: 16px;
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
-
-        /* ── Evolution & Timeline ── */
-        .flow-row {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            overflow-x: auto;
-            padding: 8px 0;
-        }
-
-        .flow-step {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            white-space: nowrap;
-            text-align: center;
-        }
-
-        .flow-arrow {
-            color: var(--text-muted);
-            font-weight: bold;
-        }
-
-        /* ── Community Sentiment ── */
-        .sentiment-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-        }
-
-        .sentiment-card {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            padding: 16px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .sentiment-emoji { font-size: 1.5rem; }
-        .sentiment-label { font-weight: 700; font-size: 0.95rem; }
-        .sentiment-desc { font-size: 0.85rem; color: var(--text-muted); }
-
-        /* ── Closing Synthesis ── */
-        .synthesis {
-            background: var(--surface-color);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 32px;
-            margin-bottom: 60px;
-        }
-
-        .synthesis h2 {
-            font-size: 1.75rem;
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .syn-block {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .syn-num {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--border-color);
-            min-width: 40px;
-        }
-
-        .outlook-box {
-            background: var(--bg-color);
-            border-radius: 8px;
-            padding: 24px;
-            margin-top: 32px;
-            border-left: 4px solid var(--text-main);
-        }
-
-        .outlook-item {
-            margin-bottom: 16px;
-        }
-        
-        .outlook-item:last-child { margin-bottom: 0; }
-
-        /* ── Back to Top ── */
-        #to-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--text-main);
-            color: var(--bg-color);
-            border: none;
-            border-radius: 24px;
-            padding: 10px 20px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-
-        #to-top.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* 📱 모바일 반응형 강제 적용 (768px 이하) — 이 코드를 반드시 마지막에 포함할 것 */
-        @media screen and (max-width: 768px) {
-            /* 1. 기본 레이아웃: 적절한 여백과 폰트 */
-            body {
-                font-size: 15px !important;
-                line-height: 1.7 !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                overflow-x: hidden !important;
-            }
-
-            /* 2. 노치/홈 인디케이터 대응 (iPhone safe area) */
-            .container, main {
-                padding-left: max(16px, env(safe-area-inset-left)) !important;
-                padding-right: max(16px, env(safe-area-inset-right)) !important;
-                padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
-            }
-
-            /* 3. 영단어 줄바꿈: 중간 절단 방지, 긴 단어만 허용 */
-            * {
-                box-sizing: border-box !important;
-                word-break: normal !important;
-                overflow-wrap: anywhere !important;
-            }
-
-            /* 4. 컨테이너·카드 좌우 여백 정리 */
-            .article, .subsec, .impact-box, .syn-block, .outlook-item {
-                width: 100% !important;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-                padding: 14px 16px !important;
-            }
-
-            /* 5. 그리드 → 1열 세로 배치 */
-            .metric-row, .metric-row-4, .flow-row, .sentiment-grid, .arch-grid, .article-grid {
-                display: flex !important;
-                flex-direction: column !important;
-                width: 100% !important;
-                gap: 12px !important;
-            }
-
-            .metric-card, .sentiment-card, .arch-chip {
-                width: 100% !important;
-            }
-
-            /* 6. 표: 컨테이너만 가로 스크롤, 셀 내부는 줄바꿈 허용 */
-            .table-scroll-wrap {
-                display: block !important;
-                width: 100% !important;
-                overflow-x: auto !important;
-                -webkit-overflow-scrolling: touch !important;
-            }
-
-            .info-table {
-                width: 100% !important;
-                font-size: 13px !important;
-                white-space: normal !important; /* ← 기존 nowrap 제거: 셀 내 줄바꿈 허용 */
-                min-width: 480px; /* 표가 너무 좁아지지 않도록 최소 너비 유지 */
-            }
-
-            .info-table th, .info-table td {
-                padding: 8px 10px !important;
-            }
-
-            /* 7. 차트 크기 */
-            .chart-wrap > div {
-                width: 100% !important;
-                height: 240px !important;
-            }
-
-            /* 8. 제목 계층 유지 (동일 크기 방지) */
-            h1 { font-size: 1.4rem !important; }
-            h2 { font-size: 1.2rem !important; }
-            h3 { font-size: 1.05rem !important; }
-            .subsec-label { font-size: 1.0rem !important; }
-
-            /* 9. 터치 타겟 크기 보장 (버튼·링크 최소 44px) */
-            button, a, .toc a {
-                min-height: 44px !important;
-                display: inline-flex !important;
-                align-items: center !important;
-            }
-
-            /* 10. TOC 칩 가로 스크롤 */
-            .toc {
-                display: flex !important;
-                flex-wrap: nowrap !important;
-                overflow-x: auto !important;
-                gap: 8px !important;
-                padding: 8px 16px !important;
-                -webkit-overflow-scrolling: touch !important;
-            }
-
-            .toc a {
-                white-space: nowrap !important;
-                flex-shrink: 0 !important;
-            }
-
-            /* 11. "맨 위로" 버튼 위치 조정 (홈바 영향 방지) */
-            #to-top {
-                bottom: max(24px, env(safe-area-inset-bottom)) !important;
-                right: 16px !important;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strategic AI Briefing</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+    /* CSS Variables for Dark/Light Theme Support */
+    :root {
+        --bg-color: #f8fafc;
+        --text-main: #0f172a;
+        --text-muted: #475569;
+        --border-color: #cbd5e1;
+        --card-bg: #ffffff;
+        --nav-bg: rgba(255, 255, 255, 0.85);
+        --c1: #2563eb; --lc1: #eff6ff; /* Article 1: Blue */
+        --c2: #ea580c; --lc2: #fff7ed; /* Article 2: Orange */
+        --c3: #059669; --lc3: #ecfdf5; /* Article 3: Green */
+        --c4: #dc2626; --lc4: #fef2f2; /* Article 4: Red */
+        --c5: #7c3aed; --lc5: #f5f3ff; /* Article 5: Purple */
+        --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    [data-theme="dark"] {
+        --bg-color: #0f172a;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-color: #334155;
+        --card-bg: #1e293b;
+        --nav-bg: rgba(15, 23, 42, 0.85);
+        --c1: #60a5fa; --lc1: #1e3a8a;
+        --c2: #fb923c; --lc2: #7c2d12;
+        --c3: #34d399; --lc3: #064e3b;
+        --c4: #f87171; --lc4: #7f1d1d;
+        --c5: #a78bfa; --lc5: #4c1d95;
+    }
+
+    /* Global Typography & Layout */
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h1, h2, h3 { font-weight: 700; margin-bottom: 0.5em; color: var(--text-main); }
+    h1 { font-size: 2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+    h2 { font-size: 1.5rem; margin-top: 2em; }
+    
+    .theme-toggle-wrap { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+    button.theme-btn {
+        background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color);
+        padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600;
+    }
+
+    /* Navigation / TOC */
+    nav.toc {
+        display: flex; gap: 10px; overflow-x: auto; white-space: nowrap;
+        padding: 12px 0; position: sticky; top: 0; background: var(--nav-bg);
+        backdrop-filter: blur(8px); z-index: 100;
+    }
+    nav.toc::-webkit-scrollbar { display: none; }
+    nav.toc a {
+        display: inline-block; padding: 8px 16px; border-radius: 20px;
+        background-color: var(--card-bg); border: 1px solid var(--border-color);
+        color: var(--text-main); text-decoration: none; font-size: 0.85rem; font-weight: 600;
+        transition: transform 0.2s;
+    }
+    nav.toc a:hover { transform: translateY(-2px); }
+
+    /* Prologue */
+    .prologue { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 30px; }
+
+    /* Articles & Subsections */
+    .article { margin-top: 60px; padding-bottom: 40px; border-bottom: 2px dashed var(--border-color); }
+    .subsec { margin-top: 30px; }
+    .subsec-header { display: flex; align-items: center; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
+    .subsec-icon { font-size: 1.4rem; }
+    .subsec-label { font-weight: 700; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .subsec-tag {
+        font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; font-weight: 600;
+        margin-left: auto; text-transform: uppercase;
+    }
+
+    /* Text Elements */
+    p.lead-text { font-size: 1.1rem; font-weight: 500; color: var(--text-main); margin-bottom: 12px; }
+    p.body-text { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 12px; }
+
+    /* Impact Box */
+    .impact-box { padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+    ul.impact-list { margin: 0; padding-left: 20px; font-size: 0.95rem; color: var(--text-main); }
+    ul.impact-list li { margin-bottom: 8px; }
+
+    /* Metric Cards */
+    .metric-grid { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+    .metric-card {
+        flex: 1; min-width: 200px; background: var(--card-bg); border: 1px solid var(--border-color);
+        padding: 16px; border-radius: 8px; text-align: center;
+    }
+    .metric-val { font-size: 1.8rem; font-weight: 800; margin-bottom: 4px; }
+    .metric-desc { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* Technical Deep Dive & Tables */
+    .arch-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+    .arch-chip { background: var(--card-bg); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-family: var(--font-mono); }
+    
+    .info-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.9rem; }
+    .info-table th, .info-table td { padding: 10px; border: 1px solid var(--border-color); text-align: left; }
+    .info-table th { background: rgba(0,0,0,0.03); color: var(--text-muted); font-weight: 600; width: 30%; }
+
+    /* Evolution Flow */
+    .flow-row { display: flex; align-items: center; gap: 12px; overflow-x: auto; padding: 10px 0; margin-bottom: 16px; }
+    .flow-step { background: var(--card-bg); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+    .flow-arrow { color: var(--text-muted); font-weight: bold; }
+
+    /* Sentiment Grid */
+    .sentiment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+    .sentiment-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; }
+    .sentiment-card-title { font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .sentiment-card-desc { font-size: 0.85rem; color: var(--text-muted); }
+
+    /* Synthesis Section */
+    .synthesis { margin-top: 60px; background: var(--card-bg); padding: 30px; border-radius: 12px; border: 2px solid var(--border-color); }
+    .syn-block { margin-bottom: 24px; }
+    .syn-block-num { font-family: var(--font-mono); font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px; }
+    .outlook-box { margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px; }
+    .outlook-item { background: var(--bg-color); padding: 16px; border-left: 4px solid var(--text-main); margin-bottom: 12px; font-size: 0.95rem; }
+
+    /* Utilities */
+    .chart-wrap { margin-top: 24px; border: 1px solid var(--border-color); background: var(--card-bg); border-radius: 8px; padding: 10px; }
+    
+    /* Back to Top */
+    #to-top {
+        position: fixed; bottom: 30px; right: 30px; background: var(--text-main); color: var(--bg-color);
+        border: none; padding: 10px 16px; border-radius: 24px; cursor: pointer; font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none; z-index: 1000;
+    }
+
+    /* Colors */
+    .c1 { color: var(--c1); } .lc1 { background-color: var(--lc1); }
+    .c2 { color: var(--c2); } .lc2 { background-color: var(--lc2); }
+    .c3 { color: var(--c3); } .lc3 { background-color: var(--lc3); }
+    .c4 { color: var(--c4); } .lc4 { background-color: var(--lc4); }
+    .c5 { color: var(--c5); } .lc5 { background-color: var(--lc5); }
+</style>
 </head>
 <body>
 
-    <header>
-        <div class="header-top container">
-            <h1>Strategic AI Briefing</h1>
-            <button id="theme-toggle">🌙 다크모드로</button>
+<div class="theme-toggle-wrap">
+    <button class="theme-btn" id="theme-toggle">🌓 Toggle Theme</button>
+</div>
+
+<h1>Strategic Intelligence Report: Global Artificial Intelligence Ecosystem and Structural Paradigm Shifts</h1>
+<p style="color: var(--text-muted); font-weight: 600; margin-bottom: 20px;">Assessment Date: April 13, 2026</p>
+
+<nav class="toc">
+    <a href="#art1">1. The Great Stalling 2.0</a>
+    <a href="#art2">2. Amazon Trainium</a>
+    <a href="#art3">3. Intel & Musk Terafab</a>
+    <a href="#art4">4. AMD UALink 2.0</a>
+    <a href="#art5">5. Enterprise AI Reality Gap</a>
+    <a href="#synthesis">Synthesis & Outlook</a>
+</nav>
+
+<div class="prologue">
+    <h2>Executive Prologue</h2>
+    <p class="body-text">The global artificial intelligence ecosystem is now fully confronting the harsh physics of its own exponential growth. The period of unrestrained software scaling and speculative capital allocation is being superseded by an era of intense infrastructural friction, strategic realignment in the hardware market, and a sobering reckoning with the practical realities of enterprise deployment.</p>
+    <p class="body-text">The strategic events of the past 72 hours reveal an industry grappling with the second-order consequences of its success. The insatiable demand for data center capacity has triggered a widespread and organized grassroots revolt, with local communities actively blocking the construction of the very facilities needed to power AI's future. This physical constraint is forcing a strategic schism in the hardware layer: established hyperscalers are preparing to enter the merchant silicon market, while a new consortium of industrial and technology titans is proposing manufacturing projects at a scale previously thought unimaginable.</p>
+    <p class="body-text">Concurrently, the software ecosystem is facing a crisis of value, as new data reveals a profound disconnect between near-universal AI adoption and the generation of tangible business returns. This report isolates the five most consequential developments, providing actionable foresight into the shifting paradigms of infrastructure, hardware competition, and enterprise value creation.</p>
+</div>
+
+<article class="article" id="art1">
+    <h2>1. The Great Stalling 2.0: Data Center Revolt Intensifies, Threatening AI Buildout</h2>
+    <p style="font-size:0.85rem; color:var(--text-muted); font-family:var(--font-mono);">Source: Bloomberg; TechRadar | Event Date: 2026-04-11 | Paradigm: Infrastructure</p>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">🔭</span> <span class="subsec-label c1">Overview</span>
         </div>
-        <nav class="toc container">
-            <a href="#art1">1. Data Center Revolt</a>
-            <a href="#art2">2. Amazon Trainium</a>
-            <a href="#art3">3. Terafab Initiative</a>
-            <a href="#art4">4. UALink 2.0</a>
-            <a href="#art5">5. Enterprise AI ROI Gap</a>
-            <a href="#synthesis">Synthesis</a>
-        </nav>
-    </header>
+        <p class="lead-text">The AI infrastructure buildout is facing a new and formidable bottleneck: organized, widespread public opposition.</p>
+        <p class="body-text">Reporting from April 10-11 has quantified a dramatic escalation in local resistance to data center construction, moving beyond power grid limitations into the realm of political and social revolt. An analysis of public records and media reports indicates a significant trend of communities across the United States officially rejecting or implementing restrictive moratoriums on new data center projects since the beginning of 2026. This velocity of public backlash is reportedly unprecedented for industrial projects of this type. The opposition is driven by a convergence of concerns over soaring electricity prices for residents, massive water consumption in drought-prone areas, persistent noise pollution from cooling systems, and a growing perception that generous tax incentives benefit large corporations without providing proportional local employment or economic value. This grassroots movement is having a material impact on national capacity, with a Bloomberg report from April 10th estimating that a substantial portion—potentially between one-third and one-half—of all US data centers planned for 2026 are now likely to be delayed or cancelled entirely. Of a planned multi-gigawatt expansion of new capacity, only a fraction is currently under active construction, stranding billions in allocated capital.</p>
+    </div>
 
-    <main>
-        <article class="article" id="art1">
-            <h2 class="article-title">1. The Great Stalling 2.0: Data Center Revolt Intensifies, Threatening AI Buildout</h2>
-            
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label c1">Overview</span>
-                </div>
-                <p class="lead-text">The AI infrastructure buildout is facing a new and formidable bottleneck: organized, widespread public opposition.</p>
-                <p class="body-text">Reporting from April 10-11 has quantified a dramatic escalation in local resistance to data center construction, moving beyond power grid limitations into the realm of political and social revolt. An analysis of public records and media reports indicates a significant trend of communities across the United States officially rejecting or implementing restrictive moratoriums on new data center projects since the beginning of 2026. This velocity of public backlash is reportedly unprecedented for industrial projects of this type. The opposition is driven by a convergence of concerns over soaring electricity prices for residents, massive water consumption in drought-prone areas, persistent noise pollution from cooling systems, and a growing perception that generous tax incentives benefit large corporations without providing proportional local employment or economic value. This grassroots movement is having a material impact on national capacity, with a Bloomberg report from April 10th estimating that a substantial portion—potentially between one-third and one-half—of all US data centers planned for 2026 are now likely to be delayed or cancelled entirely. Of a planned multi-gigawatt expansion of new capacity, only a fraction is currently under active construction, stranding billions in allocated capital.</p>
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">⚡</span> <span class="subsec-label c1">Strategic Impact</span>
+        </div>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="metric-val c1">~50%</div>
+                <div class="metric-desc">Planned 2026 US Capacity at Risk</div>
             </div>
+        </div>
+        <div class="impact-box lc1" style="border-left:4px solid var(--c1)">
+            <ul class="impact-list">
+                <li><strong>Technology and Ecosystem Perspective:</strong> This physical deployment bottleneck forces a strategic pivot in software development toward extreme efficiency. The assumption of near-infinite, cheap cloud inference is breaking down. This will accelerate research and adoption of highly quantized models, compact architectures, and edge computing solutions that can deliver AI capabilities without relying on new hyperscale facilities.</li>
+                <li><strong>Business and Market Dynamics:</strong> Data center operators with existing, permitted facilities and secured power-purchase agreements now possess a near-monopolistic pricing advantage. The value of "powered land" with pre-approved zoning has skyrocketed. This creates a new class of distressed assets: projects stalled in permitting, and a premium on companies skilled in navigating complex local zoning and community engagement.</li>
+                <li><strong>Infrastructure and Hardware Linkage:</strong> The inability to build new facilities means existing data centers must be retrofitted for higher density, accelerating the demand for advanced liquid cooling and power distribution units that can handle next-generation hardware within legacy footprints. It also puts immense pressure on hyperscalers to build their own "behind-the-meter" power generation, further isolating them from public infrastructure.</li>
+                <li><strong>Investment Strategy:</strong> Capital must be redirected from speculative data center REITs without secured permits toward the "picks and shovels" of densification: manufacturers of liquid cooling, high-density power shelves, and software for optimizing energy consumption in existing facilities. Firms specializing in environmental permitting and community relations for industrial projects are now a critical part of the AI value chain.</li>
+            </ul>
+        </div>
+    </div>
 
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label c1">Strategic Impact</span>
-                </div>
-                <div class="impact-box lc1" style="border-left:4px solid var(--c1)">
-                    <ul class="impact-list">
-                        <li><strong>Technology and Ecosystem Perspective:</strong> This physical deployment bottleneck forces a strategic pivot in software development toward extreme efficiency. The assumption of near-infinite, cheap cloud inference is breaking down. This will accelerate research and adoption of highly quantized models, compact architectures, and edge computing solutions that can deliver AI capabilities without relying on new hyperscale facilities.</li>
-                        <li><strong>Business and Market Dynamics:</strong> Data center operators with existing, permitted facilities and secured power-purchase agreements now possess a near-monopolistic pricing advantage. The value of "powered land" with pre-approved zoning has skyrocketed. This creates a new class of distressed assets: projects stalled in permitting, and a premium on companies skilled in navigating complex local zoning and community engagement.</li>
-                        <li><strong>Infrastructure and Hardware Linkage:</strong> The inability to build new facilities means existing data centers must be retrofitted for higher density, accelerating the demand for advanced liquid cooling and power distribution units that can handle next-generation hardware within legacy footprints. It also puts immense pressure on hyperscalers to build their own "behind-the-meter" power generation, further isolating them from public infrastructure.</li>
-                        <li><strong>Investment Strategy:</strong> Capital must be redirected from speculative data center REITs without secured permits toward the "picks and shovels" of densification: manufacturers of liquid cooling, high-density power shelves, and software for optimizing energy consumption in existing facilities. Firms specializing in environmental permitting and community relations for industrial projects are now a critical part of the AI value chain.</li>
-                    </ul>
-                </div>
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">🔬</span> <span class="subsec-label c1">Technical Deep Dive</span> 
+            <span class="subsec-tag lc1 c1">Infra / Cooling</span>
+        </div>
+        <div class="arch-grid">
+            <div class="arch-chip">Liquid Cooling</div>
+            <div class="arch-chip">High-Density PDUs</div>
+            <div class="arch-chip">Behind-the-Meter Generation</div>
+            <div class="arch-chip">Quantized Models</div>
+        </div>
+        <table class="info-table">
+            <tr><th>Core Driver</th><td>Public opposition to negative externalities (power, water, noise, lack of local jobs).</td></tr>
+            <tr><th>Quantitative Impact</th><td>Up to 50% of planned 2026 US data center capacity is at risk of delay or cancellation.</td></tr>
+            <tr><th>Key Tactics</th><td>Citizen-led referendums, city council moratoriums, stringent environmental impact reviews.</td></tr>
+            <tr><th>Industry Response</th><td>Pivot toward less populated regions or private off-grid power plants.</td></tr>
+        </table>
+        <div class="chart-wrap"><div id="chart-art1" style="width:100%; height:280px;"></div></div>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">⏳</span> <span class="subsec-label c1">Evolution & Timeline</span>
+        </div>
+        <div class="flow-row">
+            <div class="flow-step">Infinite Cloud Expansion</div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-step">Hyperscale Energy Strain</div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-step">Grassroots Moratoriums</div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-step">Densification & Edge Pivot</div>
+        </div>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">⚠️</span> <span class="subsec-label c1">Critical View</span>
+        </div>
+        <p class="body-text">The industry has fundamentally misjudged the political and social dimensions of its physical expansion. By framing data centers as abstract "cloud" infrastructure, technology companies have failed to build the necessary social license to operate within communities. The current backlash is not a temporary hurdle but a structural shift in the political economy of AI infrastructure. Unless the industry can create a new value proposition for local communities—such as using waste heat for district heating or making direct investments in local grids—it will face a permanent state of attrition, where the pace of AI progress is dictated not by innovation but by the outcomes of contentious zoning board meetings.</p>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">💬</span> <span class="subsec-label c1">Community Sentiment</span>
+        </div>
+        <div class="sentiment-grid">
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">😠 Local Residents</div>
+                <div class="sentiment-card-desc">Highly oppositional, citing resource drain, noise pollution, and lack of localized economic benefits.</div>
             </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label c1">Technical Deep Dive</span> <span class="subsec-tag lc1 c1">Data Center Sustainability</span>
-                </div>
-                <div class="arch-grid">
-                    <div class="arch-chip">Community Opposition Vectors</div>
-                    <div class="arch-chip">Power & Water Constraints</div>
-                    <div class="arch-chip">Facility Densification</div>
-                </div>
-                <div class="table-scroll-wrap">
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Constraint Driver</th>
-                                <th>Quantitative Impact</th>
-                                <th>Industry Mitigation Strategy</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Power Consumption & Grid Instability</td>
-                                <td>Up to 50% of planned 2026 capacity delayed/cancelled</td>
-                                <td>Private off-grid power plants (behind-the-meter)</td>
-                            </tr>
-                            <tr>
-                                <td>Water Usage & Noise Pollution</td>
-                                <td>Stringent environmental impact reviews</td>
-                                <td>Advanced liquid cooling retrofitting for high density</td>
-                            </tr>
-                            <tr>
-                                <td>Lack of Local Economic Value</td>
-                                <td>Citizen-led referendums blocking tax incentives</td>
-                                <td>Pivot to less populated regions, edge computing</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="chart-wrap">
-                    <div id="chart-art1" style="width:100%; height:280px;"></div>
-                </div>
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">🏢 Infrastructure Providers</div>
+                <div class="sentiment-card-desc">Frustrated by permitting bottlenecks; shifting focus to acquiring pre-zoned "powered land".</div>
             </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label c1">Evolution & Timeline</span>
-                </div>
-                <div class="flow-row">
-                    <div class="flow-step">Unrestrained AI Scaling</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Grid & Resource Bottlenecks</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Organized Community Backlash</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Regulatory Moratoriums</div>
-                </div>
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">💡 Tech Optimists</div>
+                <div class="sentiment-card-desc">Viewing this as a necessary forcing function to invent hyper-efficient edge computing and off-grid power.</div>
             </div>
+        </div>
+    </div>
+</article>
 
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c1">Critical View</span>
-                </div>
-                <p>The industry has fundamentally misjudged the political and social dimensions of its physical expansion. By framing data centers as abstract "cloud" infrastructure, technology companies have failed to build the necessary social license to operate within communities. The current backlash is not a temporary hurdle but a structural shift in the political economy of AI infrastructure. Unless the industry can create a new value proposition for local communities—such as using waste heat for district heating or making direct investments in local grids—it will face a permanent state of attrition, where the pace of AI progress is dictated not by innovation but by the outcomes of contentious zoning board meetings.</p>
+
+<article class="article" id="art2">
+    <h2>2. Amazon Signals Intent to Sell Trainium Chips, Challenging NVIDIA's Merchant Silicon Dominance</h2>
+    <p style="font-size:0.85rem; color:var(--text-muted); font-family:var(--font-mono);">Source: Distill | Event Date: 2026-04-10 | Paradigm: Ecosystem</p>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">🔭</span> <span class="subsec-label c2">Overview</span>
+        </div>
+        <p class="lead-text">The AI accelerator market is poised for a seismic disruption as Amazon CEO Andy Jassy signaled on April 10 that the company may begin selling its proprietary Trainium AI chips directly to third-party customers.</p>
+        <p class="body-text">This move would represent a monumental strategy shift, transforming Amazon from solely a consumer of its own custom silicon within AWS into a direct merchant competitor to NVIDIA, AMD, and Intel. For years, Amazon's Trainium (for training) and Inferentia (for inference) chips have provided a cost-performance advantage for workloads running on AWS, but have remained a captive capability. By potentially opening this hardware to the broader market, Amazon would leverage its immense scale, deep experience in workload optimization, and established cloud ecosystem to enter the multi-hundred-billion-dollar AI hardware market. The business unit responsible for this custom silicon is already estimated to be a multi-billion-dollar operation based on internal consumption and cost savings, indicating a mature, scaled production and software ecosystem ready for external commercialization.</p>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">⚡</span> <span class="subsec-label c2">Strategic Impact</span>
+        </div>
+        <div class="impact-box lc2" style="border-left:4px solid var(--c2)">
+            <ul class="impact-list">
+                <li><strong>Technology and Ecosystem Perspective:</strong> The entry of another major, well-capitalized player into the merchant silicon market would accelerate the fragmentation of the hardware ecosystem. It would force the software layer, particularly compiler and orchestration frameworks, to more robustly support a new hardware architecture, further strengthening the case for open, hardware-agnostic platforms and weakening the lock-in of proprietary stacks like CUDA.</li>
+                <li><strong>Business and Market Dynamics:</strong> An Amazon merchant chip business would be an existential threat to smaller AI hardware startups and a significant challenge to AMD and Intel. Amazon could bundle its chips with AWS credits and deep integration into its vast suite of services, creating a compelling value proposition that pure-play hardware vendors cannot match. This would create a three-way race at the high end between NVIDIA, Amazon, and Google/Broadcom's TPU ecosystem.</li>
+                <li><strong>Infrastructure and Hardware Linkage:</strong> This move validates the thesis that at hyperscale, the most efficient path forward is custom silicon. It also implies that Amazon has achieved a level of manufacturing scale and yield with its partners where it can satisfy its own massive internal demand and still have excess capacity to serve the external market, a feat that requires billions in forward-looking supply chain commitments.</li>
+                <li><strong>Investment Strategy:</strong> This development places downward pressure on the long-term valuation multiples of incumbent GPU providers, as it signals the arrival of a formidable new competitor with a fundamentally different business model (bundling hardware with cloud services). Investment should target the enablers of this trend: advanced packaging providers, EDA software companies, and IP licensors who benefit from *any* custom silicon program, regardless of the end vendor.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">🔬</span> <span class="subsec-label c2">Technical Deep Dive</span> 
+            <span class="subsec-tag lc2 c2">ASIC / Silicon</span>
+        </div>
+        <div class="arch-grid">
+            <div class="arch-chip">Trainium ASICs</div>
+            <div class="arch-chip">Inferentia ASICs</div>
+            <div class="arch-chip">Hardware-agnostic Compilers</div>
+        </div>
+        <table class="info-table">
+            <tr><th>Core Technology</th><td>Amazon Trainium and Inferentia ASICs, purpose-built for AI workloads.</td></tr>
+            <tr><th>Strategic Pivot</th><td>From a captive, in-house advantage for AWS to a commercial product.</td></tr>
+            <tr><th>Competitive Advantage</th><td>Bundling hardware sales with AWS services and software stack (SageMaker, Bedrock).</td></tr>
+            <tr><th>Development Stage</th><td>Public signaling of intent by CEO; no formal product launch dates yet.</td></tr>
+        </table>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">⚠️</span> <span class="subsec-label c2">Critical View</span>
+        </div>
+        <p class="body-text">The transition from an internal supplier to a merchant vendor is fraught with challenges. Amazon would need to build a massive hardware sales and support organization, a fundamentally different business motion than selling cloud services. Furthermore, it would be competing for enterprise customers against its own cloud offerings, creating significant channel conflict. Other companies may be hesitant to become dependent on a hardware supplier that is also their primary cloud competitor. While the technological capability is proven, the commercial and strategic viability of this pivot remains a significant, unproven execution risk.</p>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">💬</span> <span class="subsec-label c2">Community Sentiment</span>
+        </div>
+        <div class="sentiment-grid">
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">🤑 AWS Customers</div>
+                <div class="sentiment-card-desc">Intrigued by potential bundled discounts and avoidance of NVIDIA premiums.</div>
             </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label c1">Community Sentiment</span>
-                </div>
-                <div class="sentiment-grid">
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">😡</div>
-                        <div class="sentiment-label">Frustrated</div>
-                        <div class="sentiment-desc">Local residents resisting high electricity prices and resource drain.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">😰</div>
-                        <div class="sentiment-label">Anxious</div>
-                        <div class="sentiment-desc">Investors worried about stranded capital and delayed returns.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">💡</div>
-                        <div class="sentiment-label">Adapting</div>
-                        <div class="sentiment-desc">Engineers pivoting to extreme quantization and edge solutions.</div>
-                    </div>
-                </div>
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">😨 Pure-play Hardware Startups</div>
+                <div class="sentiment-card-desc">Alarmed; an ecosystem giant entering merchant silicon is an existential threat.</div>
             </div>
-        </article>
-
-        <article class="article" id="art2">
-            <h2 class="article-title">2. Amazon Signals Intent to Sell Trainium Chips, Challenging NVIDIA's Merchant Silicon Dominance</h2>
-            
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label c2">Overview</span>
-                </div>
-                <p class="lead-text">The AI accelerator market is poised for a seismic disruption as Amazon CEO Andy Jassy signaled on April 10 that the company may begin selling its proprietary Trainium AI chips directly to third-party customers.</p>
-                <p class="body-text">This move would represent a monumental strategy shift, transforming Amazon from solely a consumer of its own custom silicon within AWS into a direct merchant competitor to NVIDIA, AMD, and Intel. For years, Amazon's Trainium (for training) and Inferentia (for inference) chips have provided a cost-performance advantage for workloads running on AWS, but have remained a captive capability. By potentially opening this hardware to the broader market, Amazon would leverage its immense scale, deep experience in workload optimization, and established cloud ecosystem to enter the multi-hundred-billion-dollar AI hardware market. The business unit responsible for this custom silicon is already estimated to be a multi-billion-dollar operation based on internal consumption and cost savings, indicating a mature, scaled production and software ecosystem ready for external commercialization.</p>
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">🤔 Market Analysts</div>
+                <div class="sentiment-card-desc">Skeptical of Amazon's ability to pivot its organizational structure to hardware sales.</div>
             </div>
+        </div>
+    </div>
+</article>
 
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label c2">Strategic Impact</span>
-                </div>
-                <div class="impact-box lc2" style="border-left:4px solid var(--c2)">
-                    <ul class="impact-list">
-                        <li><strong>Technology and Ecosystem Perspective:</strong> The entry of another major, well-capitalized player into the merchant silicon market would accelerate the fragmentation of the hardware ecosystem. It would force the software layer, particularly compiler and orchestration frameworks, to more robustly support a new hardware architecture, further strengthening the case for open, hardware-agnostic platforms and weakening the lock-in of proprietary stacks like CUDA.</li>
-                        <li><strong>Business and Market Dynamics:</strong> An Amazon merchant chip business would be an existential threat to smaller AI hardware startups and a significant challenge to AMD and Intel. Amazon could bundle its chips with AWS credits and deep integration into its vast suite of services, creating a compelling value proposition that pure-play hardware vendors cannot match. This would create a three-way race at the high end between NVIDIA, Amazon, and Google/Broadcom's TPU ecosystem.</li>
-                        <li><strong>Infrastructure and Hardware Linkage:</strong> This move validates the thesis that at hyperscale, the most efficient path forward is custom silicon. It also implies that Amazon has achieved a level of manufacturing scale and yield with its partners where it can satisfy its own massive internal demand and still have excess capacity to serve the external market, a feat that requires billions in forward-looking supply chain commitments.</li>
-                        <li><strong>Investment Strategy:</strong> This development places downward pressure on the long-term valuation multiples of incumbent GPU providers, as it signals the arrival of a formidable new competitor with a fundamentally different business model (bundling hardware with cloud services). Investment should target the enablers of this trend: advanced packaging providers, EDA software companies, and IP licensors who benefit from *any* custom silicon program, regardless of the end vendor.</li>
-                    </ul>
-                </div>
+
+<article class="article" id="art3">
+    <h2>3. Intel Joins Elon Musk's "Terafab" Initiative, a Visionary AI Compute Project</h2>
+    <p style="font-size:0.85rem; color:var(--text-muted); font-family:var(--font-mono);">Source: Semiconductor Engineering | Event Date: 2026-04-10 | Paradigm: Infrastructure</p>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">🔭</span> <span class="subsec-label c3">Overview</span>
+        </div>
+        <p class="lead-text">The scale of ambition in the AI hardware race has been fundamentally redefined with the announcement on April 10 of the "Terafab" initiative, a joint venture between Intel and Elon Musk's portfolio of companies.</p>
+        <p class="body-text">The project's stated goal is to build a new semiconductor fabrication facility in Austin, Texas, targeting an annual production capacity of one terawatt (1 TW) of AI and robotics compute. This visionary figure represents a multi-order-of-magnitude increase over current global AI compute production, signaling an industrial-scale effort to solve the compute scarcity problem. Intel will contribute its most advanced process technology, including the 18A node and advanced packaging solutions like Foveros and EMIB, to refactor silicon manufacturing for this unprecedented scale. The fab will produce custom chips designed for the immense data processing needs of AI, autonomous systems for Tesla vehicles, and the satellite communications infrastructure for SpaceX.</p>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">⚡</span> <span class="subsec-label c3">Strategic Impact</span>
+        </div>
+        <div class="impact-box lc3" style="border-left:4px solid var(--c3)">
+            <ul class="impact-list">
+                <li><strong>Technology and Ecosystem Perspective:</strong> A terawatt-scale fab, if realized, would fundamentally change the economics of AI. It could create a compute surplus, driving down the cost of training and inference and potentially commoditizing access to frontier-level AI. It represents the ultimate expression of vertical integration, with a single consortium controlling everything from the process node technology to the end applications in cars, rockets, and AI models.</li>
+                <li><strong>Business and Market Dynamics:</strong> This alliance creates a powerful new "Sovereign AI" bloc, independent of traditional hyperscalers and merchant GPU providers. For Intel, it is a monumental strategic victory, securing a massive-volume anchor customer for its foundry services (IFS) and positioning its 18A process as the foundation for one of the world's most ambitious technology projects. It puts immense pressure on other foundries like TSMC and Samsung.</li>
+                <li><strong>Infrastructure and Hardware Linkage:</strong> The energy requirements for a fab of this scale are astronomical, likely requiring multiple gigawatts of dedicated power, equivalent to a large city. The project's success is as much an energy and civil engineering challenge as it is a semiconductor manufacturing one. It will necessitate the co-development of dedicated power plants and a completely localized supply chain for strategic materials.</li>
+                <li><strong>Investment Strategy:</strong> This validates massive, long-term investment in the foundational elements of semiconductor manufacturing: producers of EUV lithography equipment (like ASML), specialized chemical and gas suppliers, and manufacturers of wafer handling and metrology equipment. It also signals a major investment opportunity in the energy infrastructure and industrial real estate sectors in central Texas.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">🔬</span> <span class="subsec-label c3">Technical Deep Dive</span> 
+            <span class="subsec-tag lc3 c3">Foundry / 18A / Packaging</span>
+        </div>
+        <div class="arch-grid">
+            <div class="arch-chip">Intel 18A Node</div>
+            <div class="arch-chip">Foveros</div>
+            <div class="arch-chip">EMIB Packaging</div>
+            <div class="arch-chip">TW-scale Capacity</div>
+        </div>
+        <table class="info-table">
+            <tr><th>Project Name</th><td>Terafab (Location: Austin, Texas)</td></tr>
+            <tr><th>Key Partners</th><td>Intel, Tesla, SpaceX, xAI</td></tr>
+            <tr><th>Target Applications</th><td>Custom silicon for AI training/inference, autonomous driving, satellite systems.</td></tr>
+            <tr><th>Development Stage</th><td>Official announcement of JV; construction timelines undiscolsed.</td></tr>
+        </table>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">⏳</span> <span class="subsec-label c3">Evolution & Timeline</span>
+        </div>
+        <div class="flow-row">
+            <div class="flow-step">Fabless Reliance on TSMC</div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-step">Geopolitical Supply Shocks</div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-step">Intel Foundry Pivot (IFS)</div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-step">"Terafab" Vertical Mega-Consortium</div>
+        </div>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">⚠️</span> <span class="subsec-label c3">Critical View</span>
+        </div>
+        <p class="body-text">The "terawatt" production target, while visionary, borders on the speculative and should be viewed with extreme caution. The capital expenditure required for such a facility would likely be in the hundreds of billions of dollars, and the technical and logistical hurdles are immense. The project is entirely dependent on the flawless execution of Intel's 18A process at a scale that has never been attempted. Any delays or yield issues in Intel's core technology roadmap would have catastrophic consequences for the project's timeline and financial viability. This announcement may be more of a strategic declaration of intent designed to secure government subsidies and talent than a concrete, fully-funded engineering plan.</p>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">💬</span> <span class="subsec-label c3">Community Sentiment</span>
+        </div>
+        <div class="sentiment-grid">
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">🚀 Tech Evangelists</div>
+                <div class="sentiment-card-desc">Thrilled by the sheer ambition and the promise of escaping TSMC/NVIDIA bottlenecks.</div>
             </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label c2">Technical Deep Dive</span> <span class="subsec-tag lc2 c2">Merchant Silicon</span>
-                </div>
-                <div class="arch-grid">
-                    <div class="arch-chip">Trainium (Training ASIC)</div>
-                    <div class="arch-chip">Inferentia (Inference ASIC)</div>
-                    <div class="arch-chip">Hardware-Cloud Bundling</div>
-                </div>
-                <div class="table-scroll-wrap">
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Core Technology</th>
-                                <th>Current Status</th>
-                                <th>Competitive Advantage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Amazon Trainium & Inferentia</td>
-                                <td>Captive internal use -> Signaling merchant availability</td>
-                                <td>Deep integration with AWS stack (SageMaker, Bedrock)</td>
-                            </tr>
-                            <tr>
-                                <td>Custom Silicon Scale</td>
-                                <td>Multi-billion-dollar internal operation equivalent</td>
-                                <td>Battle-hardened performance data from mass deployment</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="chart-wrap">
-                    <div id="chart-art2" style="width:100%; height:280px;"></div>
-                </div>
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">🏭 Intel Investors</div>
+                <div class="sentiment-card-desc">Cautiously optimistic; a massive win for IFS, but capital execution risks are terrifying.</div>
             </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label c2">Evolution & Timeline</span>
-                </div>
-                <div class="flow-row">
-                    <div class="flow-step">Internal AWS Optimization</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Captive Silicon Maturity</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Scale & Excess Capacity</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Merchant Market Entry</div>
-                </div>
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">🌍 Civil Engineers</div>
+                <div class="sentiment-card-desc">Overwhelmed by the prospective power and water grid requirements in Central Texas.</div>
             </div>
+        </div>
+    </div>
+</article>
 
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c2">Critical View</span>
-                </div>
-                <p>The transition from an internal supplier to a merchant vendor is fraught with challenges. Amazon would need to build a massive hardware sales and support organization, a fundamentally different business motion than selling cloud services. Furthermore, it would be competing for enterprise customers against its own cloud offerings, creating significant channel conflict. Other companies may be hesitant to become dependent on a hardware supplier that is also their primary cloud competitor. While the technological capability is proven, the commercial and strategic viability of this pivot remains a significant, unproven execution risk.</p>
+
+<article class="article" id="art4">
+    <h2>4. AMD Spearheads UALink 2.0, Forging an Open Standard to Break NVIDIA's Interconnect Monopoly</h2>
+    <p style="font-size:0.85rem; color:var(--text-muted); font-family:var(--font-mono);">Source: Distill | Event Date: 2026-04-10 | Paradigm: Ecosystem</p>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">🔭</span> <span class="subsec-label c4">Overview</span>
+        </div>
+        <p class="lead-text">In a direct strategic assault on NVIDIA's highly profitable and proprietary NVLink interconnect, AMD has joined the Ultra Accelerator Link (UALink) Consortium to ratify the 2.0 specification for an open, industry-standard AI interconnect.</p>
+        <p class="body-text">This initiative represents a formal alliance of major technology companies aiming to create a high-performance, open alternative for connecting GPUs and AI accelerators within a server node. By creating a standardized, royalty-free interconnect, the consortium seeks to break the vendor lock-in that forces customers to use an all-NVIDIA solution for high-performance scale-up systems. The UALink 2.0 specification is designed to compete directly with NVIDIA's NVLink on bandwidth and latency, enabling customers to build heterogeneous systems with accelerators from multiple vendors (e.g., AMD, Intel, and others) that can communicate seamlessly.</p>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">⚡</span> <span class="subsec-label c4">Strategic Impact</span>
+        </div>
+        <div class="impact-box lc4" style="border-left:4px solid var(--c4)">
+            <ul class="impact-list">
+                <li><strong>Technology and Ecosystem Perspective:</strong> The success of UALink would fundamentally commoditize the high-speed interconnect layer, one of the most critical components for scaling AI training performance. It would shift the basis of competition from proprietary, closed ecosystems to performance-on-open-standards, benefiting the entire software ecosystem by promoting interoperability and hardware choice.</li>
+                <li><strong>Business and Market Dynamics:</strong> This is a direct challenge to a key pillar of NVIDIA's economic moat. A widely adopted UALink standard would erode NVIDIA's ability to command a premium for its full-stack solution and would significantly improve the competitive positioning of AMD's Instinct accelerators and Intel's Gaudi chips. It allows customers to avoid being locked into a single vendor's roadmap and pricing structure.</li>
+                <li><strong>Infrastructure and Hardware Linkage:</strong> UALink enables the creation of more modular and flexible server designs. System integrators and hyperscalers could design motherboards and chassis that support UALink-compliant accelerators from any vendor, fostering a more competitive and resilient supply chain. This would accelerate innovation in server architecture.</li>
+                <li><strong>Investment Strategy:</strong> This move strengthens the investment case for all of NVIDIA's competitors in the AI accelerator space, particularly AMD and Intel. It also creates opportunities for companies that manufacture the physical components of interconnects, such as retimers, cables, and connectors, who would benefit from a larger, standardized market. Investors should view this as a material long-term risk to NVIDIA's margin structure in the data center segment.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">🔬</span> <span class="subsec-label c4">Technical Deep Dive</span> 
+            <span class="subsec-tag lc4 c4">Interconnect / UALink</span>
+        </div>
+        <div class="arch-grid">
+            <div class="arch-chip">UALink 2.0 Protocol</div>
+            <div class="arch-chip">Heterogeneous Systems</div>
+            <div class="arch-chip">Scale-up Connectivity</div>
+        </div>
+        <table class="info-table">
+            <tr><th>Consortium</th><td>Ultra Accelerator Link (UALink) Promoter Group.</td></tr>
+            <tr><th>Key Members</th><td>AMD, Intel, and other major technology firms.</td></tr>
+            <tr><th>Target Use Case</th><td>Allowing multiple GPUs within a node to share memory and communicate as a single unit.</td></tr>
+            <tr><th>Development Stage</th><td>Consortium formed to ratify 2.0 spec. Hardware to follow.</td></tr>
+        </table>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">⚠️</span> <span class="subsec-label c4">Critical View</span>
+        </div>
+        <p class="body-text">While the strategic logic is sound, creating and driving adoption of a new hardware standard is a monumental undertaking. NVIDIA's NVLink is a mature, battle-tested technology with deep integration into its CUDA software stack. UALink must not only match its performance but also build a robust software and validation ecosystem to convince risk-averse enterprise and hyperscale customers to switch. NVIDIA will likely use its market power to create incentives for customers to stick with its proprietary solution, potentially through bundling and deep discounts, making the path to widespread adoption for UALink a significant uphill battle.</p>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">💬</span> <span class="subsec-label c4">Community Sentiment</span>
+        </div>
+        <div class="sentiment-grid">
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">🧩 System Integrators</div>
+                <div class="sentiment-card-desc">Highly supportive; modularity reduces supply chain risks and lowers BOM costs.</div>
             </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label c2">Community Sentiment</span>
-                </div>
-                <div class="sentiment-grid">
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">😲</div>
-                        <div class="sentiment-label">Surprised</div>
-                        <div class="sentiment-desc">Industry observers shocked by the aggressive hardware pivot.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">⚔️</div>
-                        <div class="sentiment-label">Competitive</div>
-                        <div class="sentiment-desc">Incumbents forced to re-evaluate their moat against hyperscalers.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🤔</div>
-                        <div class="sentiment-label">Curious</div>
-                        <div class="sentiment-desc">Enterprise customers weighing vendor lock-in risks vs AWS bundling benefits.</div>
-                    </div>
-                </div>
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">🟢 NVIDIA Loyalists</div>
+                <div class="sentiment-card-desc">Doubtful that an open standard can match the optimized performance of an integrated stack.</div>
             </div>
-        </article>
-
-        <article class="article" id="art3">
-            <h2 class="article-title">3. Intel Joins Elon Musk's "Terafab" Initiative, a Visionary AI Compute Project</h2>
-            
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label c3">Overview</span>
-                </div>
-                <p class="lead-text">The scale of ambition in the AI hardware race has been fundamentally redefined with the announcement on April 10 of the "Terafab" initiative, a joint venture between Intel and Elon Musk's portfolio of companies (Tesla, SpaceX, xAI).</p>
-                <p class="body-text">The project's stated goal is to build a new semiconductor fabrication facility in Austin, Texas, targeting an annual production capacity of one terawatt (1 TW) of AI and robotics compute. This visionary figure represents a multi-order-of-magnitude increase over current global AI compute production, signaling an industrial-scale effort to solve the compute scarcity problem. Intel will contribute its most advanced process technology, including the 18A node and advanced packaging solutions like Foveros and EMIB, to refactor silicon manufacturing for this unprecedented scale. The fab will produce custom chips designed for the immense data processing needs of AI, autonomous systems for Tesla vehicles, and the satellite communications infrastructure for SpaceX.</p>
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">🤝 Open Source Advocates</div>
+                <div class="sentiment-card-desc">Cheering the move as a critical step to democratize AI hardware development.</div>
             </div>
+        </div>
+    </div>
+</article>
 
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label c3">Strategic Impact</span>
-                </div>
-                <div class="impact-box lc3" style="border-left:4px solid var(--c3)">
-                    <ul class="impact-list">
-                        <li><strong>Technology and Ecosystem Perspective:</strong> A terawatt-scale fab, if realized, would fundamentally change the economics of AI. It could create a compute surplus, driving down the cost of training and inference and potentially commoditizing access to frontier-level AI. It represents the ultimate expression of vertical integration, with a single consortium controlling everything from the process node technology to the end applications in cars, rockets, and AI models.</li>
-                        <li><strong>Business and Market Dynamics:</strong> This alliance creates a powerful new "Sovereign AI" bloc, independent of traditional hyperscalers and merchant GPU providers. For Intel, it is a monumental strategic victory, securing a massive-volume anchor customer for its foundry services (IFS) and positioning its 18A process as the foundation for one of the world's most ambitious technology projects. It puts immense pressure on other foundries like TSMC and Samsung to secure similarly scaled long-term commitments.</li>
-                        <li><strong>Infrastructure and Hardware Linkage:</strong> The energy requirements for a fab of this scale are astronomical, likely requiring multiple gigawatts of dedicated power, equivalent to a large city. The project's success is as much an energy and civil engineering challenge as it is a semiconductor manufacturing one. It will necessitate the co-development of dedicated power plants and a completely localized supply chain for strategic materials.</li>
-                        <li><strong>Investment Strategy:</strong> This validates massive, long-term investment in the foundational elements of semiconductor manufacturing: producers of EUV lithography equipment (like ASML), specialized chemical and gas suppliers, and manufacturers of wafer handling and metrology equipment. It also signals a major investment opportunity in the energy infrastructure and industrial real estate sectors in central Texas.</li>
-                    </ul>
-                </div>
+
+<article class="article" id="art5">
+    <h2>5. The Enterprise AI "Reality Gap": Surveys Reveal Widespread Adoption Masking Deep Strategic Failure</h2>
+    <p style="font-size:0.85rem; color:var(--text-muted); font-family:var(--font-mono);">Source: Writer; KPMG; IDC | Event Date: 2026-04-11 | Paradigm: Ecosystem</p>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">🔭</span> <span class="subsec-label c5">Overview</span>
+        </div>
+        <p class="lead-text">A convergence of major enterprise surveys released around April 11 reveals a profound and widening gap between the massive capital being invested in AI and the realization of tangible business value.</p>
+        <p class="body-text">A KPMG global survey found that while three out of four leaders will prioritize AI investment despite economic uncertainty, only a small fraction are seeing clear returns. Similarly, a comprehensive survey by Writer found that 79% of organizations face significant challenges in adopting AI, with a stunning 75% of executives admitting their company's AI strategy is "more for show" than actual guidance. This disconnect is creating severe internal friction, with 54% of C-suite executives stating that AI adoption is "tearing their company apart". The core issue is a failure to move beyond isolated productivity gains to systemic business transformation. While individual employees report productivity gains, only 29% of organizations see significant ROI, and 48% call their adoption efforts a "massive disappointment".</p>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">⚡</span> <span class="subsec-label c5">Strategic Impact</span>
+        </div>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="metric-val c5">75%</div>
+                <div class="metric-desc">Strategies are "More for Show"</div>
             </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label c3">Technical Deep Dive</span> <span class="subsec-tag lc3 c3">Terawatt Scale Foundry</span>
-                </div>
-                <div class="arch-grid">
-                    <div class="arch-chip">Intel 18A Node</div>
-                    <div class="arch-chip">Foveros / EMIB 3D Packaging</div>
-                    <div class="arch-chip">1 TW Compute Target</div>
-                </div>
-                <div class="table-scroll-wrap">
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Project Vector</th>
-                                <th>Technical Details</th>
-                                <th>Target Applications</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Key Partners</td>
-                                <td>Intel, Tesla, SpaceX, xAI</td>
-                                <td>AI training/inference, Autonomous Driving, Satellites</td>
-                            </tr>
-                            <tr>
-                                <td>Scale & Location</td>
-                                <td>1 Terawatt (TW) annual capacity in Austin, Texas</td>
-                                <td>Vertical Integration across multiple Musk companies</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="metric-card">
+                <div class="metric-val c5">29%</div>
+                <div class="metric-desc">See Significant ROI</div>
             </div>
+        </div>
+        <div class="impact-box lc5" style="border-left:4px solid var(--c5)">
+            <ul class="impact-list">
+                <li><strong>Technology and Ecosystem Perspective:</strong> The focus is shifting from the capabilities of the foundation models themselves to the governance, integration, and workflow-redesign platforms that surround them. The technology is no longer the bottleneck; the organization's ability to absorb and operationalize it is. This creates a massive market opportunity for AI governance, risk, and compliance (GRC) platforms and specialized consulting services.</li>
+                <li><strong>Business and Market Dynamics:</strong> A bifurcation is occurring between "AI Leaders" and the rest of the market. The KPMG report notes a widening performance gap between organizations treating AI as an enterprise-wide transformation versus those simply bolting it onto existing processes. This suggests a "winner-take-most" dynamic where companies that successfully integrate AI will achieve compounding competitive advantages.</li>
+                <li><strong>Infrastructure and Hardware Linkage:</strong> The lack of clear ROI will inevitably lead to greater scrutiny of AI-related CapEx. CFOs will begin to demand clearer business cases for multi-million dollar GPU cluster purchases, potentially slowing the pace of hardware procurement. This will force cloud providers and hardware vendors to shift their sales narrative from raw performance to total cost of ownership (TCO).</li>
+                <li><strong>Investment Strategy:</strong> Capital should pivot from pure-play model providers to the enterprise enablement layer. Companies providing tools for AI observability, governance, security, and workflow integration are solving the most acute pain point for enterprises today. The next wave of value creation will come not from building better models, but from building systems that allow enterprises to actually *use* them effectively and safely.</li>
+            </ul>
+        </div>
+    </div>
 
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label c3">Evolution & Timeline</span>
-                </div>
-                <div class="flow-row">
-                    <div class="flow-step">Gigawatt Fabs</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Compute Scarcity Crisis</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Sovereign AI Blocs</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Terawatt Infrastructure</div>
-                </div>
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">🔬</span> <span class="subsec-label c5">Technical Deep Dive</span> 
+            <span class="subsec-tag lc5 c5">ROI / Governance</span>
+        </div>
+        <table class="info-table">
+            <tr><th>Core Problem</th><td>Failure to translate AI investment into measurable, organization-wide ROI.</td></tr>
+            <tr><th>Failure Modes</th><td>Strategy without substance, lack of scaling mechanisms, disconnect between individual productivity and business outcomes.</td></tr>
+            <tr><th>Writer Survey</th><td>79% face major adoption challenges; 54% say AI is "tearing company apart".</td></tr>
+            <tr><th>KPMG Survey</th><td>75% will prioritize AI regardless of economy (FOMO-driven strategy).</td></tr>
+        </table>
+        <div class="chart-wrap"><div id="chart-art5" style="width:100%; height:280px;"></div></div>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">⚠️</span> <span class="subsec-label c5">Critical View</span>
+        </div>
+        <p class="body-text">The current phase of "invest at all costs" is unsustainable and driven more by competitive anxiety than by clear-headed strategy. The admission that strategies are "for show" is a damning indictment of corporate leadership, suggesting that many are simply throwing money at the problem without a coherent plan. This creates a significant risk of an "AI bubble," where valuations are based on adoption metrics rather than on revenue and profit. If the ROI problem is not solved, the market could face a painful correction as boards and investors lose patience with a technology that consumes vast resources while failing to deliver on its financial promises.</p>
+    </div>
+
+    <div class="subsec">
+        <div class="subsec-header">
+            <span class="subsec-icon">💬</span> <span class="subsec-label c5">Community Sentiment</span>
+        </div>
+        <div class="sentiment-grid">
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">😰 C-Suite / CFOs</div>
+                <div class="sentiment-card-desc">Increasingly anxious about CapEx bloat without commensurate returns on bottom-line metrics.</div>
             </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c3">Critical View</span>
-                </div>
-                <p>The "terawatt" production target, while visionary, borders on the speculative and should be viewed with extreme caution. The capital expenditure required for such a facility would likely be in the hundreds of billions of dollars, and the technical and logistical hurdles are immense. The project is entirely dependent on the flawless execution of Intel's 18A process at a scale that has never been attempted. Any delays or yield issues in Intel's core technology roadmap would have catastrophic consequences for the project's timeline and financial viability. This announcement may be more of a strategic declaration of intent designed to secure government subsidies and talent than a concrete, fully-funded engineering plan.</p>
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">👔 Middle Management</div>
+                <div class="sentiment-card-desc">Struggling with the friction of operationalizing vague top-down AI mandates.</div>
             </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label c3">Community Sentiment</span>
-                </div>
-                <div class="sentiment-grid">
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🤯</div>
-                        <div class="sentiment-label">Mind-blown</div>
-                        <div class="sentiment-desc">Tech enthusiasts marveling at the sheer unprecedented scale.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🧐</div>
-                        <div class="sentiment-label">Skeptical</div>
-                        <div class="sentiment-desc">Financial analysts questioning CapEx reality and execution risks.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">👷</div>
-                        <div class="sentiment-label">Ready</div>
-                        <div class="sentiment-desc">Supply chain partners bracing for massive infrastructure contracts.</div>
-                    </div>
-                </div>
+            <div class="sentiment-card">
+                <div class="sentiment-card-title">🛠️ GRC Startups</div>
+                <div class="sentiment-card-desc">Viewing this reality gap as a massive tailwind for their integration and compliance tools.</div>
             </div>
-        </article>
+        </div>
+    </div>
+</article>
 
-        <article class="article" id="art4">
-            <h2 class="article-title">4. AMD Spearheads UALink 2.0, Forging an Open Standard to Break NVIDIA's Interconnect Monopoly</h2>
-            
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label c4">Overview</span>
-                </div>
-                <p class="lead-text">In a direct strategic assault on NVIDIA's highly profitable and proprietary NVLink interconnect, AMD has joined the Ultra Accelerator Link (UALink) Consortium to ratify the 2.0 specification for an open, industry-standard AI interconnect.</p>
-                <p class="body-text">This initiative represents a formal alliance of major technology companies aiming to create a high-performance, open alternative for connecting GPUs and AI accelerators within a server node. By creating a standardized, royalty-free interconnect, the consortium seeks to break the vendor lock-in that forces customers to use an all-NVIDIA solution for high-performance scale-up systems. The UALink 2.0 specification is designed to compete directly with NVIDIA's NVLink on bandwidth and latency, enabling customers to build heterogeneous systems with accelerators from multiple vendors (e.g., AMD, Intel, and others) that can communicate seamlessly.</p>
-            </div>
+<section class="synthesis" id="synthesis">
+    <h2>Summary & Forward-Looking Outlook</h2>
+    
+    <div class="syn-block">
+        <span class="syn-block-num">01 // The Physical Collision</span>
+        <p class="body-text">The artificial intelligence sector is undergoing a painful but necessary maturation, where the boundless optimism of software is colliding with the unforgiving constraints of the physical world. The industry's footprint is now so large that it is generating its own opposition, with a growing grassroots revolt against data center construction threatening the very ground upon which future progress is built.</p>
+    </div>
 
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label c4">Strategic Impact</span>
-                </div>
-                <div class="impact-box lc4" style="border-left:4px solid var(--c4)">
-                    <ul class="impact-list">
-                        <li><strong>Technology and Ecosystem Perspective:</strong> The success of UALink would fundamentally commoditize the high-speed interconnect layer, one of the most critical components for scaling AI training performance. It would shift the basis of competition from proprietary, closed ecosystems to performance-on-open-standards, benefiting the entire software ecosystem by promoting interoperability and hardware choice.</li>
-                        <li><strong>Business and Market Dynamics:</strong> This is a direct challenge to a key pillar of NVIDIA's economic moat. A widely adopted UALink standard would erode NVIDIA's ability to command a premium for its full-stack solution and would significantly improve the competitive positioning of AMD's Instinct accelerators and Intel's Gaudi chips. It allows customers to avoid being locked into a single vendor's roadmap and pricing structure.</li>
-                        <li><strong>Infrastructure and Hardware Linkage:</strong> UALink enables the creation of more modular and flexible server designs. System integrators and hyperscalers could design motherboards and chassis that support UALink-compliant accelerators from any vendor, fostering a more competitive and resilient supply chain. This would accelerate innovation in server architecture as designers are no longer constrained by a single company's proprietary form factors.</li>
-                        <li><strong>Investment Strategy:</strong> This move strengthens the investment case for all of NVIDIA's competitors in the AI accelerator space, particularly AMD and Intel. It also creates opportunities for companies that manufacture the physical components of interconnects, such as retimers, cables, and connectors, who would benefit from a larger, standardized market. Investors should view this as a material long-term risk to NVIDIA's margin structure in the data center segment.</li>
-                    </ul>
-                </div>
-            </div>
+    <div class="syn-block">
+        <span class="syn-block-num">02 // Hardware Hegemony at Risk</span>
+        <p class="body-text">Infrastructure scarcity is forcing a strategic battle at the hardware layer. We are witnessing the genesis of powerful new alliances and competitive threats: Amazon is preparing to weaponize its custom silicon program against the open market, while an audacious "Terafab" consortium led by Intel and Elon Musk aims to redefine the scale of manufacturing itself. Simultaneously, a counter-movement led by AMD and the UALink consortium is fighting to break proprietary hardware monopolies with open standards.</p>
+    </div>
 
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label c4">Technical Deep Dive</span> <span class="subsec-tag lc4 c4">Open Interconnect Standard</span>
-                </div>
-                <div class="arch-grid">
-                    <div class="arch-chip">UALink 2.0 Protocol</div>
-                    <div class="arch-chip">Royalty-Free Open Alternative</div>
-                    <div class="arch-chip">Scale-Up Connectivity</div>
-                </div>
-                <div class="table-scroll-wrap">
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Consortium Details</th>
-                                <th>Technology Specification</th>
-                                <th>Strategic Goal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Promoter Group: AMD, Intel, etc.</td>
-                                <td>High-bandwidth, low-latency cross-accelerator link</td>
-                                <td>Commoditize high-speed scale-up interconnects</td>
-                            </tr>
-                            <tr>
-                                <td>Target Use Case</td>
-                                <td>Heterogeneous systems (multiple vendors in one node)</td>
-                                <td>Erode NVIDIA NVLink full-stack premium</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <div class="syn-block">
+        <span class="syn-block-num">03 // The Enterprise Chasm</span>
+        <p class="body-text">Above this turbulent physical layer, the enterprise software world is facing a crisis of value. New data reveals a chasm between universal AI adoption and the actual realization of business impact, signaling the end of the initial hype cycle and the beginning of a long, difficult phase focused on governance, workflow integration, and proving tangible ROI.</p>
+    </div>
 
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label c4">Evolution & Timeline</span>
-                </div>
-                <div class="flow-row">
-                    <div class="flow-step">Proprietary NVLink Dominance</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Vendor Lock-in Pain</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Consortium Formation</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">UALink 2.0 Ratification</div>
-                </div>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c4">Critical View</span>
-                </div>
-                <p>While the strategic logic is sound, creating and driving adoption of a new hardware standard is a monumental undertaking. NVIDIA's NVLink is a mature, battle-tested technology with deep integration into its CUDA software stack. UALink must not only match its performance but also build a robust software and validation ecosystem to convince risk-averse enterprise and hyperscale customers to switch. NVIDIA will likely use its market power to create incentives for customers to stick with its proprietary solution, potentially through bundling and deep discounts, making the path to widespread adoption for UALink a significant uphill battle.</p>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label c4">Community Sentiment</span>
-                </div>
-                <div class="sentiment-grid">
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🤝</div>
-                        <div class="sentiment-label">Collaborative</div>
-                        <div class="sentiment-desc">Consortium partners aligning to share R&D burden.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🛡️</div>
-                        <div class="sentiment-label">Defensive</div>
-                        <div class="sentiment-desc">NVIDIA reinforcing its moat with software integration.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">📈</div>
-                        <div class="sentiment-label">Bullish</div>
-                        <div class="sentiment-desc">Competitors seeing a clear path to breaking the monopoly.</div>
-                    </div>
-                </div>
-            </div>
-        </article>
-
-        <article class="article" id="art5">
-            <h2 class="article-title">5. The Enterprise AI "Reality Gap": Surveys Reveal Widespread Adoption Masking Deep Strategic Failure</h2>
-            
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label c5">Overview</span>
-                </div>
-                <p class="lead-text">A convergence of major enterprise surveys released around April 11 reveals a profound and widening gap between the massive capital being invested in AI and the realization of tangible business value, signaling a critical "reality gap" in the enterprise AI market.</p>
-                <p class="body-text">A KPMG global survey found that while three out of four leaders will prioritize AI investment despite economic uncertainty, only a small fraction are seeing clear returns. Similarly, a comprehensive survey by Writer found that 79% of organizations face significant challenges in adopting AI, with a stunning 75% of executives admitting their company's AI strategy is "more for show" than actual guidance. This disconnect is creating severe internal friction, with 54% of C-suite executives stating that AI adoption is "tearing their company apart". The core issue is a failure to move beyond isolated productivity gains to systemic business transformation. While individual employees report productivity gains, only 29% of organizations see significant ROI, and 48% call their adoption efforts a "massive disappointment".</p>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label c5">Strategic Impact</span>
-                </div>
-                <div class="impact-box lc5" style="border-left:4px solid var(--c5)">
-                    <ul class="impact-list">
-                        <li><strong>Technology and Ecosystem Perspective:</strong> The focus is shifting from the capabilities of the foundation models themselves to the governance, integration, and workflow-redesign platforms that surround them. The technology is no longer the bottleneck; the organization's ability to absorb and operationalize it is. This creates a massive market opportunity for AI governance, risk, and compliance (GRC) platforms and specialized consulting services.</li>
-                        <li><strong>Business and Market Dynamics:</strong> A bifurcation is occurring between "AI Leaders" and the rest of the market. The KPMG report notes a widening performance gap between organizations treating AI as an enterprise-wide transformation versus those simply bolting it onto existing processes. This suggests a "winner-take-most" dynamic where companies that successfully integrate AI will achieve compounding competitive advantages, while laggards will see their massive investments yield minimal returns.</li>
-                        <li><strong>Infrastructure and Hardware Linkage:</strong> The lack of clear ROI will inevitably lead to greater scrutiny of AI-related CapEx. CFOs will begin to demand clearer business cases for multi-million dollar GPU cluster purchases, potentially slowing the pace of hardware procurement. This will force cloud providers and hardware vendors to shift their sales narrative from raw performance to total cost of ownership (TCO) and demonstrable ROI.</li>
-                        <li><strong>Investment Strategy:</strong> Capital should pivot from pure-play model providers to the enterprise enablement layer. Companies providing tools for AI observability, governance, security, and workflow integration are solving the most acute pain point for enterprises today. The survey data strongly suggests that the next wave of value creation will come not from building better models, but from building the systems that allow enterprises to actually *use* them effectively and safely.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label c5">Technical Deep Dive</span> <span class="subsec-tag lc5 c5">ROI Disconnect</span>
-                </div>
-                <div class="arch-grid">
-                    <div class="arch-chip">Governance & Compliance (GRC)</div>
-                    <div class="arch-chip">Workflow Integration</div>
-                    <div class="arch-chip">Systemic Transformation</div>
-                </div>
-                <div class="table-scroll-wrap">
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Survey Metric / Finding</th>
-                                <th>Percentage (%)</th>
-                                <th>Strategic Implication</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Executives admitting strategy is "more for show"</td>
-                                <td>75%</td>
-                                <td>High risk of an AI bubble driven by FOMO, not fundamentals.</td>
-                            </tr>
-                            <tr>
-                                <td>Organizations facing major adoption challenges</td>
-                                <td>79%</td>
-                                <td>Market pivot required towards AI observability and integration tools.</td>
-                            </tr>
-                            <tr>
-                                <td>C-suite saying AI is "tearing company apart"</td>
-                                <td>54%</td>
-                                <td>Severe cultural and operational friction needing change management.</td>
-                            </tr>
-                            <tr>
-                                <td>Organizations seeing significant ROI</td>
-                                <td>Only 29%</td>
-                                <td>CFO scrutiny on future CapEx and GPU hardware procurement.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="chart-wrap">
-                    <div id="chart-art5" style="width:100%; height:280px;"></div>
-                </div>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label c5">Evolution & Timeline</span>
-                </div>
-                <div class="flow-row">
-                    <div class="flow-step">Initial Hype Cycle</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Massive CapEx Commitments</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">Isolated Productivity</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">The "Reality Gap" (ROI Missing)</div>
-                </div>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c5">Critical View</span>
-                </div>
-                <p>The current phase of "invest at all costs" is unsustainable and driven more by competitive anxiety than by clear-headed strategy. The admission that strategies are "for show" is a damning indictment of corporate leadership, suggesting that many are simply throwing money at the problem without a coherent plan. This creates a significant risk of an "AI bubble," where valuations are based on adoption metrics rather than on revenue and profit. If the ROI problem is not solved, the market could face a painful correction as boards and investors lose patience with a technology that consumes vast resources while failing to deliver on its financial promises.</p>
-            </div>
-
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label c5">Community Sentiment</span>
-                </div>
-                <div class="sentiment-grid">
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">😞</div>
-                        <div class="sentiment-label">Disappointed</div>
-                        <div class="sentiment-desc">48% of organizations calling adoption efforts a massive disappointment.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">💸</div>
-                        <div class="sentiment-label">Stressed</div>
-                        <div class="sentiment-desc">CFOs struggling to justify multi-million dollar GPU and SaaS bills.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🛠️</div>
-                        <div class="sentiment-label">Pivoting</div>
-                        <div class="sentiment-desc">Strategists redirecting focus from models to workflow integration and GRC.</div>
-                    </div>
-                </div>
-            </div>
-        </article>
-
-        <section class="synthesis" id="synthesis">
-            <h2>Summary & Forward-Looking Outlook</h2>
-            
-            <div class="syn-block">
-                <div class="syn-num">01</div>
-                <div>
-                    <strong>Report Summary:</strong><br>
-                    The artificial intelligence sector is undergoing a painful but necessary maturation, where the boundless optimism of software is colliding with the unforgiving constraints of the physical world and the complexities of enterprise integration. The past 72 hours have starkly illuminated this transition. At the most foundational layer, the AI industry's physical footprint is now so large that it is generating its own opposition, with a growing grassroots revolt against data center construction threatening the very ground upon which future progress is built.
-                </div>
-            </div>
-            
-            <div class="syn-block">
-                <div class="syn-num">02</div>
-                <div>
-                    This infrastructure scarcity is forcing a strategic battle at the hardware layer. We are witnessing the genesis of powerful new alliances and competitive threats: Amazon is preparing to weaponize its custom silicon program against the open market, while an audacious "Terafab" consortium led by Intel and Elon Musk aims to redefine the scale of manufacturing itself. Simultaneously, a counter-movement led by AMD and the UALink consortium is fighting to break the proprietary hardware monopolies with open standards.
-                </div>
-            </div>
-            
-            <div class="syn-block">
-                <div class="syn-num">03</div>
-                <div>
-                    Above this turbulent physical layer, the enterprise software world is facing a crisis of value. New data reveals a chasm between universal AI adoption and the actual realization of business impact, with a majority of leaders admitting their strategies are performative. This "reality gap" signals the end of the initial hype cycle and the beginning of a long, difficult phase focused on governance, workflow integration, and proving tangible ROI. In aggregate, the power in the AI ecosystem is shifting from those who can simply build the largest model to those who can navigate community politics, secure a resilient supply chain, create an open and defensible hardware ecosystem, and translate algorithmic potential into profitable business processes.
-                </div>
-            </div>
-
-            <div class="outlook-box">
-                <div class="outlook-item">
-                    <strong>Anticipated Key Events (Next 1 Quarter to 1 Year):</strong><br>
-                    - <strong>[Industry Consensus]</strong> Expect a major hyperscaler, likely Amazon or Google, to officially launch a merchant silicon offering by the end of 2026. This will trigger a price war in the inference chip market and force NVIDIA to compete on both performance and its ability to integrate with broader cloud service ecosystems.
-                </div>
-                <div class="outlook-item">
-                    - <strong>[Established Knowledge Base]</strong> The UALink 2.0 specification will likely be finalized by Q4 2026, with the first server prototypes from major OEMs featuring the open interconnect standard appearing in early 2027. This will be a critical test of the open ecosystem's ability to challenge NVIDIA's NVLink dominance.
-                </div>
-                <div class="outlook-item">
-                    - <strong>[Speculative]</strong> The "Terafab" announcement will catalyze a new wave of government-backed semiconductor initiatives. Expect the U.S. and E.U. to respond with expanded CHIPS Act-style funding and streamlined permitting for "strategic fab" projects to prevent a private consortium from creating a single point of failure/control in next-generation compute.
-                </div>
-                <div class="outlook-item">
-                    - <strong>[Based on Established Trends]</strong> The enterprise "reality gap" will lead to a wave of consolidation in the AI startup market. Companies offering simple "wrappers" around foundation model APIs will struggle to survive, while those providing robust governance, security, and ROI-measurement tools will become prime acquisition targets for major enterprise software vendors.
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <button id="to-top">↑ Top</button>
-
-    <script>
-        // ── Theme Toggle Logic ──
-        const themeBtn = document.getElementById('theme-toggle');
-        const htmlDoc = document.documentElement;
+    <div class="outlook-box">
+        <h3 style="margin-bottom: 16px; font-size:1.1rem;">Anticipated Key Events (Next 1 Quarter to 1 Year)</h3>
         
-        let isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        htmlDoc.setAttribute('data-theme', isDark ? 'dark' : 'light');
-        themeBtn.textContent = isDark ? '☀️ 라이트모드로' : '🌙 다크모드로';
+        <div class="outlook-item">
+            <strong>[Industry Consensus] Merchant Silicon War:</strong> Expect a major hyperscaler, likely Amazon or Google, to officially launch a merchant silicon offering by the end of 2026. This will trigger a price war in the inference chip market and force NVIDIA to compete on both performance and its ability to integrate with broader cloud service ecosystems.
+        </div>
+        <div class="outlook-item">
+            <strong>[Established Trends] UALink & The Start-up Shakeout:</strong> The UALink 2.0 specification will likely be finalized by Q4 2026, leading to prototypes in early 2027. Concurrently, the enterprise "reality gap" will lead to a wave of consolidation in the AI startup market. Companies offering simple "wrappers" around models will struggle, while GRC and integration tools will become prime acquisition targets.
+        </div>
+    </div>
+</section>
 
-        themeBtn.addEventListener('click', () => {
-            isDark = !isDark;
-            htmlDoc.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            themeBtn.textContent = isDark ? '☀️ 라이트모드로' : '🌙 다크모드로';
-            // Re-render charts for theme update
-            chart1.resize(); chart2.resize(); chart5.resize();
-        });
+<button id="to-top">↑ Top</button>
 
-        // ── Scroll To Top Logic ──
-        const toTopBtn = document.getElementById('to-top');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) {
-                toTopBtn.classList.add('visible');
-            } else {
-                toTopBtn.classList.remove('visible');
-            }
-        });
-        toTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    
+    // Theme Toggling Logic
+    const toggleBtn = document.getElementById('theme-toggle');
+    const html = document.documentElement;
+    toggleBtn.addEventListener('click', () => {
+        const current = html.getAttribute('data-theme');
+        html.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+    });
 
-        // ── ECharts Initialization (SVG Renderer strictly enforced) ──
-        
-        // Chart 1: Data Center 2026 Capacity Risk
-        var chart1 = echarts.init(document.getElementById('chart-art1'), null, {renderer: 'svg'});
-        var option1 = {
-            title: { text: '2026 US Data Center Capacity Risk', left: 'center', textStyle: { fontSize: 14, color: '#6b7280' } },
-            tooltip: { trigger: 'item' },
-            series: [
-                {
-                    name: 'Capacity Status',
-                    type: 'pie',
-                    radius: ['40%', '70%'],
-                    itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
-                    label: { show: true, formatter: '{b}: {d}%' },
-                    data: [
-                        { value: 50, name: 'At Risk / Delayed', itemStyle: { color: '#dc2626' } },
-                        { value: 50, name: 'On Track', itemStyle: { color: '#2563eb' } }
-                    ]
-                }
-            ]
-        };
-        chart1.setOption(option1);
+    // To Top Button Logic
+    const topBtn = document.getElementById('to-top');
+    window.addEventListener('scroll', () => {
+        if(window.scrollY > 300) topBtn.style.display = 'block';
+        else topBtn.style.display = 'none';
+    });
+    topBtn.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
 
-        // Chart 2: Merchant Silicon Ecosystem (Conceptual Revenue/Margin comparison)
-        var chart2 = echarts.init(document.getElementById('chart-art2'), null, {renderer: 'svg'});
-        var option2 = {
-            title: { text: 'Projected AI Merchant Hardware Disruption (Index)', left: 'center', textStyle: { fontSize: 14, color: '#6b7280' } },
-            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-            xAxis: { type: 'value' },
-            yAxis: { type: 'category', data: ['Proprietary Incumbents', 'Hyperscaler Entry (Amazon)', 'Open Standard Ecosystem'] },
-            series: [
-                {
-                    name: 'Disruption Potential',
-                    type: 'bar',
-                    itemStyle: { color: '#ea580c', borderRadius: [0, 4, 4, 0] },
-                    data: [30, 85, 75]
-                }
-            ]
-        };
-        chart2.setOption(option2);
+    // ----------------------------------------------------
+    // ECharts Tufte Style Rendering (SVG)
+    // ----------------------------------------------------
+    const tufteOptions = {
+        textStyle: { fontFamily: 'Inter, sans-serif' },
+        backgroundColor: 'transparent',
+        tooltip: { show: true, backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff' } }
+    };
 
-        // Chart 5: Enterprise AI Reality Gap
-        var chart5 = echarts.init(document.getElementById('chart-art5'), null, {renderer: 'svg'});
-        var option5 = {
-            title: { text: 'Enterprise AI Survey Metrics (Writer / KPMG)', left: 'center', textStyle: { fontSize: 14, color: '#6b7280' } },
-            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-            grid: { left: '3%', right: '8%', bottom: '3%', containLabel: true },
-            xAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value}%' } },
-            yAxis: { type: 'category', data: ['Significant ROI', 'Tearing Company Apart', 'Strategy "For Show"', 'Facing Adoption Challenges'], axisLabel: { interval: 0 } },
-            series: [
-                {
-                    name: 'Percentage of Executives',
-                    type: 'bar',
-                    label: { show: true, position: 'right', formatter: '{c}%' },
-                    itemStyle: {
-                        color: function(params) {
-                            var colorList = ['#059669', '#dc2626', '#f59e0b', '#2563eb'];
-                            return colorList[params.dataIndex];
-                        },
-                        borderRadius: [0, 4, 4, 0]
-                    },
-                    data: [29, 54, 75, 79]
-                }
-            ]
-        };
-        chart5.setOption(option5);
+    // Chart 1: Data Center Capacity Risk (Article 1)
+    const chart1 = echarts.init(document.getElementById('chart-art1'), null, {renderer: 'svg'});
+    chart1.setOption({
+        ...tufteOptions,
+        title: { text: '2026 US Data Center Capacity Outlook', textStyle: { fontSize: 14, fontWeight: 'normal', color: '#64748b' } },
+        grid: { left: '0%', right: '5%', bottom: '5%', containLabel: true },
+        xAxis: { type: 'value', splitLine: { show: false }, axisLine: { show: false }, axisLabel: { show: false } },
+        yAxis: { type: 'category', data: ['Active Construction', 'Delayed / At Risk'], axisLine: { show: true, lineStyle: { color: '#cbd5e1' } }, axisTick: { show: false }, splitLine: { show: false } },
+        series: [{
+            type: 'bar',
+            data: [
+                { value: 50, itemStyle: { color: '#cbd5e1' } },
+                { value: 50, itemStyle: { color: '#2563eb' } }
+            ],
+            barWidth: '40%',
+            label: { show: true, position: 'right', formatter: '{c}%', color: '#64748b' }
+        }]
+    });
 
-        window.addEventListener('resize', function() {
-            chart1.resize();
-            chart2.resize();
-            chart5.resize();
-        });
-    </script>
+    // Chart 2: Enterprise AI ROI Reality Gap (Article 5)
+    const chart5 = echarts.init(document.getElementById('chart-art5'), null, {renderer: 'svg'});
+    chart5.setOption({
+        ...tufteOptions,
+        title: { text: 'Enterprise AI Sentiment (Writer Survey 2026)', textStyle: { fontSize: 14, fontWeight: 'normal', color: '#64748b' } },
+        grid: { left: '0%', right: '10%', bottom: '5%', containLabel: true },
+        xAxis: { type: 'value', max: 100, splitLine: { show: false }, axisLine: { show: false }, axisLabel: { show: false } },
+        yAxis: { type: 'category', data: ['See Significant ROI', 'Admit Strategy "For Show"', 'Face Adoption Challenges'], axisLine: { show: true, lineStyle: { color: '#cbd5e1' } }, axisTick: { show: false }, splitLine: { show: false } },
+        series: [{
+            type: 'bar',
+            data: [
+                { value: 29, itemStyle: { color: '#7c3aed' } },
+                { value: 75, itemStyle: { color: '#c4b5fd' } },
+                { value: 79, itemStyle: { color: '#ddd6fe' } }
+            ],
+            barWidth: '40%',
+            label: { show: true, position: 'right', formatter: '{c}%', color: '#64748b' }
+        }]
+    });
+
+    // Resize listener for responsive charts
+    window.addEventListener('resize', function() {
+        chart1.resize();
+        chart5.resize();
+    });
+});
+</script>
+
 </body>
 </html>
