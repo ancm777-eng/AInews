@@ -76,7 +76,17 @@ def get_latest_claude_model(client):
         sonnet_models = [m.id for m in models_page.data if "sonnet" in m.id.lower()]
 
         if sonnet_models:
-            sonnet_models.sort(key=lambda x: tuple(int(num) for num in re.findall(r'\d+', x)), reverse=True)
+            def model_sort_key(model_id):
+                # ✅ [Fix] 날짜(8자리)와 버전 번호를 분리하여 정렬
+                # 문제: 20250514 같은 날짜 숫자가 버전 번호 6보다 커서 구버전이 선택되던 버그
+                # 예) claude-sonnet-4-20250514 vs claude-sonnet-4-6-20251210
+                # 버전 번호(짧은 숫자)를 우선 비교하고, 날짜(8자리)는 동점일 때만 보조 사용
+                parts = re.findall(r'\d+', model_id)
+                ver_parts = [int(p) for p in parts if len(p) < 8]   # 버전: 4, 6 등
+                date_val  = int(next((p for p in parts if len(p) == 8), "0"))  # 날짜: 20251210
+                return (ver_parts, date_val)
+
+            sonnet_models.sort(key=model_sort_key, reverse=True)
             target = sonnet_models[0]
             print(f"Automatically selected Claude model: {target}")
             return target
@@ -147,8 +157,9 @@ def main():
     g_client = genai.Client(api_key=g_api_key)
     g_model = get_latest_gemini_model(g_client)
 
-    # ✅ [원본 Fix] max_retries=0: tenacity와 중첩 타임아웃(18분) 방지
-    c_client = anthropic.Anthropic(api_key=c_api_key, timeout=120.0, max_retries=0) if c_api_key else None
+    # ✅ [Fix] max_retries=0: tenacity와 중첩 타임아웃(18분) 방지
+    # ✅ [Fix] timeout=300: Phase 4 검증+번역 장문 응답이 120s 초과하여 3회 전부 실패하던 문제 해결
+    c_client = anthropic.Anthropic(api_key=c_api_key, timeout=300.0, max_retries=0) if c_api_key else None
     c_model = get_latest_claude_model(c_client) if c_client else None
 
     # ✅ [Gemini Fix] base_prompt와 phase1_prompt 분리
