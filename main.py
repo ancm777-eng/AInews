@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 import anthropic
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, stop_after_attempt, wait_exponential, wait_fixed
 from github_utils import fetch_prompt_from_github
 
 # 실시간 로그 출력 설정
@@ -110,7 +110,8 @@ def run_claude_chat(client, model, messages, system=None, use_web_search=False):
     text_blocks = [b.text for b in message.content if hasattr(b, "text")]
     return "\n".join(text_blocks) if text_blocks else None
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=2, min=10, max=30), retry_error_callback=return_none_on_error)
+# ✅ 30초 간격으로 최대 5회(약 15분)까지 재시도하도록 수정
+@retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, prompt, output_file="research_result.md"):
     try:
         current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
