@@ -77,13 +77,9 @@ def get_latest_claude_model(client):
 
         if sonnet_models:
             def model_sort_key(model_id):
-                # ✅ [Fix] 날짜(8자리)와 버전 번호를 분리하여 정렬
-                # 문제: 20250514 같은 날짜 숫자가 버전 번호 6보다 커서 구버전이 선택되던 버그
-                # 예) claude-sonnet-4-20250514 vs claude-sonnet-4-6-20251210
-                # 버전 번호(짧은 숫자)를 우선 비교하고, 날짜(8자리)는 동점일 때만 보조 사용
                 parts = re.findall(r'\d+', model_id)
-                ver_parts = [int(p) for p in parts if len(p) < 8]   # 버전: 4, 6 등
-                date_val  = int(next((p for p in parts if len(p) == 8), "0"))  # 날짜: 20251210
+                ver_parts = [int(p) for p in parts if len(p) < 8]
+                date_val  = int(next((p for p in parts if len(p) == 8), "0"))
                 return (ver_parts, date_val)
 
             sonnet_models.sort(key=model_sort_key, reverse=True)
@@ -96,8 +92,6 @@ def get_latest_claude_model(client):
         print(f"Warning: Claude model discovery failed, using fallback.")
         return "claude-sonnet-4-6"
 
-# ✅ [내 Fix] system 파라미터 + web_search 옵션 유지
-# ✅ [내 Fix] web_search 사용 시 multi-block 응답에서 text만 추출하도록 처리
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10), retry_error_callback=return_none_on_error)
 def run_claude_chat(client, model, messages, system=None, use_web_search=False):
     kwargs = dict(model=model, max_tokens=8192, messages=messages)
@@ -106,11 +100,9 @@ def run_claude_chat(client, model, messages, system=None, use_web_search=False):
     if use_web_search:
         kwargs["tools"] = [{"type": "web_search_20250305", "name": "web_search"}]
     message = client.messages.create(**kwargs)
-    # web_search 사용 시 tool_use 블록이 섞이므로 text 블록만 추출
     text_blocks = [b.text for b in message.content if hasattr(b, "text")]
     return "\n".join(text_blocks) if text_blocks else None
 
-# ✅ 30초 간격으로 최대 5회(약 15분)까지 재시도하도록 수정
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, prompt, output_file="research_result.md"):
     try:
@@ -158,14 +150,9 @@ def main():
     g_client = genai.Client(api_key=g_api_key)
     g_model = get_latest_gemini_model(g_client)
 
-    # ✅ [Fix] max_retries=0: tenacity와 중첩 타임아웃(18분) 방지
-    # ✅ [Fix] timeout=300: Phase 4 검증+번역 장문 응답이 120s 초과하여 3회 전부 실패하던 문제 해결
     c_client = anthropic.Anthropic(api_key=c_api_key, timeout=300.0, max_retries=0) if c_api_key else None
     c_model = get_latest_claude_model(c_client) if c_client else None
 
-    # ✅ [Gemini Fix] base_prompt와 phase1_prompt 분리
-    # base_prompt_content: 순수 규칙/지시만 포함 → Phase 3/4에 전달
-    # phase1_prompt_content: 아카이브 포함 → Phase 1에만 전달
     url = args.url or os.getenv("PROMPT_URL")
     base_prompt_content = ""
     if url:
@@ -180,7 +167,6 @@ def main():
                 sys.exit(1)
 
     archive_text = get_recent_archives(7)
-    # Phase 1 전용: 중복 방지 아카이브 포함
     phase1_prompt_content = (archive_text + "\n" + base_prompt_content) if archive_text else base_prompt_content
 
     ref_content = ""
@@ -206,7 +192,7 @@ def main():
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
         )
         phase1_prompt_content += ref_instr
-        base_prompt_content += ref_instr  # ref는 Phase 3용 base에도 포함
+        base_prompt_content += ref_instr
         print(f"🎯 ref.txt에서 {ref_count}개의 타겟 주제를 확인하여 프롬프트에 주입했습니다.")
     else:
         print("ℹ️ ref.txt 파일이 없거나 비어있어 기본 탐색 모드로 진행합니다.")
@@ -218,7 +204,6 @@ def main():
     print(f"Starting Grounded Research (Model: {g_model})...")
     p1_start = time.time()
 
-    # Phase 1은 아카이브가 포함된 phase1_prompt_content 사용
     initial_result = run_grounded_research(g_client, g_model, phase1_prompt_content, args.output)
 
     if not initial_result:
@@ -230,9 +215,6 @@ def main():
 
     # ---------------------------------------------------------
     # Phase 2: Claude Validation
-    # ✅ [내 Fix] use_web_search=True: 실시간 검색으로 2026년 신규 사건 검증 가능
-    # ✅ [Gemini Fix] guardrail 프롬프트: 설령 웹 검색 결과가 없더라도 단정적 삭제 지시 방지
-    # ✅ [원본 Fix] system 파라미터로 날짜/역할 주입
     # ---------------------------------------------------------
     feedback = None
     claude_messages = []
@@ -256,7 +238,6 @@ def main():
             f"Respond in Korean."
         )
 
-        # ✅ [Gemini Fix] guardrail: 웹 검색으로 확인 안 되는 항목을 환각으로 단정하지 말도록 명시
         p2_user_prompt = (
             f"다음 AI 뉴스 초안의 사실 관계와 KST 기준 시간 윈도우를 검증하십시오.\n\n"
             f"[검증 지침]\n"
@@ -270,7 +251,6 @@ def main():
 
         claude_messages = [{"role": "user", "content": p2_user_prompt}]
 
-        # ✅ [내 Fix] use_web_search=True로 Claude가 직접 실시간 검색 수행
         feedback = run_claude_chat(c_client, c_model, claude_messages,
                                    system=p2_system, use_web_search=True)
 
@@ -283,8 +263,6 @@ def main():
 
     # ---------------------------------------------------------
     # Phase 3: Gemini Refinement
-    # ✅ [Gemini Fix] base_prompt_content 사용: 아카이브 제거로 어제 기사 복사 방지
-    # ✅ [두 Fix 합산] refine_prompt: 삭제 지시에도 항목 유지 + 지적된 부분만 수정
     # ---------------------------------------------------------
     refined_result = initial_result
     if feedback:
@@ -301,10 +279,10 @@ def main():
             "4. 기존 섹션 구조(Overview, Strategic Impact, Technical Deep Dive 등)를 정확히 유지하십시오."
         )
 
-        max_retries = 3
+        # ✅ 최대 재시도 횟수를 5회로 증가
+        max_retries = 5
         for attempt in range(max_retries):
             try:
-                # ✅ [Gemini Fix] base_prompt_content: 아카이브 없는 순수 규칙만 전달
                 contents = [
                     f"[Original Rules]\n{base_prompt_content}\n\n",
                     f"[Initial Draft]\n{initial_result}\n\n",
@@ -325,7 +303,8 @@ def main():
             except Exception as e:
                 print(f"⚠️ Phase 3 attempt {attempt + 1} failed: {e}")
                 if attempt < max_retries - 1:
-                    time.sleep(15)
+                    # ✅ 서버 과부하 대응: 대기 시간 30초 유지
+                    time.sleep(30)
                 else:
                     print("❌ All refinement attempts failed. Using initial result.")
                     p3_time = time.time() - p3_start
@@ -333,14 +312,14 @@ def main():
 
     # ---------------------------------------------------------
     # Phase 4: Claude Translation
-    # ✅ [Gemini Fix] multi-turn 히스토리: Claude가 자신의 Phase 2 피드백 맥락을 유지한 채 번역
-    # ✅ [원본 Fix] system 파라미터로 번역 역할 명시
-    # ✅ [원본 Fix] translated가 None이면 refined_result로 fallback
     # ---------------------------------------------------------
     final_content = refined_result
     if c_client and feedback:
         print("\n--- Phase 4: Claude Translation ---")
         print(f"Starting Claude action (Model: {c_model})...")
+        
+        # ✅ 토큰 한도(TPM) 대응: 혹시 모를 짧은 시간 내 요청 몰림 방지를 위해 10초 대기
+        time.sleep(10)
         p4_start = time.time()
 
         current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
@@ -348,26 +327,24 @@ def main():
         p4_system = (
             f"Today's actual date and time is {current_kst}. "
             f"You are a professional technical translator specializing in AI infrastructure and business intelligence. "
-            f"Context: The text provided has already been refined and corrected based on the QA feedback you provided earlier. "
+            f"Context: The text provided has already been refined and corrected based on QA feedback. "
             f"Your current task is STRICTLY to translate this finalized AI briefing into polished, executive-level business English. "
             f"Rules: preserve all section headers, data tables, URLs, and numerical figures exactly as-is. "
             f"Output only the translated report with no commentary, preamble, or explanatory notes."
         )
 
-        # ✅ [Gemini Fix] Phase 2 대화 히스토리에 이어서 append → Claude가 자신의 이전 피드백을 인지한 채 번역
-        claude_messages.append({
+        # ✅ 토큰 한도 초과 해결: 이전 claude_messages에 append 하지 않고, 번역용 메시지 리스트를 새로 만듦
+        translate_messages = [{
             "role": "user",
             "content": (
-                f"This is the final draft that has been successfully updated and corrected based on your previous QA feedback. "
                 f"Please translate the following final AI infrastructure briefing into professional business English. "
                 f"Preserve all structure, section headers, metadata fields, and numerical data exactly.\n\n"
-                f"[FINAL DRAFT (Refined based on your QA) — {current_kst}]\n{refined_result}"
+                f"[FINAL DRAFT — {current_kst}]\n{refined_result}"
             )
-        })
+        }]
 
-        translated = run_claude_chat(c_client, c_model, claude_messages, system=p4_system)
+        translated = run_claude_chat(c_client, c_model, translate_messages, system=p4_system)
 
-        # ✅ [원본 Fix] None 리턴 시 refined_result로 fallback
         if translated:
             final_content = translated
         else:
@@ -380,7 +357,6 @@ def main():
     today_str = datetime.datetime.now().strftime("%Y-%m-%d")
     os.makedirs("data", exist_ok=True)
 
-    # ✅ [원본 Fix] final_content가 None/빈 값일 경우 최종 안전망
     if not final_content:
         final_content = refined_result or initial_result
 
@@ -407,7 +383,9 @@ def main():
 
     if html_prompt_content:
         print(f"Generating HTML using model: {g_model}...")
-        max_html_retries = 3
+        
+        # ✅ 최대 재시도 횟수를 5회로 증가
+        max_html_retries = 5
         for attempt in range(max_html_retries):
             try:
                 response = g_client.models.generate_content(
@@ -431,7 +409,8 @@ def main():
             except Exception as e:
                 print(f"⚠️ Phase 5 attempt {attempt + 1} failed: {e}")
                 if attempt < max_html_retries - 1:
-                    time.sleep(15)
+                    # ✅ 서버 과부하 대응: 대기 시간 30초 유지
+                    time.sleep(30)
                 else:
                     print("❌ All HTML generation attempts failed.")
                     p5_time = time.time() - p5_start
