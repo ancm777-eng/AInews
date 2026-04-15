@@ -318,8 +318,8 @@ def main():
         print("\n--- Phase 4: Claude Translation ---")
         print(f"Starting Claude action (Model: {c_model})...")
         
-        # ✅ 토큰 한도(TPM) 대응: 혹시 모를 짧은 시간 내 요청 몰림 방지를 위해 10초 대기
-        time.sleep(10)
+        # ✅ 토큰 한도(TPM) 대응: 혹시 모를 짧은 시간 내 요청 몰림 방지를 위해 60초 대기
+        time.sleep(60)
         p4_start = time.time()
 
         current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
