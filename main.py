@@ -215,8 +215,7 @@ def main():
         print(f"🎯 ref.txt에서 {ref_count}개의 타겟 주제를 확인하여 프롬프트에 주입했습니다.")
     else:
         print("ℹ️ ref.txt 파일이 없거나 비어있어 기본 탐색 모드로 진행합니다.")
-
-    # ---------------------------------------------------------
+ ---------------------------------------------------------
     # Phase 1: Grounded Research
     # ---------------------------------------------------------
     print("\n--- Phase 1: Grounded Research ---")
@@ -234,9 +233,15 @@ def main():
         if not initial_result:
             print("❌ Phase 1 failed after 5 attempts. Exiting.")
             sys.exit(1) # 강제 종료
-        print(f"✅ Phase 1 complete. Saved to {p1_cache_file} (Time: {time.time() - p1_start:.2f}s)")
+        
+        # ⭐️ 추가된 핵심 로직: Phase 1 성공 시 ref.txt 내용 비우기
+        if os.path.exists("ref.txt"):
+            with open("ref.txt", "w", encoding="utf-8") as f:
+                pass
+            print("🧹 Phase 1 성공: 내일의 중복 검색 방지를 위해 ref.txt를 초기화했습니다.")
 
-    # ---------------------------------------------------------
+        print(f"✅ Phase 1 complete. Saved to {p1_cache_file} (Time: {time.time() - p1_start:.2f}s)")
+ ---------------------------------------------------------
     # Phase 2: Claude Validation
     # ---------------------------------------------------------
     p2_cache_file = "trial/feedback.txt"
