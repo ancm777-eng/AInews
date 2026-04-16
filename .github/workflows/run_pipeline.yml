@@ -14,7 +14,6 @@ on:
 permissions:
   contents: write
 
-
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
@@ -54,6 +53,30 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      # ⭐️ 추가된 로직: Git 커밋 날짜를 확인하여 오늘 만들어진 캐시는 보존하고, 어제 이전 캐시만 삭제
+      - name: Clean old caches (Preserve today's partial progress)
+        if: env.SKIP_RUN == 'false'
+        run: |
+          TODAY=$(date +'%Y-%m-%d')
+          echo "Current Date (KST): $TODAY"
+          
+          if [ -d "trial" ]; then
+            for file in trial/*.txt; do
+              if [ -f "$file" ]; then
+                # 해당 파일이 마지막으로 커밋된 날짜 추출 (형식: YYYY-MM-DD)
+                COMMIT_DATE=$(git log -1 --date=format:'%Y-%m-%d' --format="%cd" -- "$file")
+                
+                # 파일이 Git에 추적되고 있으며, 커밋 날짜가 오늘이 아닌 경우에만 삭제
+                if [ -n "$COMMIT_DATE" ] && [ "$COMMIT_DATE" != "$TODAY" ]; then
+                  echo "🧹 이전 날짜 캐시 파일 삭제: $file (커밋 날짜: $COMMIT_DATE)"
+                  rm "$file"
+                else
+                  echo "✅ 오늘 생성/수정된 캐시 유지: $file (커밋 날짜: $COMMIT_DATE)"
+                fi
+              fi
+            done
+          fi
 
       - name: Run Main Pipeline
         if: env.SKIP_RUN == 'false'
