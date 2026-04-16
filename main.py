@@ -4,6 +4,7 @@ import sys
 import argparse
 import re
 import datetime
+import random
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -16,8 +17,30 @@ sys.stdout.reconfigure(line_buffering=True)
 
 load_dotenv()
 
+def clean_old_caches(cache_dir="trial"):
+    """trial 폴더 내의 파일 중, 생성/수정일이 '오늘'이 아닌 어제 이전 파일들을 삭제합니다."""
+    if not os.path.exists(cache_dir):
+        return
+    
+    today_date = datetime.date.today()
+    
+    for filename in os.listdir(cache_dir):
+        if filename.endswith(".txt"):
+            file_path = os.path.join(cache_dir, filename)
+            try:
+                # 파일의 마지막 수정 시간을 가져와서 날짜로 변환
+                mtime = os.path.getmtime(file_path)
+                file_date = datetime.datetime.fromtimestamp(mtime).date()
+                
+                # 파일 날짜가 오늘과 다르면 (어제 이전 파일이면) 삭제
+                if file_date != today_date:
+                    os.remove(file_path)
+                    print(f"🧹 이전 날짜의 캐시 파일 자동 삭제 완료: {filename}")
+            except Exception as e:
+                print(f"⚠️ 캐시 파일 삭제 실패: {filename} ({e})")
+
 def return_none_on_error(retry_state):
-    print(f"\nAction ultimately failed after {retry_state.attempt_number} attempts: {retry_state.outcome.exception()}")
+    print(f"\n❌ Action ultimately failed after {retry_state.attempt_number} attempts: {retry_state.outcome.exception()}")
     return None
 
 def get_recent_archives(days=7):
@@ -49,22 +72,18 @@ def get_latest_gemini_model(client):
     try:
         models = client.models.list()
         all_names = [m.name for m in models]
-
         bad_keywords = ["flash", "nano", "vision", "latest", "customtools", "deep-research",
                         "live", "tts", "embedding", "imagen", "aqa", "preview", "exp"]
-
         pro_models = [
             n for n in all_names
             if "gemini" in n.lower() and "pro" in n.lower()
             and not any(bad in n.lower() for bad in bad_keywords)
         ]
-
         if pro_models:
             pro_models.sort(key=lambda x: tuple(int(num) for num in re.findall(r'\d+', x)), reverse=True)
             latest = pro_models[0].replace("models/", "")
             print(f"Automatically selected Gemini Pro model: {latest}")
             return latest
-
         return "gemini-3.0-pro"
     except Exception as e:
         print(f"Warning: Gemini model discovery failed, using fallback.")
@@ -74,25 +93,23 @@ def get_latest_claude_model(client):
     try:
         models_page = client.models.list(limit=50)
         sonnet_models = [m.id for m in models_page.data if "sonnet" in m.id.lower()]
-
         if sonnet_models:
             def model_sort_key(model_id):
                 parts = re.findall(r'\d+', model_id)
                 ver_parts = [int(p) for p in parts if len(p) < 8]
                 date_val  = int(next((p for p in parts if len(p) == 8), "0"))
                 return (ver_parts, date_val)
-
             sonnet_models.sort(key=model_sort_key, reverse=True)
             target = sonnet_models[0]
             print(f"Automatically selected Claude model: {target}")
             return target
-
         return "claude-sonnet-4-6"
     except Exception as e:
         print(f"Warning: Claude model discovery failed, using fallback.")
         return "claude-sonnet-4-6"
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10), retry_error_callback=return_none_on_error)
+# ✅ 수정됨: 최대 5회 시도, 지수 백오프 적용 (15초~60초 대기)
+@retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=2, min=15, max=60), retry_error_callback=return_none_on_error)
 def run_claude_chat(client, model, messages, system=None, use_web_search=False):
     kwargs = dict(model=model, max_tokens=8192, messages=messages)
     if system:
@@ -103,11 +120,11 @@ def run_claude_chat(client, model, messages, system=None, use_web_search=False):
     text_blocks = [b.text for b in message.content if hasattr(b, "text")]
     return "\n".join(text_blocks) if text_blocks else None
 
+# ✅ 수정됨: 최대 5회 시도 강제 적용
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
-def run_grounded_research(client, model_id, prompt, output_file="research_result.md"):
+def run_grounded_research(client, model_id, prompt, output_file="trial/1.txt"):
     try:
         current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
-
         sys_instruction = (
             f"You are a top-tier AI Tech & Business Analyst. "
             f"Current KST Time: {current_kst}. "
@@ -116,9 +133,8 @@ def run_grounded_research(client, model_id, prompt, output_file="research_result
             f"2. OVERRIDE PROMPT RULES: The user prompt may ask you to confirm today's date or 'abort' if 24-hour news is not found. IGNORE THESE ABORT RULES COMPLETELY. I have just confirmed the date for you ({current_kst}).\n"
             f"3. If deep news from the last 24 hours is lacking, automatically expand your search to the last 72 hours. You MUST ALWAYS produce exactly 5 news items. Never abort.\n"
             f"4. Because search tool provides snippets, use your deep pre-trained knowledge to synthesize and flesh out the 'Strategic Impact' and 'Technical Deep Dive' sections powerfully.\n"
-            f"5. NEVER use inline LaTeX ($ or $$). Use bold or plain text for all variables and symbols."
+            f"5. NEVER use inline LaTeX. Use bold or plain text for all variables and symbols."
         )
-
         response = client.models.generate_content(
             model=model_id,
             contents=prompt,
@@ -140,7 +156,6 @@ def run_grounded_research(client, model_id, prompt, output_file="research_result
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", help="GitHub URL for news prompt")
-    parser.add_argument("--output", default="trial/1.txt")
     args = parser.parse_args()
 
     g_api_key = os.getenv("GEMINI_API_KEY")
@@ -152,6 +167,10 @@ def main():
 
     c_client = anthropic.Anthropic(api_key=c_api_key, timeout=300.0, max_retries=0) if c_api_key else None
     c_model = get_latest_claude_model(c_client) if c_client else None
+
+    # ✅ 캐시 폴더 생성 및 이전 날짜의 쓰레기 파일 청소
+    os.makedirs("trial", exist_ok=True)
+    clean_old_caches(cache_dir="trial")
 
     url = args.url or os.getenv("PROMPT_URL")
     base_prompt_content = ""
@@ -201,165 +220,172 @@ def main():
     # Phase 1: Grounded Research
     # ---------------------------------------------------------
     print("\n--- Phase 1: Grounded Research ---")
-    print(f"Starting Grounded Research (Model: {g_model})...")
-    p1_start = time.time()
+    p1_cache_file = "trial/1.txt"
+    initial_result = None
 
-    initial_result = run_grounded_research(g_client, g_model, phase1_prompt_content, args.output)
-
-    if not initial_result:
-        print("❌ Phase 1 failed. Exiting.")
-        sys.exit(1)
-
-    p1_time = time.time() - p1_start
-    print(f"✅ Phase 1 complete. Saved to {args.output} (Time: {p1_time:.2f}s)")
+    if os.path.exists(p1_cache_file):
+        print("✅ Phase 1: 오늘 이미 생성된 로컬 캐시(1.txt)에서 초안을 불러옵니다.")
+        with open(p1_cache_file, "r", encoding="utf-8") as f:
+            initial_result = f.read()
+    else:
+        print(f"Starting Grounded Research (Model: {g_model})...")
+        p1_start = time.time()
+        initial_result = run_grounded_research(g_client, g_model, phase1_prompt_content, p1_cache_file)
+        if not initial_result:
+            print("❌ Phase 1 failed after 5 attempts. Exiting.")
+            sys.exit(1) # 강제 종료
+        print(f"✅ Phase 1 complete. Saved to {p1_cache_file} (Time: {time.time() - p1_start:.2f}s)")
 
     # ---------------------------------------------------------
     # Phase 2: Claude Validation
     # ---------------------------------------------------------
+    p2_cache_file = "trial/feedback.txt"
     feedback = None
     claude_messages = []
+
     if c_client:
         print("\n--- Phase 2: Claude Validation ---")
-        print(f"Starting Claude action (Model: {c_model})...")
-        p2_start = time.time()
-
-        current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
-
-        p2_system = (
-            f"Today's actual date and time is {current_kst}. "
-            f"You are a fact-checker for an AI infrastructure intelligence briefing. "
-            f"The draft was produced by a separate AI agent using real-time Google Search as of today. "
-            f"Therefore, all dates and events in the draft referencing {datetime.datetime.now().strftime('%Y')} "
-            f"are CURRENT, not future or fictional. "
-            f"Do NOT flag any {datetime.datetime.now().strftime('%Y')} dates as hypothetical or future scenarios. "
-            f"You have access to the web_search tool — use it aggressively to verify company names, "
-            f"product specs, statistics, and URLs before forming any judgment. "
-            f"Only flag an item as an error after attempting a web search and finding a clear contradiction. "
-            f"Respond in Korean."
-        )
-
-        p2_user_prompt = (
-            f"다음 AI 뉴스 초안의 사실 관계와 KST 기준 시간 윈도우를 검증하십시오.\n\n"
-            f"[검증 지침]\n"
-            f"- web_search 툴을 적극 사용하여 각 항목의 기업명, 제품명, 통계 수치, URL을 검색 후 판단하십시오.\n"
-            f"- 검색 결과가 없다는 이유만으로 '환각(Hallucination)'이라고 단정하지 마십시오. "
-            f"검색으로 명확한 반증을 찾았을 때만 오류로 지적하십시오.\n"
-            f"- 오류가 없는 항목은 논리의 비약, 전략적 분석의 깊이 부족, 아키텍처 설명의 모호함, "
-            f"양식 누락 등 품질 관점에서 건설적인 보완을 제안하십시오.\n\n"
-            f"[초안]\n{initial_result}"
-        )
-
-        claude_messages = [{"role": "user", "content": p2_user_prompt}]
-
-        feedback = run_claude_chat(c_client, c_model, claude_messages,
-                                   system=p2_system, use_web_search=True)
-
-        if feedback:
-            claude_messages.append({"role": "assistant", "content": feedback})
-            with open("trial/feedback.txt", "w", encoding="utf-8") as f: f.write(feedback)
-
-        p2_time = time.time() - p2_start
-        print(f"✅ Phase 2 complete. Saved to trial/feedback.txt (Time: {p2_time:.2f}s)")
+        if os.path.exists(p2_cache_file):
+            print("✅ Phase 2: 오늘 이미 생성된 로컬 캐시(feedback.txt)에서 피드백을 불러옵니다.")
+            with open(p2_cache_file, "r", encoding="utf-8") as f:
+                feedback = f.read()
+        else:
+            print(f"Starting Claude action (Model: {c_model})...")
+            p2_start = time.time()
+            current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
+            p2_system = (
+                f"Today's actual date and time is {current_kst}. "
+                f"You are a fact-checker for an AI infrastructure intelligence briefing. "
+                f"The draft was produced by a separate AI agent using real-time Google Search as of today. "
+                f"Therefore, all dates and events in the draft referencing {datetime.datetime.now().strftime('%Y')} "
+                f"are CURRENT, not future or fictional. "
+                f"Do NOT flag any {datetime.datetime.now().strftime('%Y')} dates as hypothetical or future scenarios. "
+                f"You have access to the web_search tool — use it aggressively to verify company names, "
+                f"product specs, statistics, and URLs before forming any judgment. "
+                f"Only flag an item as an error after attempting a web search and finding a clear contradiction. "
+                f"Respond in Korean."
+            )
+            p2_user_prompt = (
+                f"다음 AI 뉴스 초안의 사실 관계와 KST 기준 시간 윈도우를 검증하십시오.\n\n"
+                f"[검증 지침]\n"
+                f"- web_search 툴을 적극 사용하여 각 항목의 기업명, 제품명, 통계 수치, URL을 검색 후 판단하십시오.\n"
+                f"- 검색 결과가 없다는 이유만으로 '환각(Hallucination)'이라고 단정하지 마십시오. 검색으로 명확한 반증을 찾았을 때만 오류로 지적하십시오.\n"
+                f"- 오류가 없는 항목은 논리의 비약, 전략적 분석의 깊이 부족, 아키텍처 설명의 모호함, 양식 누락 등 품질 관점에서 건설적인 보완을 제안하십시오.\n\n"
+                f"[초안]\n{initial_result}"
+            )
+            claude_messages = [{"role": "user", "content": p2_user_prompt}]
+            
+            feedback = run_claude_chat(c_client, c_model, claude_messages, system=p2_system, use_web_search=True)
+            if not feedback:
+                print("❌ Phase 2 failed after 5 attempts. Exiting.")
+                sys.exit(1) # 강제 종료
+                
+            with open(p2_cache_file, "w", encoding="utf-8") as f: f.write(feedback)
+            print(f"✅ Phase 2 complete. Saved to {p2_cache_file} (Time: {time.time() - p2_start:.2f}s)")
 
     # ---------------------------------------------------------
     # Phase 3: Gemini Refinement
     # ---------------------------------------------------------
-    refined_result = initial_result
+    p3_cache_file = "trial/2.txt"
+    refined_result = initial_result # 실패 시를 대비한 Fallback (이전에는 이 상태로 넘어갔으나, 이제는 강제종료됨)
+
     if feedback:
         print("\n--- Phase 3: Gemini Refinement ---")
-        print(f"Starting Refinement (Model: {g_model})...")
-        p3_start = time.time()
-
-        refine_prompt = (
-            "위 피드백을 반영하여 [Initial Draft]를 다듬어 최종본을 작성하십시오.\n"
-            "1. [Initial Draft]의 5개 뉴스 항목 구조를 기본으로 유지할 것. "
-            "피드백이 특정 항목을 삭제하라고 하더라도, 완전히 제거하지 말고 해당 오류 부분만 수정·보강하여 유지하십시오.\n"
-            "2. 피드백에서 지적되지 않은 항목은 원문 그대로 유지하십시오. 불필요한 재작성을 금지합니다.\n"
-            "3. 인라인 수식 기호($ 또는 $$) 절대 사용 금지. 벡터는 굵은 글씨, 변수는 일반 텍스트.\n"
-            "4. 기존 섹션 구조(Overview, Strategic Impact, Technical Deep Dive 등)를 정확히 유지하십시오."
-        )
-
-        # ✅ 최대 재시도 횟수를 5회로 증가
-        max_retries = 5
-        for attempt in range(max_retries):
-            try:
-                contents = [
-                    f"[Original Rules]\n{base_prompt_content}\n\n",
-                    f"[Initial Draft]\n{initial_result}\n\n",
-                    f"[Feedback to Apply]\n{feedback}\n\n",
-                    f"[Instruction]\n{refine_prompt}"
-                ]
-                response = g_client.models.generate_content(
-                    model=g_model,
-                    contents=contents,
-                    config=types.GenerateContentConfig(temperature=0.1)
-                )
-                refined_result = response.text
-                with open("trial/2.txt", "w", encoding="utf-8") as f: f.write(refined_result)
-
-                p3_time = time.time() - p3_start
-                print(f"✅ Phase 3 complete. Saved to trial/2.txt (Time: {p3_time:.2f}s)")
-                break
-            except Exception as e:
-                print(f"⚠️ Phase 3 attempt {attempt + 1} failed: {e}")
-                if attempt < max_retries - 1:
-                    # ✅ 서버 과부하 대응: 대기 시간 30초 유지
-                    time.sleep(30)
-                else:
-                    print("❌ All refinement attempts failed. Using initial result.")
-                    p3_time = time.time() - p3_start
-                    print(f"✅ Phase 3 finished with errors. (Time: {p3_time:.2f}s)")
+        if os.path.exists(p3_cache_file):
+            print("✅ Phase 3: 오늘 이미 생성된 로컬 캐시(2.txt)에서 수정본을 불러옵니다.")
+            with open(p3_cache_file, "r", encoding="utf-8") as f:
+                refined_result = f.read()
+        else:
+            print(f"Starting Refinement (Model: {g_model})...")
+            p3_start = time.time()
+            refine_prompt = (
+                "위 피드백을 반영하여 [Initial Draft]를 다듬어 최종본을 작성하십시오.\n"
+                "1. [Initial Draft]의 5개 뉴스 항목 구조를 기본으로 유지할 것. 피드백이 특정 항목을 삭제하라고 하더라도, 완전히 제거하지 말고 해당 오류 부분만 수정·보강하여 유지하십시오.\n"
+                "2. 피드백에서 지적되지 않은 항목은 원문 그대로 유지하십시오. 불필요한 재작성을 금지합니다.\n"
+                "3. 인라인 수식 기호 절대 사용 금지. 벡터는 굵은 글씨, 변수는 일반 텍스트.\n"
+                "4. 기존 섹션 구조(Overview, Strategic Impact, Technical Deep Dive 등)를 정확히 유지하십시오."
+            )
+            max_retries = 5
+            for attempt in range(max_retries):
+                try:
+                    contents = [
+                        f"[Original Rules]\n{base_prompt_content}\n\n",
+                        f"[Initial Draft]\n{initial_result}\n\n",
+                        f"[Feedback to Apply]\n{feedback}\n\n",
+                        f"[Instruction]\n{refine_prompt}"
+                    ]
+                    response = g_client.models.generate_content(
+                        model=g_model,
+                        contents=contents,
+                        config=types.GenerateContentConfig(temperature=0.1)
+                    )
+                    refined_result = response.text
+                    with open(p3_cache_file, "w", encoding="utf-8") as f: f.write(refined_result)
+                    print(f"✅ Phase 3 complete. Saved to {p3_cache_file} (Time: {time.time() - p3_start:.2f}s)")
+                    break
+                except Exception as e:
+                    print(f"⚠️ Phase 3 attempt {attempt + 1} failed: {e}")
+                    if attempt < max_retries - 1:
+                        # ✅ 점진적 대기 시간 증가 및 약간의 난수(Jitter) 추가
+                        sleep_time = min(60, 15 * (2 ** attempt)) + random.uniform(1, 3)
+                        print(f"   {sleep_time:.1f}초 후 재시도합니다...")
+                        time.sleep(sleep_time)
+                    else:
+                        print("❌ Phase 3 failed after 5 attempts. Exiting.")
+                        sys.exit(1) # 강제 종료
 
     # ---------------------------------------------------------
     # Phase 4: Claude Translation
     # ---------------------------------------------------------
+    p4_cache_file = "trial/translated.txt"
     final_content = refined_result
+
     if c_client and feedback:
         print("\n--- Phase 4: Claude Translation ---")
-        print(f"Starting Claude action (Model: {c_model})...")
-        
-        # ✅ 토큰 한도(TPM) 대응: 혹시 모를 짧은 시간 내 요청 몰림 방지를 위해 60초 대기
-        time.sleep(60)
-        p4_start = time.time()
-
-        current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
-
-        p4_system = (
-            f"Today's actual date and time is {current_kst}. "
-            f"You are a professional technical translator specializing in AI infrastructure and business intelligence. "
-            f"Context: The text provided has already been refined and corrected based on QA feedback. "
-            f"Your current task is STRICTLY to translate this finalized AI briefing into polished, executive-level business English. "
-            f"Rules: preserve all section headers, data tables, URLs, and numerical figures exactly as-is. "
-            f"Output only the translated report with no commentary, preamble, or explanatory notes."
-        )
-
-        # ✅ 토큰 한도 초과 해결: 이전 claude_messages에 append 하지 않고, 번역용 메시지 리스트를 새로 만듦
-        translate_messages = [{
-            "role": "user",
-            "content": (
-                f"Please translate the following final AI infrastructure briefing into professional business English. "
-                f"Preserve all structure, section headers, metadata fields, and numerical data exactly.\n\n"
-                f"[FINAL DRAFT — {current_kst}]\n{refined_result}"
-            )
-        }]
-
-        translated = run_claude_chat(c_client, c_model, translate_messages, system=p4_system)
-
-        if translated:
-            final_content = translated
+        if os.path.exists(p4_cache_file):
+            print("✅ Phase 4: 오늘 이미 생성된 로컬 캐시(translated.txt)에서 번역본을 불러옵니다.")
+            with open(p4_cache_file, "r", encoding="utf-8") as f:
+                final_content = f.read()
         else:
-            print("⚠️ Claude translation timed out or failed. Falling back to Phase 3 Gemini result.")
+            print(f"Starting Claude action (Model: {c_model})...")
+            # ✅ 토큰 한도(TPM) 대응: 1분 한도를 리셋하기 위해 충분히 대기
+            print("⏳ TPM(Token Per Minute) 한도 초기화를 위해 60초 대기합니다...")
+            time.sleep(60)
+            
+            p4_start = time.time()
+            current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
+            p4_system = (
+                f"Today's actual date and time is {current_kst}. "
+                f"You are a professional technical translator specializing in AI infrastructure and business intelligence. "
+                f"Context: The text provided has already been refined and corrected based on QA feedback. "
+                f"Your current task is STRICTLY to translate this finalized AI briefing into polished, executive-level business English. "
+                f"Rules: preserve all section headers, data tables, URLs, and numerical figures exactly as-is. "
+                f"Output only the translated report with no commentary, preamble, or explanatory notes."
+            )
+            translate_messages = [{
+                "role": "user",
+                "content": (
+                    f"Please translate the following final AI infrastructure briefing into professional business English. "
+                    f"Preserve all structure, section headers, metadata fields, and numerical data exactly.\n\n"
+                    f"[FINAL DRAFT — {current_kst}]\n{refined_result}"
+                )
+            }]
 
-        p4_time = time.time() - p4_start
-        print(f"✅ Phase 4 complete. (Time: {p4_time:.2f}s)")
+            translated = run_claude_chat(c_client, c_model, translate_messages, system=p4_system)
+            if not translated:
+                print("❌ Phase 4 failed after 5 attempts. Exiting.")
+                sys.exit(1) # 강제 종료
+                
+            final_content = translated
+            with open(p4_cache_file, "w", encoding="utf-8") as f: 
+                f.write(final_content)
+            print(f"✅ Phase 4 complete. Saved to {p4_cache_file} (Time: {time.time() - p4_start:.2f}s)")
 
-    # 데이터 저장
+    # ---------------------------------------------------------
+    # 최종 데이터 저장 (Phase 5 진입 전 안전 확보)
+    # ---------------------------------------------------------
     today_str = datetime.datetime.now().strftime("%Y-%m-%d")
     os.makedirs("data", exist_ok=True)
-
-    if not final_content:
-        final_content = refined_result or initial_result
-
     with open(f"data/{today_str}.txt", "w", encoding="utf-8") as f:
         f.write(final_content)
 
@@ -383,8 +409,6 @@ def main():
 
     if html_prompt_content:
         print(f"Generating HTML using model: {g_model}...")
-        
-        # ✅ 최대 재시도 횟수를 5회로 증가
         max_html_retries = 5
         for attempt in range(max_html_retries):
             try:
@@ -393,7 +417,6 @@ def main():
                     contents=[f"{html_prompt_content}\n\n{final_content}"]
                 )
                 html_code = response.text
-
                 if "```html" in html_code:
                     html_code = html_code.split("```html")[1].split("```")[0].strip()
                 elif "```" in html_code:
@@ -402,19 +425,17 @@ def main():
                 with open("index.html", "w", encoding="utf-8") as f:
                     f.write(html_code)
 
-                p5_time = time.time() - p5_start
-                print(f"✅ Phase 5 complete. Saved to index.html (Time: {p5_time:.2f}s)")
+                print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
                 break
-
             except Exception as e:
                 print(f"⚠️ Phase 5 attempt {attempt + 1} failed: {e}")
                 if attempt < max_html_retries - 1:
-                    # ✅ 서버 과부하 대응: 대기 시간 30초 유지
-                    time.sleep(30)
+                    sleep_time = min(60, 15 * (2 ** attempt)) + random.uniform(1, 3)
+                    print(f"   {sleep_time:.1f}초 후 재시도합니다...")
+                    time.sleep(sleep_time)
                 else:
-                    print("❌ All HTML generation attempts failed.")
-                    p5_time = time.time() - p5_start
-                    print(f"✅ Phase 5 finished with errors. (Time: {p5_time:.2f}s)")
+                    print("❌ Phase 5 failed after 5 attempts. Exiting.")
+                    sys.exit(1) # 강제 종료
 
 if __name__ == "__main__":
     main()
