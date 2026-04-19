@@ -429,6 +429,10 @@ def main():
                 elif "```" in html_code:
                     html_code = html_code.split("```")[1].strip()
 
+                # ✅ 확실한 방어 로직: 텍스트 앞부분에 어떤 Preamble이 붙더라도 무조건 <!DOCTYPE html> 부터 시작하도록 잘라냄
+                if "<!DOCTYPE html>" in html_code:
+                    html_code = "<!DOCTYPE html>" + html_code.split("<!DOCTYPE html>")[1]
+
                 with open("index.html", "w", encoding="utf-8") as f:
                     f.write(html_code)
 
