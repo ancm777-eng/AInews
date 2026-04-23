@@ -73,7 +73,7 @@ def get_latest_gemini_model(client):
         models = client.models.list()
         all_names = [m.name for m in models]
         bad_keywords = ["flash", "nano", "vision", "latest", "customtools", "deep-research",
-                        "live", "tts", "embedding", "imagen", "aqa", "preview", "exp"]
+                        "live", "tts", "embedding", "imagen", "aqa", "exp"]
         pro_models = [
             n for n in all_names
             if "gemini" in n.lower() and "pro" in n.lower()
