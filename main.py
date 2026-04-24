@@ -108,7 +108,6 @@ def get_latest_claude_model(client):
         print(f"Warning: Claude model discovery failed, using fallback.")
         return "claude-sonnet-4-6"
 
-# ✅ 수정됨: 최대 5회 시도, 지수 백오프 적용 (15초~60초 대기)
 @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=2, min=15, max=60), retry_error_callback=return_none_on_error)
 def run_claude_chat(client, model, messages, system=None, use_web_search=False):
     kwargs = dict(model=model, max_tokens=8192, messages=messages)
@@ -120,20 +119,20 @@ def run_claude_chat(client, model, messages, system=None, use_web_search=False):
     text_blocks = [b.text for b in message.content if hasattr(b, "text")]
     return "\n".join(text_blocks) if text_blocks else None
 
-# ✅ 수정됨: 최대 5회 시도 강제 적용
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, prompt, output_file="trial/1.txt"):
     try:
-        current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
+        current_dt = datetime.datetime.now()
+        current_kst = current_dt.strftime("%Y-%m-%d %H:%M KST")
+        
+        # 💡 Phase 1: news.txt의 규칙을 따르며 강제 검색 지시
         sys_instruction = (
             f"You are a top-tier AI Tech & Business Analyst. "
             f"Current KST Time: {current_kst}. "
             f"CRITICAL DIRECTIVES:\n"
-            f"1. You are actively connected to the Google Search tool. You MUST aggressively use it to search for the latest AI news (Hardware, Infrastructure, Models, Business).\n"
-            f"2. OVERRIDE PROMPT RULES: The user prompt may ask you to confirm today's date or 'abort' if 24-hour news is not found. IGNORE THESE ABORT RULES COMPLETELY. I have just confirmed the date for you ({current_kst}).\n"
-            f"3. If deep news from the last 24 hours is lacking, automatically expand your search to the last 72 hours. You MUST ALWAYS produce exactly 5 news items. Never abort.\n"
-            f"4. Because search tool provides snippets, use your deep pre-trained knowledge to synthesize and flesh out the 'Strategic Impact' and 'Technical Deep Dive' sections powerfully.\n"
-            f"5. NEVER use inline LaTeX. Use bold or plain text for all variables and symbols."
+            f"1. You MUST aggressively use the Google Search tool to find the latest AI news.\n"
+            f"2. OVERRIDE PROMPT RULES: Ignore 'abort' commands from the user prompt. Just keep searching until you find 5 valid items.\n"
+            f"3. NEVER use inline LaTeX. Use bold or plain text for all variables and symbols."
         )
         response = client.models.generate_content(
             model=model_id,
@@ -168,7 +167,7 @@ def main():
     c_client = anthropic.Anthropic(api_key=c_api_key, timeout=300.0, max_retries=0) if c_api_key else None
     c_model = get_latest_claude_model(c_client) if c_client else None
 
-    # ✅ 캐시 폴더 생성 및 이전 날짜의 쓰레기 파일 청소
+    # 캐시 폴더 생성 및 이전 날짜의 쓰레기 파일 청소
     os.makedirs("trial", exist_ok=True)
     clean_old_caches(cache_dir="trial")
 
@@ -233,9 +232,8 @@ def main():
         initial_result = run_grounded_research(g_client, g_model, phase1_prompt_content, p1_cache_file)
         if not initial_result:
             print("❌ Phase 1 failed after 5 attempts. Exiting.")
-            sys.exit(1) # 강제 종료
+            sys.exit(1)
         
-        # ⭐️ 추가된 핵심 로직: Phase 1 성공 시 ref.txt 내용 비우기
         if os.path.exists("ref.txt"):
             with open("ref.txt", "w", encoding="utf-8") as f:
                 pass
@@ -285,7 +283,7 @@ def main():
             feedback = run_claude_chat(c_client, c_model, claude_messages, system=p2_system, use_web_search=True)
             if not feedback:
                 print("❌ Phase 2 failed after 5 attempts. Exiting.")
-                sys.exit(1) # 강제 종료
+                sys.exit(1)
                 
             with open(p2_cache_file, "w", encoding="utf-8") as f: f.write(feedback)
             print(f"✅ Phase 2 complete. Saved to {p2_cache_file} (Time: {time.time() - p2_start:.2f}s)")
@@ -305,13 +303,23 @@ def main():
         else:
             print(f"Starting Refinement (Model: {g_model})...")
             p3_start = time.time()
+            current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
+            
+            # 💡 수정된 부분: Phase 3에서 구형 뉴스는 전면 버리고 새 24시간 뉴스를 구글 검색으로 대체하도록 지시
             refine_prompt = (
-                "위 피드백을 반영하여 [Initial Draft]를 다듬어 최종본을 작성하십시오.\n"
-                "1. [Initial Draft]의 5개 뉴스 항목 구조를 기본으로 유지할 것. 피드백이 특정 항목을 삭제하라고 하더라도, 완전히 제거하지 말고 해당 오류 부분만 수정·보강하여 유지하십시오.\n"
-                "2. 피드백에서 지적되지 않은 항목은 원문 그대로 유지하십시오. 불필요한 재작성을 금지합니다.\n"
-                "3. 인라인 수식 기호 절대 사용 금지. 벡터는 굵은 글씨, 변수는 일반 텍스트.\n"
-                "4. 기존 섹션 구조(Overview, Strategic Impact, Technical Deep Dive 등)를 정확히 유지하십시오."
+                f"현재 실제 KST 시간은 {current_kst}입니다.\n"
+                "위 피드백을 철저히 반영하여 [Initial Draft]를 다듬어 최종본을 작성하십시오.\n"
+                "1. 🚨 [중요: 조건 위반 뉴스 전면 교체] 피드백 내용 중, 특정 기사가 '24시간 윈도우' 조건을 위반한 과거 사건으로 판명되었거나 심각한 사실 오류가 있다면, 해당 항목의 날짜나 내용만 조작해서 유지하려 하지 마십시오. **조건을 위반한 항목은 완전히 삭제(Drop)하십시오.**\n"
+                "2. 삭제된 빈 슬롯 수만큼, 당신에게 부여된 'Google Search' 툴을 즉각 사용하여 최근 24시간 이내에 발생한 **완전히 새로운 AI 뉴스(인프라, 하드웨어, 아키텍처 등)**를 직접 발굴하여 대체 작성하십시오. 최종 리포트는 무조건 5개의 항목으로 채워져야 합니다.\n"
+                "3. 시간 윈도우(24시간) 내에 해당하며 사실 관계만 일부 틀린 항목은 피드백에 따라 정확히 보강하여 유지하십시오.\n"
+                "4. 피드백에서 지적되지 않은 정상 항목은 불필요한 재작성 없이 원문을 그대로 유지하십시오.\n"
+                "5. 인라인 수식 기호 절대 사용 금지. 벡터는 굵은 글씨, 변수는 일반 텍스트.\n"
+                "6. 기존 섹션 구조(Overview, Strategic Impact, Technical Deep Dive 등)를 정확히 유지하십시오."
             )
+            
+            # 💡 수정된 부분: System Instruction에 Google Search 툴 사용 의무화 명시
+            sys_instruction = "You are a top-tier AI Intelligence Analyst. You MUST use the Google Search tool to replace any outdated or invalid news items (flagged by feedback) with breaking news strictly from the last 24 hours. Ensure the final output always contains exactly 5 valid news items."
+
             max_retries = 5
             for attempt in range(max_retries):
                 try:
@@ -321,10 +329,16 @@ def main():
                         f"[Feedback to Apply]\n{feedback}\n\n",
                         f"[Instruction]\n{refine_prompt}"
                     ]
+                    
+                    # 💡 수정된 부분: Google Search Tool 부여 및 Temperature 조정
                     response = g_client.models.generate_content(
                         model=g_model,
                         contents=contents,
-                        config=types.GenerateContentConfig(temperature=0.1)
+                        config=types.GenerateContentConfig(
+                            temperature=0.3, # 새로운 뉴스 탐색을 위해 창의성(온도) 약간 상향
+                            tools=[types.Tool(google_search=types.GoogleSearch())], # 구글 검색 툴 활성화
+                            system_instruction=sys_instruction
+                        )
                     )
                     refined_result = response.text
                     with open(p3_cache_file, "w", encoding="utf-8") as f: f.write(refined_result)
@@ -333,7 +347,7 @@ def main():
                 except Exception as e:
                     print(f"⚠️ Phase 3 attempt {attempt + 1} failed: {e}")
                     if attempt < max_retries - 1:
-                        # ✅ 점진적 대기 시간 증가 및 약간의 난수(Jitter) 추가
+                        # 점진적 대기 시간 증가 및 약간의 난수(Jitter) 추가
                         sleep_time = min(60, 15 * (2 ** attempt)) + random.uniform(1, 3)
                         print(f"   {sleep_time:.1f}초 후 재시도합니다...")
                         time.sleep(sleep_time)
@@ -355,7 +369,6 @@ def main():
                 final_content = f.read()
         else:
             print(f"Starting Claude action (Model: {c_model})...")
-            # ✅ 토큰 한도(TPM) 대응: 1분 한도를 리셋하기 위해 충분히 대기
             print("⏳ TPM(Token Per Minute) 한도 초기화를 위해 60초 대기합니다...")
             time.sleep(60)
             
@@ -381,7 +394,7 @@ def main():
             translated = run_claude_chat(c_client, c_model, translate_messages, system=p4_system)
             if not translated:
                 print("❌ Phase 4 failed after 5 attempts. Exiting.")
-                sys.exit(1) # 강제 종료
+                sys.exit(1)
                 
             final_content = translated
             with open(p4_cache_file, "w", encoding="utf-8") as f: 
@@ -429,7 +442,6 @@ def main():
                 elif "```" in html_code:
                     html_code = html_code.split("```")[1].strip()
 
-                # ✅ 확실한 방어 로직: 텍스트 앞부분에 어떤 Preamble이 붙더라도 무조건 <!DOCTYPE html> 부터 시작하도록 잘라냄
                 if "<!DOCTYPE html>" in html_code:
                     html_code = "<!DOCTYPE html>" + html_code.split("<!DOCTYPE html>")[1]
 
@@ -446,7 +458,7 @@ def main():
                     time.sleep(sleep_time)
                 else:
                     print("❌ Phase 5 failed after 5 attempts. Exiting.")
-                    sys.exit(1) # 강제 종료
+                    sys.exit(1)
 
 if __name__ == "__main__":
     main()
