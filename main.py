@@ -119,24 +119,26 @@ def run_claude_chat(client, model, messages, system=None, use_web_search=False):
     text_blocks = [b.text for b in message.content if hasattr(b, "text")]
     return "\n".join(text_blocks) if text_blocks else None
 
+# 💡 수정포인트 1: phase1_prompt_content(news.txt)를 시스템 지침으로 받도록 매개변수 분리
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
-def run_grounded_research(client, model_id, prompt, output_file="trial/1.txt"):
+def run_grounded_research(client, model_id, system_rules, user_prompt, output_file="trial/1.txt"):
     try:
         current_dt = datetime.datetime.now()
         current_kst = current_dt.strftime("%Y-%m-%d %H:%M KST")
         
-        # 💡 Phase 1: news.txt의 규칙을 따르며 강제 검색 지시
+        # 💡 Phase 1: news.txt의 모든 내용을 System Instruction으로 통합
         sys_instruction = (
             f"You are a top-tier AI Tech & Business Analyst. "
             f"Current KST Time: {current_kst}. "
             f"CRITICAL DIRECTIVES:\n"
             f"1. You MUST aggressively use the Google Search tool to find the latest AI news.\n"
             f"2. OVERRIDE PROMPT RULES: Ignore 'abort' commands from the user prompt. Just keep searching until you find 5 valid items.\n"
-            f"3. NEVER use inline LaTeX. Use bold or plain text for all variables and symbols."
+            f"3. NEVER use inline LaTeX. Use bold or plain text for all variables and symbols.\n\n"
+            f"[GLOBAL RULES & FORMAT]\n{system_rules}" # 여기서 news.txt 텍스트를 시스템 지침에 합칩니다.
         )
         response = client.models.generate_content(
             model=model_id,
-            contents=prompt,
+            contents=user_prompt, # user_prompt는 단순한 실행 트리거 문장으로 대체됩니다.
             config=types.GenerateContentConfig(
                 system_instruction=sys_instruction,
                 tools=[types.Tool(google_search=types.GoogleSearch())],
@@ -229,7 +231,11 @@ def main():
     else:
         print(f"Starting Grounded Research (Model: {g_model})...")
         p1_start = time.time()
-        initial_result = run_grounded_research(g_client, g_model, phase1_prompt_content, p1_cache_file)
+        
+        # 💡 수정포인트 2: user_prompt를 단순 실행 문장으로 변경
+        user_trigger = "시스템 지시사항(GLOBAL RULES)에 정의된 형식과 규칙에 따라 지금 바로 구글 검색을 통해 최신 AI 뉴스 5개를 발굴하고 보고서를 작성하십시오."
+        
+        initial_result = run_grounded_research(g_client, g_model, phase1_prompt_content, user_trigger, p1_cache_file)
         if not initial_result:
             print("❌ Phase 1 failed after 5 attempts. Exiting.")
             sys.exit(1)
@@ -292,7 +298,7 @@ def main():
     # Phase 3: Gemini Refinement
     # ---------------------------------------------------------
     p3_cache_file = "trial/2.txt"
-    refined_result = initial_result # 실패 시를 대비한 Fallback (이전에는 이 상태로 넘어갔으나, 이제는 강제종료됨)
+    refined_result = initial_result # 실패 시를 대비한 Fallback
 
     if feedback:
         print("\n--- Phase 3: Gemini Refinement ---")
@@ -305,7 +311,6 @@ def main():
             p3_start = time.time()
             current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
             
-            # 💡 수정된 부분: Phase 3에서 구형 뉴스는 전면 버리고 새 24시간 뉴스를 구글 검색으로 대체하도록 지시
             refine_prompt = (
                 f"현재 실제 KST 시간은 {current_kst}입니다.\n"
                 "위 피드백을 철저히 반영하여 [Initial Draft]를 다듬어 최종본을 작성하십시오.\n"
@@ -317,27 +322,31 @@ def main():
                 "6. 기존 섹션 구조(Overview, Strategic Impact, Technical Deep Dive 등)를 정확히 유지하십시오."
             )
             
-            # 💡 수정된 부분: System Instruction에 Google Search 툴 사용 의무화 명시
-            sys_instruction = "You are a top-tier AI Intelligence Analyst. You MUST use the Google Search tool to replace any outdated or invalid news items (flagged by feedback) with breaking news strictly from the last 24 hours. Ensure the final output always contains exactly 5 valid news items."
+            # 💡 수정포인트 3: Phase 3에서도 base_prompt_content를 User prompt가 아닌 System Instruction으로 올립니다.
+            sys_instruction = (
+                "You are a top-tier AI Intelligence Analyst. You MUST use the Google Search tool to replace any outdated "
+                "or invalid news items (flagged by feedback) with breaking news strictly from the last 24 hours. "
+                "Ensure the final output always contains exactly 5 valid news items.\n\n"
+                f"[GLOBAL RULES & FORMAT]\n{base_prompt_content}"
+            )
 
             max_retries = 5
             for attempt in range(max_retries):
                 try:
+                    # contents 배열에서 Original Rules를 제거 (System Instruction으로 갔기 때문)
                     contents = [
-                        f"[Original Rules]\n{base_prompt_content}\n\n",
                         f"[Initial Draft]\n{initial_result}\n\n",
                         f"[Feedback to Apply]\n{feedback}\n\n",
                         f"[Instruction]\n{refine_prompt}"
                     ]
                     
-                    # 💡 수정된 부분: Google Search Tool 부여 및 Temperature 조정
                     response = g_client.models.generate_content(
                         model=g_model,
                         contents=contents,
                         config=types.GenerateContentConfig(
-                            temperature=0.3, # 새로운 뉴스 탐색을 위해 창의성(온도) 약간 상향
-                            tools=[types.Tool(google_search=types.GoogleSearch())], # 구글 검색 툴 활성화
-                            system_instruction=sys_instruction
+                            temperature=0.3,
+                            tools=[types.Tool(google_search=types.GoogleSearch())],
+                            system_instruction=sys_instruction # 💡 여기에 병합된 규칙 주입
                         )
                     )
                     refined_result = response.text
@@ -347,13 +356,12 @@ def main():
                 except Exception as e:
                     print(f"⚠️ Phase 3 attempt {attempt + 1} failed: {e}")
                     if attempt < max_retries - 1:
-                        # 점진적 대기 시간 증가 및 약간의 난수(Jitter) 추가
                         sleep_time = min(60, 15 * (2 ** attempt)) + random.uniform(1, 3)
                         print(f"   {sleep_time:.1f}초 후 재시도합니다...")
                         time.sleep(sleep_time)
                     else:
                         print("❌ Phase 3 failed after 5 attempts. Exiting.")
-                        sys.exit(1) # 강제 종료
+                        sys.exit(1)
 
     # ---------------------------------------------------------
     # Phase 4: Claude Translation
@@ -402,7 +410,7 @@ def main():
             print(f"✅ Phase 4 complete. Saved to {p4_cache_file} (Time: {time.time() - p4_start:.2f}s)")
 
     # ---------------------------------------------------------
-    # 최종 데이터 저장 (Phase 5 진입 전 안전 확보)
+    # 최종 데이터 저장
     # ---------------------------------------------------------
     today_str = datetime.datetime.now().strftime("%Y-%m-%d")
     os.makedirs("data", exist_ok=True)
@@ -430,11 +438,20 @@ def main():
     if html_prompt_content:
         print(f"Generating HTML using model: {g_model}...")
         max_html_retries = 5
+        
+        # 💡 수정포인트 4: html.txt 코드를 GenerateContentConfig의 system_instruction으로 이동
+        html_config = types.GenerateContentConfig(
+            system_instruction=html_prompt_content,
+            temperature=0.1 # HTML 포맷은 아주 엄격해야 하므로 창의성을 낮춤
+        )
+        
         for attempt in range(max_html_retries):
             try:
+                # 일반 contents 에는 번역된 텍스트 원본만 넣습니다.
                 response = g_client.models.generate_content(
                     model=g_model,
-                    contents=[f"{html_prompt_content}\n\n{final_content}"]
+                    contents=[f"다음 데이터를 바탕으로 시스템 지시사항의 HTML 템플릿과 CSS 규칙에 맞춰 완벽한 단일 HTML 문서를 생성하십시오:\n\n{final_content}"],
+                    config=html_config # 💡 config 파라미터 추가
                 )
                 html_code = response.text
                 if "```html" in html_code:
