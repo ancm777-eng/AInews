@@ -22,7 +22,7 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
         :root {
             --bg-color: #f8fafc;
@@ -43,6 +43,9 @@
             --c3: #d97706; --lc3: #fffbeb;
             --c4: #7c3aed; --lc4: #f5f3ff;
             --c5: #dc2626; --lc5: #fef2f2;
+
+            --shadow-opacity: 0.05;
+            --card-radius: 12px;
         }
 
         [data-theme="dark"] {
@@ -64,6 +67,8 @@
             --lc3: rgba(217, 119, 6, 0.1);
             --lc4: rgba(124, 58, 237, 0.1);
             --lc5: rgba(220, 38, 38, 0.1);
+
+            --shadow-opacity: 0.3;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -134,7 +139,7 @@
 
         .synthesis { background-color: var(--synthesis-bg); color: var(--text-primary); padding: 3rem; border-radius: 12px; margin-top: 4rem; margin-bottom: 4rem; border: 1px solid var(--border-color); transition: all 0.3s; }
         .outlook-box { background-color: var(--outlook-bg); color: var(--text-primary); border-left: 4px solid var(--c1); padding: 2rem; border-radius: 0 8px 8px 0; margin-top: 3rem; transition: all 0.3s; }
-        .outlook-box h3 { color: var(--text-primary); }
+        .outlook-box h3 { color: var(--text-primary); margin-bottom: 1rem; }
         .outlook-item { color: var(--text-secondary); margin-bottom: 1rem; }
 
         /* TOC Styles */
@@ -142,45 +147,353 @@
         .toc a { background: var(--surface-color); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; text-decoration: none; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 500; transition: background 0.2s; white-space: nowrap; }
         .toc a:hover { background: var(--border-color); }
 
-        /* Custom Components CSS */
-        .article { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 2.5rem; margin-bottom: 3rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: all 0.3s; }
-        .article h2 { font-size: 1.6rem; margin-bottom: 1.5rem; color: var(--text-primary); line-height: 1.4; }
-        .subsec { margin-top: 2.5rem; }
-        .subsec-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; flex-wrap: wrap; }
-        .subsec-icon { font-size: 1.3rem; }
-        .subsec-label { font-size: 1.15rem; font-weight: 600; }
-        .subsec-tag { font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: 600; margin-left: auto; border: 1px solid currentColor; }
-        .lead-text { font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary); }
-        .body-text { color: var(--text-secondary); margin-bottom: 1rem; }
-        .impact-box { background: var(--surface-color); padding: 1.5rem; border-radius: 0 8px 8px 0; margin-top: 1rem; }
-        .impact-list { list-style-type: none; padding-left: 0; color: var(--text-secondary); }
-        .impact-list li { margin-bottom: 0.75rem; position: relative; padding-left: 1.5rem; }
-        .impact-list li::before { content: "•"; position: absolute; left: 0; color: currentColor; font-weight: bold; font-size: 1.2rem; line-height: 1; }
-        .impact-list strong { color: var(--text-primary); }
-        .arch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-        .arch-chip { background: var(--bg-color); border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; text-align: center; font-weight: 600; color: var(--text-primary); }
-        .arch-chip small { display: block; font-weight: 400; color: var(--text-secondary); margin-top: 0.25rem; }
-        .table-scroll-wrap { width: 100%; overflow-x: auto; margin-top: 1.5rem; border: 1px solid var(--border-color); border-radius: 8px; }
-        .info-table { width: 100%; border-collapse: collapse; text-align: left; background: var(--surface-color); }
-        .info-table th, .info-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.95rem; }
-        .info-table th { background: var(--bg-color); font-weight: 600; color: var(--text-primary); }
-        .info-table tr:last-child td { border-bottom: none; }
-        .chart-wrap { margin-top: 2rem; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: var(--surface-color); }
-        .flow-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
-        .flow-step { flex: 1; background: var(--bg-color); border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; text-align: center; min-width: 150px; font-weight: 600; color: var(--text-primary); }
-        .flow-step small { display: block; font-weight: 400; color: var(--text-secondary); margin-top: 0.25rem; }
-        .flow-arrow { color: var(--text-secondary); font-weight: bold; font-size: 1.2rem; }
-        .sentiment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
-        .sentiment-card { background: var(--bg-color); border: 1px solid var(--border-color); padding: 1.25rem 1rem; border-radius: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; }
-        .sentiment-emoji { font-size: 1.8rem; }
-        .sentiment-label { font-weight: 600; font-size: 0.95rem; color: var(--text-primary); }
-        .sentiment-desc { font-size: 0.85rem; color: var(--text-secondary); }
+        /* --- PREVENTING HEX HARDCODING FOR ADDITIONAL ELEMENTS --- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding-top: 2rem;
+        }
+        .header-section h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--c1), var(--c4));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header-section .subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        .header-section .date-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background-color: var(--synthesis-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .article {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            padding: 3rem;
+            margin-bottom: 4rem;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,var(--shadow-opacity));
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .article:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,calc(var(--shadow-opacity) * 1.5));
+        }
+        .article-title {
+            font-size: 1.85rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 2rem;
+            letter-spacing: -0.03em;
+            border-left: 5px solid var(--art-accent, var(--c1));
+            padding-left: 1.25rem;
+        }
         
-        .c1 { color: var(--c1); } .lc1 { background-color: var(--lc1); }
-        .c2 { color: var(--c2); } .lc2 { background-color: var(--lc2); }
-        .c3 { color: var(--c3); } .lc3 { background-color: var(--lc3); }
-        .c4 { color: var(--c4); } .lc4 { background-color: var(--lc4); }
-        .c5 { color: var(--c5); } .lc5 { background-color: var(--lc5); }
+        .subsec {
+            margin-bottom: 2.5rem;
+        }
+        .subsec:last-child {
+            margin-bottom: 0;
+        }
+        .subsec-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .subsec-icon {
+            font-size: 1.25rem;
+        }
+        .subsec-label {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+        .subsec-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-left: auto;
+        }
+
+        .lead-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .body-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        /* Strategic Impact Elements */
+        .impact-box {
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 1rem;
+        }
+        .impact-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .impact-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .impact-list li::before {
+            content: "■";
+            position: absolute;
+            left: 0;
+            color: var(--art-accent);
+            font-size: 0.8rem;
+            top: 0.1rem;
+        }
+        .impact-list li strong {
+            color: var(--text-primary);
+        }
+
+        .metric-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .metric-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric-val {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--art-accent);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+        .metric-lbl {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* Technical Deep Dive Architecture elements */
+        .arch-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .arch-chip {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-top: 3px solid var(--art-accent);
+        }
+        .arch-chip-title {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+        .arch-chip-val {
+            color: var(--text-primary);
+        }
+
+        .table-scroll-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        .info-table th {
+            background-color: var(--synthesis-bg);
+            color: var(--text-primary);
+            font-weight: 700;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .info-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .info-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Evolution & Timeline */
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .flow-step {
+            flex: 1;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
+        }
+        .flow-step-num {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--art-accent);
+            text-transform: uppercase;
+        }
+        .flow-step-lbl {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0.25rem 0;
+        }
+        .flow-step-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        .flow-arrow {
+            color: var(--text-secondary);
+            font-weight: bold;
+        }
+
+        /* Critical View */
+        .critical-box {
+            background-color: var(--warning-bg);
+            border-left: 4px solid var(--warning-text);
+            padding: 1.25rem;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        /* Community Sentiment */
+        .sentiment-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .sentiment-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .sentiment-emoji {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .sentiment-lbl {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+        .sentiment-lbl.positive { color: var(--c2); }
+        .sentiment-lbl.neutral { color: var(--c3); }
+        .sentiment-lbl.negative { color: var(--c5); }
+        .sentiment-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .chart-wrap {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Dynamic classes mapping accents */
+        .c1 { color: var(--c1) !important; } .lc1 { background-color: var(--lc1) !important; }
+        .c2 { color: var(--c2) !important; } .lc2 { background-color: var(--lc2) !important; }
+        .c3 { color: var(--c3) !important; } .lc3 { background-color: var(--lc3) !important; }
+        .c4 { color: var(--c4) !important; } .lc4 { background-color: var(--lc4) !important; }
+        .c5 { color: var(--c5) !important; } .lc5 { background-color: var(--lc5) !important; }
+
+        #art1 { --art-accent: var(--c1); --art-light-accent: var(--lc1); }
+        #art2 { --art-accent: var(--c4); --art-light-accent: var(--lc4); }
+        #art3 { --art-accent: var(--c2); --art-light-accent: var(--lc2); }
+        #art4 { --art-accent: var(--c3); --art-light-accent: var(--lc3); }
+        #art5 { --art-accent: var(--c5); --art-light-accent: var(--lc5); }
+
+        /* Outlook Styles */
+        .outlook-item {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .outlook-item:last-child {
+            margin-bottom: 0;
+        }
+        .outlook-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+        .outlook-tag.confirmed { background-color: var(--c2); }
+        .outlook-tag.forecast { background-color: var(--c1); }
+        .outlook-date {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+        .outlook-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
 
         /* 📱 모바일 반응형 강제 적용 (768px 이하) */
         @media screen and (max-width: 768px) {
@@ -222,15 +535,15 @@
     </div>
 
     <div class="top-bar">
-        <h1>Daily AI Tech/Infrastructure Briefing<br><span style="font-size:0.8rem; font-weight:400;">May 20, 2026</span></h1>
+        <h1>Strategic Tech Briefing</h1>
     </div>
     
     <nav class="toc">
-        <a href="#art1">1. Google I/O: Agentic Gemini</a>
-        <a href="#art2">2. Google I/O: Edge AI</a>
-        <a href="#art3">3. H2O.ai: tabH2O</a>
-        <a href="#art4">4. Hellbender: Physical AI</a>
-        <a href="#art5">5. Domino: App Hub</a>
+        <a href="#art1">1. Gemini Agentic Era</a>
+        <a href="#art2">2. Google Edge AI Ecosystem</a>
+        <a href="#art3">3. tabH2O Foundation Model</a>
+        <a href="#art4">4. Hellbender Edge Cameras</a>
+        <a href="#art5">5. Domino App Hub Governance</a>
         <a href="#synthesis">Synthesis</a>
     </nav>
 
@@ -238,21 +551,42 @@
     <button id="to-top">↑ Top</button>
 
     <main>
+        <!-- Header Banner -->
+        <header class="header-section">
+            <h2>Daily AI Tech/Infrastructure Briefing</h2>
+            <div class="subtitle">High-Yield Strategic Intelligence for Executive Decision Makers</div>
+            <div class="date-badge">May 20, 2026</div>
+        </header>
+
         <!-- Article 1 -->
         <article class="article" id="art1">
-            <h2>Google I/O 2026: The Agentic Gemini Era with Gemini 3.5 Flash and Omni</h2>
+            <h2 class="article-title">Google I/O 2026: The Agentic Gemini Era with Gemini 3.5 Flash and Omni</h2>
             
+            <!-- 1. Overview -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label c1">Overview</span>
+                    <span class="subsec-icon">🔭</span>
+                    <span class="subsec-label c1">Overview</span>
                 </div>
                 <p class="lead-text">Google unveiled its next-generation foundation models at the I/O 2026 keynote, marking a definitive shift toward agentic artificial intelligence.</p>
                 <p class="body-text">The centerpiece is the Gemini 3.5 family, starting with Gemini 3.5 Flash, which delivers four times faster output tokens per second compared to previous frontier models and has immediately become the default engine for the Gemini app and AI Search. Additionally, Google introduced Gemini Omni, a groundbreaking new world model featuring a complete multimodal architecture that natively integrates text, image, audio, and video processing. CEO of Google DeepMind Demis Hassabis described Omni as a system capable of simulating physical laws, with its first public variant, Omni Flash, focusing heavily on short-form video generation. The company also introduced Gemini Spark, a 24/7 autonomous agent designed to handle daily tasks such as parsing credit card statements to flag hidden subscription fees. The market reaction highlights that Google is aggressively leveraging its massive distribution network to normalize autonomous AI agents for billions of consumers.</p>
             </div>
 
+            <!-- 2. Strategic Impact -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label c1">Strategic Impact</span>
+                    <span class="subsec-icon">⚡</span>
+                    <span class="subsec-label c1">Strategic Impact</span>
+                </div>
+                <div class="metric-row">
+                    <div class="metric-card">
+                        <div class="metric-val">4.0x</div>
+                        <div class="metric-lbl">Inference Token Speedup</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-val">3.2Q</div>
+                        <div class="metric-lbl">Monthly processed tokens</div>
+                    </div>
                 </div>
                 <div class="impact-box lc1" style="border-left:4px solid var(--c1)">
                     <ul class="impact-list">
@@ -264,85 +598,123 @@
                 </div>
             </div>
 
+            <!-- 3. Technical Deep Dive -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label c1">Technical Deep Dive</span> <span class="subsec-tag lc1 c1">Agentic AI & Multimodal World Model</span>
+                    <span class="subsec-icon">🔬</span>
+                    <span class="subsec-label c1">Technical Deep Dive</span>
+                    <span class="subsec-tag lc1 c1">Gemini 3.5 Core Architecture</span>
                 </div>
                 <div class="arch-grid">
-                    <div class="arch-chip">Gemini 3.5 Flash<br><small>4x Faster Output Tokens</small></div>
-                    <div class="arch-chip">Gemini Omni<br><small>Native Multimodal World Model</small></div>
-                    <div class="arch-chip">Gemini Spark<br><small>24/7 Autonomous Agent</small></div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">Ultra-Low Latency Engine</div>
+                        <div class="arch-chip-val">Gemini 3.5 Flash</div>
+                    </div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">Native World Simulator</div>
+                        <div class="arch-chip-val">Gemini Omni</div>
+                    </div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">24/7 Financial Executor</div>
+                        <div class="arch-chip-val">Gemini Spark</div>
+                    </div>
                 </div>
                 <div class="table-scroll-wrap">
                     <table class="info-table">
                         <thead>
                             <tr>
-                                <th>Category</th>
-                                <th>Details</th>
+                                <th>Specification / Benchmark</th>
+                                <th>Gemini 3.5 Flash</th>
+                                <th>Gemini Omni</th>
+                                <th>Gemini Spark</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Performance</strong></td>
-                                <td>Gemini 3.5 Flash delivers 4x faster output tokens per second.</td>
+                                <td>Output Token Generation Speed</td>
+                                <td>4x faster vs. prior frontier models</td>
+                                <td>Real-time visual processing</td>
+                                <td>Optimized for VM background tasks</td>
                             </tr>
                             <tr>
-                                <td><strong>Architecture</strong></td>
-                                <td>Gemini Spark runs on dedicated Google Cloud VMs.</td>
+                                <td>Primary Distribution Vector</td>
+                                <td>Gemini App, AI Search & Workspace</td>
+                                <td>Omni Flash API (Video synthesis)</td>
+                                <td>Google AI Ultra subscription package</td>
                             </tr>
                             <tr>
-                                <td><strong>Comparative Analysis</strong></td>
-                                <td>Outperforms Gemini 3.1 Pro on Terminal-Bench 2.1, GDPval-AA, MCP Atlas, and CharXiv Reasoning.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Deployment Stage</strong></td>
-                                <td>Gemini 3.5 Flash deployed globally; Gemini Spark in internal testing.</td>
+                                <td>Benchmark Dominance</td>
+                                <td>Terminal-Bench 2.1, GDPval-AA</td>
+                                <td>MCP Atlas, CharXiv Reasoning</td>
+                                <td>In-context structured task flow execution</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="chart-wrap"><div id="chart-art1" style="width:100%; height:280px;"></div></div>
+                <div class="chart-wrap">
+                    <div id="chart-art1" style="width:100%; height:280px;"></div>
+                </div>
             </div>
 
+            <!-- 4. Evolution & Timeline -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label c1">Evolution & Timeline</span>
+                    <span class="subsec-icon">⏳</span>
+                    <span class="subsec-label c1">Evolution & Timeline</span>
                 </div>
                 <div class="flow-row">
-                    <div class="flow-step">Passive Chatbots<br><small>Prompt-dependent</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Step 1</div>
+                        <div class="flow-step-lbl">Passive Chatbots</div>
+                        <div class="flow-step-desc">Requires continuous prompt engineering & human feedback loops.</div>
+                    </div>
                     <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Multimodal Integration<br><small>Text, Image, Audio</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Step 2</div>
+                        <div class="flow-step-lbl">Multimodal Expansion</div>
+                        <div class="flow-step-desc">Native audio/visual integration (GPT-4o, Gemini 1.5).</div>
+                    </div>
                     <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Autonomous Agents<br><small>Proactive Execution</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Step 3</div>
+                        <div class="flow-step-lbl">Proactive Agentic AI</div>
+                        <div class="flow-step-desc">Autonomous action (Gemini 3.5 Flash & Spark, 4x speed, 24/7 VMs).</div>
+                    </div>
                 </div>
             </div>
 
+            <!-- 5. Critical View -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c1">Critical View</span>
+                    <span class="subsec-icon">⚠️</span>
+                    <span class="subsec-label c1">Critical View</span>
                 </div>
-                <p class="body-text">Deploying autonomous agents like Gemini Spark to manage personal finances introduces severe hallucination and liability risks. If the agent misinterprets context, it could execute irreversible actions—such as mismanaging digital payments—severely damaging user trust and inviting regulatory scrutiny. Furthermore, relying on dedicated cloud VMs for consumer agents raises questions about long-term infrastructure cost sustainability.</p>
+                <div class="critical-box">
+                    Deploying autonomous agents like Gemini Spark to manage personal finances introduces severe hallucination and liability risks. If the agent misinterprets context, it could execute irreversible actions—such as mismanaging digital payments—severely damaging user trust and inviting regulatory scrutiny. Furthermore, relying on dedicated cloud VMs for consumer agents raises questions about long-term infrastructure cost sustainability.
+                </div>
             </div>
 
+            <!-- 6. Community Sentiment -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label c1">Community Sentiment</span>
+                    <span class="subsec-icon">💬</span>
+                    <span class="subsec-label c1">Community Sentiment</span>
                 </div>
                 <div class="sentiment-grid">
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">🚀</span>
-                        <span class="sentiment-label">Bullish</span>
-                        <span class="sentiment-desc">Massive distribution advantage</span>
+                        <div class="sentiment-emoji">🚀</div>
+                        <div class="sentiment-lbl positive">Bullish</div>
+                        <div class="sentiment-desc">Developers are thrilled with the 4x token speedup, enabling truly real-time conversational agent applications.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">⚖️</span>
-                        <span class="sentiment-label">Cautious</span>
-                        <span class="sentiment-desc">Hallucination & liability risks</span>
+                        <div class="sentiment-emoji">⚖️</div>
+                        <div class="sentiment-lbl neutral">Cautious</div>
+                        <div class="sentiment-desc">Security analysts express concerns regarding Gemini Spark's access to financial statements and API-driven VM executions.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">🏗️</span>
-                        <span class="sentiment-label">Infrastructure</span>
-                        <span class="sentiment-desc">Unprecedented TPU scaling needed</span>
+                        <div class="sentiment-emoji">🛑</div>
+                        <div class="sentiment-lbl negative">Skeptical</div>
+                        <div class="sentiment-desc">Publishers fear that "AI Search" expansion using high-velocity inference will choke remaining organic web referral traffic.</div>
                     </div>
                 </div>
             </div>
@@ -350,21 +722,35 @@
 
         <!-- Article 2 -->
         <article class="article" id="art2">
-            <h2>Google I/O 2026: Antigravity 2.0, Project Aura Smart Glasses, and Edge AI</h2>
+            <h2 class="article-title">Google I/O 2026: Antigravity 2.0, Project Aura Smart Glasses, and Edge AI</h2>
             
+            <!-- 1. Overview -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label c2">Overview</span>
+                    <span class="subsec-icon">🔭</span>
+                    <span class="subsec-label c4">Overview</span>
                 </div>
                 <p class="lead-text">Beyond its core Gemini models, Google I/O 2026 showcased a massive expansion of its developer ecosystem and hardware integrations.</p>
                 <p class="body-text">Google officially launched Antigravity 2.0, a major upgrade to its agent-first development platform that allows all developers—from independent creators to enterprise teams—to orchestrate and build autonomous agents. On the hardware front, XREAL and Google jointly demonstrated Project Aura, XREAL's first Android XR smart glasses developed in collaboration with Qualcomm. These glasses utilize multimodal AI to process real-time visual and audio data, enabling seamless execution of tasks like Google Maps immersive 3D navigation, YouTube VR playback, and DisplayPort laptop extension. Furthermore, Google Research showcased the Coralboard, an edge AI development board built in partnership with Synaptics. Powered by the Astra SL2619 NPU, the board is designed to run hardware-accelerated Gemma 3 270 million parameter models locally. This multi-tiered announcement proves Google is aggressively pushing AI out of the cloud and into the physical world.</p>
             </div>
 
+            <!-- 2. Strategic Impact -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label c2">Strategic Impact</span>
+                    <span class="subsec-icon">⚡</span>
+                    <span class="subsec-label c4">Strategic Impact</span>
                 </div>
-                <div class="impact-box lc2" style="border-left:4px solid var(--c2)">
+                <div class="metric-row">
+                    <div class="metric-card">
+                        <div class="metric-val">1 TOPS</div>
+                        <div class="metric-lbl">Astra SL2619 NPU Compute</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-val">270M</div>
+                        <div class="metric-lbl">Local Gemma 3 execution</div>
+                    </div>
+                </div>
+                <div class="impact-box lc4" style="border-left:4px solid var(--c4)">
                     <ul class="impact-list">
                         <li><strong>Technology & Ecosystem:</strong> Democratizes agentic AI development through the Antigravity 2.0 platform while simultaneously pushing inference to the edge via the Coralboard and Project Aura.</li>
                         <li><strong>Business & Market Dynamics:</strong> Google is aggressively expanding its AI footprint into physical wearables through strategic partnerships, directly competing with Meta's Ray-Ban glasses and Apple's spatial computing ecosystem.</li>
@@ -374,85 +760,123 @@
                 </div>
             </div>
 
+            <!-- 3. Technical Deep Dive -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label c2">Technical Deep Dive</span> <span class="subsec-tag lc2 c2">Edge AI & XR Wearables</span>
+                    <span class="subsec-icon">🔬</span>
+                    <span class="subsec-label c4">Technical Deep Dive</span>
+                    <span class="subsec-tag lc4 c4">Qualcomm & Synaptics Edge HW</span>
                 </div>
                 <div class="arch-grid">
-                    <div class="arch-chip">Antigravity 2.0<br><small>Agent-first Platform</small></div>
-                    <div class="arch-chip">Project Aura<br><small>Android XR Smart Glasses</small></div>
-                    <div class="arch-chip">Coralboard<br><small>Astra SL2619 NPU</small></div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">Developer Platform</div>
+                        <div class="arch-chip-val">Antigravity 2.0</div>
+                    </div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">AR AR/XR Glasses</div>
+                        <div class="arch-chip-val">XREAL Project Aura</div>
+                    </div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">Edge NPU Processor</div>
+                        <div class="arch-chip-val">Astra SL2619 NPU</div>
+                    </div>
                 </div>
                 <div class="table-scroll-wrap">
                     <table class="info-table">
                         <thead>
                             <tr>
-                                <th>Category</th>
-                                <th>Details</th>
+                                <th>Hardware / Platform</th>
+                                <th>Primary Compute Engine</th>
+                                <th>Target Model / Execution</th>
+                                <th>Real-World Application</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Hardware</strong></td>
-                                <td>Synaptics Astra SL2619 SoC (1 TOPS NPU, based on SL2610).</td>
+                                <td>Project Aura Smart Glasses</td>
+                                <td>Qualcomm Snapdragon Platform</td>
+                                <td>Multi-modal Vision & Audio API</td>
+                                <td>Immersive Maps, Laptop Expansion</td>
                             </tr>
                             <tr>
-                                <td><strong>Software</strong></td>
-                                <td>Gemma 3 270 million parameter local execution.</td>
+                                <td>Synaptics Coralboard</td>
+                                <td>Astra SL2619 SoC (1 TOPS NPU)</td>
+                                <td>Local Gemma 3 (270 million params)</td>
+                                <td>Local hardware-accelerated edge tasks</td>
                             </tr>
                             <tr>
-                                <td><strong>Comparative Analysis</strong></td>
-                                <td>Shifts AI from cloud-dependent API calls to localized, privacy-preserving edge execution.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Deployment Stage</strong></td>
-                                <td>Antigravity 2.0 launched; Coralboard showcased; Project Aura in prototype.</td>
+                                <td>Antigravity 2.0</td>
+                                <td>Cloud & On-Device Orchestrator</td>
+                                <td>Agentic Workflow Frameworks</td>
+                                <td>Multi-agent scheduling & chains</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="chart-wrap"><div id="chart-art2" style="width:100%; height:280px;"></div></div>
+                <div class="chart-wrap">
+                    <div id="chart-art2" style="width:100%; height:280px;"></div>
+                </div>
             </div>
 
+            <!-- 4. Evolution & Timeline -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label c2">Evolution & Timeline</span>
+                    <span class="subsec-icon">⏳</span>
+                    <span class="subsec-label c4">Evolution & Timeline</span>
                 </div>
                 <div class="flow-row">
-                    <div class="flow-step">Cloud-dependent API<br><small>High Latency</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Step 1</div>
+                        <div class="flow-step-lbl">Cloud-First AI</div>
+                        <div class="flow-step-desc">All sensor data routed to high-latency, centralized cloud servers.</div>
+                    </div>
                     <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Local NPU Integration<br><small>1 TOPS Compute</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Step 2</div>
+                        <div class="flow-step-lbl">Hybrid AR / Wearables</div>
+                        <div class="flow-step-desc">Project Aura offloads local sensor data stream processing.</div>
+                    </div>
                     <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Always-on Edge AI<br><small>Privacy-preserving</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Step 3</div>
+                        <div class="flow-step-lbl">Edge-Native NPU</div>
+                        <div class="flow-step-desc">Coralboard / Astra SL2619 runs 270M models completely locally.</div>
+                    </div>
                 </div>
             </div>
 
+            <!-- 5. Critical View -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c2">Critical View</span>
+                    <span class="subsec-icon">⚠️</span>
+                    <span class="subsec-label c4">Critical View</span>
                 </div>
-                <p class="body-text">Always-on multimodal glasses equipped with cameras and microphones raise severe privacy and mass surveillance concerns that have historically derailed consumer smart glasses adoption. Additionally, while the SL2619 NPU provides localized inference, 1 TOPS of compute may quickly become a bottleneck as developers attempt to run increasingly complex multimodal models on edge devices.</p>
+                <div class="critical-box">
+                    Always-on multimodal glasses equipped with cameras and microphones raise severe privacy and mass surveillance concerns that have historically derailed consumer smart glasses adoption. Additionally, while the SL2619 NPU provides localized inference, 1 TOPS of compute may quickly become a bottleneck as developers attempt to run increasingly complex multimodal models on edge devices.
+                </div>
             </div>
 
+            <!-- 6. Community Sentiment -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label c2">Community Sentiment</span>
+                    <span class="subsec-icon">💬</span>
+                    <span class="subsec-label c4">Community Sentiment</span>
                 </div>
                 <div class="sentiment-grid">
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">🕶️</span>
-                        <span class="sentiment-label">Innovative</span>
-                        <span class="sentiment-desc">Seamless XR integration</span>
+                        <div class="sentiment-emoji">👓</div>
+                        <div class="sentiment-lbl positive">Excited</div>
+                        <div class="sentiment-desc">Wearable enthusiasts are praising Project Aura for avoiding bulky form factors and integrating native Android XR navigation features.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">🔒</span>
-                        <span class="sentiment-label">Concerned</span>
-                        <span class="sentiment-desc">Privacy & surveillance risks</span>
+                        <div class="sentiment-emoji">🕵️</div>
+                        <div class="sentiment-lbl neutral">Apprehensive</div>
+                        <div class="sentiment-desc">Privacy watchdog groups are heavily flagging the potential for discreet video recording using Project Aura's dual-camera system.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">⚡</span>
-                        <span class="sentiment-label">Optimistic</span>
-                        <span class="sentiment-desc">Reduced cloud dependency</span>
+                        <div class="sentiment-emoji">🔌</div>
+                        <div class="sentiment-lbl negative">Skeptical</div>
+                        <div class="sentiment-desc">Hardware developers criticize the Astra SL2619's 1 TOPS compute capacity, calling it a limiting factor for complex multimodal agents.</div>
                     </div>
                 </div>
             </div>
@@ -460,21 +884,25 @@
 
         <!-- Article 3 -->
         <article class="article" id="art3">
-            <h2>H2O.ai Unveils tabH2O Foundation Model for Tabular Data at Dell Technologies World</h2>
+            <h2 class="article-title">H2O.ai Unveils tabH2O Foundation Model for Tabular Data at Dell Technologies World</h2>
             
+            <!-- 1. Overview -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label c3">Overview</span>
+                    <span class="subsec-icon">🔭</span>
+                    <span class="subsec-label c2">Overview</span>
                 </div>
                 <p class="lead-text">Addressing a critical gap in the generative AI landscape, H2O.ai launched tabH2O, a breakthrough foundation model specifically designed for tabular data, at Dell Technologies World 2026.</p>
                 <p class="body-text">While most foundation models focus on text, image, or video, tabH2O allows enterprises to generate high-accuracy predictions instantly from structured datasets using a single API call. This eliminates the massive overhead of traditional machine learning, including model training, feature engineering, and infrastructure management. Pre-integrated into the Dell AI Factory with NVIDIA, the model enables organizations to deploy sovereign, predictive AI securely across on-premises and air-gapped environments. The enterprise sector has reacted with strong interest, as this technology unlocks immediate value from proprietary corporate data and significantly advances the capabilities of data science teams.</p>
             </div>
 
+            <!-- 2. Strategic Impact -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label c3">Strategic Impact</span>
+                    <span class="subsec-icon">⚡</span>
+                    <span class="subsec-label c2">Strategic Impact</span>
                 </div>
-                <div class="impact-box lc3" style="border-left:4px solid var(--c3)">
+                <div class="impact-box lc2" style="border-left:4px solid var(--c2)">
                     <ul class="impact-list">
                         <li><strong>Technology & Ecosystem:</strong> Significantly advances predictive analytics by applying the foundation model paradigm directly to structured enterprise data, bypassing traditional ML pipelines.</li>
                         <li><strong>Business & Market Dynamics:</strong> Disrupts traditional data science workflows, lowering the barrier to entry for enterprises to extract predictive value from their proprietary databases without hiring massive data engineering teams.</li>
@@ -484,81 +912,119 @@
                 </div>
             </div>
 
+            <!-- 3. Technical Deep Dive -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label c3">Technical Deep Dive</span> <span class="subsec-tag lc3 c3">Tabular Foundation Model</span>
+                    <span class="subsec-icon">🔬</span>
+                    <span class="subsec-label c2">Technical Deep Dive</span>
+                    <span class="subsec-tag lc2 c2">In-Context Tabular Learning</span>
                 </div>
                 <div class="arch-grid">
-                    <div class="arch-chip">tabH2O Model<br><small>Single Forward Pass</small></div>
-                    <div class="arch-chip">Dell AI Factory<br><small>On-premise Infrastructure</small></div>
-                    <div class="arch-chip">In-context Learning<br><small>No Gradient Updates</small></div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">Learning Mechanism</div>
+                        <div class="arch-chip-val">In-Context Learning</div>
+                    </div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">Gradient Tuning</div>
+                        <div class="arch-chip-val">Zero (Single Forward Pass)</div>
+                    </div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">Deployment Base</div>
+                        <div class="arch-chip-val">Dell AI Factory & NVIDIA</div>
+                    </div>
                 </div>
                 <div class="table-scroll-wrap">
                     <table class="info-table">
                         <thead>
                             <tr>
-                                <th>Category</th>
-                                <th>Details</th>
+                                <th>Workflow Stage</th>
+                                <th>Traditional ML Pipeline</th>
+                                <th>tabH2O Pipeline Approach</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Mechanism</strong></td>
-                                <td>In-context learning utilizing a single forward pass without gradient updates or dataset-specific training.</td>
+                                <td>Training Overheads</td>
+                                <td>Hours/Days (Gradient calculation, grid search)</td>
+                                <td>None (In-context single forward pass)</td>
                             </tr>
                             <tr>
-                                <td><strong>Comparative Analysis</strong></td>
-                                <td>Bypasses the traditional, time-consuming machine learning pipeline in favor of instant, API-driven predictions.</td>
+                                <td>Feature Engineering</td>
+                                <td>Manual scaling, missing value imputation, encoding</td>
+                                <td>Native model comprehension of raw tables</td>
                             </tr>
                             <tr>
-                                <td><strong>Deployment Stage</strong></td>
-                                <td>Officially launched and available for enterprise deployment via Dell AI Factory.</td>
+                                <td>Deployment Architecture</td>
+                                <td>Complex (Custom Docker images, MLflow tracking)</td>
+                                <td>Simple on-premises API endpoint via Dell Stack</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="chart-wrap"><div id="chart-art3" style="width:100%; height:280px;"></div></div>
+                <div class="chart-wrap">
+                    <div id="chart-art3" style="width:100%; height:280px;"></div>
+                </div>
             </div>
 
+            <!-- 4. Evolution & Timeline -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label c3">Evolution & Timeline</span>
+                    <span class="subsec-icon">⏳</span>
+                    <span class="subsec-label c2">Evolution & Timeline</span>
                 </div>
                 <div class="flow-row">
-                    <div class="flow-step">Traditional ML<br><small>Feature Engineering</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Step 1</div>
+                        <div class="flow-step-lbl">Traditional ML</div>
+                        <div class="flow-step-desc">Manual feature engineering, model training, hyperparameter tuning.</div>
+                    </div>
                     <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Model Training<br><small>High Overhead</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Step 2</div>
+                        <div class="flow-step-lbl">AutoML Era</div>
+                        <div class="flow-step-desc">Automated model selection (H2O Driverless, TPOT) but still requires training.</div>
+                    </div>
                     <div class="flow-arrow">➔</div>
-                    <div class="flow-step">tabH2O<br><small>Instant API Prediction</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Step 3</div>
+                        <div class="flow-step-lbl">Tabular Foundation</div>
+                        <div class="flow-step-desc">tabH2O predicts instantly on raw data via a single zero-shot forward pass.</div>
+                    </div>
                 </div>
             </div>
 
+            <!-- 5. Critical View -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c3">Critical View</span>
+                    <span class="subsec-icon">⚠️</span>
+                    <span class="subsec-label c2">Critical View</span>
                 </div>
-                <p class="body-text">Tabular data is highly idiosyncratic to individual businesses. A generalized foundation model may struggle to understand the nuanced, domain-specific context of proprietary database schemas, potentially leading to confident but statistically flawed predictions if the outputs are not rigorously validated by human domain experts.</p>
+                <div class="critical-box">
+                    Tabular data is highly idiosyncratic to individual businesses. A generalized foundation model may struggle to understand the nuanced, domain-specific context of proprietary database schemas, potentially leading to confident but statistically flawed predictions if the outputs are not rigorously validated by human domain experts.
+                </div>
             </div>
 
+            <!-- 6. Community Sentiment -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label c3">Community Sentiment</span>
+                    <span class="subsec-icon">💬</span>
+                    <span class="subsec-label c2">Community Sentiment</span>
                 </div>
                 <div class="sentiment-grid">
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">📊</span>
-                        <span class="sentiment-label">Disruptive</span>
-                        <span class="sentiment-desc">Bypasses traditional ML</span>
+                        <div class="sentiment-emoji">🔥</div>
+                        <div class="sentiment-lbl positive">Efficient</div>
+                        <div class="sentiment-desc">Enterprise data scientists are excited to offload tedious feature pipeline tuning tasks and get instant prediction baselines.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">🏢</span>
-                        <span class="sentiment-label">Enterprise-ready</span>
-                        <span class="sentiment-desc">Secure on-premise deployment</span>
+                        <div class="sentiment-emoji">🤔</div>
+                        <div class="sentiment-lbl neutral">Inquisitive</div>
+                        <div class="sentiment-desc">Database administrators question how well tabH2O parses niche relational schemas and legacy column nomenclatures.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">🤔</span>
-                        <span class="sentiment-label">Skeptical</span>
-                        <span class="sentiment-desc">Domain-specific accuracy concerns</span>
+                        <div class="sentiment-emoji">🛡️</div>
+                        <div class="sentiment-lbl negative">Skeptical</div>
+                        <div class="sentiment-desc">Risk auditors in finance are reluctant to authorize zero-shot tabular models for high-value credit approval processes.</div>
                     </div>
                 </div>
             </div>
@@ -566,21 +1032,35 @@
 
         <!-- Article 4 -->
         <article class="article" id="art4">
-            <h2>Hellbender Raises 12.5 Million USD Seed Round to Accelerate Physical AI and Edge Cameras</h2>
+            <h2 class="article-title">Hellbender Raises 12.5 Million USD Seed Round to Accelerate Physical AI and Edge Cameras</h2>
             
+            <!-- 1. Overview -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label c4">Overview</span>
+                    <span class="subsec-icon">🔭</span>
+                    <span class="subsec-label c3">Overview</span>
                 </div>
                 <p class="lead-text">Signaling continued momentum in the physical AI sector, Pittsburgh-based hardware startup Hellbender closed a 12.5 million USD seed round on May 19, 2026.</p>
                 <p class="body-text">Co-led by Magarac Venture Partners and Veredas Partners, the funding will accelerate the domestic manufacturing of Hellbender's edge AI camera systems, including the Stereo Camera, Vine Camera System, and Tadpole Camera. Designed for autonomous robots and industrial machines across healthcare, transportation, retail, energy, and manufacturing, these smart cameras process visual information in real-time directly on the device. By bypassing the latency and bandwidth constraints of cloud computing, Hellbender enables split-second decision-making. This capital injection highlights a structural shift in venture funding toward hardware infrastructure that enables AI to interact safely and autonomously with the physical world.</p>
             </div>
 
+            <!-- 2. Strategic Impact -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label c4">Strategic Impact</span>
+                    <span class="subsec-icon">⚡</span>
+                    <span class="subsec-label c3">Strategic Impact</span>
                 </div>
-                <div class="impact-box lc4" style="border-left:4px solid var(--c4)">
+                <div class="metric-row">
+                    <div class="metric-card">
+                        <div class="metric-val">$12.5M</div>
+                        <div class="metric-lbl">Capital Raised (Seed)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-val">Real-time</div>
+                        <div class="metric-lbl">Local Inference Execution</div>
+                    </div>
+                </div>
+                <div class="impact-box lc3" style="border-left:4px solid var(--c3)">
                     <ul class="impact-list">
                         <li><strong>Technology & Ecosystem:</strong> Pushes the boundaries of spatial intelligence and sensor fusion by embedding neural processing directly into optical hardware for diverse industrial applications.</li>
                         <li><strong>Business & Market Dynamics:</strong> Strengthens the domestic US supply chain for critical AI hardware components, reducing reliance on overseas manufacturing for industrial automation and robotics.</li>
@@ -590,81 +1070,123 @@
                 </div>
             </div>
 
+            <!-- 3. Technical Deep Dive -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label c4">Technical Deep Dive</span> <span class="subsec-tag lc4 c4">Physical AI & Sensor Fusion</span>
+                    <span class="subsec-icon">🔬</span>
+                    <span class="subsec-label c3">Technical Deep Dive</span>
+                    <span class="subsec-tag lc3 c3">Edge Vision Architecture</span>
                 </div>
                 <div class="arch-grid">
-                    <div class="arch-chip">Stereo/Vine/Tadpole<br><small>Edge AI Cameras</small></div>
-                    <div class="arch-chip">Hailo AI Accelerators<br><small>Neural Processing</small></div>
-                    <div class="arch-chip">Raspberry Pi<br><small>Compute Modules</small></div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">AI Accelerator</div>
+                        <div class="arch-chip-val">Hailo Hardware Engine</div>
+                    </div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">Core Compute</div>
+                        <div class="arch-chip-val">Raspberry Pi CM</div>
+                    </div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">Primary Products</div>
+                        <div class="arch-chip-val">Stereo, Vine, Tadpole</div>
+                    </div>
                 </div>
                 <div class="table-scroll-wrap">
                     <table class="info-table">
                         <thead>
                             <tr>
-                                <th>Category</th>
-                                <th>Details</th>
+                                <th>Camera System Portfolio</th>
+                                <th>Primary Target Application</th>
+                                <th>Core Compute Architecture</th>
+                                <th>Unique Feature Point</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Hardware Architecture</strong></td>
-                                <td>Systems utilize Hailo AI accelerators paired with Raspberry Pi compute modules.</td>
+                                <td>Tadpole Camera</td>
+                                <td>General robotics, warehouse vehicles</td>
+                                <td>Raspberry Pi CM4 + Hailo NPU</td>
+                                <td>Form-factor optimized local vision</td>
                             </tr>
                             <tr>
-                                <td><strong>Comparative Analysis</strong></td>
-                                <td>Eliminates the round-trip latency of sending high-resolution video feeds to the cloud for inference.</td>
+                                <td>Stereo Camera</td>
+                                <td>Depth mapping, collision avoidance</td>
+                                <td>Dual sensor hardware fusion block</td>
+                                <td>Sub-millisecond parallax depth math</td>
                             </tr>
                             <tr>
-                                <td><strong>Deployment Stage</strong></td>
-                                <td>Funding secured; Tadpole Camera pre-orders begin in June 2026.</td>
+                                <td>Vine Camera System</td>
+                                <td>Agricultural automation, energy assets</td>
+                                <td>IP67 ruggedized edge processor</td>
+                                <td>Solar-friendly ultra-low power states</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="chart-wrap"><div id="chart-art4" style="width:100%; height:280px;"></div></div>
+                <div class="chart-wrap">
+                    <div id="chart-art4" style="width:100%; height:280px;"></div>
+                </div>
             </div>
 
+            <!-- 4. Evolution & Timeline -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label c4">Evolution & Timeline</span>
+                    <span class="subsec-icon">⏳</span>
+                    <span class="subsec-label c3">Evolution & Timeline</span>
                 </div>
                 <div class="flow-row">
-                    <div class="flow-step">Centralized Cloud<br><small>Latency Constraints</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Stage 1</div>
+                        <div class="flow-step-lbl">IP Camera + Cloud</div>
+                        <div class="flow-step-desc">Visual streams sent to cloud for heavy NVR analysis (High Latency).</div>
+                    </div>
                     <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Decentralized Edge<br><small>Real-time Processing</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Stage 2</div>
+                        <div class="flow-step-lbl">Local PC / Gateway</div>
+                        <div class="flow-step-desc">Cameras stream locally to an on-premise server hosting GPUs.</div>
+                    </div>
                     <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Physical AI<br><small>Autonomous Actuation</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Stage 3</div>
+                        <div class="flow-step-lbl">Embedded Edge NPU</div>
+                        <div class="flow-step-desc">Hailo-powered Tadpole Cameras do all inference natively on-board.</div>
+                    </div>
                 </div>
             </div>
 
+            <!-- 5. Critical View -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c4">Critical View</span>
+                    <span class="subsec-icon">⚠️</span>
+                    <span class="subsec-label c3">Critical View</span>
                 </div>
-                <p class="body-text">Hardware manufacturing is notoriously capital-intensive and prone to severe supply chain bottlenecks. A 12.5 million USD seed round is relatively small for scaling domestic hardware production across multiple product lines, meaning Hellbender will likely need to raise significantly more capital soon to meet industrial demand, risking early equity dilution for its founders.</p>
+                <div class="critical-box">
+                    Hardware manufacturing is notoriously capital-intensive and prone to severe supply chain bottlenecks. A 12.5 million USD seed round is relatively small for scaling domestic hardware production across multiple product lines, meaning Hellbender will likely need to raise significantly more capital soon to meet industrial demand, risking early equity dilution for its founders.
+                </div>
             </div>
 
+            <!-- 6. Community Sentiment -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label c4">Community Sentiment</span>
+                    <span class="subsec-icon">💬</span>
+                    <span class="subsec-label c3">Community Sentiment</span>
                 </div>
                 <div class="sentiment-grid">
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">🤖</span>
-                        <span class="sentiment-label">Forward-looking</span>
-                        <span class="sentiment-desc">Enables autonomous robotics</span>
+                        <div class="sentiment-emoji">🇺🇸</div>
+                        <div class="sentiment-lbl positive">Patriotic</div>
+                        <div class="sentiment-desc">Hardware advocates highly endorse the domestic US-based production focus, shielding visual automation pipelines from geopolitics.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">🏭</span>
-                        <span class="sentiment-label">Strategic</span>
-                        <span class="sentiment-desc">Strengthens domestic supply chain</span>
+                        <div class="sentiment-emoji">🚜</div>
+                        <div class="sentiment-lbl neutral">Pragmatic</div>
+                        <div class="sentiment-desc">Industrial integrators look forward to Tadpole pre-orders in June, but anticipate supply chain hiccups for custom camera blocks.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">💸</span>
-                        <span class="sentiment-label">Risky</span>
-                        <span class="sentiment-desc">Capital-intensive hardware scaling</span>
+                        <div class="sentiment-emoji">📉</div>
+                        <div class="sentiment-lbl negative">Skeptical</div>
+                        <div class="sentiment-desc">Venture capitalists raise doubts that $12.5M is sufficient to maintain three distinct industrial assembly lines simultaneously.</div>
                     </div>
                 </div>
             </div>
@@ -672,123 +1194,178 @@
 
         <!-- Article 5 -->
         <article class="article" id="art5">
-            <h2>Domino Data Lab Unveils App Hub for Regulated Enterprise AI Applications</h2>
+            <h2 class="article-title">Domino Data Lab Unveils App Hub for Regulated Enterprise AI Applications</h2>
             
+            <!-- 1. Overview -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span> <span class="subsec-label c5">Overview</span>
+                    <span class="subsec-icon">🔭</span>
+                    <span class="subsec-label c5">Overview</span>
                 </div>
                 <p class="lead-text">Bridging the gap between experimental AI models and mission-critical business operations, Domino Data Lab announced the launch of App Hub at its multi-city Rev 2026 conference starting in New York on May 19.</p>
                 <p class="body-text">The new capability expands the Domino Enterprise AI Platform to manage the full lifecycle of AI-powered applications, specifically targeting highly regulated industries such as pharmaceuticals, finance, and national security. App Hub provides a unified environment for the development, deployment, and governance of AI apps, ensuring they are auditable, secure, and seamlessly integrated into complex enterprise IT ecosystems. This release directly addresses the industry-wide bottleneck where AI projects stall at the demo phase due to a lack of enterprise-grade compliance and scalability.</p>
             </div>
 
+            <!-- 2. Strategic Impact -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span> <span class="subsec-label c5">Strategic Impact</span>
+                    <span class="subsec-icon">⚡</span>
+                    <span class="subsec-label c5">Strategic Impact</span>
                 </div>
                 <div class="impact-box lc5" style="border-left:4px solid var(--c5)">
                     <ul class="impact-list">
                         <li><strong>Technology & Ecosystem:</strong> Shifts the enterprise focus from merely hosting foundation models to deploying governed, full-stack AI applications that end-users can safely interact with.</li>
                         <li><strong>Business & Market Dynamics:</strong> Cements Domino Data Lab's position as a premier MLOps and LLMOps provider for regulated industries, increasing vendor lock-in through end-to-end lifecycle management.</li>
-                        <li><strong>Infrastructure & Hardware:</strong> N/A (Primary impact is on software governance and deployment pipelines).</li>
+                        <li><strong>Infrastructure & Hardware:</strong> App Hub ensures security parameters can be enforced across hybrid cloud structures without direct raw infrastructure changes.</li>
                         <li><strong>Investment Strategy:</strong> Investors should overweight AI middleware and governance platforms. As regulatory scrutiny intensifies, enterprises will heavily invest in platforms that guarantee compliance and auditability for their AI deployments.</li>
                     </ul>
                 </div>
             </div>
 
+            <!-- 3. Technical Deep Dive -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span> <span class="subsec-label c5">Technical Deep Dive</span> <span class="subsec-tag lc5 c5">AI Governance & MLOps</span>
+                    <span class="subsec-icon">🔬</span>
+                    <span class="subsec-label c5">Technical Deep Dive</span>
+                    <span class="subsec-tag lc5 c5">Auditable Enterprise AI Stack</span>
                 </div>
                 <div class="arch-grid">
-                    <div class="arch-chip">Domino App Hub<br><small>Unified Environment</small></div>
-                    <div class="arch-chip">Regulated Industries<br><small>Pharma, Finance</small></div>
-                    <div class="arch-chip">Lifecycle Management<br><small>Auditability & Security</small></div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">Control Layer</div>
+                        <div class="arch-chip-val">Domino App Hub</div>
+                    </div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">Security Focus</div>
+                        <div class="arch-chip-val">Full Audit Trace</div>
+                    </div>
+                    <div class="arch-chip">
+                        <div class="arch-chip-title">Target Sectors</div>
+                        <div class="arch-chip-val">Pharma, Fin, Defense</div>
+                    </div>
                 </div>
                 <div class="table-scroll-wrap">
                     <table class="info-table">
                         <thead>
                             <tr>
-                                <th>Category</th>
-                                <th>Details</th>
+                                <th>Hub Operational Block</th>
+                                <th>Functional Technical Focus</th>
+                                <th>Regulatory Audit Value</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Platform</strong></td>
-                                <td>Domino App Hub.</td>
+                                <td>Development Sandbox</td>
+                                <td>Unified sandbox for secure prototype staging</td>
+                                <td>Prevents raw training dataset leaks to public APIs</td>
                             </tr>
                             <tr>
-                                <td><strong>Focus</strong></td>
-                                <td>Governance, auditability, and deployment of AI apps in regulated environments.</td>
+                                <td>Deployment Pipeline</td>
+                                <td>Scale-out hosting for active production web apps</td>
+                                <td>Enforces strict identity access controls (RBAC/IAM)</td>
                             </tr>
                             <tr>
-                                <td><strong>Comparative Analysis</strong></td>
-                                <td>Upgrades AI infrastructure from raw model hosting to comprehensive application lifecycle management.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Deployment Stage</strong></td>
-                                <td>Currently in private preview, with general availability expected by Q3 2026.</td>
+                                <td>Governance Framework</td>
+                                <td>Deep application activity & prompt tracing</td>
+                                <td>Enables rapid compliance audits in regulated fields</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="chart-wrap"><div id="chart-art5" style="width:100%; height:280px;"></div></div>
+                <div class="chart-wrap">
+                    <div id="chart-art5" style="width:100%; height:280px;"></div>
+                </div>
             </div>
 
+            <!-- 4. Evolution & Timeline -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span> <span class="subsec-label c5">Evolution & Timeline</span>
+                    <span class="subsec-icon">⏳</span>
+                    <span class="subsec-label c5">Evolution & Timeline</span>
                 </div>
                 <div class="flow-row">
-                    <div class="flow-step">Experimental Models<br><small>Demo Phase</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Phase 1</div>
+                        <div class="flow-step-lbl">Experimental Sandbox</div>
+                        <div class="flow-step-desc">Models trained loosely on isolated local servers with poor deployment pipelines.</div>
+                    </div>
                     <div class="flow-arrow">➔</div>
-                    <div class="flow-step">Raw Model Hosting<br><small>Lack of Guardrails</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Phase 2</div>
+                        <div class="flow-step-lbl">MLOps & APIs</div>
+                        <div class="flow-step-desc">Enterprise hosting of API model endpoints, but still missing interface-level security.</div>
+                    </div>
                     <div class="flow-arrow">➔</div>
-                    <div class="flow-step">App Hub<br><small>Governed Full-stack AI</small></div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Phase 3</div>
+                        <div class="flow-step-lbl">Unified App Hub</div>
+                        <div class="flow-step-desc">End-to-end governed application deployment for audited interactive AI tools.</div>
+                    </div>
                 </div>
             </div>
 
+            <!-- 5. Critical View -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span> <span class="subsec-label c5">Critical View</span>
+                    <span class="subsec-icon">⚠️</span>
+                    <span class="subsec-label c5">Critical View</span>
                 </div>
-                <p class="body-text">While App Hub centralizes governance, it also creates a single point of failure for enterprise AI deployment. Furthermore, as hyperscalers like AWS and Microsoft Azure rapidly expand their native AI governance tools, independent platforms like Domino face intense competitive pressure to justify their premium pricing and maintain market share.</p>
+                <div class="critical-box">
+                    While App Hub centralizes governance, it also creates a single point of failure for enterprise AI deployment. Furthermore, as hyperscalers like AWS and Microsoft Azure rapidly expand their native AI governance tools, independent platforms like Domino face intense competitive pressure to justify their premium pricing and maintain market share.
+                </div>
             </div>
 
+            <!-- 6. Community Sentiment -->
             <div class="subsec">
                 <div class="subsec-header">
-                    <span class="subsec-icon">💬</span> <span class="subsec-label c5">Community Sentiment</span>
+                    <span class="subsec-icon">💬</span>
+                    <span class="subsec-label c5">Community Sentiment</span>
                 </div>
                 <div class="sentiment-grid">
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">🛡️</span>
-                        <span class="sentiment-label">Essential</span>
-                        <span class="sentiment-desc">Crucial for regulated sectors</span>
+                        <div class="sentiment-emoji">🛡️</div>
+                        <div class="sentiment-lbl positive">Compliant</div>
+                        <div class="sentiment-desc">Enterprise CIOs express massive relief, as auditable logs will expedite bottlenecked security review processes.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">🔗</span>
-                        <span class="sentiment-label">Strategic</span>
-                        <span class="sentiment-desc">Increases vendor lock-in</span>
+                        <div class="sentiment-emoji">⚙️</div>
+                        <div class="sentiment-lbl neutral">Adaptable</div>
+                        <div class="sentiment-desc">ML Engineers are optimistic about platform tools, but query the effort required to migrate existing pipelines.</div>
                     </div>
                     <div class="sentiment-card">
-                        <span class="sentiment-emoji">⚔️</span>
-                        <span class="sentiment-label">Competitive</span>
-                        <span class="sentiment-desc">Pressure from hyperscalers</span>
+                        <div class="sentiment-emoji">🔒</div>
+                        <div class="sentiment-lbl negative">Skeptical</div>
+                        <div class="sentiment-desc">Enterprise architects express concerns regarding vendor lock-in, as models become heavily dependent on Domino's API layers.</div>
                     </div>
                 </div>
             </div>
         </article>
 
-        <!-- Synthesis -->
+        <!-- Synthesis Section -->
         <section class="synthesis" id="synthesis">
-            <h2>Summary and Forward-Looking Outlook</h2>
-            <p class="body-text" style="margin-top: 1rem;">The events of May 19, 2026, illustrate an artificial intelligence ecosystem undergoing a massive structural shift toward autonomous execution and physical deployment. Google's I/O 2026 announcements—spanning Gemini 3.5 Flash, the Omni world model, and the Antigravity 2.0 agent platform—prove that the industry is moving beyond passive chatbots to proactive agents capable of executing complex workflows. Concurrently, XREAL's Project Aura and the Synaptics Coralboard highlight the critical transition of AI inference from the cloud to edge devices. In the enterprise sector, H2O.ai's launch of tabH2O significantly advances predictive analytics for structured data, while Domino Data Lab's App Hub ensures that these powerful AI applications can be securely governed in regulated industries. Finally, Hellbender's 12.5 million USD funding round underscores that venture capital is aggressively backing the physical AI hardware required to give autonomous systems real-time sensory capabilities.</p>
+            <h2>Summary & Forward-Looking Outlook</h2>
             
+            <p class="lead-text">The events of May 19, 2026, illustrate an artificial intelligence ecosystem undergoing a massive structural shift toward autonomous execution and physical deployment.</p>
+            <p class="body-text">Google's I/O 2026 announcements—spanning Gemini 3.5 Flash, the Omni world model, and the Antigravity 2.0 agent platform—prove that the industry is moving beyond passive chatbots to proactive agents capable of executing complex workflows. Concurrently, XREAL's Project Aura and the Synaptics Coralboard highlight the critical transition of AI inference from the cloud to edge devices. In the enterprise sector, H2O.ai's launch of tabH2O significantly advances predictive analytics for structured data, while Domino Data Lab's App Hub ensures that these powerful AI applications can be securely governed in regulated industries. Finally, Hellbender's 12.5 million USD funding round underscores that venture capital is aggressively backing the physical AI hardware required to give autonomous systems real-time sensory capabilities.</p>
+
             <div class="outlook-box">
                 <h3>Upcoming Tech Calendar</h3>
-                <div class="outlook-item" style="margin-top: 1rem;">
-                    <strong>[Confirmed Schedule] June 2026:</strong> Following the debut of Gemini 3.5 Flash, Google is scheduled to roll out Gemini 3.5 Pro to enterprise cloud customers, which will likely trigger a response from OpenAI regarding its next-generation enterprise API pricing.
+                
+                <div class="outlook-item">
+                    <span class="outlook-tag confirmed">Confirmed Schedule</span>
+                    <div class="outlook-date">June 2026</div>
+                    <div class="outlook-desc">Following the debut of Gemini 3.5 Flash, Google is scheduled to roll out Gemini 3.5 Pro to enterprise cloud customers, which will likely trigger a response from OpenAI regarding its next-generation enterprise API pricing.</div>
+                </div>
+
+                <div class="outlook-item">
+                    <span class="outlook-tag forecast">Editorial Forecast</span>
+                    <div class="outlook-date">By End of Q3 2026</div>
+                    <div class="outlook-desc">Driven by the launch of Google's Antigravity 2.0 platform and Domino's App Hub, market analysts project that major cybersecurity firms will announce specialized agent firewalls to monitor and restrict the autonomous actions of enterprise AI agents.</div>
+                </div>
+
+                <div class="outlook-item">
+                    <span class="outlook-tag forecast">Editorial Forecast</span>
+                    <div class="outlook-date">By Q4 2026</div>
+                    <div class="outlook-desc">As AI agents like Gemini Spark gain the ability to autonomously manage financial tasks, expect the FTC and the Consumer Financial Protection Bureau to issue joint guidance on AI liability and unauthorized digital transactions.</div>
                 </div>
             </div>
         </section>
@@ -807,21 +1384,23 @@
                 }
             }
 
-            // 초기 설정 감지
+            // Initial settings detection
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 htmlElement.setAttribute('data-theme', 'dark');
             }
             updateBtnText(htmlElement.getAttribute('data-theme'));
 
-            // 테마 토글 이벤트
+            // Theme toggle event
             themeBtn.addEventListener('click', () => {
                 const currentTheme = htmlElement.getAttribute('data-theme');
                 const newTheme = currentTheme === 'light' ? 'dark' : 'light';
                 htmlElement.setAttribute('data-theme', newTheme);
                 updateBtnText(newTheme);
+                // Trigger charts update with slight delay to ensure CSS styles are updated
+                setTimeout(updateCharts, 50);
             });
 
-            // 맨 위로 스크롤 이벤트
+            // Back to top scroll event
             const toTopBtn = document.getElementById('to-top');
             if(toTopBtn) {
                 window.addEventListener('scroll', () => {
@@ -836,94 +1415,155 @@
                 });
             }
 
-            // ECharts Initialization
-            const chartOptions = {
-                textStyle: { fontFamily: 'Inter, sans-serif' },
-                backgroundColor: 'transparent'
-            };
+            // --- APACHE ECHARTS INITIALIZATION ---
+            let chart1, chart2, chart3, chart4, chart5;
 
-            // Chart 1: Token Processing Speed
-            const chart1 = echarts.init(document.getElementById('chart-art1'), null, {renderer: 'svg'});
-            chart1.setOption({
-                ...chartOptions,
-                title: { text: 'Token Processing Speed (Relative)', textStyle: { color: '#64748b', fontSize: 14, fontWeight: 500 } },
-                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-                grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-                xAxis: { type: 'category', data: ['Gemini 3.1 Pro', 'Gemini 3.5 Flash'], axisLabel: { color: '#64748b' }, axisLine: { lineStyle: { color: '#e2e8f0' } } },
-                yAxis: { type: 'value', axisLabel: { color: '#64748b' }, splitLine: { lineStyle: { color: '#e2e8f0', type: 'dashed' } } },
-                series: [{ type: 'bar', data: [1, 4], itemStyle: { color: '#2563eb', borderRadius: [4,4,0,0] }, barWidth: '40%' }]
-            });
+            function getCSSVar(name) {
+                return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+            }
 
-            // Chart 2: AI Inference Paradigm Shift
-            const chart2 = echarts.init(document.getElementById('chart-art2'), null, {renderer: 'svg'});
-            chart2.setOption({
-                ...chartOptions,
-                title: { text: 'AI Inference Paradigm Shift', textStyle: { color: '#64748b', fontSize: 14, fontWeight: 500 } },
-                tooltip: { trigger: 'item' },
-                series: [{
-                    type: 'pie', radius: ['40%', '70%'], center: ['50%', '55%'],
-                    data: [
-                        { value: 70, name: 'Edge AI (Local NPU)', itemStyle: { color: '#059669' } },
-                        { value: 30, name: 'Cloud API', itemStyle: { color: '#94a3b8' } }
-                    ],
-                    label: { color: '#64748b' },
-                    itemStyle: { borderColor: '#fff', borderWidth: 2 }
-                }]
-            });
+            function initAllCharts() {
+                chart1 = echarts.init(document.getElementById('chart-art1'), null, {renderer: 'svg'});
+                chart2 = echarts.init(document.getElementById('chart-art2'), null, {renderer: 'svg'});
+                chart3 = echarts.init(document.getElementById('chart-art3'), null, {renderer: 'svg'});
+                chart4 = echarts.init(document.getElementById('chart-art4'), null, {renderer: 'svg'});
+                chart5 = echarts.init(document.getElementById('chart-art5'), null, {renderer: 'svg'});
+                
+                updateCharts();
+            }
 
-            // Chart 3: Time to Prediction
-            const chart3 = echarts.init(document.getElementById('chart-art3'), null, {renderer: 'svg'});
-            chart3.setOption({
-                ...chartOptions,
-                title: { text: 'Time to Prediction (Conceptual)', textStyle: { color: '#64748b', fontSize: 14, fontWeight: 500 } },
-                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-                grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-                xAxis: { type: 'value', axisLabel: { color: '#64748b' }, splitLine: { lineStyle: { color: '#e2e8f0', type: 'dashed' } } },
-                yAxis: { type: 'category', data: ['Traditional ML', 'tabH2O'], axisLabel: { color: '#64748b' }, axisLine: { lineStyle: { color: '#e2e8f0' } } },
-                series: [{ type: 'bar', data: [100, 5], itemStyle: { color: '#d97706', borderRadius: [0,4,4,0] }, barWidth: '40%' }]
-            });
+            function updateCharts() {
+                const textPrimary = getCSSVar('--text-primary');
+                const textSecondary = getCSSVar('--text-secondary');
+                const borderColor = getCSSVar('--border-color');
+                const bg = 'transparent';
 
-            // Chart 4: Latency Comparison
-            const chart4 = echarts.init(document.getElementById('chart-art4'), null, {renderer: 'svg'});
-            chart4.setOption({
-                ...chartOptions,
-                title: { text: 'Latency: Cloud vs Edge (ms)', textStyle: { color: '#64748b', fontSize: 14, fontWeight: 500 } },
-                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-                grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-                xAxis: { type: 'category', data: ['Cloud Inference', 'Edge (Hellbender)'], axisLabel: { color: '#64748b' }, axisLine: { lineStyle: { color: '#e2e8f0' } } },
-                yAxis: { type: 'value', axisLabel: { color: '#64748b' }, splitLine: { lineStyle: { color: '#e2e8f0', type: 'dashed' } } },
-                series: [{ type: 'bar', data: [150, 10], itemStyle: { color: '#7c3aed', borderRadius: [4,4,0,0] }, barWidth: '40%' }]
-            });
+                const c1 = getCSSVar('--c1');
+                const c2 = getCSSVar('--c2');
+                const c3 = getCSSVar('--c3');
+                const c4 = getCSSVar('--c4');
+                const c5 = getCSSVar('--c5');
 
-            // Chart 5: AI App Lifecycle Governance
-            const chart5 = echarts.init(document.getElementById('chart-art5'), null, {renderer: 'svg'});
-            chart5.setOption({
-                ...chartOptions,
-                title: { text: 'AI App Lifecycle Governance', textStyle: { color: '#64748b', fontSize: 14, fontWeight: 500 } },
-                tooltip: { trigger: 'item' },
-                radar: {
-                    indicator: [
-                        { name: 'Security', max: 100 },
-                        { name: 'Auditability', max: 100 },
-                        { name: 'Deployment', max: 100 },
-                        { name: 'Monitoring', max: 100 },
-                        { name: 'Compliance', max: 100 }
-                    ],
-                    axisName: { color: '#64748b' },
-                    splitLine: { lineStyle: { color: '#e2e8f0' } },
-                    splitArea: { show: false }
-                },
-                series: [{
-                    type: 'radar',
-                    data: [
-                        { value: [95, 90, 85, 90, 95], name: 'Domino App Hub', itemStyle: { color: '#dc2626' }, areaStyle: { color: 'rgba(220, 38, 38, 0.2)' } },
-                        { value: [50, 40, 70, 60, 30], name: 'Raw Model Hosting', itemStyle: { color: '#94a3b8' }, areaStyle: { color: 'rgba(148, 163, 184, 0.2)' } }
+                // Chart 1: Gemini 3.5 Token Throughput Speed Comparison
+                chart1.setOption({
+                    backgroundColor: bg,
+                    textStyle: { fontFamily: 'Inter', color: textSecondary },
+                    title: { text: 'Inference Speed Benchmark (Tokens/sec)', left: 'center', textStyle: { color: textPrimary, fontSize: 13, fontWeight: 'bold' } },
+                    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                    grid: { top: 40, bottom: 40, left: 50, right: 20 },
+                    xAxis: { type: 'category', data: ['Gemini 3.1 Pro', 'Claude 3.5 S.', 'GPT-4o 2026', 'Gemini 3.5 Flash'], axisLine: { lineStyle: { color: borderColor } }, axisLabel: { color: textSecondary } },
+                    yAxis: { type: 'value', splitLine: { lineStyle: { color: borderColor } }, axisLabel: { color: textSecondary } },
+                    series: [{
+                        data: [100, 120, 160, 400],
+                        type: 'bar',
+                        itemStyle: {
+                            color: function(params) {
+                                return params.dataIndex === 3 ? c1 : textSecondary;
+                            },
+                            borderRadius: [4, 4, 0, 0]
+                        }
+                    }]
+                });
+
+                // Chart 2: Edge NPU Performance TOPS
+                chart2.setOption({
+                    backgroundColor: bg,
+                    textStyle: { fontFamily: 'Inter', color: textSecondary },
+                    title: { text: 'Edge Compute Module TOPS Comparison', left: 'center', textStyle: { color: textPrimary, fontSize: 13, fontWeight: 'bold' } },
+                    tooltip: { trigger: 'axis' },
+                    grid: { top: 45, bottom: 40, left: 50, right: 20 },
+                    xAxis: { type: 'category', data: ['R-Pi CM4', 'Coralboard NPU', 'Project Aura SoC', 'Standard Mobile'], axisLine: { lineStyle: { color: borderColor } }, axisLabel: { color: textSecondary } },
+                    yAxis: { type: 'value', name: 'TOPS', splitLine: { lineStyle: { color: borderColor } }, axisLabel: { color: textSecondary } },
+                    series: [{
+                        data: [0.4, 1.0, 3.2, 5.0],
+                        type: 'line',
+                        smooth: true,
+                        lineStyle: { color: c4, width: 3 },
+                        itemStyle: { color: c4 },
+                        areaStyle: { color: c4 + '22' }
+                    }]
+                });
+
+                // Chart 3: tabH2O Processing Speed comparison
+                chart3.setOption({
+                    backgroundColor: bg,
+                    textStyle: { fontFamily: 'Inter', color: textSecondary },
+                    title: { text: 'Time Cost: Traditional ML vs tabH2O (Log Scale)', left: 'center', textStyle: { color: textPrimary, fontSize: 13, fontWeight: 'bold' } },
+                    tooltip: { trigger: 'axis' },
+                    grid: { top: 60, bottom: 40, left: 80, right: 20 },
+                    xAxis: { type: 'category', data: ['Data Ingest', 'Feature Eng', 'Training', 'Tuning', 'Inference'], axisLine: { lineStyle: { color: borderColor } }, axisLabel: { color: textSecondary } },
+                    yAxis: { type: 'log', name: 'Time (sec)', splitLine: { lineStyle: { color: borderColor } }, axisLabel: { color: textSecondary } },
+                    legend: { data: ['Traditional ML', 'tabH2O'], top: 25, textStyle: { color: textSecondary } },
+                    series: [
+                        { name: 'Traditional ML', type: 'line', data: [9000, 21600, 43200, 30600, 0.05], lineStyle: { color: textSecondary, width: 2 }, itemStyle: { color: textSecondary } },
+                        { name: 'tabH2O', type: 'line', data: [10, 0.1, 0.1, 0.1, 1], lineStyle: { color: c2, width: 3 }, itemStyle: { color: c2 } }
                     ]
-                }]
-            });
+                });
+
+                // Chart 4: Hellbender Target Sector Distribution
+                chart4.setOption({
+                    backgroundColor: bg,
+                    textStyle: { fontFamily: 'Inter', color: textSecondary },
+                    title: { text: 'Edge AI Camera Target Sector Allocation', left: 'center', textStyle: { color: textPrimary, fontSize: 13, fontWeight: 'bold' } },
+                    tooltip: { trigger: 'item' },
+                    series: [{
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        center: ['50%', '55%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: { borderRadius: 6, borderColor: bg, borderWidth: 2 },
+                        label: { show: true, color: textPrimary },
+                        labelLine: { show: true, lineStyle: { color: borderColor } },
+                        data: [
+                            { value: 30, name: 'Manufacturing', itemStyle: { color: c3 } },
+                            { value: 25, name: 'Transportation', itemStyle: { color: c1 } },
+                            { value: 20, name: 'Energy', itemStyle: { color: c4 } },
+                            { value: 15, name: 'Healthcare', itemStyle: { color: c2 } },
+                            { value: 10, name: 'Retail', itemStyle: { color: textSecondary } }
+                        ]
+                    }]
+                });
+
+                // Chart 5: Domino App Hub Radar Evaluation
+                chart5.setOption({
+                    backgroundColor: bg,
+                    textStyle: { fontFamily: 'Inter', color: textSecondary },
+                    title: { text: 'Domino App Hub vs Hyperscaler Platform Evaluation', left: 'center', textStyle: { color: textPrimary, fontSize: 13, fontWeight: 'bold' } },
+                    tooltip: { trigger: 'item' },
+                    radar: {
+                        indicator: [
+                            { name: 'Compliance', max: 100 },
+                            { name: 'Multi-Cloud', max: 100 },
+                            { name: 'Sandbox Dev', max: 100 },
+                            { name: 'Pharma Specs', max: 100 },
+                            { name: 'Lifecycle Speed', max: 100 },
+                            { name: 'Governance Trace', max: 100 }
+                        ],
+                        splitArea: { show: false },
+                        splitLine: { lineStyle: { color: borderColor } },
+                        axisLine: { lineStyle: { color: borderColor } },
+                        center: ['50%', '55%'],
+                        radius: '60%'
+                    },
+                    legend: { data: ['Domino App Hub', 'Hyperscalers'], top: 25, textStyle: { color: textSecondary } },
+                    series: [{
+                        type: 'radar',
+                        data: [
+                            { value: [95, 90, 85, 98, 88, 95], name: 'Domino App Hub', itemStyle: { color: c5 }, areaStyle: { color: c5 + '22' } },
+                            { value: [70, 40, 90, 60, 92, 65], name: 'Hyperscalers', itemStyle: { color: textSecondary }, areaStyle: { color: textSecondary + '11' } }
+                        ]
+                    }]
+                });
+            }
+
+            initAllCharts();
 
             window.addEventListener('resize', () => {
-                chart1.resize(); chart2.resize(); chart3.resize(); chart4.resize(); chart5.resize();
+                if(chart1) chart1.resize();
+                if(chart2) chart2.resize();
+                if(chart3) chart3.resize();
+                if(chart4) chart4.resize();
+                if(chart5) chart5.resize();
             });
         });
     </script>
