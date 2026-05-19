@@ -72,22 +72,40 @@ def get_latest_gemini_model(client):
     try:
         models = client.models.list()
         all_names = [m.name for m in models]
-        bad_keywords = ["flash", "nano", "vision", "latest", "customtools", "deep-research",
+        # "flash" 제외, 탐색 대상을 flash 모델로 전면 선회
+        bad_keywords = ["nano", "vision", "latest", "customtools", "deep-research",
                         "live", "tts", "embedding", "imagen", "aqa", "exp"]
-        pro_models = [
+        flash_models = [
             n for n in all_names
-            if "gemini" in n.lower() and "pro" in n.lower()
+            if "gemini" in n.lower() and "flash" in n.lower()
             and not any(bad in n.lower() for bad in bad_keywords)
         ]
-        if pro_models:
-            pro_models.sort(key=lambda x: tuple(int(num) for num in re.findall(r'\d+', x)), reverse=True)
-            latest = pro_models[0].replace("models/", "")
-            print(f"Automatically selected Gemini Pro model: {latest}")
+        if flash_models:
+            # 소수점이 들어간 버전을 정상적으로 비교 정렬하기 위해 파서 구현 (예: "3.5" -> (3, 5))
+            def model_sort_key(model_name):
+                parts = re.findall(r'\d+\.?\d*', model_name)
+                version_parts = []
+                for p in parts:
+                    if '.' in p:
+                        try:
+                            version_parts.extend([int(x) for x in p.split('.')])
+                        except ValueError:
+                            pass
+                    else:
+                        try:
+                            version_parts.append(int(p))
+                        except ValueError:
+                            pass
+                return tuple(version_parts)
+
+            flash_models.sort(key=model_sort_key, reverse=True)
+            latest = flash_models[0].replace("models/", "")
+            print(f"Automatically selected Gemini Flash model: {latest}")
             return latest
-        return "gemini-3.0-pro"
+        return "gemini-3.5-flash"
     except Exception as e:
         print(f"Warning: Gemini model discovery failed, using fallback.")
-        return "gemini-3.0-pro"
+        return "gemini-3.5-flash"
 
 def get_latest_claude_model(client):
     try:
