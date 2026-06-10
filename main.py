@@ -7,7 +7,7 @@ import datetime
 import random
 from dotenv import load_dotenv
 from google import genai
-from google.genai import types
+from google import types
 import anthropic
 from tenacity import retry, stop_after_attempt, wait_exponential, wait_fixed
 from github_utils import fetch_prompt_from_github
@@ -72,7 +72,6 @@ def get_latest_gemini_model(client):
     try:
         models = client.models.list()
         all_names = [m.name for m in models]
-        # "flash" 제외, 탐색 대상을 flash 모델로 전면 선회
         bad_keywords = ["nano", "vision", "latest", "customtools", "deep-research",
                         "live", "tts", "embedding", "imagen", "aqa", "exp"]
         flash_models = [
@@ -81,7 +80,6 @@ def get_latest_gemini_model(client):
             and not any(bad in n.lower() for bad in bad_keywords)
         ]
         if flash_models:
-            # 소수점이 들어간 버전을 정상적으로 비교 정렬하기 위해 파서 구현 (예: "3.5" -> (3, 5))
             def model_sort_key(model_name):
                 parts = re.findall(r'\d+\.?\d*', model_name)
                 version_parts = []
@@ -107,24 +105,29 @@ def get_latest_gemini_model(client):
         print(f"Warning: Gemini model discovery failed, using fallback.")
         return "gemini-3.5-flash"
 
-def get_latest_claude_model(client):
+def get_latest_claude_model(client, tier="sonnet"):
+    """
+    지정한 티어(sonnet, opus 등)에 맞는 최신 Claude 모델을 동적으로 탐색합니다.
+    새로운 버전(예: opus-4-9 등)이 출시되면 정렬 로직에 의해 자동으로 최우선 선택됩니다.
+    """
     try:
         models_page = client.models.list(limit=50)
-        sonnet_models = [m.id for m in models_page.data if "sonnet" in m.id.lower()]
-        if sonnet_models:
+        target_models = [m.id for m in models_page.data if tier.lower() in m.id.lower()]
+        if target_models:
             def model_sort_key(model_id):
                 parts = re.findall(r'\d+', model_id)
                 ver_parts = [int(p) for p in parts if len(p) < 8]
                 date_val  = int(next((p for p in parts if len(p) == 8), "0"))
                 return (ver_parts, date_val)
-            sonnet_models.sort(key=model_sort_key, reverse=True)
-            target = sonnet_models[0]
-            print(f"Automatically selected Claude model: {target}")
+                
+            target_models.sort(key=model_sort_key, reverse=True)
+            target = target_models[0]
+            print(f"Automatically selected Claude {tier.upper()} model: {target}")
             return target
-        return "claude-sonnet-4-6"
+        return f"claude-{tier}-4-6" if tier == "sonnet" else f"claude-{tier}-4-8"
     except Exception as e:
-        print(f"Warning: Claude model discovery failed, using fallback.")
-        return "claude-sonnet-4-6"
+        print(f"Warning: Claude {tier} model discovery failed, using fallback.")
+        return f"claude-{tier}-4-6" if tier == "sonnet" else f"claude-{tier}-4-8"
 
 @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=2, min=15, max=60), retry_error_callback=return_none_on_error)
 def run_claude_chat(client, model, messages, system=None, use_web_search=False):
@@ -137,14 +140,12 @@ def run_claude_chat(client, model, messages, system=None, use_web_search=False):
     text_blocks = [b.text for b in message.content if hasattr(b, "text")]
     return "\n".join(text_blocks) if text_blocks else None
 
-# [Surgical Change 1] 파라미터 분리: system_rules 와 user_prompt
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, system_rules, user_prompt, output_file="trial/1.txt"):
     try:
         current_dt = datetime.datetime.now()
         current_kst = current_dt.strftime("%Y-%m-%d %H:%M KST")
         
-        # [Surgical Change 1] 시스템 지시에 규칙 병합
         sys_instruction = (
             f"You are a top-tier AI Tech & Business Analyst. "
             f"Current KST Time: {current_kst}. "
@@ -185,7 +186,10 @@ def main():
     g_model = get_latest_gemini_model(g_client)
 
     c_client = anthropic.Anthropic(api_key=c_api_key, timeout=300.0, max_retries=0) if c_api_key else None
-    c_model = get_latest_claude_model(c_client) if c_client else None
+    
+    # 각 작업 성격에 맞게 Sonnet 계열과 Opus 계열 최신 모델을 분리하여 동적 로드
+    c_sonnet_model = get_latest_claude_model(c_client, tier="sonnet") if c_client else None
+    c_opus_model = get_latest_claude_model(c_client, tier="opus") if c_client else None
 
     # 캐시 폴더 생성 및 이전 날짜의 쓰레기 파일 청소
     os.makedirs("trial", exist_ok=True)
@@ -250,7 +254,6 @@ def main():
         print(f"Starting Grounded Research (Model: {g_model})...")
         p1_start = time.time()
         
-        # [Surgical Change 1] user_trigger 생성 및 전달
         user_trigger = "시스템 지시사항(GLOBAL RULES)에 정의된 형식과 규칙에 따라 지금 바로 구글 검색을 통해 최신 AI 뉴스 5개를 발굴하고 보고서를 작성하십시오."
         initial_result = run_grounded_research(g_client, g_model, phase1_prompt_content, user_trigger, p1_cache_file)
         
@@ -266,7 +269,7 @@ def main():
         print(f"✅ Phase 1 complete. Saved to {p1_cache_file} (Time: {time.time() - p1_start:.2f}s)")
 
     # ---------------------------------------------------------
-    # Phase 2: Claude Validation
+    # Phase 2: Claude Validation (Opus Tier 고도화)
     # ---------------------------------------------------------
     p2_cache_file = "trial/feedback.txt"
     feedback = None
@@ -279,7 +282,7 @@ def main():
             with open(p2_cache_file, "r", encoding="utf-8") as f:
                 feedback = f.read()
         else:
-            print(f"Starting Claude action (Model: {c_model})...")
+            print(f"Starting Claude action (Model: {c_opus_model})...")
             p2_start = time.time()
             current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
             p2_system = (
@@ -304,7 +307,8 @@ def main():
             )
             claude_messages = [{"role": "user", "content": p2_user_prompt}]
             
-            feedback = run_claude_chat(c_client, c_model, claude_messages, system=p2_system, use_web_search=True)
+            # 교차 검증의 정교함을 극대화하기 위해 동적 바인딩된 최신 Opus 모델 투입
+            feedback = run_claude_chat(c_client, c_opus_model, claude_messages, system=p2_system, use_web_search=True)
             if not feedback:
                 print("❌ Phase 2 failed after 5 attempts. Exiting.")
                 sys.exit(1)
@@ -313,10 +317,10 @@ def main():
             print(f"✅ Phase 2 complete. Saved to {p2_cache_file} (Time: {time.time() - p2_start:.2f}s)")
 
     # ---------------------------------------------------------
-    # Phase 3: Gemini Refinement
+    # Phase 3: Gemini Refinement (품질 제안 흡수 피드백 루프)
     # ---------------------------------------------------------
     p3_cache_file = "trial/2.txt"
-    refined_result = initial_result # 실패 시를 대비한 Fallback (이전에는 이 상태로 넘어갔으나, 이제는 강제종료됨)
+    refined_result = initial_result
 
     if feedback:
         print("\n--- Phase 3: Gemini Refinement ---")
@@ -332,15 +336,14 @@ def main():
             refine_prompt = (
                 f"현재 실제 KST 시간은 {current_kst}입니다.\n"
                 "위 피드백을 철저히 반영하여 [Initial Draft]를 다듬어 최종본을 작성하십시오.\n"
-                "1. 🚨 [중요: 조건 위반 뉴스 전면 교체] 피드백 내용 중, 특정 기사가 '24시간 윈도우' 조건을 위반한 과거 사건으로 판명되었거나 심각한 사실 오류가 있다면, 해당 항목의 날짜나 내용만 조작해서 유지하려 하지 마십시오. **조건을 위반한 항목은 완전히 삭제(Drop)하십시오.**\n"
-                "2. 삭제된 빈 슬롯 수만큼, 당신에게 부여된 'Google Search' 툴을 즉각 사용하여 최근 24시간 이내에 발생한 **완전히 새로운 AI 뉴스(인프라, 하드웨어, 아키텍처 등)**를 직접 발굴하여 대체 작성하십시오. 최종 리포트는 무조건 5개의 항목으로 채워져야 합니다.\n"
-                "3. 시간 윈도우(24시간) 내에 해당하며 사실 관계만 일부 틀린 항목은 피드백에 따라 정확히 보강하여 유지하십시오.\n"
-                "4. 피드백에서 지적되지 않은 정상 항목은 불필요한 재작성 없이 원문을 그대로 유지하십시오.\n"
+                "1. 🚨 [조건 위반 및 사실 오류 수정] 피드백 내용 중 기사가 조건을 위반했거나 심각한 사실 오류가 있다면, 해당 항목을 전면 삭제(Drop)하십시오.\n"
+                "2. 💡 [품질 보완 제안 적극 반영] 피드백의 '품질 보완 제안(📌 보완 제안)' 파트에 명시된 개선 요청 사항들(누락된 하위 아키텍처 명시, 구체적인 파트너십 브랜드 보완, 교정 명칭 반영 등)을 본문에 완벽히 녹여내어 분석의 깊이를 극대화하십시오.\n"
+                "3. 삭제된 빈 슬롯 수만큼, 당신에게 부여된 'Google Search' 툴을 즉각 사용하여 최근 24시간 이내에 발생한 완전히 새로운 AI 인프라/하드웨어 뉴스를 직접 발굴하여 대체 작성하십시오. 최종 리포트는 무조건 5개의 항목으로 채워져야 합니다.\n"
+                "4. 피드백에서 지적되지 않은 정상 항목은 불필요한 재작성 없이 원문을 최대한 유지하십시오.\n"
                 "5. 인라인 수식 기호 절대 사용 금지. 벡터는 굵은 글씨, 변수는 일반 텍스트.\n"
                 "6. 기존 섹션 구조(Overview, Strategic Impact, Technical Deep Dive 등)를 정확히 유지하십시오."
             )
             
-            # [Surgical Change 2] base_prompt_content를 시스템 지시사항에 병합
             sys_instruction = (
                 "You are a top-tier AI Intelligence Analyst. You MUST use the Google Search tool to replace any outdated "
                 "or invalid news items (flagged by feedback) with breaking news strictly from the last 24 hours. "
@@ -351,7 +354,6 @@ def main():
             max_retries = 5
             for attempt in range(max_retries):
                 try:
-                    # [Surgical Change 2] 일반 contents 배열에서 [Original Rules] 파트 제거
                     contents = [
                         f"[Initial Draft]\n{initial_result}\n\n",
                         f"[Feedback to Apply]\n{feedback}\n\n",
@@ -382,7 +384,7 @@ def main():
                         sys.exit(1)
 
     # ---------------------------------------------------------
-    # Phase 4: Claude Translation
+    # Phase 4: Claude Translation (Sonnet Tier 및 불필요한 고정 대기 제거)
     # ---------------------------------------------------------
     p4_cache_file = "trial/translated.txt"
     final_content = refined_result
@@ -394,9 +396,8 @@ def main():
             with open(p4_cache_file, "r", encoding="utf-8") as f:
                 final_content = f.read()
         else:
-            print(f"Starting Claude action (Model: {c_model})...")
-            print("⏳ TPM(Token Per Minute) 한도 초기화를 위해 60초 대기합니다...")
-            time.sleep(60)
+            print(f"Starting Claude action (Model: {c_sonnet_model})...")
+            # 🧹 [Surgical Change] 일일 배치 작동 환경 및 예외처리 구조(@retry)를 고려하여 불필요한 고정 60초 대기(time.sleep) 제거
             
             p4_start = time.time()
             current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
@@ -417,7 +418,8 @@ def main():
                 )
             }]
 
-            translated = run_claude_chat(c_client, c_model, translate_messages, system=p4_system)
+            # 번역 작업에 최적화된 동적 바인딩 최신 Sonnet 모델 투입
+            translated = run_claude_chat(c_client, c_sonnet_model, translate_messages, system=p4_system)
             if not translated:
                 print("❌ Phase 4 failed after 5 attempts. Exiting.")
                 sys.exit(1)
@@ -457,7 +459,6 @@ def main():
         print(f"Generating HTML using model: {g_model}...")
         max_html_retries = 5
         
-        # [Surgical Change 3] html_config를 별도로 정의하여 system_instruction 주입
         html_config = types.GenerateContentConfig(
             system_instruction=html_prompt_content,
             temperature=0.1
@@ -465,7 +466,6 @@ def main():
         
         for attempt in range(max_html_retries):
             try:
-                # [Surgical Change 3] 일반 contents에는 번역 텍스트만 전달
                 response = g_client.models.generate_content(
                     model=g_model,
                     contents=[f"다음 데이터를 바탕으로 시스템 지시사항의 HTML 템플릿과 CSS 규칙에 맞춰 완벽한 단일 HTML 문서를 생성하십시오:\n\n{final_content}"],
