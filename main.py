@@ -1,3 +1,5 @@
+# main.py 상단 임포트 섹션 수정
+
 import os
 import time
 import sys
@@ -7,7 +9,7 @@ import datetime
 import random
 from dotenv import load_dotenv
 from google import genai
-from google import types
+from google.genai import types  # 🎯 기존 'from google import types'에서 수정 완료
 import anthropic
 from tenacity import retry, stop_after_attempt, wait_exponential, wait_fixed
 from github_utils import fetch_prompt_from_github
