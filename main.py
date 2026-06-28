@@ -474,6 +474,27 @@ def main():
                     config=html_config
                 )
                 html_code = response.text
+                
+                # 🛠️ [Surgical Change] None 반환 시 상세 원인 파악을 위한 고도화된 디버깅 코드
+                if not html_code:
+                    print("❌ [디버깅] Gemini API가 빈 응답(None)을 반환했습니다. 원인을 분석합니다:")
+                    try:
+                        if response.candidates:
+                            candidate = response.candidates[0]
+                            # 차단 사유 (예: SAFETY, RECITATION 등) 출력
+                            print(f" - Finish Reason (종료 사유): {candidate.finish_reason}")
+                            if hasattr(candidate, 'safety_ratings'):
+                                print(f" - Safety Ratings (안전 등급): {candidate.safety_ratings}")
+                        else:
+                            print(" - Candidates(생성 후보군) 리스트가 완전히 비어 있습니다.")
+                        
+                        if hasattr(response, 'prompt_feedback') and response.prompt_feedback:
+                            print(f" - Prompt Feedback: {response.prompt_feedback}")
+                    except Exception as log_err:
+                        print(f" - 디버깅 메타데이터 추출 중 추가 에러 발생: {log_err}")
+                        
+                    raise ValueError("Gemini 모델이 유효한 텍스트를 출력하지 못했습니다. (안전 필터 차단 혹은 입력 오류)")
+
                 if "```html" in html_code:
                     html_code = html_code.split("```html")[1].split("```")[0].strip()
                 elif "```" in html_code:
