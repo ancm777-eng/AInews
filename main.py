@@ -1,5 +1,3 @@
-# main.py 상단 임포트 섹션 수정
-
 import os
 import time
 import sys
@@ -9,8 +7,8 @@ import datetime
 import random
 from dotenv import load_dotenv
 from google import genai
-from google.genai import types  # 🎯 기존 'from google import types'에서 수정 완료
-import anthropic
+from google.genai import types 
+from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential, wait_fixed
 from github_utils import fetch_prompt_from_github
 
@@ -107,40 +105,19 @@ def get_latest_gemini_model(client):
         print(f"Warning: Gemini model discovery failed, using fallback.")
         return "gemini-3.5-flash"
 
-def get_latest_claude_model(client, tier="sonnet"):
-    """
-    지정한 티어(sonnet, opus 등)에 맞는 최신 Claude 모델을 동적으로 탐색합니다.
-    새로운 버전(예: opus-4-9 등)이 출시되면 정렬 로직에 의해 자동으로 최우선 선택됩니다.
-    """
-    try:
-        models_page = client.models.list(limit=50)
-        target_models = [m.id for m in models_page.data if tier.lower() in m.id.lower()]
-        if target_models:
-            def model_sort_key(model_id):
-                parts = re.findall(r'\d+', model_id)
-                ver_parts = [int(p) for p in parts if len(p) < 8]
-                date_val  = int(next((p for p in parts if len(p) == 8), "0"))
-                return (ver_parts, date_val)
-                
-            target_models.sort(key=model_sort_key, reverse=True)
-            target = target_models[0]
-            print(f"Automatically selected Claude {tier.upper()} model: {target}")
-            return target
-        return f"claude-{tier}-4-6" if tier == "sonnet" else f"claude-{tier}-4-8"
-    except Exception as e:
-        print(f"Warning: Claude {tier} model discovery failed, using fallback.")
-        return f"claude-{tier}-4-6" if tier == "sonnet" else f"claude-{tier}-4-8"
-
 @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=2, min=15, max=60), retry_error_callback=return_none_on_error)
-def run_claude_chat(client, model, messages, system=None, use_web_search=False):
-    kwargs = dict(model=model, max_tokens=8192, messages=messages)
+def run_gpt_chat(client, model, messages, system=None):
+    api_messages = []
     if system:
-        kwargs["system"] = system
-    if use_web_search:
-        kwargs["tools"] = [{"type": "web_search_20250305", "name": "web_search"}]
-    message = client.messages.create(**kwargs)
-    text_blocks = [b.text for b in message.content if hasattr(b, "text")]
-    return "\n".join(text_blocks) if text_blocks else None
+        api_messages.append({"role": "system", "content": system})
+    api_messages.extend(messages)
+    
+    response = client.chat.completions.create(
+        model=model,
+        messages=api_messages,
+        temperature=0.3
+    )
+    return response.choices[0].message.content
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, system_rules, user_prompt, output_file="trial/1.txt"):
@@ -181,18 +158,14 @@ def main():
     args = parser.parse_args()
 
     g_api_key = os.getenv("GEMINI_API_KEY")
-    c_api_key = os.getenv("CLAUDE_API_KEY")
+    o_api_key = os.getenv("OPENAI_API_KEY")
     if not g_api_key: sys.exit(1)
 
     g_client = genai.Client(api_key=g_api_key)
     g_model = get_latest_gemini_model(g_client)
 
-    c_client = anthropic.Anthropic(api_key=c_api_key, timeout=300.0, max_retries=0) if c_api_key else None
+    o_client = OpenAI(api_key=o_api_key, max_retries=0) if o_api_key else None
     
-    # 각 작업 성격에 맞게 Sonnet 계열과 Opus 계열 최신 모델을 분리하여 동적 로드
-    c_sonnet_model = get_latest_claude_model(c_client, tier="sonnet") if c_client else None
-    c_opus_model = get_latest_claude_model(c_client, tier="opus") if c_client else None
-
     # 캐시 폴더 생성 및 이전 날짜의 쓰레기 파일 청소
     os.makedirs("trial", exist_ok=True)
     clean_old_caches(cache_dir="trial")
@@ -271,20 +244,20 @@ def main():
         print(f"✅ Phase 1 complete. Saved to {p1_cache_file} (Time: {time.time() - p1_start:.2f}s)")
 
     # ---------------------------------------------------------
-    # Phase 2: Claude Validation (Opus Tier 고도화)
+    # Phase 2: GPT-5.6 Sol Validation (초고도화 팩트체크)
     # ---------------------------------------------------------
     p2_cache_file = "trial/feedback.txt"
     feedback = None
-    claude_messages = []
+    gpt_messages = []
 
-    if c_client:
-        print("\n--- Phase 2: Claude Validation ---")
+    if o_client:
+        print("\n--- Phase 2: GPT-5.6 Validation ---")
         if os.path.exists(p2_cache_file):
             print("✅ Phase 2: 오늘 이미 생성된 로컬 캐시(feedback.txt)에서 피드백을 불러옵니다.")
             with open(p2_cache_file, "r", encoding="utf-8") as f:
                 feedback = f.read()
         else:
-            print(f"Starting Claude action (Model: {c_opus_model})...")
+            print("Starting GPT-5.6 action (Model: gpt-5.6-sol)...")
             p2_start = time.time()
             current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
             p2_system = (
@@ -294,25 +267,23 @@ def main():
                 f"Therefore, all dates and events in the draft referencing {datetime.datetime.now().strftime('%Y')} "
                 f"are CURRENT, not future or fictional. "
                 f"Do NOT flag any {datetime.datetime.now().strftime('%Y')} dates as hypothetical or future scenarios. "
-                f"You have access to the web_search tool — use it aggressively to verify company names, "
+                f"Use your advanced reasoning capabilities to verify company names, "
                 f"product specs, statistics, and URLs before forming any judgment. "
-                f"Only flag an item as an error after attempting a web search and finding a clear contradiction. "
                 f"Respond in Korean."
             )
             p2_user_prompt = (
                 f"다음 AI 뉴스 초안의 사실 관계와 KST 기준 시간 윈도우를 검증하십시오.\n\n"
                 f"[검증 지침]\n"
-                f"- web_search 툴을 적극 사용하여 각 항목의 기업명, 제품명, 통계 수치, URL을 검색 후 판단하십시오.\n"
-                f"- 검색 결과가 없다는 이유만으로 '환각(Hallucination)'이라고 단정하지 마십시오. 검색으로 명확한 반증을 찾았을 때만 오류로 지적하십시오.\n"
+                f"- 각 항목의 기업명, 제품명, 통계 수치, URL을 엄격하게 교차 검증하십시오.\n"
+                f"- 명확한 논리적 모순이나 반증을 찾았을 때만 오류로 지적하십시오.\n"
                 f"- 오류가 없는 항목은 논리의 비약, 전략적 분석의 깊이 부족, 아키텍처 설명의 모호함, 양식 누락 등 품질 관점에서 건설적인 보완을 제안하십시오.\n\n"
                 f"[초안]\n{initial_result}"
             )
-            claude_messages = [{"role": "user", "content": p2_user_prompt}]
+            gpt_messages = [{"role": "user", "content": p2_user_prompt}]
             
-            # 교차 검증의 정교함을 극대화하기 위해 동적 바인딩된 최신 Opus 모델 투입
-            feedback = run_claude_chat(c_client, c_opus_model, claude_messages, system=p2_system, use_web_search=True)
+            feedback = run_gpt_chat(o_client, "gpt-5.6-sol", gpt_messages, system=p2_system)
             if not feedback:
-                print("❌ Phase 2 failed after 5 attempts. Exiting.")
+                print("❌ Phase 2 failed. Exiting.")
                 sys.exit(1)
                 
             with open(p2_cache_file, "w", encoding="utf-8") as f: f.write(feedback)
@@ -386,21 +357,19 @@ def main():
                         sys.exit(1)
 
     # ---------------------------------------------------------
-    # Phase 4: Claude Translation (Sonnet Tier 및 불필요한 고정 대기 제거)
+    # Phase 4: GPT-5.6 Terra Translation (번역)
     # ---------------------------------------------------------
     p4_cache_file = "trial/translated.txt"
     final_content = refined_result
 
-    if c_client and feedback:
-        print("\n--- Phase 4: Claude Translation ---")
+    if o_client and feedback:
+        print("\n--- Phase 4: GPT-5.6 Translation ---")
         if os.path.exists(p4_cache_file):
             print("✅ Phase 4: 오늘 이미 생성된 로컬 캐시(translated.txt)에서 번역본을 불러옵니다.")
             with open(p4_cache_file, "r", encoding="utf-8") as f:
                 final_content = f.read()
         else:
-            print(f"Starting Claude action (Model: {c_sonnet_model})...")
-            # 🧹 [Surgical Change] 일일 배치 작동 환경 및 예외처리 구조(@retry)를 고려하여 불필요한 고정 60초 대기(time.sleep) 제거
-            
+            print("Starting GPT-5.6 action (Model: gpt-5.6-terra)...")
             p4_start = time.time()
             current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
             p4_system = (
@@ -420,10 +389,9 @@ def main():
                 )
             }]
 
-            # 번역 작업에 최적화된 동적 바인딩 최신 Sonnet 모델 투입
-            translated = run_claude_chat(c_client, c_sonnet_model, translate_messages, system=p4_system)
+            translated = run_gpt_chat(o_client, "gpt-5.6-terra", translate_messages, system=p4_system)
             if not translated:
-                print("❌ Phase 4 failed after 5 attempts. Exiting.")
+                print("❌ Phase 4 failed. Exiting.")
                 sys.exit(1)
                 
             final_content = translated
