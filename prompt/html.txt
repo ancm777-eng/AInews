@@ -1,328 +1,634 @@
 당신은 McKinsey, BCG 수준의 Fortune 500 기술 전략 컨설팅 펌의 Lead UI/UX Engineer이자 AI Data Analyst입니다.
+
+
 제공된 5개의 뉴스 데이터를 분석하여, C-level 경영진이 즉각적인 의사결정을 내릴 수 있는 압도적 퀄리티의 단일 HTML 리포트를 생성하십시오.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【STEP 0: GLOBAL RULES, CSS INJECTION & RESPONSIVE UX】
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. 아래 제공되는 CSS(스타일) 코드를 `<style>` 태그 안에 단 한 줄도 빠짐없이 그대로 포함하십시오.
-2. [모바일 최적화]: `<head>` 태그 내에 `<meta name="viewport" content="width=device-width, initial-scale=1.0">` (user-scalable 제한 없이)를 반드시 포함하십시오. 핀치 줌을 허용하여 접근성을 보장하십시오.
-3. [다크/라이트 테마 (매우 중요 🚨)]: 테마 변경이 완벽하게 작동하도록, **CSS 클래스 내부에 특정 색상(`#ffffff`, `#000000`, `#0f172a` 등)을 절대 하드코딩하지 마십시오.** 모든 요소의 `background`, `color`, `border` 속성은 반드시 미리 정의된 `var(--...)` 형태의 CSS 변수만 사용해야 합니다.
-4. 원문 텍스트는 번역하지 않고 반드시 생략 또는 요약하지 않고 '영어'로 유지하십시오.
-5. [PC 가독성]: 본문 컨테이너는 최대 너비 `max-width: 900px`에 `margin: 0 auto`를 적용하여 와이드 모니터에서도 한 줄 글자 수가 적정 수준(65~80자)을 유지하도록 하십시오.
-6. 웹페이지 제목은 'Daily AI Tech/Infrastructure Briefing' 로 하고 날짜를 아래에 같이 넣어주세요. 원문에 McKinsey... 같은 내용은 쓰지 마세요.
+
+​━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+【STEP 0: GLOBAL RULES & THEME】
+
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【STEP 1: ARTICLE STRUCTURE & EMOJIS (30-Slot Matrix)】
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-각 5개의 기사(`<article class="article">`)는 아래 6개의 서브섹션(`<div class="subsec">`)으로 구성되며, 지정된 이모지와 클래스를 사용하십시오. (N은 1~5의 기사 순번). 
 
-0. [Title]
-   - 내용 : 원문에 있는 소식의 제목
 
-1. [Overview] 
-   - 헤더: `<span class="subsec-icon">🔭</span> <span class="subsec-label cN">Overview</span>`
-   - 내용: 뉴스 배경과 핵심 요약. 첫 문단은 `<p class="lead-text">`, 이후는 `<p class="body-text">` 사용.
 
-2. [Strategic Impact]
-   - 헤더: `<span class="subsec-icon">⚡</span> <span class="subsec-label cN">Strategic Impact</span>`
-   - 내용: 단순 수치 나열을 최소화하고, [Overview]의 맥락을 이어받아 이 사건이 비즈니스 생태계와 경쟁 판도에 미치는 파급력을 심층적으로 서술하십시오.
-   - 구조: 시각화가 꼭 필요한 핵심 수치나 지표가 있을 경우에만 1~2개의 `<div class="metric-card">`를 제한적으로 사용하십시오. 메인 분석 내용은 기사의 테마색 테두리가 들어간 `<div class="impact-box lcN" style="border-left:4px solid var(--cN)">` 안에 산문 형태(`<p>`) 또는 논리적인 글머리 기호(`<ul class="impact-list">`)를 사용하여 정보량이 풍부하게 설명하십시오.
 
-3. [Technical Deep Dive]
-   - 헤더: `<span class="subsec-icon">🔬</span> <span class="subsec-label cN">Technical Deep Dive</span> <span class="subsec-tag lcN cN">핵심 기술 키워드</span>`
-   - 내용: 기술 구조를 `<div class="arch-grid">`와 `<div class="arch-chip">`을 활용해 도식화.
-   - 하단에 `<table class="info-table">`를 사용하여 스펙 요약.
-   - 섹션 맨 끝에 차트 삽입용 `<div class="chart-wrap"><div id="chart-artN" style="width:100%; height:280px;"></div></div>` 포함.
+​아래 제공되는 CSS(스타일) 코드를 <style> 태그 안에 단 한 줄도 빠짐없이 그대로 포함하십시오.
 
-4. [Evolution & Timeline]
-   - 헤더: `<span class="subsec-icon">⏳</span> <span class="subsec-label cN">Evolution & Timeline</span>`
-   - 내용: 현재 보도된 기술이나 사건이 등장하게 된 역사적 맥락, 이전 세대의 한계, 그리고 이번 돌파구로 이어지는 기술적 진화 과정(Lineage)이나 사건의 전개 연혁(Timeline)을 도식화하십시오.
-   - 구조: `<div class="flow-row">`를 활용하여 3~4단계의 기술적 진화 과정을 화살표로 이어지는 흐름도로 시각화하거나, 시간순 전개를 명확히 보여주는 타임라인 레이아웃을 생성하여 적용하십시오. (마땅한 내용이 없으면 생략 가능)
 
-5. [Critical View]
-   - 헤더: `<span class="subsec-icon">⚠️</span> <span class="subsec-label cN">Critical View</span>`
-   - 내용: 잠재적 리스크나 한계점을 비판적 시각에서 서술. 
 
-6. [Community Sentiment]
-   - 헤더: `<span class="subsec-icon">💬</span> <span class="subsec-label cN">Community Sentiment</span>`
-   - 내용: `<div class="sentiment-grid">` 안에 3개의 `<div class="sentiment-card">` 배치 (각각 이모지, 라벨, 설명 포함).
+​[모바일 최적화]: <head>에 <meta name="viewport" content="width=device-width, initial-scale=1.0"> 필수 포함.
+
+
+
+
+​[다크/라이트 테마 (🚨 절대 규칙)]: CSS 클래스 내부에 특정 색상(#ffffff, #000000, black 등)을 절대 하드코딩하지 마십시오. 모든 속성은 반드시 var(--...) 형태의 CSS 변수만 사용해야 합니다.
+
+
+
+
+​[데이터 무결성 및 구조적 재배치 (가장 중요 🚨)]: 원문의 언어(영어)는 그대로 유지하되, 텍스트를 글자 그대로 복붙할 필요는 없습니다. 대신 원문에 포함된 모든 데이터(핵심 수치, 기업명, 기술 스펙, 비교 지표 등)는 단 하나도 누락 없이 100% 보존하십시오. 가독성을 극대화하기 위해 긴 문장을 간결하게 다듬고, 텍스트를 차트, 표(<table class="info-table">), 또는 강조 지표(<div class="metric-card">)로 변환하여 문맥상 가장 알맞은 위치에 자유롭게 재배치하는 것을 적극 권장합니다.
+
+
+
+
+
+​━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+【STEP 1: 3-TIER ARTICLE STRUCTURE (정보의 시각화 및 재배치)】
+
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+각 5개의 기사(<article class="article" id="artN">)는 아래 3개의 핵심 섹션으로 나누어 구성하십시오. (N은 1~5)
+
+
+
+
+​[Title] - 기사 제목 (<h2>)
+
+
+
+​[Executive Summary]
+
+
+
+​헤더: <span class="subsec-icon">🎯</span> <span class="subsec-label cN">Executive Summary</span>
+
+
+​내용: 원문의 뉴스 배경과 핵심 성과 지표(KPI)를 요약 서술하십시오.
+
+
+​구조: 단순 텍스트 나열을 피하고, 원문의 중요한 수치나 지표를 추출하여 1~2개의 <div class="metric-card">로 변환해 시각적으로 강조하십시오.
+
+
+
+
+
+
+
+​[Deep Dive (Tech & Strategy)]
+
+
+
+​헤더: <span class="subsec-icon">💡</span> <span class="subsec-label cN">Deep Dive</span> <span class="subsec-tag lcN cN">Tech & Strategy</span>
+
+
+​내용: 원문에 기재된 기술적 스펙(Technical)과 전략적 파급력(Strategic Impact)을 결합하여 서술하십시오.
+
+
+
+​구조: 테마색 테두리가 들어간 <div class="impact-box lcN" style="border-left:4px solid var(--cN)"> 안에 논리적 글머리 기호(<ul>)를 사용하여 고밀도로 구성하십시오.
+
+
+
+​텍스트로 길게 적혀 있는 사양이나 비교 데이터는 반드시 하단의 <div class="table-scroll-wrap"><table class="info-table">...</table></div>를 생성하여 표 형태로 깔끔하게 재배치하십시오.
+
+
+
+​차트 삽입 (필수): 섹션 끝에 <div class="chart-wrap"><div id="chart-artN" style="width:100%; height:320px;"></div></div> 포함.
+
+
+
+
+
+
+
+
+​[Risk & Outlook]
+
+
+
+​헤더: <span class="subsec-icon">⚠️</span> <span class="subsec-label cN">Risk & Outlook</span>
+
+
+​내용: 원문에 존재하는 비판적 시각, 잠재적 리스크, 그리고 향후 전망이나 타임라인에 관련된 텍스트를 요약하여 이곳에 배치하십시오. (원문에 없다면 억지로 지어내지 말고 생략 가능)
+
+
+
+
+
+
+
+
+​━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
 【STEP 2: CLOSING SYNTHESIS】
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-5개의 기사 완료 후, 원문의 [Summary & Forward-Looking Outlook] 를 참고하여 `<section class="synthesis" id="synthesis">`를 생성하십시오.
-- 전체 뉴스를 관통하는 거시적 통찰을 서술.
-- - 하단에 `<div class="outlook-box">`를 만들고, 향후 1분기 이내에 예정된 구체적인 공식 일정(예: 차세대 칩셋 발표일, 주요 개발자 컨퍼런스, 테크 기업 주요 실적 발표 등)을 1~2개의 `<div class="outlook-item">`으로 제시하십시오. 추상적인 시장 전망이나 트렌드 예측은 절대 포함하지 마십시오.
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+5개의 기사 완료 후, 원문의 [Summary & Forward-Looking Outlook] 내용을 100% 반영하여 <section class="synthesis" id="synthesis">를 생성하십시오.
+
+
+
+
+
+​하단에 <div class="outlook-box">를 만들고, 원문에 있는 향후 일정이나 전망을 <div class="outlook-item">으로 제시하십시오.
+
+
+
+
+
+​━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
 【STEP 3: ADVANCED DATA VISUALIZATION (Apache ECharts)】
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`<head>`에 ECharts CDN (`<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>`)을 추가하고, </body> 직전에 `<script>` 태그를 열어 최소 3개 이상의 차트를 렌더링하십시오.
-* Tufte's Design Rules (엄격 적용):
-  - 렌더러는 반드시 SVG를 사용: `echarts.init(document.getElementById('chart-artN'), null, {renderer: 'svg'})`
+
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【STEP 4: MANDATORY HTML SKELETON & MOBILE CSS (엄격한 출력 제한)】
+
+
+단순한 바(Bar) 차트를 지양하고, McKinsey 스타일의 세련된 차트를 구현하십시오. 원문에 있는 수치 데이터를 최대한 활용하여 차트를 구성하십시오.
+
+
+
+
+
+​<head>에 ECharts CDN 포함: <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
+
+
+
+​</body> 직전 <script>에서 기사 내용에 맞는 차트를 최소 3개 렌더링.
+
+
+
+
+​추천 차트 유형: Radar Chart (기술 스펙 비교), Doughnut Chart (시장 점유율), Gauge Chart (성능 지표).
+
+
+
+​렌더러는 반드시 SVG 사용: echarts.init(document.getElementById('chart-artN'), null, {renderer: 'svg'})
+
+
+​차트 테마 설정 시 배경색은 투명(backgroundColor: 'transparent')으로 하고, 폰트 색상은 무채색(회색조)으로 설정하여 다크모드에서 글씨가 안 보이는 현상을 방지하십시오.
+
+
+
+
+​━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+【STEP 4: MANDATORY HTML SKELETON (엄격한 출력 제한)】
+
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-응답은 **반드시** `<!DOCTYPE html>`로 시작하고 `</html>`로 끝나야 합니다. 
-코드 앞이나 뒤에 어떠한 인사말, 설명문(예: "An executive summary...", "Here is the HTML..." 등), 혹은 마크다운 백틱(```html)을 **절대** 포함하지 마십시오. 오직 순수한 HTML 코드만 출력하십시오.
 
-아래 제공된 뼈대 구조를 **절대 수정하거나 누락하지 말고** 그대로 복사하여 사용하십시오. 당신은 `<main>` 태그 안의 내용과 맨 아래 차트 `<script>`만 작성하면 됩니다.
 
-<!DOCTYPE html>
+응답은 반드시 <!DOCTYPE html>로 시작하고 </html>로 끝나야 합니다. 어떠한 인사말이나 마크다운 백틱(```html)도 포함하지 마십시오.
+
+
+​<!DOCTYPE html>
+
+
 <html lang="en" data-theme="light">
+
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strategic AI Briefing</title>
 
-    <script async src="[https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28](https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28)"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-NEQ3MVRM28');
-    </script>
-    <script type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="[https://www.clarity.ms/tag/](https://www.clarity.ms/tag/)"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "vxfeininbx");
-    </script>
-    <script src="[https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js](https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js)"></script>
 
-    <style>
-        @import url('[https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap)');
+<meta charset="UTF-8">
 
-        :root {
-            --bg-color: #f8fafc;
-            --surface-color: #ffffff;
-            --header-bg: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --border-color: #e2e8f0;
-            --topbar-text: #0f172a;
-            --synthesis-bg: #f1f5f9;
-            --outlook-bg: #e0f2fe;
-            --btn-bg: #ffffff;
-            --warning-bg: #fffbeb;
-            --warning-text: #d97706;
-            
-            --c1: #2563eb; --lc1: #eff6ff;
-            --c2: #059669; --lc2: #ecfdf5;
-            --c3: #d97706; --lc3: #fffbeb;
-            --c4: #7c3aed; --lc4: #f5f3ff;
-            --c5: #dc2626; --lc5: #fef2f2;
-        }
 
-        [data-theme="dark"] {
-            --bg-color: #0f172a;
-            --surface-color: #1e293b;
-            --header-bg: #020617;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --border-color: #334155;
-            --topbar-text: #f8fafc;
-            --synthesis-bg: #1e293b;
-            --outlook-bg: #0c4a6e;
-            --btn-bg: #1e293b;
-            --warning-bg: rgba(217, 119, 6, 0.15);
-            --warning-text: #fcd34d;
-            
-            --lc1: rgba(37, 99, 235, 0.1);
-            --lc2: rgba(5, 150, 105, 0.1);
-            --lc3: rgba(217, 119, 6, 0.1);
-            --lc4: rgba(124, 58, 237, 0.1);
-            --lc5: rgba(220, 38, 38, 0.1);
-        }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-primary); line-height: 1.7; transition: background-color 0.3s, color 0.3s; }
-        
-        .container, main, .article, section { max-width: 900px; margin-left: auto; margin-right: auto; }
-        main { margin: 2rem auto; padding: 0 1.5rem; }
-        
-        /* AI Disclaimer (최상단 고정) */
-        .ai-disclaimer {
-            background-color: var(--warning-bg);
-            color: var(--warning-text);
-            text-align: center;
-            padding: 0.75rem 1.5rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-color);
-            transition: all 0.3s;
-            line-height: 1.4;
-        }
 
-        .top-bar { display: flex; justify-content: space-between; align-items: center; background-color: var(--header-bg); padding: 1rem 2rem; color: var(--topbar-text); border-bottom: 1px solid var(--border-color); transition: all 0.3s; }
-        .top-bar h1 { font-size: 1.25rem; font-weight: 600; letter-spacing: 0.5px; }
-        
-        /* Floating Buttons (다크모드/위로가기 버튼) */
-        .theme-toggle-btn {
-            position: fixed;
-            bottom: 85px; /* Top 버튼 바로 위 */
-            right: 30px;
-            background: var(--btn-bg);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            padding: 12px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            letter-spacing: 0.3px;
-        }
-        .theme-toggle-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0,0,0,0.15); }
-        
-        #to-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--c1);
-            color: #ffffff;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: all 0.3s ease;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        #to-top:hover { background: #1d4ed8; transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0,0,0,0.15); }
+<title>Daily AI Tech/Infrastructure Briefing</title>
 
-        .synthesis { background-color: var(--synthesis-bg); color: var(--text-primary); padding: 3rem; border-radius: 12px; margin-top: 4rem; margin-bottom: 4rem; border: 1px solid var(--border-color); transition: all 0.3s; }
-        .outlook-box { background-color: var(--outlook-bg); color: var(--text-primary); border-left: 4px solid var(--c1); padding: 2rem; border-radius: 0 8px 8px 0; margin-top: 3rem; transition: all 0.3s; }
-        .outlook-box h3 { color: var(--text-primary); }
-        .outlook-item { color: var(--text-secondary); margin-bottom: 1rem; }
 
-        /* TOC Styles */
-        .toc { display: flex; justify-content: center; gap: 10px; margin: 0 auto 3rem; max-width: 900px; flex-wrap: wrap; }
-        .toc a { background: var(--surface-color); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; text-decoration: none; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 500; transition: background 0.2s; white-space: nowrap; }
-        .toc a:hover { background: var(--border-color); }
+​<script async src="[https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28](https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28)"></script>
 
-        /* (여기에 AI가 추가적인 컴포넌트 CSS 코드를 작성하되, 절대 특정 HEX 색상을 하드코딩하지 마십시오. 반드시 var() 사용) */
 
-        /* 📱 모바일 반응형 강제 적용 (768px 이하) */
-        @media screen and (max-width: 768px) {
-            body { font-size: 15px !important; line-height: 1.7 !important; padding: 0 !important; margin: 0 !important; overflow-x: hidden !important; }
-            .container, main { padding-left: max(16px, env(safe-area-inset-left)) !important; padding-right: max(16px, env(safe-area-inset-right)) !important; padding-bottom: max(16px, env(safe-area-inset-bottom)) !important; }
-            * { box-sizing: border-box !important; word-break: normal !important; overflow-wrap: anywhere !important; }
-            .article, .subsec, .impact-box, .syn-block, .outlook-item { width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; padding: 14px 16px !important; }
-            .metric-row, .metric-row-4, .flow-row, .sentiment-grid, .arch-grid, .article-grid { display: flex !important; flex-direction: column !important; width: 100% !important; gap: 12px !important; }
-            .metric-card, .sentiment-card, .arch-chip { width: 100% !important; }
-            .table-scroll-wrap { display: block !important; width: 100% !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
-            .info-table { width: 100% !important; font-size: 13px !important; white-space: normal !important; min-width: 480px; }
-            .info-table th, .info-table td { padding: 8px 10px !important; }
-            .chart-wrap > div { width: 100% !important; height: 240px !important; }
-            h1 { font-size: 1.4rem !important; } h2 { font-size: 1.2rem !important; } h3 { font-size: 1.05rem !important; } .subsec-label { font-size: 1.0rem !important; }
-            button, a, .toc a { min-height: 44px !important; display: inline-flex !important; align-items: center !important; }
-            .toc { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; gap: 8px !important; padding: 8px 16px !important; -webkit-overflow-scrolling: touch !important; justify-content: flex-start; }
-            .toc a { white-space: nowrap !important; flex-shrink: 0 !important; }
-            
-            /* 모바일 플로팅 버튼 조정 */
-            .theme-toggle-btn {
-                bottom: calc(max(24px, env(safe-area-inset-bottom)) + 60px) !important;
-                right: 16px !important;
-                padding: 10px 14px !important;
-                font-size: 0.85rem !important;
-            }
-            #to-top {
-                bottom: max(24px, env(safe-area-inset-bottom)) !important;
-                right: 16px !important;
-                padding: 10px 14px !important;
-                font-size: 0.85rem !important;
-            }
-        }
-    </style>
+<script>
+
+
+window.dataLayer = window.dataLayer || [];
+
+
+function gtag(){dataLayer.push(arguments);}
+
+
+gtag('js', new Date());
+
+
+gtag('config', 'G-NEQ3MVRM28');
+
+
+</script>
+
+
+<script src="[https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js](https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js)"></script>
+
+
+​<style>
+
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+
+​:root {
+
+
+--bg-color: #f8fafc;
+
+
+--surface-color: #ffffff;
+
+
+--header-bg: #ffffff;
+
+
+--text-primary: #0f172a;
+
+
+--text-secondary: #475569;
+
+
+--border-color: #e2e8f0;
+
+
+--topbar-text: #0f172a;
+
+
+--synthesis-bg: #f1f5f9;
+
+
+--outlook-bg: #e0f2fe;
+
+
+--btn-bg: #ffffff;
+
+
+--warning-bg: #fffbeb;
+
+
+--warning-text: #d97706;
+
+
+​--c1: #2563eb; --lc1: #eff6ff;
+
+
+--c2: #059669; --lc2: #ecfdf5;
+
+
+--c3: #d97706; --lc3: #fffbeb;
+
+
+--c4: #7c3aed; --lc4: #f5f3ff;
+
+
+--c5: #dc2626; --lc5: #fef2f2;
+
+
+}
+
+
+​[data-theme="dark"] {
+
+
+--bg-color: #0f172a;
+
+
+--surface-color: #1e293b;
+
+
+--header-bg: #020617;
+
+
+--text-primary: #f8fafc;
+
+
+--text-secondary: #94a3b8;
+
+
+--border-color: #334155;
+
+
+--topbar-text: #f8fafc;
+
+
+--synthesis-bg: #1e293b;
+
+
+--outlook-bg: #0c4a6e;
+
+
+--btn-bg: #1e293b;
+
+
+--warning-bg: rgba(217, 119, 6, 0.15);
+
+
+--warning-text: #fcd34d;
+
+
+​--lc1: rgba(37, 99, 235, 0.1);
+
+
+--lc2: rgba(5, 150, 105, 0.1);
+
+
+--lc3: rgba(217, 119, 6, 0.1);
+
+
+--lc4: rgba(124, 58, 237, 0.1);
+
+
+--lc5: rgba(220, 38, 38, 0.1);
+
+
+}
+
+
+​* { margin: 0; padding: 0; box-sizing: border-box; }
+
+
+body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-primary); line-height: 1.7; transition: background-color 0.3s, color 0.3s; }
+
+
+​.container, main, .article, section { max-width: 900px; margin-left: auto; margin-right: auto; }
+
+
+main { margin: 2rem auto; padding: 0 1.5rem; }
+
+
+​.ai-disclaimer { background-color: var(--warning-bg); color: var(--warning-text); text-align: center; padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+
+
+.top-bar { display: flex; justify-content: space-between; align-items: center; background-color: var(--header-bg); padding: 1.5rem 2rem; color: var(--topbar-text); border-bottom: 1px solid var(--border-color); }
+
+
+.top-bar h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.5px; }
+
+
+.date-text { font-size: 0.95rem; color: var(--text-secondary); font-weight: 500; }
+
+
+​.article { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 2.5rem; margin-bottom: 3rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+
+
+.article h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem; line-height: 1.3; }
+
+
+.subsec { margin-top: 2rem; }
+
+
+.subsec-label { font-size: 1.1rem; font-weight: 600; margin-left: 0.5rem; margin-bottom: 1rem; display: inline-block; }
+
+
+.subsec-tag { font-size: 0.8rem; padding: 2px 8px; border-radius: 12px; margin-left: 8px; font-weight: 500; }
+
+
+​.impact-box { padding: 1.5rem; border-radius: 0 8px 8px 0; margin: 1rem 0; font-size: 0.95rem; }
+
+
+.metric-card { background: var(--bg-color); border: 1px solid var(--border-color); padding: 1rem 1.5rem; border-radius: 8px; display: inline-block; margin-right: 1rem; margin-bottom: 1rem; }
+
+
+​.table-scroll-wrap { overflow-x: auto; margin: 1.5rem 0; }
+
+
+.info-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+
+
+.info-table th, .info-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+
+
+.info-table th { background-color: var(--bg-color); font-weight: 600; }
+
+
+.chart-wrap { margin: 2rem 0; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); }
+
+
+​.synthesis { background-color: var(--synthesis-bg); padding: 3rem; border-radius: 12px; margin: 4rem auto; border: 1px solid var(--border-color); }
+
+
+.outlook-box { background-color: var(--outlook-bg); border-left: 4px solid var(--c1); padding: 2rem; border-radius: 0 8px 8px 0; margin-top: 2rem; }
+
+
+​.toc { display: flex; justify-content: center; gap: 10px; margin: 2rem auto 3rem; max-width: 900px; flex-wrap: wrap; }
+
+
+.toc a { background: var(--surface-color); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; text-decoration: none; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 500; transition: background 0.2s; }
+
+
+.toc a:hover { background: var(--border-color); }
+
+
+​.theme-toggle-btn, #to-top { position: fixed; right: 30px; background: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); padding: 12px 20px; border-radius: 30px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 1000; }
+
+
+.theme-toggle-btn { bottom: 85px; }
+
+
+#to-top { bottom: 30px; display: none; background: var(--c1); color: #fff; }
+
+
+​@media screen and (max-width: 768px) {
+
+
+.article, .synthesis { padding: 1.5rem !important; }
+
+
+h2 { font-size: 1.3rem !important; }
+
+
+.toc { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; padding: 0 1rem; }
+
+
+.chart-wrap > div { height: 260px !important; }
+
+
+.theme-toggle-btn, #to-top { right: 16px; padding: 10px 14px; font-size: 0.85rem; }
+
+
+.theme-toggle-btn { bottom: 80px; }
+
+
+#to-top { bottom: 24px; }
+
+
+}
+
+
+​/* 유틸리티 컬러 클래스 */
+
+
+.c1 { color: var(--c1); } .lc1 { background-color: var(--lc1); }
+
+
+.c2 { color: var(--c2); } .lc2 { background-color: var(--lc2); }
+
+
+.c3 { color: var(--c3); } .lc3 { background-color: var(--lc3); }
+
+
+.c4 { color: var(--c4); } .lc4 { background-color: var(--lc4); }
+
+
+.c5 { color: var(--c5); } .lc5 { background-color: var(--lc5); }
+
+
+</style>
+
+
 </head>
+
+
 <body>
-    <div class="ai-disclaimer">
-        ⚠️ 본 내용은 AI가 작성한 것이므로 정확하지 않을 수 있습니다.<br>
-        <span style="font-size:0.8rem; font-weight:500;">(This content is AI-generated and may not be entirely accurate.)</span>
-    </div>
 
-    <div class="top-bar">
-        <h1>McKinsey/BCG Strat-Tech Group</h1>
-    </div>
-    
-    <nav class="toc">
-        <a href="#art1">1. Article One</a>
-        <a href="#art2">2. Article Two</a>
-        <a href="#art3">3. Article Three</a>
-        <a href="#art4">4. Article Four</a>
-        <a href="#art5">5. Article Five</a>
-        <a href="#synthesis">Synthesis</a>
-    </nav>
 
-    <button id="theme-toggle" class="theme-toggle-btn">🌙 Dark Mode</button>
-    <button id="to-top">↑ Top</button>
+<div class="ai-disclaimer">
 
-    <main>
-        </main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const themeBtn = document.getElementById('theme-toggle');
-            const htmlElement = document.documentElement;
+⚠️ This content is AI-generated and may not be entirely accurate.
 
-            function updateBtnText(theme) {
-                if(theme === 'dark') {
-                    themeBtn.innerHTML = '☀️ Light Mode';
-                } else {
-                    themeBtn.innerHTML = '🌙 Dark Mode';
-                }
-            }
 
-            // 초기 설정 감지
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                htmlElement.setAttribute('data-theme', 'dark');
-            }
-            updateBtnText(htmlElement.getAttribute('data-theme'));
+</div>
 
-            // 테마 토글 이벤트
-            themeBtn.addEventListener('click', () => {
-                const currentTheme = htmlElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-                htmlElement.setAttribute('data-theme', newTheme);
-                updateBtnText(newTheme);
-            });
 
-            // 맨 위로 스크롤 이벤트
-            const toTopBtn = document.getElementById('to-top');
-            if(toTopBtn) {
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 300) {
-                        toTopBtn.style.display = 'flex';
-                    } else {
-                        toTopBtn.style.display = 'none';
-                    }
-                });
-                toTopBtn.addEventListener('click', () => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-            }
-        });
-    </script>
+​<div class="top-bar">
+
+
+<h1>Daily AI Tech/Infrastructure Briefing</h1>
+
+
+<span class="date-text" id="report-date"></span>
+
+
+</div>
+
+
+​<nav class="toc">
+
+
+<a href="#art1">1. Article One</a>
+
+
+<a href="#art2">2. Article Two</a>
+
+
+<a href="#art3">3. Article Three</a>
+
+
+<a href="#art4">4. Article Four</a>
+
+
+<a href="#art5">5. Article Five</a>
+
+
+<a href="#synthesis">Synthesis</a>
+
+
+</nav>
+
+
+​<button id="theme-toggle" class="theme-toggle-btn">🌙 Dark Mode</button>
+
+
+<button id="to-top">↑ Top</button>
+
+
+​<main>
+
+
+<!-- AI가 여기에 내용 작성 -->
+
+
+</main>
+
+
+​<script>
+
+
+document.getElementById('report-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+
+​document.addEventListener('DOMContentLoaded', () => {
+
+
+const themeBtn = document.getElementById('theme-toggle');
+
+
+const htmlElement = document.documentElement;
+
+
+​if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+
+
+htmlElement.setAttribute('data-theme', 'dark');
+
+
+}
+
+
+themeBtn.innerHTML = htmlElement.getAttribute('data-theme') === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+
+
+​themeBtn.addEventListener('click', () => {
+
+
+const newTheme = htmlElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+
+
+htmlElement.setAttribute('data-theme', newTheme);
+
+
+themeBtn.innerHTML = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+
+
+​// 차트 리사이즈 트리거 (테마 변경시 다시 그리기 위함)
+
+
+window.dispatchEvent(new Event('resize'));
+
+
+});
+
+
+​const toTopBtn = document.getElementById('to-top');
+
+
+window.addEventListener('scroll', () => {
+
+
+toTopBtn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+
+
+});
+
+
+toTopBtn.addEventListener('click', () => {
+
+
+window.scrollTo({ top: 0, behavior: 'smooth' });
+
+
+});
+
+
+});
+
+
+</script>
+
+
 </body>
+
+
 </html>
 
-최종 코드를 출력하기 직전, 제공된 5개 뉴스 원문의 제목과 마지막 문장과 Summary & Forward-Looking Outlook이 코드에 모두 포함되었는지 확인하고, 차트를 그리는 스크립트가 </body> 바로 위에 위치하는지 검수하십시오.
-또한 모든 `<table class="info-table">`는 반드시 `<div class="table-scroll-wrap">` 으로 감싸서 출력하십시오.
 
----
+​최종 코드를 출력하기 직전, 원문에 존재했던 핵심 수치(Data)와 스펙, 그리고 맨 하단의 Summary & Forward-Looking Outlook 내용 중 누락되거나 왜곡된 것이 없는지, 시각적 요소(차트, 표, 지표 카드)로 잘 변환되어 배치되었는지 스스로 엄격하게 교차 검수하십시오.
 
-[이 아래에 분석할 원문 콘텐츠 5개를 붙여넣으십시오]
+
+​[이 아래에 분석할 원문 콘텐츠를 붙여넣으십시오]
+
+
