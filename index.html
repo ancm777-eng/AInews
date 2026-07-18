@@ -1,1190 +1,508 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily AI Tech/Infrastructure Briefing</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily AI Tech/Infrastructure Briefing</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-NEQ3MVRM28');
+</script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-NEQ3MVRM28');
-    </script>
-    <script type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "vxfeininbx");
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+:root {
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+--bg-color: #f8fafc;
 
-        :root {
-            --bg-color: #f8fafc;
-            --surface-color: #ffffff;
-            --header-bg: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --border-color: #e2e8f0;
-            --topbar-text: #0f172a;
-            --synthesis-bg: #f1f5f9;
-            --outlook-bg: #e0f2fe;
-            --btn-bg: #ffffff;
-            --warning-bg: #fffbeb;
-            --warning-text: #d97706;
-            
-            --c1: #2563eb; --lc1: #eff6ff;
-            --c2: #059669; --lc2: #ecfdf5;
-            --c3: #d97706; --lc3: #fffbeb;
-            --c4: #7c3aed; --lc4: #f5f3ff;
-            --c5: #dc2626; --lc5: #fef2f2;
-        }
+--surface-color: #ffffff;
 
-        [data-theme="dark"] {
-            --bg-color: #0f172a;
-            --surface-color: #1e293b;
-            --header-bg: #020617;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --border-color: #334155;
-            --topbar-text: #f8fafc;
-            --synthesis-bg: #1e293b;
-            --outlook-bg: #0c4a6e;
-            --btn-bg: #1e293b;
-            --warning-bg: rgba(217, 119, 6, 0.15);
-            --warning-text: #fcd34d;
-            
-            --lc1: rgba(37, 99, 235, 0.15);
-            --lc2: rgba(5, 150, 105, 0.15);
-            --lc3: rgba(217, 119, 6, 0.15);
-            --lc4: rgba(124, 58, 237, 0.15);
-            --lc5: rgba(220, 38, 38, 0.15);
-        }
+--header-bg: #ffffff;
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-primary); line-height: 1.7; transition: background-color 0.3s, color 0.3s; }
-        
-        .container, main, .article, section { max-width: 900px; margin-left: auto; margin-right: auto; }
-        main { margin: 2rem auto; padding: 0 1.5rem; }
-        
-        /* AI Disclaimer (최상단 고정) */
-        .ai-disclaimer {
-            background-color: var(--warning-bg);
-            color: var(--warning-text);
-            text-align: center;
-            padding: 0.75rem 1.5rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-color);
-            transition: all 0.3s;
-            line-height: 1.4;
-        }
+--text-primary: #0f172a;
 
-        .top-bar { display: flex; justify-content: space-between; align-items: center; background-color: var(--header-bg); padding: 1.5rem 2rem; color: var(--topbar-text); border-bottom: 1px solid var(--border-color); transition: all 0.3s; }
-        .top-bar h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
-        .top-bar .date-badge { font-size: 0.875rem; background: var(--synthesis-bg); padding: 4px 12px; border-radius: 12px; font-weight: 500; color: var(--text-secondary); }
-        
-        /* Floating Buttons (다크모드/위로가기 버튼) */
-        .theme-toggle-btn {
-            position: fixed;
-            bottom: 85px; /* Top 버튼 바로 위 */
-            right: 30px;
-            background: var(--btn-bg);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            padding: 12px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            letter-spacing: 0.3px;
-        }
-        .theme-toggle-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0,0,0,0.15); }
-        
-        #to-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--c1);
-            color: #ffffff;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: all 0.3s ease;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        #to-top:hover { background: #1d4ed8; transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0,0,0,0.15); }
+--text-secondary: #475569;
 
-        /* Article Card Styling */
-        .article { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 2.5rem; margin-bottom: 3rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: all 0.3s; }
-        .article-header { margin-bottom: 2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 1.5rem; }
-        .article-meta { display: flex; gap: 12px; margin-bottom: 0.75rem; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .meta-tag { padding: 2px 8px; border-radius: 4px; }
-        .article-title { font-size: 1.75rem; font-weight: 700; line-height: 1.3; color: var(--text-primary); }
-        
-        /* Subsections */
-        .subsec { margin-bottom: 2.5rem; }
-        .subsec:last-child { margin-bottom: 0; }
-        .subsec-header { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
-        .subsec-icon { font-size: 1.25rem; }
-        .subsec-label { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .subsec-tag { font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; font-weight: 600; margin-left: auto; }
-        
-        /* Typography */
-        .lead-text { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; line-height: 1.6; }
-        .body-text { font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem; }
-        
-        /* Strategic Impact Box */
-        .impact-box { padding: 1.5rem; border-radius: 8px; margin-top: 1rem; background: var(--surface-color); }
-        .impact-list { list-style-type: none; }
-        .impact-list li { position: relative; padding-left: 1.5rem; margin-bottom: 0.75rem; color: var(--text-secondary); font-size: 0.95rem; }
-        .impact-list li::before { content: "•"; position: absolute; left: 0; font-weight: bold; font-size: 1.2rem; }
-        
-        /* Metric Cards */
-        .metric-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-        .metric-card { background: var(--bg-color); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: 10px; text-align: center; }
-        .metric-value { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; }
-        .metric-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
+--border-color: #e2e8f0;
 
-        /* Technical Deep Dive Components */
-        .arch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
-        .arch-chip { background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.75rem; border-radius: 8px; text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
-        
-        /* Tables */
-        .table-scroll-wrap { width: 100%; overflow-x: auto; margin: 1.5rem 0; border: 1px solid var(--border-color); border-radius: 8px; }
-        .info-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; background: var(--surface-color); }
-        .info-table th { background: var(--bg-color); color: var(--text-primary); font-weight: 600; padding: 10px 16px; border-bottom: 1px solid var(--border-color); }
-        .info-table td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
-        .info-table tr:last-child td { border-bottom: none; }
+--topbar-text: #0f172a;
 
-        /* Charts */
-        .chart-wrap { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; }
+--synthesis-bg: #f1f5f9;
 
-        /* Evolution & Timeline */
-        .flow-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1.5rem 0; }
-        .flow-step { flex: 1; background: var(--bg-color); border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; text-align: center; position: relative; }
-        .flow-step h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--text-primary); }
-        .flow-step p { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; }
-        .flow-arrow { font-size: 1.5rem; color: var(--text-secondary); }
+--outlook-bg: #e0f2fe;
 
-        /* Sentiment Grid */
-        .sentiment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
-        .sentiment-card { background: var(--bg-color); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: 10px; text-align: center; }
-        .sentiment-emoji { font-size: 1.75rem; margin-bottom: 0.5rem; }
-        .sentiment-label { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem; }
-        .sentiment-desc { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; }
+--btn-bg: #ffffff;
 
-        /* Synthesis & Outlook */
-        .synthesis { background-color: var(--synthesis-bg); color: var(--text-primary); padding: 3rem; border-radius: 12px; margin-top: 4rem; margin-bottom: 4rem; border: 1px solid var(--border-color); transition: all 0.3s; }
-        .synthesis h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; }
-        .syn-block { margin-bottom: 1.5rem; }
-        .syn-block h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .syn-block p { font-size: 0.95rem; color: var(--text-secondary); }
-        .outlook-box { background-color: var(--outlook-bg); color: var(--text-primary); border-left: 4px solid var(--c1); padding: 2rem; border-radius: 0 8px 8px 0; margin-top: 3rem; transition: all 0.3s; }
-        .outlook-box h3 { color: var(--text-primary); font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; }
-        .outlook-item { color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem; }
-        .outlook-item strong { color: var(--text-primary); }
+--warning-bg: #fffbeb;
 
-        /* TOC Styles */
-        .toc { display: flex; justify-content: center; gap: 10px; margin: 0 auto 3rem; max-width: 900px; flex-wrap: wrap; }
-        .toc a { background: var(--surface-color); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; text-decoration: none; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 500; transition: background 0.2s; white-space: nowrap; }
-        .toc a:hover { background: var(--border-color); }
+--warning-text: #d97706;
 
-        /* Color Helpers */
-        .c1 { color: var(--c1); } .lc1 { background-color: var(--lc1); color: var(--c1); }
-        .c2 { color: var(--c2); } .lc2 { background-color: var(--lc2); color: var(--c2); }
-        .c3 { color: var(--c3); } .lc3 { background-color: var(--lc3); color: var(--c3); }
-        .c4 { color: var(--c4); } .lc4 { background-color: var(--lc4); color: var(--c4); }
-        .c5 { color: var(--c5); } .lc5 { background-color: var(--lc5); color: var(--c5); }
+--c1: #2563eb; --lc1: #eff6ff;
 
-        /* 📱 모바일 반응형 강제 적용 (768px 이하) */
-        @media screen and (max-width: 768px) {
-            body { font-size: 15px !important; line-height: 1.7 !important; padding: 0 !important; margin: 0 !important; overflow-x: hidden !important; }
-            .container, main { padding-left: max(16px, env(safe-area-inset-left)) !important; padding-right: max(16px, env(safe-area-inset-right)) !important; padding-bottom: max(16px, env(safe-area-inset-bottom)) !important; }
-            * { box-sizing: border-box !important; word-break: normal !important; overflow-wrap: anywhere !important; }
-            .article, .subsec, .impact-box, .syn-block, .outlook-item { width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; padding: 14px 16px !important; }
-            .metric-row, .metric-row-4, .flow-row, .sentiment-grid, .arch-grid, .article-grid { display: flex !important; flex-direction: column !important; width: 100% !important; gap: 12px !important; }
-            .metric-card, .sentiment-card, .arch-chip { width: 100% !important; }
-            .table-scroll-wrap { display: block !important; width: 100% !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
-            .info-table { width: 100% !important; font-size: 13px !important; white-space: normal !important; min-width: 480px; }
-            .info-table th, .info-table td { padding: 8px 10px !important; }
-            .chart-wrap > div { width: 100% !important; height: 240px !important; }
-            h1 { font-size: 1.4rem !important; } h2 { font-size: 1.2rem !important; } h3 { font-size: 1.05rem !important; } .subsec-label { font-size: 1.0rem !important; }
-            button, a, .toc a { min-height: 44px !important; display: inline-flex !important; align-items: center !important; }
-            .toc { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; gap: 8px !important; padding: 8px 16px !important; -webkit-overflow-scrolling: touch !important; justify-content: flex-start; }
-            .toc a { white-space: nowrap !important; flex-shrink: 0 !important; }
-            
-            /* 모바일 플로팅 버튼 조정 */
-            .theme-toggle-btn {
-                bottom: calc(max(24px, env(safe-area-inset-bottom)) + 60px) !important;
-                right: 16px !important;
-                padding: 10px 14px !important;
-                font-size: 0.85rem !important;
-            }
-            #to-top {
-                bottom: max(24px, env(safe-area-inset-bottom)) !important;
-                right: 16px !important;
-                padding: 10px 14px !important;
-                font-size: 0.85rem !important;
-            }
-        }
-    </style>
+--c2: #059669; --lc2: #ecfdf5;
+
+--c3: #d97706; --lc3: #fffbeb;
+
+--c4: #7c3aed; --lc4: #f5f3ff;
+
+--c5: #dc2626; --lc5: #fef2f2;
+
+}
+
+[data-theme="dark"] {
+
+--bg-color: #0f172a;
+
+--surface-color: #1e293b;
+
+--header-bg: #020617;
+
+--text-primary: #f8fafc;
+
+--text-secondary: #94a3b8;
+
+--border-color: #334155;
+
+--topbar-text: #f8fafc;
+
+--synthesis-bg: #1e293b;
+
+--outlook-bg: #0c4a6e;
+
+--btn-bg: #1e293b;
+
+--warning-bg: rgba(217, 119, 6, 0.15);
+
+--warning-text: #fcd34d;
+
+--lc1: rgba(37, 99, 235, 0.1);
+
+--lc2: rgba(5, 150, 105, 0.1);
+
+--lc3: rgba(217, 119, 6, 0.1);
+
+--lc4: rgba(124, 58, 237, 0.1);
+
+--lc5: rgba(220, 38, 38, 0.1);
+
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-primary); line-height: 1.7; transition: background-color 0.3s, color 0.3s; }
+
+.container, main, .article, section { max-width: 900px; margin-left: auto; margin-right: auto; }
+
+main { margin: 2rem auto; padding: 0 1.5rem; }
+
+.ai-disclaimer { background-color: var(--warning-bg); color: var(--warning-text); text-align: center; padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+
+.top-bar { display: flex; justify-content: space-between; align-items: center; background-color: var(--header-bg); padding: 1.5rem 2rem; color: var(--topbar-text); border-bottom: 1px solid var(--border-color); }
+
+.top-bar h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.5px; }
+
+.date-text { font-size: 0.95rem; color: var(--text-secondary); font-weight: 500; }
+
+.article { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 2.5rem; margin-bottom: 3rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+
+.article h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem; line-height: 1.3; }
+
+.subsec { margin-top: 2rem; }
+
+.subsec-label { font-size: 1.1rem; font-weight: 600; margin-left: 0.5rem; margin-bottom: 1rem; display: inline-block; }
+
+.subsec-tag { font-size: 0.8rem; padding: 2px 8px; border-radius: 12px; margin-left: 8px; font-weight: 500; }
+
+.impact-box { padding: 1.5rem; border-radius: 0 8px 8px 0; margin: 1rem 0; font-size: 0.95rem; }
+
+.metric-card { background: var(--bg-color); border: 1px solid var(--border-color); padding: 1rem 1.5rem; border-radius: 8px; display: inline-block; margin-right: 1rem; margin-bottom: 1rem; }
+
+.table-scroll-wrap { overflow-x: auto; margin: 1.5rem 0; }
+
+.info-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+
+.info-table th, .info-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+
+.info-table th { background-color: var(--bg-color); font-weight: 600; }
+
+.chart-wrap { margin: 2rem 0; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); }
+
+.synthesis { background-color: var(--synthesis-bg); padding: 3rem; border-radius: 12px; margin: 4rem auto; border: 1px solid var(--border-color); }
+
+.outlook-box { background-color: var(--outlook-bg); border-left: 4px solid var(--c1); padding: 2rem; border-radius: 0 8px 8px 0; margin-top: 2rem; }
+
+.toc { display: flex; justify-content: center; gap: 10px; margin: 2rem auto 3rem; max-width: 900px; flex-wrap: wrap; }
+
+.toc a { background: var(--surface-color); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; text-decoration: none; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 500; transition: background 0.2s; }
+
+.toc a:hover { background: var(--border-color); }
+
+.theme-toggle-btn, #to-top { position: fixed; right: 30px; background: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); padding: 12px 20px; border-radius: 30px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 1000; }
+
+.theme-toggle-btn { bottom: 85px; }
+
+#to-top { bottom: 30px; display: none; background: var(--c1); color: #fff; }
+
+@media screen and (max-width: 768px) {
+
+.article, .synthesis { padding: 1.5rem !important; }
+
+h2 { font-size: 1.3rem !important; }
+
+.toc { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; padding: 0 1rem; }
+
+.chart-wrap > div { height: 260px !important; }
+
+.theme-toggle-btn, #to-top { right: 16px; padding: 10px 14px; font-size: 0.85rem; }
+
+.theme-toggle-btn { bottom: 80px; }
+
+#to-top { bottom: 24px; }
+
+}
+
+/* 유틸리티 컬러 클래스 */
+
+.c1 { color: var(--c1); } .lc1 { background-color: var(--lc1); }
+
+.c2 { color: var(--c2); } .lc2 { background-color: var(--lc2); }
+
+.c3 { color: var(--c3); } .lc3 { background-color: var(--lc3); }
+
+.c4 { color: var(--c4); } .lc4 { background-color: var(--lc4); }
+
+.c5 { color: var(--c5); } .lc5 { background-color: var(--lc5); }
+</style>
 </head>
 <body>
-    <div class="ai-disclaimer">
-        ⚠️ 본 내용은 AI가 작성한 것이므로 정확하지 않을 수 있습니다.<br>
-        <span style="font-size:0.8rem; font-weight:500;">(This content is AI-generated and may not be entirely accurate.)</span>
-    </div>
+<div class="ai-disclaimer">⚠️ This content is AI-generated and may not be entirely accurate.</div>
+<div class="top-bar">
+<h1>Daily AI Tech/Infrastructure Briefing</h1>
+<span class="date-text" id="report-date"></span>
+</div>
+<nav class="toc">
+<a href="#art1">1. Kimi K3</a>
+<a href="#art2">2. Meta / Anthropic</a>
+<a href="#art3">3. Gemini Delay</a>
+<a href="#art4">4. SpaceX / Pentagon</a>
+<a href="#art5">5. Apple / Nvidia</a>
+<a href="#synthesis">Synthesis</a>
+</nav>
+<button id="theme-toggle" class="theme-toggle-btn">🌙 Dark Mode</button>
+<button id="to-top">↑ Top</button>
 
-    <div class="top-bar">
-        <h1>Daily AI Tech/Infrastructure Briefing</h1>
-        <div class="date-badge">July 16, 2026</div>
-    </div>
-    
-    <nav class="toc">
-        <a href="#art1">1. Inkling Open-Weights</a>
-        <a href="#art2">2. Apple Silicon Pivot</a>
-        <a href="#art3">3. Nokia AI-RAN</a>
-        <a href="#art4">4. NY Data Center Moratorium</a>
-        <a href="#art5">5. 3M & MSFT Optical Interconnect</a>
-        <a href="#synthesis">Synthesis</a>
-    </nav>
+<main>
+<article class="article" id="art1">
+<h2>Moonshot AI Launches Kimi K3, Surprising Silicon Valley and Fueling Open-Weight Debate</h2>
+<div class="subsec">
+<span class="subsec-icon">🎯</span><span class="subsec-label c1">Executive Summary</span>
+<p>Beijing-based Moonshot AI, led by Pittsburgh-educated entrepreneur Yang Zhilin, unveiled Kimi K3: a frontier-scale open-weight challenger to OpenAI’s GPT-5.6 Sol and Anthropic’s Claude Fable 5. The public release took first place on Arena’s front-end coding leaderboard and coincided with a broader semiconductor selloff as investors reassessed U.S. compute-and-CapEx moats under strict export controls.</p>
+<div class="metric-card"><strong class="c1">2.8 Trillion</strong><br>total parameters; weights released publicly</div>
+<div class="metric-card"><strong class="c1">#1 Arena Rank</strong><br>front-end coding capability</div>
+</div>
+<div class="subsec">
+<span class="subsec-icon">💡</span><span class="subsec-label c1">Deep Dive</span><span class="subsec-tag lc1 c1">Tech &amp; Strategy</span>
+<div class="impact-box lc1" style="border-left:4px solid var(--c1)">
+<ul>
+<li>Kimi K3 outperformed Claude Fable 5 and GPT-5.6 Sol on web-development tasks while demonstrating that an open-weight model can rival or exceed closed-source systems at a fraction of token cost.</li>
+<li>The result challenges the thesis that chip hoarding and raw capital alone determine frontier leadership; algorithmic efficiency may temper near-term urgency for exponential GPU scaling.</li>
+<li>Portfolio implication: underweight highly valued semiconductor momentum names; overweight platforms and middleware able to operationalize high-performance, low-cost open weights.</li>
+<li>Status: official announcement / model launch; live on the Arena evaluation platform. Focus: software and hardware. Paradigm shift category: Model.</li>
+</ul>
+</div>
+<div class="table-scroll-wrap"><table class="info-table">
+<thead><tr><th>Specification / Comparison</th><th>Reported Value</th></tr></thead>
+<tbody>
+<tr><td>Total parameters</td><td>2.8 Trillion</td></tr>
+<tr><td>Arena front-end coding rank</td><td>Number 1</td></tr>
+<tr><td>Task cost efficiency</td><td>$3.24 vs. $10+ for Claude Fable 5</td></tr>
+<tr><td>Deployment</td><td>Public weights; live Arena evaluation</td></tr>
+<tr><td>Source / timing</td><td>The Washington Post / AP / Arena.ai · Event &amp; publication: July 17, 2026 · EDT; published July 18 KST</td></tr>
+</tbody></table></div>
+<div class="chart-wrap"><div id="chart-art1" style="width:100%; height:320px;"></div></div>
+</div>
+<div class="subsec">
+<span class="subsec-icon">⚠️</span><span class="subsec-label c1">Risk &amp; Outlook</span>
+<p>Despite revolutionary coding and web-development benchmarks, broader reasoning and multi-step planning performance still slightly trails U.S. flagships. A public 2.8-trillion-parameter release also heightens national-security concerns around unmonitored cyber-weapons and vulnerability exploitation.</p>
+</div>
+</article>
 
-    <button id="theme-toggle" class="theme-toggle-btn">🌙 Dark Mode</button>
-    <button id="to-top">↑ Top</button>
+<article class="article" id="art2">
+<h2>Meta in Early-Stage Talks for $10 Billion Compute-Leasing Deal with Anthropic</h2>
+<div class="subsec">
+<span class="subsec-icon">🎯</span><span class="subsec-label c2">Executive Summary</span>
+<p>Meta Platforms is reportedly negotiating to lease up to $10 billion of AI data-center compute to Anthropic over two years. Initiated by Anthropic in June, the arrangement would use monthly payments and give both parties early-exit options—positioning Meta as a commercial cloud and “neocloud” provider while Anthropic seeks capacity to relieve Nvidia-chip shortages constraining Claude Fable 5.</p>
+<div class="metric-card"><strong class="c2">$10B / 2 Years</strong><br>proposed compute lease</div>
+<div class="metric-card"><strong class="c2">$125B–$145B</strong><br>Meta projected 2026 CapEx</div>
+</div>
+<div class="subsec">
+<span class="subsec-icon">💡</span><span class="subsec-label c2">Deep Dive</span><span class="subsec-tag lc2 c2">Tech &amp; Strategy</span>
+<div class="impact-box lc2" style="border-left:4px solid var(--c2)">
+<ul>
+<li>The transaction validates a neocloud model: a consumer hyperscaler monetizes excess infrastructure as managed hosting for a direct frontier-model rival.</li>
+<li>It diversifies Meta beyond advertising, places it against GPU-cloud specialists CoreWeave and Nebius, and provides a high-margin route to mitigate its 2026 CapEx burden.</li>
+<li>For Anthropic—reportedly preparing for an IPO—capacity would support scaling Claude Fable 5 amid strict usage limits caused by persistent Nvidia shortages.</li>
+<li>Status: press report / strategic negotiations; early-stage and terms remain fluid. Focus: hardware. Paradigm shift category: Infrastructure.</li>
+</ul>
+</div>
+<div class="table-scroll-wrap"><table class="info-table">
+<thead><tr><th>Commercial Infrastructure Metric</th><th>Reported Value</th></tr></thead>
+<tbody>
+<tr><td>Meta–Anthropic proposal</td><td>Up to $10 Billion; 2 years; monthly installments; mutual early-exit options</td></tr>
+<tr><td>Annualized proposed value</td><td>Approximately $5 Billion per year</td></tr>
+<tr><td>Anthropic–SpaceX agreement</td><td>$45 Billion over 3 years, signed May 2026; $15 Billion per year</td></tr>
+<tr><td>Meta 2026 CapEx</td><td>$125 Billion to $145 Billion</td></tr>
+<tr><td>Source / timing</td><td>The New York Times / Reuters / Barchart · Event &amp; publication: July 17, 2026 · EDT; published July 18 KST</td></tr>
+</tbody></table></div>
+<div class="chart-wrap"><div id="chart-art2" style="width:100%; height:320px;"></div></div>
+</div>
+<div class="subsec">
+<span class="subsec-icon">⚠️</span><span class="subsec-label c2">Risk &amp; Outlook</span>
+<p>Leasing to Anthropic could signal insufficient internal demand for Meta’s data-center footprint. The cloud-hosting move also introduces operational and security complexity for a business historically centered on consumer software.</p>
+</div>
+</article>
 
-    <main>
-        <!-- ARTICLE 1 -->
-        <article class="article" id="art1">
-            <div class="article-header">
-                <div class="article-meta">
-                    <span class="meta-tag lc1">Model Launch</span>
-                    <span>July 15, 2026</span>
-                </div>
-                <h2 class="article-title">Thinking Machines Launches "Inkling" Open-Weights Model to Challenge Closed-Source Monopolies</h2>
-            </div>
+<article class="article" id="art3">
+<h2>Google’s Gemini 3.5 Pro Faces Months-Long Delay Over Coding Stumbles and Internal Friction</h2>
+<div class="subsec">
+<span class="subsec-icon">🎯</span><span class="subsec-label c3">Executive Summary</span>
+<p>Alphabet’s flagship Gemini 3.5 Pro is months behind schedule as Google works to improve coding and recursive tool-calling capabilities. A late-June training-data update produced disappointing results, while requirements to work across Search, Maps, and YouTube have added deployment friction. Bloomberg’s July 17 report describes frustration among engineers, researchers, and managers as competitors extend their lead.</p>
+<div class="metric-card"><strong class="c3">Late July or August 2026</strong><br>revised target release window</div>
+<div class="metric-card"><strong class="c3">3 Integrated Products</strong><br>Search, Maps, and YouTube</div>
+</div>
+<div class="subsec">
+<span class="subsec-icon">💡</span><span class="subsec-label c3">Deep Dive</span><span class="subsec-tag lc3 c3">Tech &amp; Strategy</span>
+<div class="impact-box lc3" style="border-left:4px solid var(--c3)">
+<ul>
+<li>The delay exposes how difficult frontier pretraining and competitive coding parity remain, even for a scaled incumbent.</li>
+<li>GPT-5.6 Sol, Claude Fable 5, and Meta’s Muse Spark 1.1 have deployed advanced coding capabilities, putting Google in a defensive enterprise and developer-market posture.</li>
+<li>Near-term internal demand for high-throughput inference compute may slow, potentially reducing hardware utilization while remediation continues.</li>
+<li>Investment implication: underweight Google versus OpenAI/Microsoft and Anthropic in the near term; monitor resolution of coding bottlenecks. Status: internal testing and partner previews; public release delayed. Focus: software. Category: Model.</li>
+</ul>
+</div>
+<div class="table-scroll-wrap"><table class="info-table">
+<thead><tr><th>Readout</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td>Target release</td><td>Delayed to late July or August 2026</td></tr>
+<tr><td>Primary bottleneck</td><td>Coding capabilities and recursive tool-calling</td></tr>
+<tr><td>Training intervention</td><td>Training data updated late last month; results disappointing</td></tr>
+<tr><td>Competitive reference models</td><td>GPT-5.6 Sol; Claude Fable 5; Meta Muse Spark 1.1</td></tr>
+<tr><td>Source / timing</td><td>Bloomberg / LA Times / Seeking Alpha · Event &amp; publication: July 17, 2026 · EDT; published July 18 KST</td></tr>
+</tbody></table></div>
+<div class="chart-wrap"><div id="chart-art3" style="width:100%; height:320px;"></div></div>
+</div>
+<div class="subsec">
+<span class="subsec-icon">⚠️</span><span class="subsec-label c3">Risk &amp; Outlook</span>
+<p>The choice to delay reflects pressure to deliver a flawless flagship but reveals organizational coordination challenges across Google’s broad product portfolio. Further slippage risks surrendering developer and enterprise mindshare to Anthropic and OpenAI.</p>
+</div>
+</article>
 
-            <!-- 1. Overview -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span>
-                    <span class="subsec-label c1">Overview</span>
-                </div>
-                <p class="lead-text">The artificial intelligence landscape has witnessed a major structural shift with the official release of "Inkling," the first general-purpose open-weights model from Thinking Machines Lab.</p>
-                <p class="body-text">Founded by former OpenAI Chief Technology Officer Mira Murati, the San Francisco-based startup has positioned Inkling as a direct, highly customizable alternative to the proprietary, closed-source models that currently dominate the market. Coming in at a colossal 975 billion total parameters, Inkling is a natively multimodal Mixture-of-Experts (MoE) transformer that utilizes only 41 billion active parameters per token, balancing computational efficiency with high-end reasoning capabilities. The model supports an expansive context window of up to 1 million tokens and was trained from scratch on 45 trillion multimodal tokens spanning text, images, audio, and video. Crucially, Thinking Machines has designed Inkling to be highly customizable via its "Tinker" platform, allowing enterprises to fine-tune the model on their own proprietary workflows rather than relying on frozen, centralized APIs. The release represents a major boost for the Western open-weights ecosystem, which has struggled to keep pace with Chinese open-source models following Meta's shift toward a proprietary approach. Early developer reception has been highly enthusiastic, with day-zero integration already live across major infrastructure platforms including vLLM, SGLang, Together AI, and Unsloth.</p>
-            </div>
+<article class="article" id="art4">
+<h2>SpaceX in Talks with Pentagon for Multibillion-Dollar AI Infrastructure Deal</h2>
+<div class="subsec">
+<span class="subsec-icon">🎯</span><span class="subsec-label c4">Executive Summary</span>
+<p>SpaceX is discussing a multibillion-dollar agreement with the U.S. Department of Defense to provide dedicated AI data-center capacity for sensitive, classified workloads under the Pentagon’s $30 billion “Artificial Intelligence Arsenal.” The proposal would extend SpaceX’s cloud business and make it a direct competitor to Oracle, CoreWeave, and Amazon after similar infrastructure agreements with Anthropic and Google.</p>
+<div class="metric-card"><strong class="c4">$30B</strong><br>Pentagon Artificial Intelligence Arsenal</div>
+<div class="metric-card"><strong class="c4">5 Approved Providers</strong><br>SpaceX, Amazon, Google, Microsoft, Oracle</div>
+</div>
+<div class="subsec">
+<span class="subsec-icon">💡</span><span class="subsec-label c4">Deep Dive</span><span class="subsec-tag lc4 c4">Tech &amp; Strategy</span>
+<div class="impact-box lc4" style="border-left:4px solid var(--c4)">
+<ul>
+<li>The negotiations accelerate sovereign, secure AI infrastructure purpose-built for national security, including air-gapped facilities for classified training and inference.</li>
+<li>SpaceX’s land holdings, energy access, proprietary networking, vertically integrated energy, and satellite communications can support resilient, low-cost, off-grid compute clusters versus providers reliant on public utility grids.</li>
+<li>The move challenges the traditional defense-cloud concentration around Microsoft, Amazon, and Oracle and elevates SpaceX in a high-margin government-compute segment.</li>
+<li>Status: active negotiations; SpaceX already approved for specific classified AI applications. Focus: hardware. Paradigm shift category: Infrastructure.</li>
+</ul>
+</div>
+<div class="table-scroll-wrap"><table class="info-table">
+<thead><tr><th>Defense Compute Dimension</th><th>Reported Detail</th></tr></thead>
+<tbody>
+<tr><td>Target deal value</td><td>Multibillion-Dollar</td></tr>
+<tr><td>Pentagon initiative</td><td>Artificial Intelligence Arsenal — $30 Billion</td></tr>
+<tr><td>Approved cloud providers</td><td>SpaceX, Amazon, Google, Microsoft, Oracle</td></tr>
+<tr><td>Workload profile</td><td>Highly sensitive, classified AI workloads</td></tr>
+<tr><td>Source / timing</td><td>The Wall Street Journal / Reuters / Seeking Alpha · Event &amp; publication: July 17, 2026 · EDT; published July 18 KST</td></tr>
+</tbody></table></div>
+<div class="chart-wrap"><div id="chart-art4" style="width:100%; height:320px;"></div></div>
+</div>
+<div class="subsec">
+<span class="subsec-icon">⚠️</span><span class="subsec-label c4">Risk &amp; Outlook</span>
+<p>Concentrating critical defense AI infrastructure within SpaceX creates governance and single-point-of-failure concerns given Elon Musk’s global business interests and unpredictable public posture. Militarization of frontier models under the $30 billion initiative could also accelerate an unregulated global AI arms race.</p>
+</div>
+</article>
 
-            <!-- 2. Strategic Impact -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span>
-                    <span class="subsec-label c1">Strategic Impact</span>
-                </div>
-                <div class="metric-row">
-                    <div class="metric-card">
-                        <div class="metric-value">975B</div>
-                        <div class="metric-label">Total Parameters</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">41B</div>
-                        <div class="metric-label">Active Parameters</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">1M</div>
-                        <div class="metric-label">Context Window</div>
-                    </div>
-                </div>
-                <div class="impact-box lc1" style="border-left:4px solid var(--c1)">
-                    <ul class="impact-list">
-                        <li><strong>Technology & Ecosystem Perspective:</strong> Revitalizes the Western open-weights ecosystem, offering a highly customizable foundation model with a novel "controllable thinking effort" mechanism. This allows developers to dynamically trade accuracy for speed, shifting the paradigm away from static, one-size-fits-all model scaling.</li>
-                        <li><strong>Business & Market Dynamics:</strong> Directly challenges the closed-source, API-only monopolies of OpenAI, Anthropic, and Google, while reducing enterprise reliance on Chinese open-source alternatives. By offering an Apache 2.0 licensed model, Thinking Machines enables enterprises to retain full ownership of their intellectual property and fine-tuning loops.</li>
-                        <li><strong>Infrastructure & Hardware Implications:</strong> The 975B parameter size requires specialized quantization (such as 1-bit GGUF quants or NVFP4) and high-bandwidth memory (HBM) to run efficiently, driving demand for advanced edge-AI hardware and distributed inference clusters.</li>
-                        <li><strong>Investment Strategy:</strong> Highly bullish for decentralized AI infrastructure, open-source orchestration tools, and specialized quantization startups. Investors should prioritize platforms that enable customized, on-premise model tuning and agentic workflow automation.</li>
-                    </ul>
-                </div>
-            </div>
+<article class="article" id="art5">
+<h2>Apple Briefly Overtakes Nvidia as World’s Most Valuable Company Amid AI Investment Reassessment</h2>
+<div class="subsec">
+<span class="subsec-icon">🎯</span><span class="subsec-label c5">Executive Summary</span>
+<p>On July 17, 2026, Apple briefly became the world’s most valuable publicly traded company, reaching a $4.88 trillion market capitalization as Nvidia fell 3.5% in early trading to $4.86 trillion. The reordering signals investor rotation from pure AI infrastructure build-out toward downstream monetization, ecosystem lock-in, services, and consumer hardware upgrades.</p>
+<div class="metric-card"><strong class="c5">$4.88T vs. $4.86T</strong><br>Apple vs. Nvidia market capitalization</div>
+<div class="metric-card"><strong class="c5">23%</strong><br>Apple stock rise this year</div>
+</div>
+<div class="subsec">
+<span class="subsec-icon">💡</span><span class="subsec-label c5">Deep Dive</span><span class="subsec-tag lc5 c5">Tech &amp; Strategy</span>
+<div class="impact-box lc5" style="border-left:4px solid var(--c5)">
+<ul>
+<li>Apple’s less CapEx-intensive model is being re-rated for earnings durability and its ability to monetize AI across a massive active device base.</li>
+<li>Nvidia, which had led for nearly a year, faces increased execution risk and volatility; options markets imply a wide 68% probability band around its future valuation.</li>
+<li>Apple’s nearly 23% year-to-date gain outperformed the Nasdaq and restored the top position for the first time since April last year.</li>
+<li>Investment implication: balance pure-play hardware exposure with consumer platforms that monetize AI without comparable CapEx intensity. Status: July 17 market event / financial milestone. Focus: both software and hardware. Category: Infrastructure.</li>
+</ul>
+</div>
+<div class="table-scroll-wrap"><table class="info-table">
+<thead><tr><th>Market Metric</th><th>Reported Value</th></tr></thead>
+<tbody>
+<tr><td>Apple market capitalization</td><td>$4.88 Trillion</td></tr>
+<tr><td>Nvidia market capitalization</td><td>$4.86 Trillion</td></tr>
+<tr><td>Nvidia early-trading decline</td><td>3.5%</td></tr>
+<tr><td>Nvidia implied volatility</td><td>43.4%</td></tr>
+<tr><td>Apple share performance</td><td>Nearly 23% this year; outperformed Nasdaq</td></tr>
+<tr><td>Source / timing</td><td>Reuters / Forbes / MacRumors · Event &amp; publication: July 17, 2026 · EDT; published July 18 KST</td></tr>
+</tbody></table></div>
+<div class="chart-wrap"><div id="chart-art5" style="width:100%; height:320px;"></div></div>
+</div>
+<div class="subsec">
+<span class="subsec-icon">⚠️</span><span class="subsec-label c5">Risk &amp; Outlook</span>
+<p>Apple still must deliver upgraded Siri and on-device AI features. If consumer adoption stalls, its premium valuation could correct sharply despite confidence in its consumer monetization strategy.</p>
+</div>
+</article>
 
-            <!-- 3. Technical Deep Dive -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span>
-                    <span class="subsec-label c1">Technical Deep Dive</span>
-                    <span class="subsec-tag lc1 c1">Sparse MoE Transformer</span>
-                </div>
-                <div class="arch-grid">
-                    <div class="arch-chip">66-Layer Decoder</div>
-                    <div class="arch-chip">256 Experts (6 Active)</div>
-                    <div class="arch-chip">Query-Conditioned Attention</div>
-                    <div class="arch-chip">Hierarchical Patch Encoder</div>
-                </div>
-                <div class="table-scroll-wrap">
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Metric / Feature</th>
-                                <th>Inkling Specification</th>
-                                <th>Industry Benchmark Comparison</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>SWE-bench Verified</td>
-                                <td>77.6%</td>
-                                <td>Outperforms Nvidia's Nemotron 3 (71.9%)</td>
-                            </tr>
-                            <tr>
-                                <td>VoiceBench Score</td>
-                                <td>91.4%</td>
-                                <td>Top-tier native audio processing</td>
-                            </tr>
-                            <tr>
-                                <td>Token Efficiency</td>
-                                <td>1/3 tokens required</td>
-                                <td>Matches Nemotron 3 Ultra at a fraction of the cost</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="chart-wrap">
-                    <div id="chart-art1" style="width:100%; height:280px;"></div>
-                </div>
-            </div>
+<section class="synthesis" id="synthesis">
+<h2>Strategic Synthesis &amp; Forward-Looking Outlook</h2>
+<p>The past 24 hours indicate a structural transition across the global AI value chain: from speculative software development toward disciplined physical deployment, infrastructure monetization, and localized agentic execution.</p>
+<div class="impact-box lc1" style="border-left:4px solid var(--c1)">
+<ul>
+<li><strong>Kimi K3:</strong> Moonshot AI’s open-weight release shows that models can match or exceed closed-source giants at a fraction of token cost, driving a violent global semiconductor selloff and a reassessment of U.S. CapEx moats.</li>
+<li><strong>Neocloud monetization:</strong> Meta’s potential $10 billion Anthropic lease demonstrates how consumer-tech infrastructure can become managed hosting, monetizing Meta’s CapEx while helping Anthropic circumvent Nvidia shortages.</li>
+<li><strong>Frontier execution:</strong> Gemini 3.5 Pro’s delay illustrates persistent engineering difficulty in coding capability and frontier pretraining; SpaceX’s Pentagon discussions position it as a sovereign-compute gatekeeper.</li>
+<li><strong>Market re-rating:</strong> Apple’s brief return to the top valuation spot marks a sentiment shift from infrastructure build-out toward downstream, consumer-facing AI monetization.</li>
+</ul>
+</div>
+<div class="outlook-box">
+<h3 class="c1">Upcoming Tech Calendar</h3>
+<div class="outlook-item"><strong>July 24, 2026:</strong> DeepSeek V4 stable release.</div>
+<div class="outlook-item"><strong>September 1, 2026:</strong> OpenAI physical security key requirement for Trusted Access for Cyber program.</div>
+<div class="outlook-item"><strong>September 2026:</strong> John Ternus scheduled to take over as Apple CEO.</div>
+<div class="outlook-item"><strong>October 2026:</strong> Anthropic rumored IPO.</div>
+</div>
+</section>
+</main>
 
-            <!-- 4. Evolution & Timeline -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span>
-                    <span class="subsec-label c1">Evolution & Timeline</span>
-                </div>
-                <div class="flow-row">
-                    <div class="flow-step">
-                        <h4>Dense Models</h4>
-                        <p>Monolithic scaling, high compute cost per token.</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <h4>Standard MoE</h4>
-                        <p>Sparse routing, but static thinking effort.</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <h4>Inkling MoE</h4>
-                        <p>Controllable thinking effort, dynamic routing.</p>
-                    </div>
-                </div>
-            </div>
+<script>
+document.getElementById('report-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            <!-- 5. Critical View -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span>
-                    <span class="subsec-label c1">Critical View</span>
-                </div>
-                <p class="body-text">While the open-weights release is a major milestone, Inkling's raw benchmark scores still trail behind top-tier proprietary models like OpenAI's GPT-5.6 Sol and Claude's Fable 5. Furthermore, its post-training reliance on data generated by existing Chinese open-source models (such as Kimi K2.5) exposes the startup to criticisms regarding original research and potential IP disputes, though the model itself was trained from scratch.</p>
-            </div>
+document.addEventListener('DOMContentLoaded', () => {
+const themeBtn = document.getElementById('theme-toggle');
+const htmlElement = document.documentElement;
 
-            <!-- 6. Community Sentiment -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">💬</span>
-                    <span class="subsec-label c1">Community Sentiment</span>
-                </div>
-                <div class="sentiment-grid">
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🔥</div>
-                        <div class="sentiment-label">Developers</div>
-                        <div class="sentiment-desc">Highly enthusiastic about day-zero integrations and Tinker customization.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">💼</div>
-                        <div class="sentiment-label">Enterprise</div>
-                        <div class="sentiment-desc">Relieved to have an Apache 2.0 alternative to avoid API vendor lock-in.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🧐</div>
-                        <div class="sentiment-label">Analysts</div>
-                        <div class="sentiment-desc">Skeptical of the post-training data lineage and potential IP friction.</div>
-                    </div>
-                </div>
-            </div>
-        </article>
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+htmlElement.setAttribute('data-theme', 'dark');
+}
+themeBtn.innerHTML = htmlElement.getAttribute('data-theme') === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
 
-        <!-- ARTICLE 2 -->
-        <article class="article" id="art2">
-            <div class="article-header">
-                <div class="article-meta">
-                    <span class="meta-tag lc2">Strategic Pivot</span>
-                    <span>July 15, 2026</span>
-                </div>
-                <h2 class="article-title">Apple Explores AI Chip Startup Acquisitions Amid "Baltra" Server Silicon Delays</h2>
-            </div>
+themeBtn.addEventListener('click', () => {
+const newTheme = htmlElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+htmlElement.setAttribute('data-theme', newTheme);
+themeBtn.innerHTML = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
 
-            <!-- 1. Overview -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span>
-                    <span class="subsec-label c2">Overview</span>
-                </div>
-                <p class="lead-text">Apple is executing a profound strategic pivot by actively exploring the acquisition of semiconductor startups to bolster its artificial intelligence server capabilities.</p>
-                <p class="body-text">According to a report from The Information, the iPhone maker has held discussions with investment bankers and approached several chip designers to gauge their interest in a buyout, marking a rare departure from its historically conservative M&A posture. This sudden deal hunt is driven by a critical performance bottleneck in Apple's internal AI infrastructure, which currently relies on M2 Ultra processors. When Apple engineers recently attempted to run Google's massive Gemini models on these internal servers to power its revamped, AI-driven Siri, the Mac-derived silicon buckled under the load, forcing Apple to route demanding tasks through Nvidia GPUs hosted in Google Cloud. Making matters more urgent, Apple's first dedicated in-house AI server chip, code-named "Baltra" and developed alongside Broadcom, has slipped past its planned 2026 debut to a 2027 data-center ramp. To bypass these infrastructure bottlenecks and protect its core doctrine of absolute user privacy through on-device and private cloud processing, Apple is now looking to acquire specialized talent and IP to accelerate its next-generation server silicon. This comes amid a major leadership transition: hardware chief John Ternus is set to succeed Tim Cook as CEO effective September 1, 2026, while Johny Srouji's authority is expanding to cover all hardware engineering in addition to semiconductors.</p>
-            </div>
+// 차트 리사이즈 트리거 (테마 변경시 다시 그리기 위함)
+window.dispatchEvent(new Event('resize'));
+});
 
-            <!-- 2. Strategic Impact -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span>
-                    <span class="subsec-label c2">Strategic Impact</span>
-                </div>
-                <div class="metric-row">
-                    <div class="metric-card">
-                        <div class="metric-value">$45.6B</div>
-                        <div class="metric-label">Cash Reserves</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">2027</div>
-                        <div class="metric-label">Baltra Delayed To</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">$2.0B</div>
-                        <div class="metric-label">Q.ai Acquisition</div>
-                    </div>
-                </div>
-                <div class="impact-box lc2" style="border-left:4px solid var(--c2)">
-                    <ul class="impact-list">
-                        <li><strong>Technology & Ecosystem Perspective:</strong> Signals that Apple's device-centric silicon architecture (M-series) cannot easily scale to handle hyperscale, multi-node cloud inference, forcing a fundamental redesign of its server-side hardware.</li>
-                        <li><strong>Business & Market Dynamics:</strong> Apple's willingness to pursue multi-billion-dollar chip acquisitions (following its recent $2 billion buyout of Israeli silent-speech AI startup Q.ai) will trigger a wave of consolidation in the semiconductor startup space.</li>
-                        <li><strong>Infrastructure & Hardware Implications:</strong> Accelerates the development of dedicated, non-GPU server ASICs optimized for secure, private cloud compute (PCC), driving demand for advanced packaging and high-speed interconnects.</li>
-                        <li><strong>Investment Strategy:</strong> Highly bullish for AI chip design startups and advanced packaging firms. Overweight Broadcom as Apple's primary networking partner, and monitor potential acquisition targets in the server-silicon space.</li>
-                    </ul>
-                </div>
-            </div>
+const toTopBtn = document.getElementById('to-top');
+window.addEventListener('scroll', () => {
+toTopBtn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+});
 
-            <!-- 3. Technical Deep Dive -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span>
-                    <span class="subsec-label c2">Technical Deep Dive</span>
-                    <span class="subsec-tag lc2 c2">Server ASICs & Interconnects</span>
-                </div>
-                <div class="arch-grid">
-                    <div class="arch-chip">M2 Ultra (Current)</div>
-                    <div class="arch-chip">Baltra (2027 ASIC)</div>
-                    <div class="arch-chip">Private Cloud Compute</div>
-                    <div class="arch-chip">Multi-Node Interconnect</div>
-                </div>
-                <div class="table-scroll-wrap">
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Silicon Platform</th>
-                                <th>Architecture Type</th>
-                                <th>Primary Bottleneck / Advantage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>M2 Ultra</td>
-                                <td>Consumer Mac SoC</td>
-                                <td>Lacks high-speed multi-node interconnects for hyperscale workloads</td>
-                            </tr>
-                            <tr>
-                                <td>Baltra (Delayed)</td>
-                                <td>Purpose-built Server ASIC</td>
-                                <td>Designed for massive batch-inference; delayed to 2027</td>
-                            </tr>
-                            <tr>
-                                <td>Nvidia H200 (Google Cloud)</td>
-                                <td>Hyperscale GPU</td>
-                                <td>High performance, but compromises Apple's absolute privacy narrative</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="chart-wrap">
-                    <div id="chart-art2" style="width:100%; height:280px;"></div>
-                </div>
-            </div>
+toTopBtn.addEventListener('click', () => {
+window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 
-            <!-- 4. Evolution & Timeline -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span>
-                    <span class="subsec-label c2">Evolution & Timeline</span>
-                </div>
-                <div class="flow-row">
-                    <div class="flow-step">
-                        <h4>On-Device NPU</h4>
-                        <p>Absolute privacy, limited model size.</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <h4>M2 Ultra PCC</h4>
-                        <p>Hybrid cloud, but buckled under Gemini loads.</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <h4>Baltra / M&A Silicon</h4>
-                        <p>Dedicated server ASICs for secure multi-node inference.</p>
-                    </div>
-                </div>
-            </div>
+const muted = '#64748b';
+const grid = '#94a3b8';
+const charts = [];
+const makeChart = (id, option) => {
+const chart = echarts.init(document.getElementById(id), null, {renderer: 'svg'});
+chart.setOption(option);
+charts.push(chart);
+};
 
-            <!-- 5. Critical View -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span>
-                    <span class="subsec-label c2">Critical View</span>
-                </div>
-                <p class="body-text">Apple's sudden hunt for chip startups exposes a rare and significant vulnerability in its vertically integrated hardware pipeline. Relying on Google Cloud and Nvidia GPUs in the interim undermines Apple's core marketing narrative of absolute user privacy, while acquiring and integrating a hardware startup carries substantial execution and cultural integration risks under the incoming leadership of John Ternus.</p>
-            </div>
+makeChart('chart-art1', {
+backgroundColor: 'transparent',
+title: {text: 'Token-Cost Benchmark', left: 'center', textStyle: {color: muted, fontSize: 14}},
+tooltip: {trigger: 'item'},
+series: [{
+type: 'pie', radius: ['48%', '72%'], center: ['50%', '55%'],
+label: {color: muted, formatter: '{b}\n${c}'},
+data: [
+{value: 3.24, name: 'Kimi K3', itemStyle: {color: '#2563eb'}},
+{value: 10, name: 'Claude Fable 5 (minimum)', itemStyle: {color: '#94a3b8'}}
+]
+}]
+});
 
-            <!-- 6. Community Sentiment -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">💬</span>
-                    <span class="subsec-label c2">Community Sentiment</span>
-                </div>
-                <div class="sentiment-grid">
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">📈</div>
-                        <div class="sentiment-label">Investors</div>
-                        <div class="sentiment-desc">Optimistic about aggressive M&A to close the infrastructure gap.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🔒</div>
-                        <div class="sentiment-label">Privacy Advocates</div>
-                        <div class="sentiment-desc">Concerned about interim routing of Siri data to Google Cloud.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🤔</div>
-                        <div class="sentiment-label">Analysts</div>
-                        <div class="sentiment-desc">Skeptical of Apple's ability to quickly integrate complex server silicon teams.</div>
-                    </div>
-                </div>
-            </div>
-        </article>
+makeChart('chart-art2', {
+backgroundColor: 'transparent',
+title: {text: 'Annualized Compute Commitments ($B)', left: 'center', textStyle: {color: muted, fontSize: 14}},
+tooltip: {trigger: 'axis'},
+radar: {
+indicator: [{name:'Meta–Anthropic', max: 16},{name:'Anthropic–SpaceX', max: 16}],
+axisName: {color: muted}, splitLine: {lineStyle: {color: grid}}, splitArea: {areaStyle: {color: 'transparent'}}
+},
+series: [{type: 'radar', data: [{value: [5, 15], name: 'Annualized value', areaStyle: {color: 'rgba(5,150,105,0.2)'}, lineStyle: {color: '#059669'}, itemStyle: {color: '#059669'}}]}]
+});
 
-        <!-- ARTICLE 3 -->
-        <article class="article" id="art3">
-            <div class="article-header">
-                <div class="article-meta">
-                    <span class="meta-tag lc3">Product Launch</span>
-                    <span>July 15, 2026</span>
-                </div>
-                <h2 class="article-title">Nokia Launches Industry's First Commercial AI-RAN Platform with Nvidia Aerial</h2>
-            </div>
+makeChart('chart-art3', {
+backgroundColor: 'transparent',
+title: {text: 'Gemini 3.5 Pro Release Readiness', left: 'center', textStyle: {color: muted, fontSize: 14}},
+series: [{
+type: 'gauge', startAngle: 210, endAngle: -30, min: 0, max: 100,
+progress: {show: true, width: 18, itemStyle: {color: '#d97706'}},
+axisLine: {lineStyle: {width: 18, color: [[1, '#e2e8f0']]}},
+axisTick: {show: false}, splitLine: {show: false}, axisLabel: {show: false},
+pointer: {show: false}, detail: {valueAnimation: true, formatter: 'Delayed', color: muted, fontSize: 18},
+data: [{value: 45}]
+}]
+});
 
-            <!-- 1. Overview -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span>
-                    <span class="subsec-label c3">Overview</span>
-                </div>
-                <p class="lead-text">Nokia has officially announced the launch of the telecommunications industry's first commercial AI-RAN (Radio Access Network) platform, marking one of the most significant architectural shifts in mobile network design in decades.</p>
-                <p class="body-text">Developed in partnership with Nvidia, the platform integrates Nokia's AI-native anyRAN software with Nvidia's Aerial AI-RAN platform, moving telecom providers away from custom, single-purpose silicon toward GPU-powered merchant silicon. By running compute-intensive AI algorithms at radio timescales, the platform aims to deliver more than 100% spectral efficiency gains by 2028, effectively doubling the data capacity operators can extract from their existing spectrum assets. Nokia is offering three distinct deployment paths to accommodate different operator requirements, including a GPU-powered AirScale capacity plug-in for existing deployments, a standalone AI-RAN node, and GPU-powered commercial off-the-shelf (COTS) server options for cloud-native operators. The platform will be monetized through a software subscription model, with pilot deployments scheduled for late 2026 and a general commercial release in 2027. T-Mobile US has been confirmed as the first operator to initiate field trials, signaling strong commercial interest in software-defined, AI-native network upgrades. This launch is a critical milestone for Nokia's CEO Justin Hotard, who folded the mobile business into a new Mobile Infrastructure segment. The Nvidia partnership sits at the center of this repair job, backed by a $1 billion investment from Nvidia for a 3% stake in October 2025.</p>
-            </div>
+makeChart('chart-art4', {
+backgroundColor: 'transparent',
+title: {text: 'Pentagon Approved Cloud Provider Set', left: 'center', textStyle: {color: muted, fontSize: 14}},
+tooltip: {trigger: 'item'},
+series: [{
+type: 'pie', radius: ['38%', '68%'], center: ['50%', '55%'],
+label: {color: muted, formatter: '{b}'},
+data: [
+{value: 1, name:'SpaceX', itemStyle:{color:'#7c3aed'}},
+{value: 1, name:'Amazon', itemStyle:{color:'#94a3b8'}},
+{value: 1, name:'Google', itemStyle:{color:'#d97706'}},
+{value: 1, name:'Microsoft', itemStyle:{color:'#2563eb'}},
+{value: 1, name:'Oracle', itemStyle:{color:'#dc2626'}}
+]
+}]
+});
 
-            <!-- 2. Strategic Impact -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span>
-                    <span class="subsec-label c3">Strategic Impact</span>
-                </div>
-                <div class="metric-row">
-                    <div class="metric-card">
-                        <div class="metric-value">&gt;100%</div>
-                        <div class="metric-label">Spectral Efficiency (2028)</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">1.5x</div>
-                        <div class="metric-label">Capacity Gain</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">$1.0B</div>
-                        <div class="metric-label">Nvidia Investment</div>
-                    </div>
-                </div>
-                <div class="impact-box lc3" style="border-left:4px solid var(--c3)">
-                    <ul class="impact-list">
-                        <li><strong>Technology & Ecosystem Perspective:</strong> Merges telecommunications infrastructure with the broader AI compute ecosystem, transforming cell towers into distributed edge-AI data centers capable of running both network functions and local AI inference.</li>
-                        <li><strong>Business & Market Dynamics:</strong> Solidifies Nvidia's entry into the massive telecom market, while positioning Nokia ahead of its primary rival, Ericsson, which has deployed less compute-intensive AI-RAN solutions.</li>
-                        <li><strong>Infrastructure & Hardware Implications:</strong> Drives a massive upgrade cycle for edge-compute hardware, requiring GPU acceleration at the base station level and accelerating the transition toward Open RAN (ORAN) compliance.</li>
-                        <li><strong>Investment Strategy:</strong> Highly bullish for Nvidia and Nokia. Overweight edge-AI infrastructure providers, specialized telecom software developers, and operators (like T-Mobile) capable of monetizing distributed edge-inference.</li>
-                    </ul>
-                </div>
-            </div>
+makeChart('chart-art5', {
+backgroundColor: 'transparent',
+title: {text: 'Market Capitalization Snapshot ($T)', left: 'center', textStyle: {color: muted, fontSize: 14}},
+tooltip: {trigger: 'axis'},
+xAxis: {type: 'category', data: ['Apple', 'Nvidia'], axisLabel: {color: muted}, axisLine: {lineStyle: {color: grid}}},
+yAxis: {type: 'value', min: 4.8, max: 4.9, axisLabel: {color: muted}, splitLine: {lineStyle: {color: '#e2e8f0'}}},
+series: [{
+type: 'line', smooth: true, symbolSize: 12,
+data: [{value:4.88, itemStyle:{color:'#dc2626'}},{value:4.86, itemStyle:{color:'#64748b'}}],
+lineStyle: {width: 4, color: '#dc2626'},
+areaStyle: {color: 'rgba(220,38,38,0.12)'}
+}]
+});
 
-            <!-- 3. Technical Deep Dive -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span>
-                    <span class="subsec-label c3">Technical Deep Dive</span>
-                    <span class="subsec-tag lc3 c3">Nvidia Aerial Integration</span>
-                </div>
-                <div class="arch-grid">
-                    <div class="arch-chip">anyRAN Software</div>
-                    <div class="arch-chip">Nvidia Aerial L1</div>
-                    <div class="arch-chip">GPU-powered COTS</div>
-                    <div class="arch-chip">Multi-User MIMO</div>
-                </div>
-                <div class="table-scroll-wrap">
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Architecture Metric</th>
-                                <th>Legacy Baseband (Marvell)</th>
-                                <th>Nvidia GPU-Accelerated AI-RAN</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Power Envelope</td>
-                                <td>190 Watts</td>
-                                <td>190 Watts (Same Envelope)</td>
-                            </tr>
-                            <tr>
-                                <td>Capacity Scaling</td>
-                                <td>1.0x Baseline</td>
-                                <td>1.5x Capacity</td>
-                            </tr>
-                            <tr>
-                                <td>Spectral Efficiency</td>
-                                <td>Baseline</td>
-                                <td>2.0x (Launch) -> >100% Target (2028)</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="chart-wrap">
-                    <div id="chart-art3" style="width:100%; height:280px;"></div>
-                </div>
-            </div>
-
-            <!-- 4. Evolution & Timeline -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span>
-                    <span class="subsec-label c3">Evolution & Timeline</span>
-                </div>
-                <div class="flow-row">
-                    <div class="flow-step">
-                        <h4>Legacy RAN</h4>
-                        <p>Custom, single-purpose ASICs. Scarce compute.</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <h4>Open RAN (ORAN)</h4>
-                        <p>COTS servers, software-defined but limited AI.</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <h4>AI-RAN (Nvidia)</h4>
-                        <p>GPU-accelerated parallel processing at radio timescales.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. Critical View -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span>
-                    <span class="subsec-label c3">Critical View</span>
-                </div>
-                <p class="body-text">While the promised 100% spectral efficiency gains are revolutionary, they require operators to invest in expensive GPU hardware at a time when many are still struggling to recoup their massive 5G capital expenditures. Furthermore, Ericsson has been selling commercial AI-in-RAN subscriptions on over 15 live deployments since June 2026, running on existing baseband silicon without GPUs, whereas Nokia's "first" claim relies on the narrower definition of GPU-accelerated AI-RAN.</p>
-            </div>
-
-            <!-- 6. Community Sentiment -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">💬</span>
-                    <span class="subsec-label c3">Community Sentiment</span>
-                </div>
-                <div class="sentiment-grid">
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">📶</div>
-                        <div class="sentiment-label">Operators</div>
-                        <div class="sentiment-desc">Excited by spectral efficiency gains but highly cautious about GPU CapEx.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🚀</div>
-                        <div class="sentiment-label">Nvidia Bulls</div>
-                        <div class="sentiment-desc">See this as the opening of a massive new multi-billion dollar telecom market.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">📉</div>
-                        <div class="sentiment-label">Ericsson Camps</div>
-                        <div class="sentiment-desc">Dismissive of Nokia's "first" claim, pointing to their own live non-GPU deployments.</div>
-                    </div>
-                </div>
-            </div>
-        </article>
-
-        <!-- ARTICLE 4 -->
-        <article class="article" id="art4">
-            <div class="article-header">
-                <div class="article-meta">
-                    <span class="meta-tag lc4">Regulatory Action</span>
-                    <span>July 14, 2026</span>
-                </div>
-                <h2 class="article-title">New York State Launches Nation's First Moratorium on New Hyperscale Data Centers</h2>
-            </div>
-
-            <!-- 1. Overview -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span>
-                    <span class="subsec-label c4">Overview</span>
-                </div>
-                <p class="lead-text">In a watershed moment for the physical limits of the AI boom, New York Governor Kathy Hochul signed an Executive Order establishing the nation's first statewide moratorium on new hyperscale data centers.</p>
-                <p class="body-text">The executive order temporarily pauses state environmental permits for up to one year for new large-scale data centers. This regulatory freeze is designed to give state regulators time to build a comprehensive regulatory framework that protects ratepayers, the environment, the energy grid, and local communities from the massive power and water demands of AI infrastructure. Additionally, the Governor announced plans to pursue legislation to repeal sales tax exemptions for massive data centers across the state and establish a New York State Data Center Community Investment Framework to ensure local communities benefit from future developments. The move highlights a growing backlash against the rapid expansion of AI factories, which threaten to strain local utility grids, drive up electricity bills, and deplete natural resources.</p>
-            </div>
-
-            <!-- 2. Strategic Impact -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span>
-                    <span class="subsec-label c4">Strategic Impact</span>
-                </div>
-                <div class="metric-row">
-                    <div class="metric-card">
-                        <div class="metric-value">1 Year</div>
-                        <div class="metric-label">Moratorium Duration</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">1st</div>
-                        <div class="metric-label">Statewide Pause</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">Tens of Millions</div>
-                        <div class="metric-label">Est. CapEx Increase / Facility</div>
-                    </div>
-                </div>
-                <div class="impact-box lc4" style="border-left:4px solid var(--c4)">
-                    <ul class="impact-list">
-                        <li><strong>Technology & Ecosystem Perspective:</strong> Signals a transition from unconstrained infrastructure expansion to strict regulatory oversight, forcing hyperscalers to seek alternative regions or invest heavily in local grid upgrades and sustainable energy sources.</li>
-                        <li><strong>Business & Market Dynamics:</strong> Increases the cost of building and operating AI data centers in premium markets, potentially driving development to states with more lenient regulations or abundant energy resources, while creating a precedent that other states may follow.</li>
-                        <li><strong>Infrastructure & Hardware Implications:</strong> Accelerates the demand for highly efficient hardware, including advanced liquid cooling, low-power silicon, and alternative energy sources (nuclear, geothermal) to bypass environmental permitting bottlenecks.</li>
-                        <li><strong>Investment Strategy:</strong> Bearish for near-term data center developers in highly regulated states. Highly bullish for alternative energy providers, advanced cooling technology firms, and edge-AI architectures that reduce reliance on centralized hyperscale data centers.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- 3. Technical Deep Dive -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span>
-                    <span class="subsec-label c4">Technical Deep Dive</span>
-                    <span class="subsec-tag lc4 c4">Grid & Resource Constraints</span>
-                </div>
-                <div class="arch-grid">
-                    <div class="arch-chip">Grid Transmission</div>
-                    <div class="arch-chip">Water Usage Effectiveness</div>
-                    <div class="arch-chip">Sales Tax Repeal</div>
-                    <div class="arch-chip">Community Framework</div>
-                </div>
-                <div class="table-scroll-wrap">
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Regulatory Vector</th>
-                                <th>Previous Policy</th>
-                                <th>New Moratorium Policy</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Environmental Permitting</td>
-                                <td>Rapid, streamlined approvals</td>
-                                <td>1-year temporary freeze on new permits</td>
-                            </tr>
-                            <tr>
-                                <td>Tax Incentives</td>
-                                <td>Generous sales tax exemptions</td>
-                                <td>Proposed repeal of exemptions for massive facilities</td>
-                            </tr>
-                            <tr>
-                                <td>Community Integration</td>
-                                <td>Minimal local requirements</td>
-                                <td>Mandatory Community Investment Framework</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 4. Evolution & Timeline -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span>
-                    <span class="subsec-label c4">Evolution & Timeline</span>
-                </div>
-                <div class="flow-row">
-                    <div class="flow-step">
-                        <h4>Unconstrained Growth</h4>
-                        <p>Rapid permitting, heavy tax incentives.</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <h4>Grid Strain</h4>
-                        <p>Surging power/water demands, rising utility bills.</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <h4>Regulatory Freeze</h4>
-                        <p>NY Moratorium, framework drafting, tax repeals.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. Critical View -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span>
-                    <span class="subsec-label c4">Critical View</span>
-                </div>
-                <p class="body-text">While the moratorium protects local ratepayers and the environment, critics warn it could drive high-tech jobs and billions of dollars in infrastructure investment out of New York to competing states. Furthermore, a prolonged pause could cede ground in the global AI race, particularly as other nations rapidly build out their own sovereign AI infrastructure.</p>
-            </div>
-
-            <!-- 6. Community Sentiment -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">💬</span>
-                    <span class="subsec-label c4">Community Sentiment</span>
-                </div>
-                <div class="sentiment-grid">
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🌱</div>
-                        <div class="sentiment-label">Environmentalists</div>
-                        <div class="sentiment-desc">Celebratory; view this as a necessary step to protect local ecosystems.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">😟</div>
-                        <div class="sentiment-label">Hyperscalers</div>
-                        <div class="sentiment-desc">Frustrated by sudden regulatory hurdles and potential CapEx increases.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">👍</div>
-                        <div class="sentiment-label">Local Residents</div>
-                        <div class="sentiment-desc">Supportive of measures protecting utility grids and water resources.</div>
-                    </div>
-                </div>
-            </div>
-        </article>
-
-        <!-- ARTICLE 5 -->
-        <article class="article" id="art5">
-            <div class="article-header">
-                <div class="article-meta">
-                    <span class="meta-tag lc5">Strategic Partnership</span>
-                    <span>July 15, 2026</span>
-                </div>
-                <h2 class="article-title">3M and Microsoft Partner to Deploy Expanded Beam Optical (EBO) Technology in Azure Data Centers</h2>
-            </div>
-
-            <!-- 1. Overview -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔭</span>
-                    <span class="subsec-label c5">Overview</span>
-                </div>
-                <p class="lead-text">Industrial conglomerate 3M and Microsoft have announced a major strategic partnership focused on advancing AI data center infrastructure and accelerating enterprise transformation.</p>
-                <p class="body-text">Under the agreement, Microsoft's Azure will become the first hyperscale cloud provider to deploy 3M's proprietary Expanded Beam Optical (EBO) technology in its data centers. Traditional fiber optic connectors rely on direct-contact connections, which are highly sensitive to dust and contamination, requiring frequent cleaning and inspection in high-density environments. In contrast, 3M's EBO technology uses an expanded beam optical interface instead of direct contact, making fiber connections faster to install, more tolerant of contamination, and easier to maintain. Microsoft reported that early testing of 3M's EBO technology demonstrated the potential to significantly reduce network deployment timelines and improve signal reliability under demanding data center conditions. In return, 3M will implement Microsoft's AI and digital platforms across its global business functions, deploying AI agents to automate customer order management, credit checks, and financial auditing.</p>
-            </div>
-
-            <!-- 2. Strategic Impact -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚡</span>
-                    <span class="subsec-label c5">Strategic Impact</span>
-                </div>
-                <div class="metric-row">
-                    <div class="metric-card">
-                        <div class="metric-value">EBO</div>
-                        <div class="metric-label">Technology Name</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">Azure</div>
-                        <div class="metric-label">First Deployer</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">MSA</div>
-                        <div class="metric-label">Standardization Body</div>
-                    </div>
-                </div>
-                <div class="impact-box lc5" style="border-left:4px solid var(--c5)">
-                    <ul class="impact-list">
-                        <li><strong>Technology & Ecosystem Perspective:</strong> Addresses a critical physical bottleneck in hyperscale AI data centers—fiber optic connectivity and contamination—by replacing legacy physical-contact connectors with robust, expanded-beam interfaces.</li>
-                        <li><strong>Business & Market Dynamics:</strong> Strengthens Microsoft's infrastructure reliability and deployment speed, while establishing 3M as a key hardware supplier for the AI era, driving industry-wide standardization through the EBO Multi-Source Agreement.</li>
-                        <li><strong>Infrastructure & Hardware Implications:</strong> Accelerates the construction and scaling of high-density AI clusters, reducing the maintenance overhead and downtime associated with optical network failures.</li>
-                        <li><strong>Investment Strategy:</strong> Highly bullish for 3M and Microsoft. Overweight advanced optical networking component manufacturers, fiber optic equipment suppliers, and materials science companies supporting data center physical layers.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- 3. Technical Deep Dive -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">🔬</span>
-                    <span class="subsec-label c5">Technical Deep Dive</span>
-                    <span class="subsec-tag lc5 c5">Optical Interconnects</span>
-                </div>
-                <div class="arch-grid">
-                    <div class="arch-chip">Expanded Beam Interface</div>
-                    <div class="arch-chip">Non-Direct Contact</div>
-                    <div class="arch-chip">Dust Tolerance</div>
-                    <div class="arch-chip">EBO MSA Standard</div>
-                </div>
-                <div class="table-scroll-wrap">
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Connector Type</th>
-                                <th>Connection Mechanism</th>
-                                <th>Contamination Sensitivity</th>
-                                <th>Maintenance Overhead</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Traditional (LC/MPO)</td>
-                                <td>Direct physical contact</td>
-                                <td>Extremely high (requires pristine cleanliness)</td>
-                                <td>High (frequent cleaning & inspection)</td>
-                            </tr>
-                            <tr>
-                                <td>3M EBO</td>
-                                <td>Expanded beam optical interface</td>
-                                <td>Very low (highly tolerant of dust/particles)</td>
-                                <td>Low (faster installation, minimal cleaning)</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 4. Evolution & Timeline -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⏳</span>
-                    <span class="subsec-label c5">Evolution & Timeline</span>
-                </div>
-                <div class="flow-row">
-                    <div class="flow-step">
-                        <h4>Physical Contact</h4>
-                        <p>High maintenance, sensitive to dust.</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <h4>EBO Development</h4>
-                        <p>3M designs non-contact expanded beam interface.</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <h4>Azure Deployment</h4>
-                        <p>Microsoft deploys EBO in Azure data centers.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. Critical View -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">⚠️</span>
-                    <span class="subsec-label c5">Critical View</span>
-                </div>
-                <p class="body-text">While EBO technology represents a major operational improvement, it requires a complete overhaul of existing optical patch panels and transceiver interfaces, introducing significant near-term capital costs for data center operators. Furthermore, achieving industry-wide standardization through the Multi-Source Agreement will take years, potentially limiting EBO's near-term adoption to Microsoft's proprietary footprint.</p>
-            </div>
-
-            <!-- 6. Community Sentiment -->
-            <div class="subsec">
-                <div class="subsec-header">
-                    <span class="subsec-icon">💬</span>
-                    <span class="subsec-label c5">Community Sentiment</span>
-                </div>
-                <div class="sentiment-grid">
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">🛠️</div>
-                        <div class="sentiment-label">Network Engineers</div>
-                        <div class="sentiment-desc">Relieved; EBO significantly reduces the hassle of fiber cleaning and maintenance.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">💰</div>
-                        <div class="sentiment-label">CFOs</div>
-                        <div class="sentiment-desc">Concerned about the near-term capital costs of overhauling optical panels.</div>
-                    </div>
-                    <div class="sentiment-card">
-                        <div class="sentiment-emoji">⚠️</div>
-                        <div class="sentiment-label">Competitors</div>
-                        <div class="sentiment-desc">Alerted; scrambling to align with the EBO Multi-Source Agreement.</div>
-                    </div>
-                </div>
-            </div>
-        </article>
-
-        <!-- CLOSING SYNTHESIS -->
-        <section class="synthesis" id="synthesis">
-            <h2>Summary & Forward-Looking Outlook</h2>
-            
-            <div class="syn-block">
-                <h3>Macro Paradigm Shifts</h3>
-                <p>The global AI ecosystem is undergoing a profound transition from unconstrained, centralized scaling to highly optimized, localized, and regulated architectures. The launch of Thinking Machines' "Inkling" model signals a powerful resurgence in the Western open-weights ecosystem, offering enterprises unprecedented customization and IP ownership. Simultaneously, physical and regulatory bottlenecks are forcing a redesign of the underlying infrastructure. Apple's strategic pivot toward semiconductor acquisitions highlights the limits of consumer-derived silicon for hyperscale workloads, while New York's landmark data center moratorium underscores the growing environmental and grid constraints facing AI factories. To bypass these physical limits, the industry is turning to materials science breakthroughs, such as 3M's Expanded Beam Optical technology, and edge-compute innovations like Nokia's GPU-accelerated AI-RAN platform, which merges telecommunications with distributed AI inference.</p>
-            </div>
-
-            <div class="outlook-box">
-                <h3>Upcoming Milestones (Q3 2026 - 2027)</h3>
-                <div class="outlook-item">
-                    <strong>September 1, 2026:</strong> John Ternus officially succeeds Tim Cook as Apple CEO, marking a new era of hardware and semiconductor leadership.
-                </div>
-                <div class="outlook-item">
-                    <strong>Late 2026:</strong> Nokia and T-Mobile US initiate the first field trials of the GPU-powered AI-RAN platform.
-                </div>
-                <div class="outlook-item">
-                    <strong>Mid-2027:</strong> Apple's dedicated in-house AI server chip, "Baltra," is scheduled for its first data-center ramp.
-                </div>
-                <div class="outlook-item">
-                    <strong>2027:</strong> Nokia's AI-RAN platform reaches general commercial release, driving a massive edge-compute upgrade cycle.
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- ECharts Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Chart 1: SWE-bench Verified Score Comparison
-            const chart1Dom = document.getElementById('chart-art1');
-            if (chart1Dom) {
-                const chart1 = echarts.init(chart1Dom, null, {renderer: 'svg'});
-                const option1 = {
-                    title: {
-                        text: 'SWE-bench Verified Score (%)',
-                        textStyle: { fontSize: 14, color: 'var(--text-primary)' }
-                    },
-                    tooltip: { trigger: 'axis' },
-                    xAxis: {
-                        type: 'category',
-                        data: ['Nvidia Nemotron 3', 'Inkling (Thinking Machines)'],
-                        axisLabel: { color: 'var(--text-secondary)' }
-                    },
-                    yAxis: {
-                        type: 'value',
-                        min: 60,
-                        max: 80,
-                        axisLabel: { color: 'var(--text-secondary)' }
-                    },
-                    series: [{
-                        data: [71.9, 77.6],
-                        type: 'bar',
-                        itemStyle: {
-                            color: function(params) {
-                                return params.dataIndex === 1 ? '#2563eb' : '#94a3b8';
-                            }
-                        },
-                        label: {
-                            show: true,
-                            position: 'top',
-                            formatter: '{c}%'
-                        }
-                    }]
-                };
-                chart1.setOption(option1);
-                window.addEventListener('resize', () => chart1.resize());
-            }
-
-            // Chart 2: Apple AI Server Silicon Memory Bandwidth Bottleneck
-            const chart2Dom = document.getElementById('chart-art2');
-            if (chart2Dom) {
-                const chart2 = echarts.init(chart2Dom, null, {renderer: 'svg'});
-                const option2 = {
-                    title: {
-                        text: 'Memory Bandwidth Comparison (GB/s)',
-                        textStyle: { fontSize: 14, color: 'var(--text-primary)' }
-                    },
-                    tooltip: { trigger: 'axis' },
-                    xAxis: {
-                        type: 'category',
-                        data: ['M2 Ultra (Current)', 'Baltra (Est. 2027)', 'Nvidia H200 (Cloud)'],
-                        axisLabel: { color: 'var(--text-secondary)' }
-                    },
-                    yAxis: {
-                        type: 'value',
-                        axisLabel: { color: 'var(--text-secondary)' }
-                    },
-                    series: [{
-                        data: [800, 2000, 4800],
-                        type: 'bar',
-                        itemStyle: {
-                            color: function(params) {
-                                if (params.dataIndex === 0) return '#dc2626';
-                                if (params.dataIndex === 1) return '#059669';
-                                return '#94a3b8';
-                            }
-                        },
-                        label: {
-                            show: true,
-                            position: 'top',
-                            formatter: '{c} GB/s'
-                        }
-                    }]
-                };
-                chart2.setOption(option2);
-                window.addEventListener('resize', () => chart2.resize());
-            }
-
-            // Chart 3: Nokia AI-RAN Spectral Efficiency Gains
-            const chart3Dom = document.getElementById('chart-art3');
-            if (chart3Dom) {
-                const chart3 = echarts.init(chart3Dom, null, {renderer: 'svg'});
-                const option3 = {
-                    title: {
-                        text: 'Spectral Efficiency Gains (%)',
-                        textStyle: { fontSize: 14, color: 'var(--text-primary)' }
-                    },
-                    tooltip: { trigger: 'axis' },
-                    xAxis: {
-                        type: 'category',
-                        data: ['Traditional RAN', 'AI-RAN (Launch)', 'AI-RAN (2028 Target)'],
-                        axisLabel: { color: 'var(--text-secondary)' }
-                    },
-                    yAxis: {
-                        type: 'value',
-                        axisLabel: { color: 'var(--text-secondary)' }
-                    },
-                    series: [{
-                        data: [0, 20, 100],
-                        type: 'line',
-                        smooth: true,
-                        lineStyle: { color: '#d97706', width: 3 },
-                        itemStyle: { color: '#d97706' },
-                        label: {
-                            show: true,
-                            position: 'top',
-                            formatter: '+{c}%'
-                        }
-                    }]
-                };
-                chart3.setOption(option3);
-                window.addEventListener('resize', () => chart3.resize());
-            }
-        });
-    </script>
+window.addEventListener('resize', () => charts.forEach(chart => chart.resize()));
+});
+</script>
 </body>
 </html>
