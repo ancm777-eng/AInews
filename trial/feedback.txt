@@ -1,0 +1,324 @@
+## 종합 판정
+
+**현 상태로는 배포 부적합하며, 전면적인 출처 재검증이 필요합니다.**  
+초안에는 다음 문제가 동시에 존재합니다.
+
+1. **확정적인 내부 모순·계산 오류**
+2. **기사 원문이 아닌 홈페이지 루트 URL만 제시**
+3. **보도·협상·루머를 공식 발표처럼 서술**
+4. **정확한 시각과 시간대 없이 `event_within_24h_window: true`로 단정**
+5. **Executive Summary가 실제 5개 본문 항목과 불일치**
+6. 모델명·계약·IPO 일정·국방 프로그램처럼 핵심적인 주장에 공식 원문이 없음
+
+---
+
+# 1. KST 24시간 윈도우 검증
+
+현재 시각은 **2026-07-18 10:07 KST**이므로 검증 대상 구간은 다음과 같습니다.
+
+> **2026-07-17 10:07 KST ~ 2026-07-18 10:07 KST**
+
+| 항목 | 기재 날짜 | 24시간 판정 | 판단 |
+|---|---:|---|---|
+| 1. Moonshot AI | 이벤트 7월 16일 | **오류 가능성이 매우 높음** | 베이징 현지 7월 16일 이벤트라면 KST로 환산해도 늦어도 7월 17일 00:59이므로 윈도우 밖입니다. |
+| 2. Meta–Anthropic | 이벤트 7월 17일 | **판정 불가** | 정확한 시각·시간대가 없어 10:07 KST 전후를 구분할 수 없습니다. |
+| 3. Gemini 3.5 Pro | 이벤트 7월 17일 | **판정 불가** | 공식 출시 시각과 시간대가 필요합니다. |
+| 4. SpaceX–Pentagon | 이벤트 7월 17일 | **판정 불가** | 기사 게시 시각 또는 협상 사실이 보도된 최초 시각이 필요합니다. |
+| 5. Aina | 이벤트 7월 16일 | **오류 가능성이 매우 높음** | 인도 현지 7월 16일 이벤트라면 KST로 늦어도 7월 17일 03:29이므로 윈도우 밖입니다. |
+
+### 시간 기준상의 핵심 문제
+
+- 초안은 **이벤트 시점**과 **기사 게시 시점**을 혼용합니다.
+- “Publication Date: 2026-07-17”만으로는 24시간 포함 여부를 입증할 수 없습니다.
+- 각 항목에 최소한 다음 필드가 필요합니다.
+  - `event_at`
+  - `published_at`
+  - `source_timezone`
+  - `published_at_kst`
+  - `window_basis: event | publication`
+- 1번과 5번은 이벤트 날짜가 7월 16일인데도 `event_within_24h_window: true`로 표시되어 있어, 현재 정의대로라면 잘못된 메타데이터입니다.
+
+---
+
+# 2. 항목별 사실관계 검증
+
+## 1. Moonshot AI의 Kimi K3 출시 및 반도체주 급락
+
+### 판정: **중대한 근거 부족 + 시간 메타데이터 오류**
+
+#### 확인되는 문제
+
+1. **제시 URL이 기사 URL이 아님**
+   - `https://www.reuters.com`은 Reuters 홈페이지일 뿐 해당 보도의 영구 링크가 아닙니다.
+   - Washington Post, Bloomberg, Business Insider 기사 URL도 제시되지 않았습니다.
+   - “Official Announcement”라면 Moonshot AI 공식 블로그, 모델 카드, GitHub 또는 Hugging Face 링크가 우선 제시되어야 합니다.
+
+2. **핵심 제품명과 경쟁 모델명이 검증되지 않음**
+   - `Kimi K3`
+   - `GPT-5.6 Sol`
+   - `Claude Fable 5`
+   
+   모두 정확한 공식 제품 페이지나 발표 링크가 없습니다. 특히 비교의 기준이 되는 경쟁 모델명까지 공식 출처 없이 서술되어 있어 벤치마크 주장을 검증할 수 없습니다.
+
+3. **“Frontend Code Arena” 명칭과 순위 근거가 불명확**
+   - 리더보드 운영 기관, 평가 날짜, 모델 버전, 투표 수, 신뢰구간이 없습니다.
+   - `Arena.ai`라는 출처 표기도 정확한 리더보드 URL이 아닙니다.
+   - “전체 1위”인지 “오픈웨이트 모델 중 1위”인지도 구분되지 않습니다.
+
+4. **시장 급락의 인과관계를 과도하게 단정**
+   - Philadelphia Semiconductor Index가 한 주에 약 9% 하락했다는 수치에는 기준 종가와 기간이 필요합니다.
+   - 설령 수치가 맞더라도 이를 Kimi K3 발표가 “triggered”했다고 하려면 Reuters/Bloomberg 등의 명시적 인과 분석이 필요합니다.
+   - 단일 모델 발표와 주간 지수 변동을 직접 연결하는 것은 현재 근거로는 전략적 해석을 넘어선 인과 단정입니다.
+
+5. **기술적 논리 비약**
+   - 2.8조 파라미터라는 큰 모델 규모 자체는 “극단적 알고리즘 효율성”의 증거가 아닙니다.
+   - 효율성을 주장하려면 최소한 훈련 FLOPs, 활성 파라미터 수, MoE 구조, 토큰 수, 훈련 비용, 추론 처리량 및 하드웨어 구성이 필요합니다.
+   - “토큰 비용이 3분의 1”이라는 API 가격은 훈련 효율 또는 컴퓨트 효율과 동일하지 않습니다.
+
+6. **24시간 메타데이터 부정확**
+   - 베이징 현지 이벤트 날짜가 7월 16일이라면 KST 기준 대상 윈도우 밖입니다.
+
+### 수정 권고
+
+- 상태를 `Official Announcement`에서 **`Unverified press report`**로 낮추십시오.
+- Moonshot 공식 발표·모델 카드·가중치 저장소를 제시하기 전까지 파라미터 수와 공개일을 확정적으로 쓰지 마십시오.
+- 반도체주 하락은 별도 시장 항목으로 분리하고, “동시에 발생했다”와 “발표 때문에 하락했다”를 구별해야 합니다.
+
+---
+
+## 2. Meta–Anthropic 100억 달러 컴퓨트 임대 협상
+
+### 판정: **명확한 산술 오류 + 핵심 계약 관계 검증 필요**
+
+#### 확정 오류
+
+> “This deal is roughly one-third the size of … $45 billion”
+
+- 100억 달러는 450억 달러의 **약 22.2%**입니다.
+- 따라서 총계약액 기준으로는 “약 3분의 1”이 아니라 **약 4.5분의 1**입니다.
+- 연평균 금액을 비교한다면:
+  - 100억 달러 / 2년 = 연 50억 달러
+  - 450억 달러 / 3년 = 연 150억 달러
+  - 연간 기준으로는 정확히 3분의 1에 가깝습니다.
+- 따라서 문장을 **“annualized value is roughly one-third”**로 고치거나 총액 비교 문장을 삭제해야 합니다.
+
+#### 검증되지 않은 핵심 주장
+
+1. Meta가 Anthropic에 2년간 최대 100억 달러의 컴퓨트를 임대한다는 협상
+2. Anthropic이 2026년 10월 IPO를 준비 중이라는 주장
+3. Nvidia 부족 때문에 Claude Fable 5 사용량을 제한했다는 인과관계
+4. Anthropic과 SpaceX가 2026년 5월 450억 달러 규모의 3년 계약을 체결했다는 주장
+5. Meta의 2026년 CapEx가 1,250억~1,450억 달러라는 수치
+
+이들은 모두 기사 영구 링크, 기업 공시, 실적발표 자료 또는 계약 당사자의 확인이 필요합니다.
+
+#### 전략적 해석상의 문제
+
+- Meta가 일부 컴퓨트를 외부에 임대한다는 사실만으로 “자체 모델이 내부 수요를 충분히 만들지 못한다”고 결론 내릴 수는 없습니다.
+- 지역·전력·네트워크·칩 종류·완공 시점의 불일치 때문에 일시적 잉여 용량이 생길 수도 있습니다.
+- Meta가 일반 상용 클라우드에 진출하는 것과 특정 상대방에게 전용 용량을 제공하는 것은 다른 사업 모델입니다.
+
+### 시간 판정
+
+- 7월 17일이라는 날짜만으로는 대상 윈도우에 포함되는지 알 수 없습니다.
+- NYT 원문의 게시 시각과 업데이트 시각을 KST로 변환해야 합니다.
+
+---
+
+## 3. Google의 Gemini 3.5 Pro 출시
+
+### 판정: **공식 출시를 입증하는 1차 출처 없음**
+
+#### 확인되는 문제
+
+1. **Primary URL이 무효**
+   - `https://www.google.com`은 제품 발표나 모델 카드가 아닙니다.
+   - 공식 출시라면 Google Blog, DeepMind Blog, Gemini API 문서, Vertex AI 릴리스 노트 중 하나가 필요합니다.
+
+2. **출처 구성이 부적절**
+   - `TechTimes / Techridge Studios / OpenAI Blog`가 출처로 기재되어 있습니다.
+   - OpenAI 블로그는 Google 제품 출시의 1차 출처가 될 수 없습니다.
+   - Google 공식 출처가 하나도 없는데 상태가 `Official Launch`로 지정되어 있습니다.
+
+3. **“6주 지연 후 전체 베이스 모델 폐기·재훈련” 주장 미입증**
+   - 이는 상당히 구체적인 내부 개발 정보입니다.
+   - 익명 관계자 보도인지, Google의 공식 설명인지 출처를 분리해야 합니다.
+   - “recursive tool-calling 문제 때문에 pretraining을 처음부터 다시 했다”는 기술적 인과도 추가 설명이 필요합니다. 도구 호출 문제는 포스트트레이닝, 에이전트 런타임 또는 API 오케스트레이션 계층에서 발생할 수도 있기 때문입니다.
+
+4. **가격과 제품 접근권 혼용**
+   - 월 250달러가 구독 플랜 가격인지, Deep Think 기능의 가격인지, API 가격인지 구분되지 않습니다.
+   - 소비자용 Ultra 구독 접근권과 기업용·개발자 API 정식 제공은 별도로 검증해야 합니다.
+
+5. **비교 근거 누락**
+   - “GPT-5.6 Sol과 코딩 에이전트 벤치마크에서 동급”
+   - “두 배의 컨텍스트”
+   
+   어느 벤치마크와 어느 비교 모델 버전을 기준으로 했는지 없습니다.
+
+### 수정 권고
+
+공식 링크가 확보되지 않으면 제목을 다음 정도로 낮추는 것이 적절합니다.
+
+> “Reports Claim Google Is Preparing or Releasing a Rebuilt Gemini Model”
+
+또한 다음 상태를 분리해야 합니다.
+
+- Consumer preview
+- Google AI Ultra availability
+- Gemini API preview
+- Vertex AI enterprise availability
+- Deep Think limited access
+
+---
+
+## 4. SpaceX–Pentagon AI 인프라 계약 협상
+
+### 판정: **중대한 사실 검증 필요 + 인프라 설명에 명백한 과장**
+
+#### 확인되는 문제
+
+1. **Bloomberg 기사 링크가 없음**
+   - `https://www.bloomberg.com`은 홈페이지일 뿐 해당 보도를 확인할 수 없습니다.
+   - Quiver Quantitative는 2차 집계·시장 데이터 서비스일 수 있으므로 국방 계약의 1차 근거로 충분하지 않습니다.
+
+2. **“승인된 클라우드 제공자” 목록 검증 필요**
+   - `[SpaceX, Amazon, Google, Microsoft, Oracle]`이라고 기재했지만 계약명, 조달 번호, 승인 기관, 보안등급이 없습니다.
+   - 기존 미 국방부의 주요 엔터프라이즈 클라우드 체계와 새로운 AI 사업자 승인 체계를 혼동했을 가능성이 있으므로 SAM.gov, DoD, CDAO 또는 계약 공고 링크가 필요합니다.
+   - “SpaceX already approved for specific classified AI applications”는 별도의 공식 근거 없이는 확정할 수 없습니다.
+
+3. **‘Artificial Intelligence Arsenal’ 300억 달러 프로그램 미입증**
+   - 공식 프로그램명, 예산 항목, 의회 승인 문서, DoD 발표 링크가 없습니다.
+   - 언론이 사용한 설명적 표현인지 정식 사업명인지 구분해야 합니다.
+
+4. **SpaceX의 인프라 역량을 과장**
+   - “vertically integrated energy”라는 표현은 입증되지 않습니다.
+   - SpaceX가 위성 통신 역량을 보유한 것과 발전·전력 조달·데이터센터 운영을 수직통합했다는 것은 다른 주장입니다.
+   - “off-grid compute clusters” 역시 실제 전력 설계나 프로젝트 자료 없이 단정할 수 없습니다.
+
+5. **기존 계약 주장 미검증**
+   - Anthropic 및 Google과 “최근 유사한 AI 인프라 계약을 체결했다”는 내용에는 계약 발표 링크가 필요합니다.
+   - 2번 항목의 450억 달러 Anthropic–SpaceX 계약과 연결되므로, 이 계약이 틀리면 두 항목이 함께 무너집니다.
+
+6. **상태 표현이 과도함**
+   - 협상 단계인데 “critical sovereign compute gatekeeper”라고 결론 내리는 것은 시기상조입니다.
+   - 계약 체결, 예산 확정, 보안 인증 및 실제 가동은 각각 다른 단계입니다.
+
+### 시간 판정
+
+- 7월 17일 기사라 하더라도 게시 시각이 없으므로 `event_within_24h_window: true`를 확정할 수 없습니다.
+
+---
+
+## 5. Aina의 550만 달러 시드 투자
+
+### 판정: **다섯 항목 중 상대적으로 개연성이 높지만, 원문 링크와 시간 기준 보완 필요**
+
+#### 검증 필요 사항
+
+다음 세부 정보는 투자 발표 원문과 대조해야 합니다.
+
+- 투자금이 정확히 **550만 달러**인지
+- Redstart Labs와 360 ONE Asset가 공동 리드인지
+- MIXI Global Investments, Antler, Blume Founders Fund의 정확한 참여 형태
+- 창업자가 전 Ultrahuman 하드웨어 부사장 Apoorv Shankar인지
+- 설립 시점이 2025년 5월인지
+- Dune이 정확히 3키 제품인지
+- “수백 대를 출하했다”는 수치가 회사 발표인지 언론의 독립 확인인지
+
+#### 확인되는 문제
+
+1. `https://www.finsmes.com`은 홈페이지이며 해당 투자 기사 링크가 아닙니다.
+2. Dune과 비공개 플래그십 인터페이스가 같은 제품인지 다른 제품인지 설명이 혼재합니다.
+3. 3키 키패드에서 “복잡한 에이전트 워크플로를 단일 물리 버튼으로 실행한다”는 설명은 기능 검증 없이 확대 해석되었을 수 있습니다.
+4. 시드 투자 한 건을 소비자 전자기기의 “paradigm shift”로 평가하는 것은 지나치게 강합니다.
+
+### 시간 오류
+
+- 인도 현지 이벤트 날짜가 7월 16일이라면 KST 기준 대상 구간 밖입니다.
+- 7월 17일 보도가 대상 구간에 들어왔다면 메타데이터를 `publication_within_24h_window`로 바꿔야지, `event_within_24h_window`를 true로 두면 안 됩니다.
+
+---
+
+# 3. 문서 전체의 명확한 내부 불일치
+
+## Executive Summary와 본문이 일치하지 않음
+
+요약에는 다음 세 가지가 선정 주제라고 적혀 있습니다.
+
+- “a major strategic pivot in Apple’s silicon doctrine”
+- “the convergence of telecommunications and edge-AI compute”
+- “the nation’s first regulatory moratorium on hyperscale data centers”
+- “materials science breakthroughs addressing physical data center bottlenecks”
+
+그러나 실제 5개 본문에는 다음이 없습니다.
+
+- Apple 실리콘 항목 없음
+- 통신·엣지 AI 융합 항목 없음
+- 데이터센터 모라토리엄 항목 없음
+- 소재과학 혁신 항목 없음
+
+반대로 본문의 Meta–Anthropic, Google Gemini, SpaceX–Pentagon, Aina 투자 항목은 Executive Summary의 선정 기준 설명에 제대로 반영되지 않았습니다.
+
+이는 단순한 분석 부족이 아니라 **다른 초안의 Executive Summary가 남아 있는 편집 오류**로 보입니다.
+
+---
+
+# 4. URL 검증 결과
+
+제시된 URL은 도메인 자체는 알려진 사이트이지만, 모두 해당 사실을 입증하는 **기사·보도자료 영구 링크가 아닙니다.**
+
+| 항목 | 제시 URL | 판정 |
+|---|---|---|
+| 1 | `https://www.reuters.com` | Reuters 홈페이지. 기사 식별 불가 |
+| 2 | `https://www.nytimes.com` | NYT 홈페이지. 기사 식별 불가 |
+| 3 | `https://www.google.com` | 검색·기업 홈페이지. 제품 발표 근거가 아님 |
+| 4 | `https://www.bloomberg.com` | Bloomberg 홈페이지. 기사 식별 불가 |
+| 5 | `https://www.finsmes.com` | FinSMEs 홈페이지. 투자 기사 식별 불가 |
+
+각 URL은 최소한 다음 조건을 충족해야 합니다.
+
+- 기사 제목이 포함된 영구 링크
+- 게시 시각 및 시간대 확인 가능
+- 업데이트 시각 분리
+- 공식 발표라면 기업 뉴스룸·IR·제품 문서 링크 병기
+- 벤치마크라면 특정 리더보드 스냅샷 또는 평가 페이지
+- 투자라면 회사 발표와 투자자 발표를 교차 제시
+
+---
+
+# 5. Upcoming Tech Calendar 검증
+
+| 일정 | 판정 |
+|---|---|
+| 7월 27일 Kimi K3 가중치 공개 | Moonshot 공식 링크 없이는 확정 일정으로 기재 불가 |
+| 9월 17일 revAlation Chicago | 행사 공식 페이지와 연도·장소 확인 필요 |
+| 2026년 10월 Anthropic IPO | 협상 기사 수준이라면 “rumored”보다도 **unconfirmed report**로 표시하고 출처 필요 |
+| 10월 7~9일 America’s Youth AI Festival / MIT RAISE | 두 행사가 동일 행사인지, 공동 개최인지 불명확. 각각 공식 페이지 필요 |
+
+특히 IPO는 회사·거래소 제출 서류가 없는 상태라면 확정 일정표가 아니라 **모니터링 항목**에 넣는 편이 적절합니다.
+
+---
+
+# 최종 결론
+
+### 확정적으로 수정해야 할 사항
+
+- 100억 달러가 450억 달러의 약 3분의 1이라는 표현
+- 1번과 5번의 `event_within_24h_window: true`
+- Executive Summary와 실제 본문 항목의 불일치
+- 홈페이지 루트 URL을 Primary URL로 사용한 형식
+- 보도·루머를 공식 출시 또는 확정 계약처럼 분류한 상태값
+
+### 원문 확보 전까지 보류해야 할 핵심 주장
+
+- Kimi K3의 2.8조 파라미터와 7월 27일 가중치 공개
+- GPT-5.6 Sol 및 Claude Fable 5라는 정확한 제품명
+- Kimi 발표가 반도체주 급락을 촉발했다는 인과관계
+- Meta–Anthropic 100억 달러 계약 협상
+- Anthropic–SpaceX 450억 달러 계약
+- Gemini 3.5 Pro 공식 출시와 6주 전면 재훈련
+- SpaceX의 미 국방부 승인 클라우드 지위
+- 300억 달러 “Artificial Intelligence Arsenal”
+- Anthropic의 2026년 10월 IPO 일정
+
+따라서 이 초안은 **“검증 완료 브리핑”이 아니라 “미검증 보도 후보 목록” 수준**으로 재분류하는 것이 타당합니다.
