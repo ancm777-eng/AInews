@@ -112,15 +112,11 @@ def run_gpt_chat(client, model, messages, system=None):
         api_messages.append({"role": "system", "content": system})
     api_messages.extend(messages)
     
-    # 🛠️ [Surgical Change] 'sol' 모델인 경우 온도(temperature) 제한이 있으므로 파라미터를 제외
-    kwargs = {
-        "model": model,
-        "messages": api_messages
-    }
-    if "sol" not in model.lower():
-        kwargs["temperature"] = 0.3
-        
-    response = client.chat.completions.create(**kwargs)
+    # 🛠️ [Surgical Change] GPT-5.6 시리즈(sol, terra 모두)는 temperature 임의 조작을 지원하지 않으므로 완전히 제거
+    response = client.chat.completions.create(
+        model=model,
+        messages=api_messages
+    )
     return response.choices[0].message.content
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
