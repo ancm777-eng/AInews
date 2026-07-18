@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types 
 from openai import OpenAI
+import anthropic  # 🛠️ [추가] Claude 사용을 위한 패키지 임포트
 from tenacity import retry, stop_after_attempt, wait_exponential, wait_fixed
 from github_utils import fetch_prompt_from_github
 
@@ -18,7 +19,6 @@ sys.stdout.reconfigure(line_buffering=True)
 load_dotenv()
 
 def clean_old_caches(cache_dir="trial"):
-    """trial 폴더 내의 파일 중, 생성/수정일이 '오늘'이 아닌 어제 이전 파일들을 삭제합니다."""
     if not os.path.exists(cache_dir):
         return
     
@@ -28,11 +28,9 @@ def clean_old_caches(cache_dir="trial"):
         if filename.endswith(".txt"):
             file_path = os.path.join(cache_dir, filename)
             try:
-                # 파일의 마지막 수정 시간을 가져와서 날짜로 변환
                 mtime = os.path.getmtime(file_path)
                 file_date = datetime.datetime.fromtimestamp(mtime).date()
                 
-                # 파일 날짜가 오늘과 다르면 (어제 이전 파일이면) 삭제
                 if file_date != today_date:
                     os.remove(file_path)
                     print(f"🧹 이전 날짜의 캐시 파일 자동 삭제 완료: {filename}")
@@ -112,12 +110,26 @@ def run_gpt_chat(client, model, messages, system=None):
         api_messages.append({"role": "system", "content": system})
     api_messages.extend(messages)
     
-    # 🛠️ [Surgical Change] GPT-5.6 시리즈(sol, terra 모두)는 temperature 임의 조작을 지원하지 않으므로 완전히 제거
     response = client.chat.completions.create(
         model=model,
         messages=api_messages
     )
     return response.choices[0].message.content
+
+# 🛠️ [추가] Claude API 호출을 위한 전용 래퍼 함수 (HTML 생성을 위해 max_tokens 여유롭게 설정)
+@retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=2, min=15, max=60), retry_error_callback=return_none_on_error)
+def run_claude_chat(client, model, messages, system=None):
+    kwargs = {
+        "model": model,
+        "max_tokens": 8192,
+        "messages": messages,
+        "temperature": 0.0
+    }
+    if system:
+        kwargs["system"] = system
+        
+    response = client.messages.create(**kwargs)
+    return response.content[0].text
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, system_rules, user_prompt, output_file="trial/1.txt"):
@@ -159,14 +171,16 @@ def main():
 
     g_api_key = os.getenv("GEMINI_API_KEY")
     o_api_key = os.getenv("OPENAI_API_KEY")
+    c_api_key = os.getenv("CLAUDE_API_KEY") # 🛠️ [추가] Claude API Key 로드
+    
     if not g_api_key: sys.exit(1)
 
     g_client = genai.Client(api_key=g_api_key)
     g_model = get_latest_gemini_model(g_client)
 
     o_client = OpenAI(api_key=o_api_key, max_retries=0) if o_api_key else None
+    c_client = anthropic.Anthropic(api_key=c_api_key, max_retries=0) if c_api_key else None # 🛠️ [추가] 클라이언트 초기화
     
-    # 캐시 폴더 생성 및 이전 날짜의 쓰레기 파일 청소
     os.makedirs("trial", exist_ok=True)
     clean_old_caches(cache_dir="trial")
 
@@ -408,7 +422,7 @@ def main():
         f.write(final_content)
 
     # ---------------------------------------------------------
-    # Phase 5: HTML Generation (GPT-5.6-terra 적용)
+    # Phase 5: HTML Generation (Claude-5-Sonnet 적용)
     # ---------------------------------------------------------
     print("\n--- Phase 5: HTML Generation ---")
     p5_start = time.time()
@@ -426,17 +440,18 @@ def main():
             except FileNotFoundError: pass
 
     if html_prompt_content:
-        if not o_client:
-            print("❌ Phase 5 failed: OpenAI client is required for GPT HTML generation. Please set OPENAI_API_KEY.")
+        # 🛠️ [수정] OpenAI가 아닌 Anthropic 클라이언트 존재 여부 체크
+        if not c_client:
+            print("❌ Phase 5 failed: Anthropic client is required for Claude HTML generation. Please set CLAUDE_API_KEY.")
             sys.exit(1)
 
-        print("Generating HTML using model: gpt-5.6-terra...")
+        print("Generating HTML using model: claude-5-sonnet-20260630...")
         
         user_prompt = f"다음 데이터를 바탕으로 시스템 지시사항의 HTML 템플릿과 CSS 규칙에 맞춰 완벽한 단일 HTML 문서를 생성하십시오:\n\n{final_content}"
         messages = [{"role": "user", "content": user_prompt}]
         
-        # run_gpt_chat 함수 재사용 (tenacity를 통한 자동 재시도 적용)
-        html_code = run_gpt_chat(o_client, "gpt-5.6-terra", messages, system=html_prompt_content)
+        # 🛠️ [수정] run_gpt_chat 대신 새롭게 만든 run_claude_chat 호출
+        html_code = run_claude_chat(c_client, "claude-5-sonnet-20260630", messages, system=html_prompt_content)
         
         if not html_code:
             print("❌ Phase 5 failed after retries. Exiting.")
