@@ -408,7 +408,7 @@ def main():
         f.write(final_content)
 
     # ---------------------------------------------------------
-    # Phase 5: HTML Generation
+    # Phase 5: HTML Generation (GPT-5.6-terra 적용)
     # ---------------------------------------------------------
     print("\n--- Phase 5: HTML Generation ---")
     p5_start = time.time()
@@ -426,65 +426,35 @@ def main():
             except FileNotFoundError: pass
 
     if html_prompt_content:
-        print(f"Generating HTML using model: {g_model}...")
-        max_html_retries = 5
+        if not o_client:
+            print("❌ Phase 5 failed: OpenAI client is required for GPT HTML generation. Please set OPENAI_API_KEY.")
+            sys.exit(1)
+
+        print("Generating HTML using model: gpt-5.6-terra...")
         
-        html_config = types.GenerateContentConfig(
-            system_instruction=html_prompt_content,
-            temperature=0.1
-        )
+        user_prompt = f"다음 데이터를 바탕으로 시스템 지시사항의 HTML 템플릿과 CSS 규칙에 맞춰 완벽한 단일 HTML 문서를 생성하십시오:\n\n{final_content}"
+        messages = [{"role": "user", "content": user_prompt}]
         
-        for attempt in range(max_html_retries):
-            try:
-                response = g_client.models.generate_content(
-                    model=g_model,
-                    contents=[f"다음 데이터를 바탕으로 시스템 지시사항의 HTML 템플릿과 CSS 규칙에 맞춰 완벽한 단일 HTML 문서를 생성하십시오:\n\n{final_content}"],
-                    config=html_config
-                )
-                html_code = response.text
-                
-                # 🛠️ [Surgical Change] None 반환 시 상세 원인 파악을 위한 고도화된 디버깅 코드
-                if not html_code:
-                    print("❌ [디버깅] Gemini API가 빈 응답(None)을 반환했습니다. 원인을 분석합니다:")
-                    try:
-                        if response.candidates:
-                            candidate = response.candidates[0]
-                            # 차단 사유 (예: SAFETY, RECITATION 등) 출력
-                            print(f" - Finish Reason (종료 사유): {candidate.finish_reason}")
-                            if hasattr(candidate, 'safety_ratings'):
-                                print(f" - Safety Ratings (안전 등급): {candidate.safety_ratings}")
-                        else:
-                            print(" - Candidates(생성 후보군) 리스트가 완전히 비어 있습니다.")
-                        
-                        if hasattr(response, 'prompt_feedback') and response.prompt_feedback:
-                            print(f" - Prompt Feedback: {response.prompt_feedback}")
-                    except Exception as log_err:
-                        print(f" - 디버깅 메타데이터 추출 중 추가 에러 발생: {log_err}")
-                        
-                    raise ValueError("Gemini 모델이 유효한 텍스트를 출력하지 못했습니다. (안전 필터 차단 혹은 입력 오류)")
+        # run_gpt_chat 함수 재사용 (tenacity를 통한 자동 재시도 적용)
+        html_code = run_gpt_chat(o_client, "gpt-5.6-terra", messages, system=html_prompt_content)
+        
+        if not html_code:
+            print("❌ Phase 5 failed after retries. Exiting.")
+            sys.exit(1)
 
-                if "```html" in html_code:
-                    html_code = html_code.split("```html")[1].split("```")[0].strip()
-                elif "```" in html_code:
-                    html_code = html_code.split("```")[1].strip()
+        # 마크다운 래퍼 제거 및 HTML 정제
+        if "```html" in html_code:
+            html_code = html_code.split("```html")[1].split("```")[0].strip()
+        elif "```" in html_code:
+            html_code = html_code.split("```")[1].strip()
 
-                if "<!DOCTYPE html>" in html_code:
-                    html_code = "<!DOCTYPE html>" + html_code.split("<!DOCTYPE html>")[1]
+        if "<!DOCTYPE html>" in html_code:
+            html_code = "<!DOCTYPE html>" + html_code.split("<!DOCTYPE html>")[1]
 
-                with open("index.html", "w", encoding="utf-8") as f:
-                    f.write(html_code)
+        with open("index.html", "w", encoding="utf-8") as f:
+            f.write(html_code)
 
-                print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
-                break
-            except Exception as e:
-                print(f"⚠️ Phase 5 attempt {attempt + 1} failed: {e}")
-                if attempt < max_html_retries - 1:
-                    sleep_time = min(60, 15 * (2 ** attempt)) + random.uniform(1, 3)
-                    print(f"   {sleep_time:.1f}초 후 재시도합니다...")
-                    time.sleep(sleep_time)
-                else:
-                    print("❌ Phase 5 failed after 5 attempts. Exiting.")
-                    sys.exit(1)
+        print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
 
 if __name__ == "__main__":
     main()
