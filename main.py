@@ -451,7 +451,7 @@ def main():
         messages = [{"role": "user", "content": user_prompt}]
         
         # 🛠️ [수정] run_gpt_chat 대신 새롭게 만든 run_claude_chat 호출
-        html_code = run_claude_chat(c_client, "claude-5-sonnet-20260630", messages, system=html_prompt_content)
+        html_code = run_claude_chat(c_client, "claude-5-sonnet-latest", messages, system=html_prompt_content)
         
         if not html_code:
             print("❌ Phase 5 failed after retries. Exiting.")
