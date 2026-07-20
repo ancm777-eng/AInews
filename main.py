@@ -118,11 +118,17 @@ def run_gpt_chat(client, model, messages, system=None):
 
 # 🛠️ [추가] Claude API 호출을 위한 전용 래퍼 함수 (HTML 생성을 위해 max_tokens 여유롭게 설정)
 @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=2, min=15, max=60), retry_error_callback=return_none_on_error)
-def run_claude_chat(client, model, messages, system=None, temperature=None):
+def run_claude_chat(client, model, messages, system=None, temperature=None, validate_fn=None):
     kwargs = {
         "model": model,
-        "max_tokens": 8192,
+        # 🛡️ [수정] Sonnet 5는 max_tokens가 thinking+응답 텍스트를 합친 하드 리밋임(최대 128,000).
+        # CSS/스켈레톤을 Python 템플릿으로 분리한 뒤에는 Claude가 기사 콘텐츠만 생성하므로 이 정도면 충분.
+        "max_tokens": 16000,
         "messages": messages,
+        # 🛡️ [수정] 이 작업은 정해진 템플릿/CSS에 데이터를 정확히 채워넣는 포맷팅 작업이라
+        # 별도의 다단계 추론이 필요 없음. adaptive thinking을 꺼서 보이지 않는 thinking 토큰이
+        # max_tokens 예산과 비용을 낭비하지 않도록 함 (결과물 품질에는 영향 없음).
+        "thinking": {"type": "disabled"},
     }
     if system:
         kwargs["system"] = system
@@ -140,7 +146,40 @@ def run_claude_chat(client, model, messages, system=None, temperature=None):
     text_parts = [block.text for block in response.content if getattr(block, "type", None) == "text"]
     if not text_parts:
         raise ValueError("Claude 응답에 text 블록이 없습니다 (ThinkingBlock만 반환됨).")
-    return "".join(text_parts)
+    result = "".join(text_parts)
+
+    # 🛡️ [수정] 완성도 체크를 재시도 데코레이터 "안쪽"에서 수행.
+    # 바깥에서 체크하면 API 호출 자체는 성공으로 끝나버려 재시도가 아예 발생하지 않음(1회 시도 후 즉시 종료되는 버그였음).
+    # validate_fn이 실패 시 예외를 던지면 @retry가 지수 백오프로 실제 재시도를 수행함.
+    if validate_fn:
+        validate_fn(result)
+
+    return result
+
+
+def _strip_markdown_fence(text):
+    """```html ... ``` 또는 ``` ... ``` 마크다운 래퍼를 제거."""
+    if "```html" in text:
+        return text.split("```html")[1].split("```")[0].strip()
+    elif "```" in text:
+        return text.split("```")[1].strip()
+    return text
+
+
+def validate_articles_content(text):
+    """🛡️ [추가] Phase 5용 검증 함수. 이제 Claude는 전체 문서가 아니라
+    <main> 안에 들어갈 5개의 <article> 블록만 생성하므로, 검증 기준도 그에 맞춤.
+    - <article> 열고 닫는 태그가 5쌍 이상 있어야 함 (응답이 잘리면 미달됨)
+    - 문서 골격(DOCTYPE/head/style 등)이 실수로 포함되지 않았는지 확인
+    """
+    stripped = _strip_markdown_fence(text)
+    open_count = stripped.count("<article")
+    close_count = stripped.count("</article>")
+    if open_count < 5 or close_count < 5:
+        raise ValueError(f"기사 블록이 불완전합니다 (open={open_count}, close={close_count}). 응답이 잘렸을 수 있습니다.")
+    for forbidden in ("<!DOCTYPE", "<head", "<style", "```"):
+        if forbidden in stripped:
+            raise ValueError(f"문서 골격/마크다운({forbidden})이 잘못 포함되었습니다.")
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, system_rules, user_prompt, output_file="trial/1.txt"):
@@ -438,68 +477,82 @@ def main():
     print("\n--- Phase 5: HTML Generation ---")
     p5_start = time.time()
 
+    # 🛡️ [수정] CSS/문서 골격은 매일 바뀌지 않는 고정 부분이라 Python 템플릿으로 분리.
+    # Claude는 이제 <main> 안에 들어갈 기사 콘텐츠만 생성하면 되므로 출력 토큰이 크게 줄어듦.
+    template_content = ""
+    for path in ("prompt/template.html", "template.html"):
+        try:
+            with open(path, "r", encoding="utf-8") as f: template_content = f.read()
+            break
+        except FileNotFoundError:
+            continue
+
+    if not template_content or "{{ARTICLES_CONTENT}}" not in template_content:
+        print("❌ Phase 5 failed: template.html을 찾을 수 없거나 {{ARTICLES_CONTENT}} 자리표시자가 없습니다.")
+        sys.exit(1)
+
     html_prompt_url = os.getenv("HTML_PROMPT_URL")
     html_prompt_content = ""
     if html_prompt_url:
         html_prompt_content = fetch_prompt_from_github(html_prompt_url)
     else:
-        try:
-            with open("prompt/html.txt", "r", encoding="utf-8") as f: html_prompt_content = f.read()
-        except FileNotFoundError:
+        for path in ("prompt/html_content.txt", "html_content.txt"):
             try:
-                with open("html.txt", "r", encoding="utf-8") as f: html_prompt_content = f.read()
-            except FileNotFoundError: pass
+                with open(path, "r", encoding="utf-8") as f: html_prompt_content = f.read()
+                break
+            except FileNotFoundError:
+                continue
 
     # 🛡️ [방어 로직] html 프롬프트가 없으면 Phase 5를 조용히 건너뛰지 말고 명확히 실패 처리
     # (이전에는 이 경우 아무 에러 없이 스크립트가 종료되어, index.html이 갱신되지 않았는데도
     #  워크플로우가 "성공"으로 표시되는 문제가 있었음)
     if not html_prompt_content:
-        print("❌ Phase 5 failed: html.txt 프롬프트를 찾을 수 없습니다 (HTML_PROMPT_URL 또는 prompt/html.txt 확인 필요).")
+        print("❌ Phase 5 failed: html_content.txt 프롬프트를 찾을 수 없습니다 (HTML_PROMPT_URL 또는 prompt/html_content.txt 확인 필요).")
         sys.exit(1)
 
-    if html_prompt_content:
-        # 🛠️ [수정] OpenAI가 아닌 Anthropic 클라이언트 존재 여부 체크
-        if not c_client:
-            print("❌ Phase 5 failed: Anthropic client is required for Claude HTML generation. Please set CLAUDE_API_KEY.")
-            sys.exit(1)
+    # 🛠️ [수정] OpenAI가 아닌 Anthropic 클라이언트 존재 여부 체크
+    if not c_client:
+        print("❌ Phase 5 failed: Anthropic client is required for Claude HTML generation. Please set CLAUDE_API_KEY.")
+        sys.exit(1)
 
-        claude_model_id = "claude-sonnet-5"
-        print(f"Generating HTML using model: {claude_model_id}...")
-        
-        user_prompt = f"다음 데이터를 바탕으로 시스템 지시사항의 HTML 템플릿과 CSS 규칙에 맞춰 완벽한 단일 HTML 문서를 생성하십시오:\n\n{final_content}"
-        messages = [{"role": "user", "content": user_prompt}]
-        
-        # 🛠️ [수정] run_gpt_chat 대신 새롭게 만든 run_claude_chat 호출
-        html_code = run_claude_chat(c_client, claude_model_id, messages, system=html_prompt_content)
-        
-        if not html_code:
-            print("❌ Phase 5 failed after retries. Exiting.")
-            sys.exit(1)
+    claude_model_id = "claude-sonnet-5"
+    print(f"Generating article content using model: {claude_model_id}...")
 
-        # 마크다운 래퍼 제거 및 HTML 정제
-        if "```html" in html_code:
-            html_code = html_code.split("```html")[1].split("```")[0].strip()
-        elif "```" in html_code:
-            html_code = html_code.split("```")[1].strip()
+    user_prompt = f"다음 데이터를 바탕으로 시스템 지시사항에 맞춰 5개 기사(<article>) 블록만 생성하십시오:\n\n{final_content}"
+    messages = [{"role": "user", "content": user_prompt}]
 
-        if "<!DOCTYPE html>" in html_code:
-            html_code = "<!DOCTYPE html>" + html_code.split("<!DOCTYPE html>")[1]
+    # 🛠️ [수정] validate_fn=validate_articles_content: 응답이 잘리거나 골격이 잘못 섞이면
+    # @retry가 실제로 재시도하도록 함
+    articles_content = run_claude_chat(
+        c_client, claude_model_id, messages,
+        system=html_prompt_content, validate_fn=validate_articles_content
+    )
 
-        # 🛡️ [방어 로직] 응답이 잘리거나(truncated) 불완전한 HTML이면 성공으로 간주하지 않음
-        if "<!DOCTYPE html>" not in html_code or "</html>" not in html_code:
-            print("❌ Phase 5 failed: 생성된 HTML이 불완전합니다 (DOCTYPE 또는 종료 태그 누락). index.html을 덮어쓰지 않습니다.")
-            sys.exit(1)
+    if not articles_content:
+        print("❌ Phase 5 failed after retries. Exiting.")
+        sys.exit(1)
 
-        with open("index.html", "w", encoding="utf-8") as f:
-            f.write(html_code)
+    articles_content = _strip_markdown_fence(articles_content)
 
-        # 🛡️ [방어 로직] Phase 5가 "오늘 날짜"로 실제 완료됐다는 것을 증명하는 마커 파일.
-        # 워크플로우의 "이미 완료됐는지" 체크가 data/*.txt(=Phase 5 이전에 저장됨)가 아니라
-        # 이 마커를 기준으로 판단하도록 하여, Phase 5 실패 시 다음 스케줄에서 재시도가 막히지 않게 함.
-        with open("data/.html_synced", "w", encoding="utf-8") as f:
-            f.write(today_str)
+    # 🛡️ [방어 로직] 템플릿에 기사 콘텐츠를 끼워넣어 최종 문서를 Python 쪽에서 조립.
+    # CSS/골격은 항상 template.html 그대로이므로 매일 CSS가 미세하게 달라질 위험이 원천 차단됨.
+    html_code = template_content.replace("{{ARTICLES_CONTENT}}", articles_content)
 
-        print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
+    # 🛡️ [방어 로직] 최종 안전망 - 조립 결과가 실제로 완전한 문서인지 마지막으로 확인
+    if "{{ARTICLES_CONTENT}}" in html_code or "<!DOCTYPE html>" not in html_code or "</html>" not in html_code:
+        print("❌ Phase 5 failed: 최종 HTML 조립에 실패했습니다. index.html을 덮어쓰지 않습니다.")
+        sys.exit(1)
+
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(html_code)
+
+    # 🛡️ [방어 로직] Phase 5가 "오늘 날짜"로 실제 완료됐다는 것을 증명하는 마커 파일.
+    # 워크플로우의 "이미 완료됐는지" 체크가 data/*.txt(=Phase 5 이전에 저장됨)가 아니라
+    # 이 마커를 기준으로 판단하도록 하여, Phase 5 실패 시 다음 스케줄에서 재시도가 막히지 않게 함.
+    with open("data/.html_synced", "w", encoding="utf-8") as f:
+        f.write(today_str)
+
+    print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
 
 if __name__ == "__main__":
     main()
