@@ -1,508 +1,316 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily AI Tech/Infrastructure Briefing</title>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-NEQ3MVRM28');
-</script>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-:root {
-
---bg-color: #f8fafc;
-
---surface-color: #ffffff;
-
---header-bg: #ffffff;
-
---text-primary: #0f172a;
-
---text-secondary: #475569;
-
---border-color: #e2e8f0;
-
---topbar-text: #0f172a;
-
---synthesis-bg: #f1f5f9;
-
---outlook-bg: #e0f2fe;
-
---btn-bg: #ffffff;
-
---warning-bg: #fffbeb;
-
---warning-text: #d97706;
-
---c1: #2563eb; --lc1: #eff6ff;
-
---c2: #059669; --lc2: #ecfdf5;
-
---c3: #d97706; --lc3: #fffbeb;
-
---c4: #7c3aed; --lc4: #f5f3ff;
-
---c5: #dc2626; --lc5: #fef2f2;
-
-}
-
-[data-theme="dark"] {
-
---bg-color: #0f172a;
-
---surface-color: #1e293b;
-
---header-bg: #020617;
-
---text-primary: #f8fafc;
-
---text-secondary: #94a3b8;
-
---border-color: #334155;
-
---topbar-text: #f8fafc;
-
---synthesis-bg: #1e293b;
-
---outlook-bg: #0c4a6e;
-
---btn-bg: #1e293b;
-
---warning-bg: rgba(217, 119, 6, 0.15);
-
---warning-text: #fcd34d;
-
---lc1: rgba(37, 99, 235, 0.1);
-
---lc2: rgba(5, 150, 105, 0.1);
-
---lc3: rgba(217, 119, 6, 0.1);
-
---lc4: rgba(124, 58, 237, 0.1);
-
---lc5: rgba(220, 38, 38, 0.1);
-
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-primary); line-height: 1.7; transition: background-color 0.3s, color 0.3s; }
-
-.container, main, .article, section { max-width: 900px; margin-left: auto; margin-right: auto; }
-
-main { margin: 2rem auto; padding: 0 1.5rem; }
-
-.ai-disclaimer { background-color: var(--warning-bg); color: var(--warning-text); text-align: center; padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: 600; border-bottom: 1px solid var(--border-color); }
-
-.top-bar { display: flex; justify-content: space-between; align-items: center; background-color: var(--header-bg); padding: 1.5rem 2rem; color: var(--topbar-text); border-bottom: 1px solid var(--border-color); }
-
-.top-bar h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.5px; }
-
-.date-text { font-size: 0.95rem; color: var(--text-secondary); font-weight: 500; }
-
-.article { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 2.5rem; margin-bottom: 3rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-
-.article h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem; line-height: 1.3; }
-
-.subsec { margin-top: 2rem; }
-
-.subsec-label { font-size: 1.1rem; font-weight: 600; margin-left: 0.5rem; margin-bottom: 1rem; display: inline-block; }
-
-.subsec-tag { font-size: 0.8rem; padding: 2px 8px; border-radius: 12px; margin-left: 8px; font-weight: 500; }
-
-.impact-box { padding: 1.5rem; border-radius: 0 8px 8px 0; margin: 1rem 0; font-size: 0.95rem; }
-
-.metric-card { background: var(--bg-color); border: 1px solid var(--border-color); padding: 1rem 1.5rem; border-radius: 8px; display: inline-block; margin-right: 1rem; margin-bottom: 1rem; }
-
-.table-scroll-wrap { overflow-x: auto; margin: 1.5rem 0; }
-
-.info-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-
-.info-table th, .info-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
-
-.info-table th { background-color: var(--bg-color); font-weight: 600; }
-
-.chart-wrap { margin: 2rem 0; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); }
-
-.synthesis { background-color: var(--synthesis-bg); padding: 3rem; border-radius: 12px; margin: 4rem auto; border: 1px solid var(--border-color); }
-
-.outlook-box { background-color: var(--outlook-bg); border-left: 4px solid var(--c1); padding: 2rem; border-radius: 0 8px 8px 0; margin-top: 2rem; }
-
-.toc { display: flex; justify-content: center; gap: 10px; margin: 2rem auto 3rem; max-width: 900px; flex-wrap: wrap; }
-
-.toc a { background: var(--surface-color); color: var(--text-primary); padding: 8px 16px; border-radius: 20px; text-decoration: none; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 500; transition: background 0.2s; }
-
-.toc a:hover { background: var(--border-color); }
-
-.theme-toggle-btn, #to-top { position: fixed; right: 30px; background: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); padding: 12px 20px; border-radius: 30px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 1000; }
-
-.theme-toggle-btn { bottom: 85px; }
-
-#to-top { bottom: 30px; display: none; background: var(--c1); color: #fff; }
-
-@media screen and (max-width: 768px) {
-
-.article, .synthesis { padding: 1.5rem !important; }
-
-h2 { font-size: 1.3rem !important; }
-
-.toc { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; padding: 0 1rem; }
-
-.chart-wrap > div { height: 260px !important; }
-
-.theme-toggle-btn, #to-top { right: 16px; padding: 10px 14px; font-size: 0.85rem; }
-
-.theme-toggle-btn { bottom: 80px; }
-
-#to-top { bottom: 24px; }
-
-}
-
-/* 유틸리티 컬러 클래스 */
-
-.c1 { color: var(--c1); } .lc1 { background-color: var(--lc1); }
-
-.c2 { color: var(--c2); } .lc2 { background-color: var(--lc2); }
-
-.c3 { color: var(--c3); } .lc3 { background-color: var(--lc3); }
-
-.c4 { color: var(--c4); } .lc4 { background-color: var(--lc4); }
-
-.c5 { color: var(--c5); } .lc5 { background-color: var(--lc5); }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Infrastructure System Architecture Briefing</title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NEQ3MVRM28');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
+    <style>
+        /* 전문 문서 느낌을 위한 폰트 설정: 본문은 깔끔한 Sans-serif, 제목은 무게감 있는 Serif */
+        @import url('https://fonts.googleapis.com/css2?family=Lora:wght@500;600&family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap');
+
+        :root {
+            --bg-main: #ffffff;
+            --text-main: #202124;
+            --text-muted: #5f6368;
+            --border-light: #dadce0;
+            --border-dark: #3c4043;
+            --accent-blue: #1a73e8;
+            --bg-surface: #f8f9fa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', -apple-system, sans-serif; background-color: var(--bg-surface); color: var(--text-main); line-height: 1.6; font-size: 15px; }
+
+        header { background-color: var(--bg-main); border-bottom: 1px solid var(--border-light); padding: 2rem 0; margin-bottom: 3rem; }
+        .header-content { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+        .doc-category { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; display: block; }
+        h1 { font-family: 'Lora', serif; font-size: 2.2rem; font-weight: 600; color: #202124; line-height: 1.2; margin-bottom: 0.5rem; }
+        .meta-info { font-size: 0.9rem; color: var(--text-muted); display: flex; gap: 1rem; }
+
+        main { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+
+        .paper-section { background: var(--bg-main); padding: 3rem; margin-bottom: 3rem; border: 1px solid var(--border-light); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .paper-section h2 { font-family: 'Lora', serif; font-size: 1.6rem; font-weight: 600; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid var(--border-dark); }
+
+        .section-title { font-size: 1.1rem; font-weight: 700; color: #202124; margin: 2rem 0 1rem 0; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        p { margin-bottom: 1.2rem; color: #3c4043; text-align: justify; }
+
+        /* Academic Booktabs Table Style */
+        .table-wrapper { overflow-x: auto; margin: 2rem 0; }
+        .academic-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
+        .academic-table th, .academic-table td { padding: 10px 12px; }
+        .academic-table th { font-weight: 700; border-top: 2px solid var(--border-dark); border-bottom: 1px solid var(--text-main); color: var(--text-main); }
+        .academic-table td { border-bottom: 1px solid var(--border-light); color: #3c4043; }
+        .academic-table tr:last-child td { border-bottom: 2px solid var(--border-dark); }
+
+        .chart-container { width: 100%; height: 350px; margin: 2.5rem 0; border: 1px solid var(--border-light); background: #ffffff; padding: 1rem; }
+
+        .code-term { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; background: var(--bg-surface); border: 1px solid var(--border-light); padding: 2px 6px; border-radius: 4px; }
+
+        @media (max-width: 768px) {
+            .paper-section { padding: 1.5rem; }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
 </head>
 <body>
-<div class="ai-disclaimer">⚠️ This content is AI-generated and may not be entirely accurate.</div>
-<div class="top-bar">
-<h1>Daily AI Tech/Infrastructure Briefing</h1>
-<span class="date-text" id="report-date"></span>
-</div>
-<nav class="toc">
-<a href="#art1">1. Kimi K3</a>
-<a href="#art2">2. Meta / Anthropic</a>
-<a href="#art3">3. Gemini Delay</a>
-<a href="#art4">4. SpaceX / Pentagon</a>
-<a href="#art5">5. Apple / Nvidia</a>
-<a href="#synthesis">Synthesis</a>
-</nav>
-<button id="theme-toggle" class="theme-toggle-btn">🌙 Dark Mode</button>
-<button id="to-top">↑ Top</button>
+    <header>
+        <div class="header-content">
+            <span class="doc-category">System Architecture & Intelligence Review</span>
+            <h1>Daily AI Infrastructure Briefing</h1>
+            <div class="meta-info">
+                <span id="report-date"></span> • Confidential / Internal Use
+            </div>
+        </div>
+    </header>
 
-<main>
-<article class="article" id="art1">
-<h2>Moonshot AI Launches Kimi K3, Surprising Silicon Valley and Fueling Open-Weight Debate</h2>
-<div class="subsec">
-<span class="subsec-icon">🎯</span><span class="subsec-label c1">Executive Summary</span>
-<p>Beijing-based Moonshot AI, led by Pittsburgh-educated entrepreneur Yang Zhilin, unveiled Kimi K3: a frontier-scale open-weight challenger to OpenAI’s GPT-5.6 Sol and Anthropic’s Claude Fable 5. The public release took first place on Arena’s front-end coding leaderboard and coincided with a broader semiconductor selloff as investors reassessed U.S. compute-and-CapEx moats under strict export controls.</p>
-<div class="metric-card"><strong class="c1">2.8 Trillion</strong><br>total parameters; weights released publicly</div>
-<div class="metric-card"><strong class="c1">#1 Arena Rank</strong><br>front-end coding capability</div>
-</div>
-<div class="subsec">
-<span class="subsec-icon">💡</span><span class="subsec-label c1">Deep Dive</span><span class="subsec-tag lc1 c1">Tech &amp; Strategy</span>
-<div class="impact-box lc1" style="border-left:4px solid var(--c1)">
-<ul>
-<li>Kimi K3 outperformed Claude Fable 5 and GPT-5.6 Sol on web-development tasks while demonstrating that an open-weight model can rival or exceed closed-source systems at a fraction of token cost.</li>
-<li>The result challenges the thesis that chip hoarding and raw capital alone determine frontier leadership; algorithmic efficiency may temper near-term urgency for exponential GPU scaling.</li>
-<li>Portfolio implication: underweight highly valued semiconductor momentum names; overweight platforms and middleware able to operationalize high-performance, low-cost open weights.</li>
-<li>Status: official announcement / model launch; live on the Arena evaluation platform. Focus: software and hardware. Paradigm shift category: Model.</li>
-</ul>
-</div>
-<div class="table-scroll-wrap"><table class="info-table">
-<thead><tr><th>Specification / Comparison</th><th>Reported Value</th></tr></thead>
+    <main>
+        <article class="paper-section" id="art1">
+<h2>Sparse MoE Scaling and Capital Formation: Moonshot AI's Kimi K3 Launch and Accelerated Hong Kong Listing</h2>
+
+<h3 class="section-title">1. Abstract</h3>
+<p>Moonshot AI has circulated a Hong Kong IPO proposal targeting completion within six months, capitalizing on the technical and commercial momentum of Kimi K3, a 2.8-trillion-parameter open-weight Mixture-of-Experts model released on July 16, 2026. The model attained the #1 ranking on Arena's Frontend Code leaderboard, surpassing proprietary systems from Anthropic and OpenAI, while the company's ARR run-rate expanded from 200 million USD to 300 million USD between April and June 2026. Valued at approximately 31.5 billion USD, Moonshot AI's listing represents a landmark liquidity event for backers Alibaba and Tencent and evidences that sparse architectures can deliver frontier-class performance despite continued U.S. semiconductor export restrictions.</p>
+
+<h3 class="section-title">2. Architecture & Performance</h3>
+<div class="table-wrapper">
+<table class="academic-table">
+<thead>
+<tr><th>Specification</th><th>Value</th></tr>
+</thead>
 <tbody>
-<tr><td>Total parameters</td><td>2.8 Trillion</td></tr>
-<tr><td>Arena front-end coding rank</td><td>Number 1</td></tr>
-<tr><td>Task cost efficiency</td><td>$3.24 vs. $10+ for Claude Fable 5</td></tr>
-<tr><td>Deployment</td><td>Public weights; live Arena evaluation</td></tr>
-<tr><td>Source / timing</td><td>The Washington Post / AP / Arena.ai · Event &amp; publication: July 17, 2026 · EDT; published July 18 KST</td></tr>
-</tbody></table></div>
-<div class="chart-wrap"><div id="chart-art1" style="width:100%; height:320px;"></div></div>
+<tr><td>Total Parameters</td><td>2.8 Trillion</td></tr>
+<tr><td>Active Parameters</td><td>~50 Billion (16 of 896 experts/token)</td></tr>
+<tr><td>Context Window</td><td>1,000,000 tokens</td></tr>
+<tr><td>API Pricing (Input / Output)</td><td>$3.00 / $15.00 per million tokens</td></tr>
+<tr><td>ARR Run-Rate (June 2026)</td><td>$300 Million USD</td></tr>
+<tr><td>ARR Run-Rate (April 2026)</td><td>$200 Million USD</td></tr>
+<tr><td>Company Valuation</td><td>~$31.5 Billion USD</td></tr>
+<tr><td>Scaling Efficiency vs. K2</td><td>2.5x improvement (KDA + AttnRes)</td></tr>
+<tr><td>Decode Speed (Million-token context)</td><td>Up to 6.3x faster</td></tr>
+</tbody>
+</table>
 </div>
-<div class="subsec">
-<span class="subsec-icon">⚠️</span><span class="subsec-label c1">Risk &amp; Outlook</span>
-<p>Despite revolutionary coding and web-development benchmarks, broader reasoning and multi-step planning performance still slightly trails U.S. flagships. A public 2.8-trillion-parameter release also heightens national-security concerns around unmonitored cyber-weapons and vulnerability exploitation.</p>
-</div>
-</article>
-
-<article class="article" id="art2">
-<h2>Meta in Early-Stage Talks for $10 Billion Compute-Leasing Deal with Anthropic</h2>
-<div class="subsec">
-<span class="subsec-icon">🎯</span><span class="subsec-label c2">Executive Summary</span>
-<p>Meta Platforms is reportedly negotiating to lease up to $10 billion of AI data-center compute to Anthropic over two years. Initiated by Anthropic in June, the arrangement would use monthly payments and give both parties early-exit options—positioning Meta as a commercial cloud and “neocloud” provider while Anthropic seeks capacity to relieve Nvidia-chip shortages constraining Claude Fable 5.</p>
-<div class="metric-card"><strong class="c2">$10B / 2 Years</strong><br>proposed compute lease</div>
-<div class="metric-card"><strong class="c2">$125B–$145B</strong><br>Meta projected 2026 CapEx</div>
-</div>
-<div class="subsec">
-<span class="subsec-icon">💡</span><span class="subsec-label c2">Deep Dive</span><span class="subsec-tag lc2 c2">Tech &amp; Strategy</span>
-<div class="impact-box lc2" style="border-left:4px solid var(--c2)">
-<ul>
-<li>The transaction validates a neocloud model: a consumer hyperscaler monetizes excess infrastructure as managed hosting for a direct frontier-model rival.</li>
-<li>It diversifies Meta beyond advertising, places it against GPU-cloud specialists CoreWeave and Nebius, and provides a high-margin route to mitigate its 2026 CapEx burden.</li>
-<li>For Anthropic—reportedly preparing for an IPO—capacity would support scaling Claude Fable 5 amid strict usage limits caused by persistent Nvidia shortages.</li>
-<li>Status: press report / strategic negotiations; early-stage and terms remain fluid. Focus: hardware. Paradigm shift category: Infrastructure.</li>
-</ul>
-</div>
-<div class="table-scroll-wrap"><table class="info-table">
-<thead><tr><th>Commercial Infrastructure Metric</th><th>Reported Value</th></tr></thead>
-<tbody>
-<tr><td>Meta–Anthropic proposal</td><td>Up to $10 Billion; 2 years; monthly installments; mutual early-exit options</td></tr>
-<tr><td>Annualized proposed value</td><td>Approximately $5 Billion per year</td></tr>
-<tr><td>Anthropic–SpaceX agreement</td><td>$45 Billion over 3 years, signed May 2026; $15 Billion per year</td></tr>
-<tr><td>Meta 2026 CapEx</td><td>$125 Billion to $145 Billion</td></tr>
-<tr><td>Source / timing</td><td>The New York Times / Reuters / Barchart · Event &amp; publication: July 17, 2026 · EDT; published July 18 KST</td></tr>
-</tbody></table></div>
-<div class="chart-wrap"><div id="chart-art2" style="width:100%; height:320px;"></div></div>
-</div>
-<div class="subsec">
-<span class="subsec-icon">⚠️</span><span class="subsec-label c2">Risk &amp; Outlook</span>
-<p>Leasing to Anthropic could signal insufficient internal demand for Meta’s data-center footprint. The cloud-hosting move also introduces operational and security complexity for a business historically centered on consumer software.</p>
-</div>
-</article>
-
-<article class="article" id="art3">
-<h2>Google’s Gemini 3.5 Pro Faces Months-Long Delay Over Coding Stumbles and Internal Friction</h2>
-<div class="subsec">
-<span class="subsec-icon">🎯</span><span class="subsec-label c3">Executive Summary</span>
-<p>Alphabet’s flagship Gemini 3.5 Pro is months behind schedule as Google works to improve coding and recursive tool-calling capabilities. A late-June training-data update produced disappointing results, while requirements to work across Search, Maps, and YouTube have added deployment friction. Bloomberg’s July 17 report describes frustration among engineers, researchers, and managers as competitors extend their lead.</p>
-<div class="metric-card"><strong class="c3">Late July or August 2026</strong><br>revised target release window</div>
-<div class="metric-card"><strong class="c3">3 Integrated Products</strong><br>Search, Maps, and YouTube</div>
-</div>
-<div class="subsec">
-<span class="subsec-icon">💡</span><span class="subsec-label c3">Deep Dive</span><span class="subsec-tag lc3 c3">Tech &amp; Strategy</span>
-<div class="impact-box lc3" style="border-left:4px solid var(--c3)">
-<ul>
-<li>The delay exposes how difficult frontier pretraining and competitive coding parity remain, even for a scaled incumbent.</li>
-<li>GPT-5.6 Sol, Claude Fable 5, and Meta’s Muse Spark 1.1 have deployed advanced coding capabilities, putting Google in a defensive enterprise and developer-market posture.</li>
-<li>Near-term internal demand for high-throughput inference compute may slow, potentially reducing hardware utilization while remediation continues.</li>
-<li>Investment implication: underweight Google versus OpenAI/Microsoft and Anthropic in the near term; monitor resolution of coding bottlenecks. Status: internal testing and partner previews; public release delayed. Focus: software. Category: Model.</li>
-</ul>
-</div>
-<div class="table-scroll-wrap"><table class="info-table">
-<thead><tr><th>Readout</th><th>Detail</th></tr></thead>
-<tbody>
-<tr><td>Target release</td><td>Delayed to late July or August 2026</td></tr>
-<tr><td>Primary bottleneck</td><td>Coding capabilities and recursive tool-calling</td></tr>
-<tr><td>Training intervention</td><td>Training data updated late last month; results disappointing</td></tr>
-<tr><td>Competitive reference models</td><td>GPT-5.6 Sol; Claude Fable 5; Meta Muse Spark 1.1</td></tr>
-<tr><td>Source / timing</td><td>Bloomberg / LA Times / Seeking Alpha · Event &amp; publication: July 17, 2026 · EDT; published July 18 KST</td></tr>
-</tbody></table></div>
-<div class="chart-wrap"><div id="chart-art3" style="width:100%; height:320px;"></div></div>
-</div>
-<div class="subsec">
-<span class="subsec-icon">⚠️</span><span class="subsec-label c3">Risk &amp; Outlook</span>
-<p>The choice to delay reflects pressure to deliver a flawless flagship but reveals organizational coordination challenges across Google’s broad product portfolio. Further slippage risks surrendering developer and enterprise mindshare to Anthropic and OpenAI.</p>
-</div>
-</article>
-
-<article class="article" id="art4">
-<h2>SpaceX in Talks with Pentagon for Multibillion-Dollar AI Infrastructure Deal</h2>
-<div class="subsec">
-<span class="subsec-icon">🎯</span><span class="subsec-label c4">Executive Summary</span>
-<p>SpaceX is discussing a multibillion-dollar agreement with the U.S. Department of Defense to provide dedicated AI data-center capacity for sensitive, classified workloads under the Pentagon’s $30 billion “Artificial Intelligence Arsenal.” The proposal would extend SpaceX’s cloud business and make it a direct competitor to Oracle, CoreWeave, and Amazon after similar infrastructure agreements with Anthropic and Google.</p>
-<div class="metric-card"><strong class="c4">$30B</strong><br>Pentagon Artificial Intelligence Arsenal</div>
-<div class="metric-card"><strong class="c4">5 Approved Providers</strong><br>SpaceX, Amazon, Google, Microsoft, Oracle</div>
-</div>
-<div class="subsec">
-<span class="subsec-icon">💡</span><span class="subsec-label c4">Deep Dive</span><span class="subsec-tag lc4 c4">Tech &amp; Strategy</span>
-<div class="impact-box lc4" style="border-left:4px solid var(--c4)">
-<ul>
-<li>The negotiations accelerate sovereign, secure AI infrastructure purpose-built for national security, including air-gapped facilities for classified training and inference.</li>
-<li>SpaceX’s land holdings, energy access, proprietary networking, vertically integrated energy, and satellite communications can support resilient, low-cost, off-grid compute clusters versus providers reliant on public utility grids.</li>
-<li>The move challenges the traditional defense-cloud concentration around Microsoft, Amazon, and Oracle and elevates SpaceX in a high-margin government-compute segment.</li>
-<li>Status: active negotiations; SpaceX already approved for specific classified AI applications. Focus: hardware. Paradigm shift category: Infrastructure.</li>
-</ul>
-</div>
-<div class="table-scroll-wrap"><table class="info-table">
-<thead><tr><th>Defense Compute Dimension</th><th>Reported Detail</th></tr></thead>
-<tbody>
-<tr><td>Target deal value</td><td>Multibillion-Dollar</td></tr>
-<tr><td>Pentagon initiative</td><td>Artificial Intelligence Arsenal — $30 Billion</td></tr>
-<tr><td>Approved cloud providers</td><td>SpaceX, Amazon, Google, Microsoft, Oracle</td></tr>
-<tr><td>Workload profile</td><td>Highly sensitive, classified AI workloads</td></tr>
-<tr><td>Source / timing</td><td>The Wall Street Journal / Reuters / Seeking Alpha · Event &amp; publication: July 17, 2026 · EDT; published July 18 KST</td></tr>
-</tbody></table></div>
-<div class="chart-wrap"><div id="chart-art4" style="width:100%; height:320px;"></div></div>
-</div>
-<div class="subsec">
-<span class="subsec-icon">⚠️</span><span class="subsec-label c4">Risk &amp; Outlook</span>
-<p>Concentrating critical defense AI infrastructure within SpaceX creates governance and single-point-of-failure concerns given Elon Musk’s global business interests and unpredictable public posture. Militarization of frontier models under the $30 billion initiative could also accelerate an unregulated global AI arms race.</p>
-</div>
-</article>
-
-<article class="article" id="art5">
-<h2>Apple Briefly Overtakes Nvidia as World’s Most Valuable Company Amid AI Investment Reassessment</h2>
-<div class="subsec">
-<span class="subsec-icon">🎯</span><span class="subsec-label c5">Executive Summary</span>
-<p>On July 17, 2026, Apple briefly became the world’s most valuable publicly traded company, reaching a $4.88 trillion market capitalization as Nvidia fell 3.5% in early trading to $4.86 trillion. The reordering signals investor rotation from pure AI infrastructure build-out toward downstream monetization, ecosystem lock-in, services, and consumer hardware upgrades.</p>
-<div class="metric-card"><strong class="c5">$4.88T vs. $4.86T</strong><br>Apple vs. Nvidia market capitalization</div>
-<div class="metric-card"><strong class="c5">23%</strong><br>Apple stock rise this year</div>
-</div>
-<div class="subsec">
-<span class="subsec-icon">💡</span><span class="subsec-label c5">Deep Dive</span><span class="subsec-tag lc5 c5">Tech &amp; Strategy</span>
-<div class="impact-box lc5" style="border-left:4px solid var(--c5)">
-<ul>
-<li>Apple’s less CapEx-intensive model is being re-rated for earnings durability and its ability to monetize AI across a massive active device base.</li>
-<li>Nvidia, which had led for nearly a year, faces increased execution risk and volatility; options markets imply a wide 68% probability band around its future valuation.</li>
-<li>Apple’s nearly 23% year-to-date gain outperformed the Nasdaq and restored the top position for the first time since April last year.</li>
-<li>Investment implication: balance pure-play hardware exposure with consumer platforms that monetize AI without comparable CapEx intensity. Status: July 17 market event / financial milestone. Focus: both software and hardware. Category: Infrastructure.</li>
-</ul>
-</div>
-<div class="table-scroll-wrap"><table class="info-table">
-<thead><tr><th>Market Metric</th><th>Reported Value</th></tr></thead>
-<tbody>
-<tr><td>Apple market capitalization</td><td>$4.88 Trillion</td></tr>
-<tr><td>Nvidia market capitalization</td><td>$4.86 Trillion</td></tr>
-<tr><td>Nvidia early-trading decline</td><td>3.5%</td></tr>
-<tr><td>Nvidia implied volatility</td><td>43.4%</td></tr>
-<tr><td>Apple share performance</td><td>Nearly 23% this year; outperformed Nasdaq</td></tr>
-<tr><td>Source / timing</td><td>Reuters / Forbes / MacRumors · Event &amp; publication: July 17, 2026 · EDT; published July 18 KST</td></tr>
-</tbody></table></div>
-<div class="chart-wrap"><div id="chart-art5" style="width:100%; height:320px;"></div></div>
-</div>
-<div class="subsec">
-<span class="subsec-icon">⚠️</span><span class="subsec-label c5">Risk &amp; Outlook</span>
-<p>Apple still must deliver upgraded Siri and on-device AI features. If consumer adoption stalls, its premium valuation could correct sharply despite confidence in its consumer monetization strategy.</p>
-</div>
-</article>
-
-<section class="synthesis" id="synthesis">
-<h2>Strategic Synthesis &amp; Forward-Looking Outlook</h2>
-<p>The past 24 hours indicate a structural transition across the global AI value chain: from speculative software development toward disciplined physical deployment, infrastructure monetization, and localized agentic execution.</p>
-<div class="impact-box lc1" style="border-left:4px solid var(--c1)">
-<ul>
-<li><strong>Kimi K3:</strong> Moonshot AI’s open-weight release shows that models can match or exceed closed-source giants at a fraction of token cost, driving a violent global semiconductor selloff and a reassessment of U.S. CapEx moats.</li>
-<li><strong>Neocloud monetization:</strong> Meta’s potential $10 billion Anthropic lease demonstrates how consumer-tech infrastructure can become managed hosting, monetizing Meta’s CapEx while helping Anthropic circumvent Nvidia shortages.</li>
-<li><strong>Frontier execution:</strong> Gemini 3.5 Pro’s delay illustrates persistent engineering difficulty in coding capability and frontier pretraining; SpaceX’s Pentagon discussions position it as a sovereign-compute gatekeeper.</li>
-<li><strong>Market re-rating:</strong> Apple’s brief return to the top valuation spot marks a sentiment shift from infrastructure build-out toward downstream, consumer-facing AI monetization.</li>
-</ul>
-</div>
-<div class="outlook-box">
-<h3 class="c1">Upcoming Tech Calendar</h3>
-<div class="outlook-item"><strong>July 24, 2026:</strong> DeepSeek V4 stable release.</div>
-<div class="outlook-item"><strong>September 1, 2026:</strong> OpenAI physical security key requirement for Trusted Access for Cyber program.</div>
-<div class="outlook-item"><strong>September 2026:</strong> John Ternus scheduled to take over as Apple CEO.</div>
-<div class="outlook-item"><strong>October 2026:</strong> Anthropic rumored IPO.</div>
-</div>
-</section>
-</main>
-
+<div class="chart-container" id="chart-art1"></div>
 <script>
-document.getElementById('report-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
-document.addEventListener('DOMContentLoaded', () => {
-const themeBtn = document.getElementById('theme-toggle');
-const htmlElement = document.documentElement;
-
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-htmlElement.setAttribute('data-theme', 'dark');
-}
-themeBtn.innerHTML = htmlElement.getAttribute('data-theme') === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-
-themeBtn.addEventListener('click', () => {
-const newTheme = htmlElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-htmlElement.setAttribute('data-theme', newTheme);
-themeBtn.innerHTML = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-
-// 차트 리사이즈 트리거 (테마 변경시 다시 그리기 위함)
-window.dispatchEvent(new Event('resize'));
-});
-
-const toTopBtn = document.getElementById('to-top');
-window.addEventListener('scroll', () => {
-toTopBtn.style.display = window.scrollY > 300 ? 'flex' : 'none';
-});
-
-toTopBtn.addEventListener('click', () => {
-window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-const muted = '#64748b';
-const grid = '#94a3b8';
-const charts = [];
-const makeChart = (id, option) => {
-const chart = echarts.init(document.getElementById(id), null, {renderer: 'svg'});
-chart.setOption(option);
-charts.push(chart);
-};
-
-makeChart('chart-art1', {
-backgroundColor: 'transparent',
-title: {text: 'Token-Cost Benchmark', left: 'center', textStyle: {color: muted, fontSize: 14}},
-tooltip: {trigger: 'item'},
-series: [{
-type: 'pie', radius: ['48%', '72%'], center: ['50%', '55%'],
-label: {color: muted, formatter: '{b}\n${c}'},
-data: [
-{value: 3.24, name: 'Kimi K3', itemStyle: {color: '#2563eb'}},
-{value: 10, name: 'Claude Fable 5 (minimum)', itemStyle: {color: '#94a3b8'}}
-]
-}]
-});
-
-makeChart('chart-art2', {
-backgroundColor: 'transparent',
-title: {text: 'Annualized Compute Commitments ($B)', left: 'center', textStyle: {color: muted, fontSize: 14}},
-tooltip: {trigger: 'axis'},
-radar: {
-indicator: [{name:'Meta–Anthropic', max: 16},{name:'Anthropic–SpaceX', max: 16}],
-axisName: {color: muted}, splitLine: {lineStyle: {color: grid}}, splitArea: {areaStyle: {color: 'transparent'}}
-},
-series: [{type: 'radar', data: [{value: [5, 15], name: 'Annualized value', areaStyle: {color: 'rgba(5,150,105,0.2)'}, lineStyle: {color: '#059669'}, itemStyle: {color: '#059669'}}]}]
-});
-
-makeChart('chart-art3', {
-backgroundColor: 'transparent',
-title: {text: 'Gemini 3.5 Pro Release Readiness', left: 'center', textStyle: {color: muted, fontSize: 14}},
-series: [{
-type: 'gauge', startAngle: 210, endAngle: -30, min: 0, max: 100,
-progress: {show: true, width: 18, itemStyle: {color: '#d97706'}},
-axisLine: {lineStyle: {width: 18, color: [[1, '#e2e8f0']]}},
-axisTick: {show: false}, splitLine: {show: false}, axisLabel: {show: false},
-pointer: {show: false}, detail: {valueAnimation: true, formatter: 'Delayed', color: muted, fontSize: 18},
-data: [{value: 45}]
-}]
-});
-
-makeChart('chart-art4', {
-backgroundColor: 'transparent',
-title: {text: 'Pentagon Approved Cloud Provider Set', left: 'center', textStyle: {color: muted, fontSize: 14}},
-tooltip: {trigger: 'item'},
-series: [{
-type: 'pie', radius: ['38%', '68%'], center: ['50%', '55%'],
-label: {color: muted, formatter: '{b}'},
-data: [
-{value: 1, name:'SpaceX', itemStyle:{color:'#7c3aed'}},
-{value: 1, name:'Amazon', itemStyle:{color:'#94a3b8'}},
-{value: 1, name:'Google', itemStyle:{color:'#d97706'}},
-{value: 1, name:'Microsoft', itemStyle:{color:'#2563eb'}},
-{value: 1, name:'Oracle', itemStyle:{color:'#dc2626'}}
-]
-}]
-});
-
-makeChart('chart-art5', {
-backgroundColor: 'transparent',
-title: {text: 'Market Capitalization Snapshot ($T)', left: 'center', textStyle: {color: muted, fontSize: 14}},
-tooltip: {trigger: 'axis'},
-xAxis: {type: 'category', data: ['Apple', 'Nvidia'], axisLabel: {color: muted}, axisLine: {lineStyle: {color: grid}}},
-yAxis: {type: 'value', min: 4.8, max: 4.9, axisLabel: {color: muted}, splitLine: {lineStyle: {color: '#e2e8f0'}}},
-series: [{
-type: 'line', smooth: true, symbolSize: 12,
-data: [{value:4.88, itemStyle:{color:'#dc2626'}},{value:4.86, itemStyle:{color:'#64748b'}}],
-lineStyle: {width: 4, color: '#dc2626'},
-areaStyle: {color: 'rgba(220,38,38,0.12)'}
-}]
-});
-
-window.addEventListener('resize', () => charts.forEach(chart => chart.resize()));
+echarts.init(document.getElementById('chart-art1'), null, {renderer: 'svg'}).setOption({
+  grid: { top: 40, right: 30, bottom: 40, left: 60 },
+  tooltip: { trigger: 'axis' },
+  xAxis: { type: 'category', data: ['Apr 2026', 'May 2026 (est.)', 'Jun 2026'], axisLine: { lineStyle: { color: '#999' } } },
+  yAxis: { type: 'value', name: 'ARR (USD Million)', splitLine: { lineStyle: { type: 'dashed', color: '#ccc' } } },
+  series: [{
+    name: 'ARR Run-Rate',
+    type: 'bar',
+    data: [200, 250, 300],
+    itemStyle: { color: '#1a73e8' },
+    barWidth: '45%',
+    label: { show: true, position: 'top', color: '#333' }
+  }]
 });
 </script>
+
+<h3 class="section-title">3. Strategic Outlook & Limitations</h3>
+<p>Operating a 2.8-trillion-parameter model at scale imposes significant latency and infrastructure costs, with local deployment requiring at least 64 advanced accelerators, constraining accessibility outside major cloud providers. The Hong Kong listing further exposes Moonshot AI to dual regulatory scrutiny from Beijing and Washington, and its long-term trajectory remains structurally dependent on continued access to compute despite U.S. export controls. Full model weight release scheduled for July 27, 2026, will serve as a critical validation checkpoint for independent benchmarking claims.</p>
+</article>
+
+<article class="paper-section" id="art2">
+<h2>State-Level Intervention in AI Infrastructure: New York's One-Year Moratorium on Large-Scale Data Centers</h2>
+
+<h3 class="section-title">1. Abstract</h3>
+<p>New York Governor Kathy Hochul signed an executive order on July 19, 2026, imposing a one-year moratorium on large-scale data center construction statewide, citing grid transmission capacity constraints, rising consumer utility rates, and insufficient local negotiating leverage against hyperscale operators. This marks the first state-level executive intervention explicitly halting the physical expansion of AI infrastructure, establishing a precedent that could be replicated across other power-constrained jurisdictions and fundamentally altering hyperscaler site-selection strategy on the U.S. East Coast.</p>
+
+<h3 class="section-title">2. Architecture & Performance</h3>
+<div class="table-wrapper">
+<table class="academic-table">
+<thead>
+<tr><th>Regulatory Parameter</th><th>Detail</th></tr>
+</thead>
+<tbody>
+<tr><td>Moratorium Duration</td><td>1 Year</td></tr>
+<tr><td>Primary Regulatory Focus</td><td>Grid transmission capacity; consumer utility rates; local power demand</td></tr>
+<tr><td>Target Infrastructure</td><td>Large-scale AI data centers</td></tr>
+<tr><td>Issuing Authority</td><td>Governor Kathy Hochul (Executive Order)</td></tr>
+<tr><td>Prior Precedent Level</td><td>Local zoning boards only</td></tr>
+<tr><td>New Precedent Level</td><td>State executive action</td></tr>
+</tbody>
+</table>
+</div>
+<div class="chart-container" id="chart-art2"></div>
+<script>
+echarts.init(document.getElementById('chart-art2'), null, {renderer: 'svg'}).setOption({
+  grid: { top: 40, right: 30, bottom: 40, left: 60 },
+  tooltip: { trigger: 'axis' },
+  xAxis: { type: 'category', data: ['Local Zoning\nDisputes (Pre-2026)', 'State Executive\nOrder (Jul 2026)'], axisLine: { lineStyle: { color: '#999' } } },
+  yAxis: { type: 'value', name: 'Regulatory Scope Index', splitLine: { lineStyle: { type: 'dashed', color: '#ccc' } } },
+  series: [{
+    name: 'Regulatory Escalation',
+    type: 'bar',
+    data: [30, 100],
+    itemStyle: { color: function(params) { return params.dataIndex === 1 ? '#1a73e8' : '#999'; } },
+    barWidth: '40%',
+    label: { show: true, position: 'top', color: '#333' }
+  }]
+});
+</script>
+
+<h3 class="section-title">3. Strategic Outlook & Limitations</h3>
+<p>While the moratorium addresses legitimate consumer-grid protection concerns, an extended construction freeze risks undermining New York's competitiveness as an AI innovation hub. Should other power-constrained states adopt similar measures, cumulative infrastructure bottlenecks could materially slow frontier-model deployment across the United States, ceding relative advantage to jurisdictions—domestic or international—with more permissive regulatory environments. State agencies are expected to conduct a comprehensive grid-impact review during the moratorium period, the outcome of which will determine whether the ban is extended, modified, or lifted.</p>
+</article>
+
+<article class="paper-section" id="art3">
+<h2>Capital Reallocation at Scale: Oracle's 30,000-Position Reduction to Finance the $500 Billion Stargate Buildout</h2>
+
+<h3 class="section-title">1. Abstract</h3>
+<p>Oracle Corporation has executed the largest workforce reduction in its 49-year history, eliminating up to 30,000 positions (approximately 18% of its global workforce) to fund its role in the 500 billion USD Stargate AI infrastructure venture. Confirmed July 18, 2026, the restructuring is not driven by financial distress—Oracle reported record cloud revenue and committed nearly 50 billion USD in fiscal 2026 capital expenditure—but reflects a deliberate strategic pivot reallocating capital from enterprise software teams toward physical data center construction supporting 4.5 gigawatts of new U.S. capacity.</p>
+
+<h3 class="section-title">2. Architecture & Performance</h3>
+<div class="table-wrapper">
+<table class="academic-table">
+<thead>
+<tr><th>Metric</th><th>Value</th></tr>
+</thead>
+<tbody>
+<tr><td>Workforce Reduction</td><td>Up to 30,000 roles (18% of global workforce)</td></tr>
+<tr><td>Most Affected Region</td><td>India (~12,000 positions)</td></tr>
+<tr><td>Fiscal 2026 CapEx Commitment</td><td>~$50 Billion USD</td></tr>
+<tr><td>Stargate Target Capacity</td><td>4.5 Gigawatts</td></tr>
+<tr><td>Stargate Total Venture Value</td><td>$500 Billion USD</td></tr>
+<tr><td>Reported Balance Sheet Debt</td><td>Over $100 Billion USD</td></tr>
+<tr><td>Primary Financing Method</td><td>Debt (vs. cash reserves at peers)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="chart-container" id="chart-art3"></div>
+<script>
+echarts.init(document.getElementById('chart-art3'), null, {renderer: 'svg'}).setOption({
+  grid: { top: 40, right: 40, bottom: 40, left: 70 },
+  tooltip: { trigger: 'axis' },
+  legend: { data: ['Oracle'], top: 0, textStyle: { color: '#333' } },
+  xAxis: { type: 'category', data: ['Workforce\nCut (%)', 'CapEx\n($B)', 'Debt\n($B, /10)', 'Stargate\nCapacity (GW)'], axisLine: { lineStyle: { color: '#999' } } },
+  yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed', color: '#ccc' } } },
+  series: [{
+    name: 'Oracle',
+    type: 'bar',
+    data: [18, 50, 10, 4.5],
+    itemStyle: { color: '#1a73e8' },
+    barWidth: '45%',
+    label: { show: true, position: 'top', color: '#333' }
+  }]
+});
+</script>
+
+<h3 class="section-title">3. Strategic Outlook & Limitations</h3>
+<p>Oracle's Stargate exposure carries substantial financial risk: with over 100 billion USD in debt and negative free cash flow, the company retains a narrow margin for execution error. Should commercial demand for frontier AI models fail to justify the scale of capital committed to these data centers, Oracle could face a severe balance-sheet reckoning, with contagion risk extending across the broader AI infrastructure financing ecosystem. Construction progress in Abilene, Texas, will serve as a near-term barometer of execution discipline.</p>
+</article>
+
+<article class="paper-section" id="art4">
+<h2>Toward Formal Oversight: The White House's Consideration of a FINRA-Style AI Safety Regulator</h2>
+
+<h3 class="section-title">1. Abstract</h3>
+<p>The White House is actively evaluating the creation of a dedicated federal regulator for AI safety and national security oversight, catalyzed by Google DeepMind CEO Demis Hassabis' proposal for an industry-funded standards body modeled on FINRA. Hassabis warned that human-level AGI may arrive within a few years, urging a mandatory 30-day pre-release review period for frontier models to assess cyber-weapon and biological risks. This follows a June 2026 executive order under which Google DeepMind, Microsoft, and xAI already agreed to submit covered models for federal national security testing.</p>
+
+<h3 class="section-title">2. Architecture & Performance</h3>
+<div class="table-wrapper">
+<table class="academic-table">
+<thead>
+<tr><th>Policy Parameter</th><th>Detail</th></tr>
+</thead>
+<tbody>
+<tr><td>Proposed Review Period</td><td>Up to 30 Days Prior to Release</td></tr>
+<tr><td>Regulatory Model Prototype</td><td>FINRA (Financial Industry Regulatory Authority)</td></tr>
+<tr><td>Key Risk Areas</td><td>Cybersecurity, biological threats, autonomous deception</td></tr>
+<tr><td>Prior Voluntary Commitments</td><td>Google DeepMind, Microsoft, xAI (June 2026 EO)</td></tr>
+<tr><td>Funding Model</td><td>Industry-funded (proposed)</td></tr>
+<tr><td>Comparable Framework</td><td>EU AI Act (risk-based classification, static)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="chart-container" id="chart-art4"></div>
+<script>
+echarts.init(document.getElementById('chart-art4'), null, {renderer: 'svg'}).setOption({
+  grid: { top: 40, right: 30, bottom: 40, left: 60 },
+  tooltip: { trigger: 'item' },
+  radar: {
+    indicator: [
+      { name: 'Adaptability', max: 100 },
+      { name: 'Industry Autonomy', max: 100 },
+      { name: 'Enforcement Rigidity', max: 100 },
+      { name: 'Speed to Market Impact', max: 100 },
+      { name: 'Capture Risk', max: 100 }
+    ],
+    axisLine: { lineStyle: { color: '#ccc' } },
+    splitLine: { lineStyle: { type: 'dashed', color: '#ddd' } }
+  },
+  series: [{
+    type: 'radar',
+    data: [
+      { value: [85, 70, 30, 75, 65], name: 'Proposed US FINRA-style', itemStyle: { color: '#1a73e8' } },
+      { value: [40, 20, 90, 30, 25], name: 'EU AI Act', itemStyle: { color: '#999' } }
+    ]
+  }],
+  legend: { data: ['Proposed US FINRA-style', 'EU AI Act'], bottom: 0, textStyle: { color: '#333' } }
+});
+</script>
+
+<h3 class="section-title">3. Strategic Outlook & Limitations</h3>
+<p>An industry-funded, self-regulatory structure carries meaningful risk of regulatory capture, as dominant incumbents such as Google and OpenAI possess the financial and technical leverage to shape standards in ways that may disadvantage open-source competitors. Simultaneously, a mandatory 30-day pre-release delay could measurably reduce the agility of U.S. developers relative to foreign competitors operating under looser regimes, presenting a direct tension between safety assurance and competitive velocity that policymakers have yet to resolve.</p>
+</article>
+
+<article class="paper-section" id="art5">
+<h2>Physical Backlash: 142 Coordinated Protests Across 42 States Against AI Data Center Expansion</h2>
+
+<h3 class="section-title">1. Abstract</h3>
+<p>Opponents of AI infrastructure expansion staged 142 coordinated protests across 42 U.S. states on July 18, 2026, forming a non-partisan nationwide mobilization demanding transparency, environmental protection, and developer accountability regarding the power and water demands of hyperscale data centers. The scale of this movement has directly influenced state-level policy, including New York's newly announced construction moratorium, and signals that AI infrastructure has transitioned from a local economic benefit into a national political liability.</p>
+
+<h3 class="section-title">2. Architecture & Performance</h3>
+<div class="table-wrapper">
+<table class="academic-table">
+<thead>
+<tr><th>Metric</th><th>Value</th></tr>
+</thead>
+<tbody>
+<tr><td>Total Protest Events</td><td>142</td></tr>
+<tr><td>States Involved</td><td>42</td></tr>
+<tr><td>Key Physical Concerns</td><td>Grid transmission capacity, water consumption, utility rates</td></tr>
+<tr><td>Movement Character</td><td>Non-partisan, cross-political coalition</td></tr>
+<tr><td>Direct Policy Linkage</td><td>New York data center moratorium (Jul 19, 2026)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="chart-container" id="chart-art5"></div>
+<script>
+echarts.init(document.getElementById('chart-art5'), null, {renderer: 'svg'}).setOption({
+  grid: { top: 40, right: 30, bottom: 40, left: 60 },
+  tooltip: { trigger: 'axis' },
+  xAxis: { type: 'category', data: ['States Involved', 'Protest Events (Total)'], axisLine: { lineStyle: { color: '#999' } } },
+  yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed', color: '#ccc' } } },
+  series: [{
+    type: 'bar',
+    data: [42, 142],
+    itemStyle: { color: '#1a73e8' },
+    barWidth: '40%',
+    label: { show: true, position: 'top', color: '#333' }
+  }]
+});
+</script>
+
+<h3 class="section-title">3. Strategic Outlook & Limitations</h3>
+<p>While concerns over environmental impact and grid stability are substantively valid, a prolonged nationwide slowdown in data center construction risks weakening the United States' position in the global AI infrastructure race. Should regulatory bottlenecks and sustained public opposition materially constrain domestic buildout, U.S. technology firms may be incentivized to relocate compute clusters to jurisdictions with weaker environmental standards, effectively displacing rather than resolving the underlying ecological externalities. The durability of local organizing coalitions formed during this mobilization will determine whether this represents a transient event or a permanent structural constraint on the sector.</p>
+</article>
+    </main>
+
+    <script>
+        document.getElementById('report-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    </script>
 </body>
 </html>
