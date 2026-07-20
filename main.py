@@ -133,7 +133,14 @@ def run_claude_chat(client, model, messages, system=None, temperature=None):
         kwargs["temperature"] = temperature
 
     response = client.messages.create(**kwargs)
-    return response.content[0].text
+
+    # 🛡️ [수정] Claude Sonnet 5는 adaptive thinking이 기본 활성화되어 있어,
+    # content[0]이 텍스트가 아니라 ThinkingBlock(추론 과정)일 수 있음.
+    # content 블록들을 순회하며 실제 text 타입 블록만 이어붙여야 함.
+    text_parts = [block.text for block in response.content if getattr(block, "type", None) == "text"]
+    if not text_parts:
+        raise ValueError("Claude 응답에 text 블록이 없습니다 (ThinkingBlock만 반환됨).")
+    return "".join(text_parts)
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, system_rules, user_prompt, output_file="trial/1.txt"):
