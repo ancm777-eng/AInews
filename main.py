@@ -439,19 +439,27 @@ def main():
                 with open("html.txt", "r", encoding="utf-8") as f: html_prompt_content = f.read()
             except FileNotFoundError: pass
 
+    # 🛡️ [방어 로직] html 프롬프트가 없으면 Phase 5를 조용히 건너뛰지 말고 명확히 실패 처리
+    # (이전에는 이 경우 아무 에러 없이 스크립트가 종료되어, index.html이 갱신되지 않았는데도
+    #  워크플로우가 "성공"으로 표시되는 문제가 있었음)
+    if not html_prompt_content:
+        print("❌ Phase 5 failed: html.txt 프롬프트를 찾을 수 없습니다 (HTML_PROMPT_URL 또는 prompt/html.txt 확인 필요).")
+        sys.exit(1)
+
     if html_prompt_content:
         # 🛠️ [수정] OpenAI가 아닌 Anthropic 클라이언트 존재 여부 체크
         if not c_client:
             print("❌ Phase 5 failed: Anthropic client is required for Claude HTML generation. Please set CLAUDE_API_KEY.")
             sys.exit(1)
 
-        print("Generating HTML using model: claude-5-sonnet-20260630...")
+        claude_model_id = "claude-sonnet-5"
+        print(f"Generating HTML using model: {claude_model_id}...")
         
         user_prompt = f"다음 데이터를 바탕으로 시스템 지시사항의 HTML 템플릿과 CSS 규칙에 맞춰 완벽한 단일 HTML 문서를 생성하십시오:\n\n{final_content}"
         messages = [{"role": "user", "content": user_prompt}]
         
         # 🛠️ [수정] run_gpt_chat 대신 새롭게 만든 run_claude_chat 호출
-        html_code = run_claude_chat(c_client, "claude-5-sonnet-latest", messages, system=html_prompt_content)
+        html_code = run_claude_chat(c_client, claude_model_id, messages, system=html_prompt_content)
         
         if not html_code:
             print("❌ Phase 5 failed after retries. Exiting.")
@@ -466,8 +474,19 @@ def main():
         if "<!DOCTYPE html>" in html_code:
             html_code = "<!DOCTYPE html>" + html_code.split("<!DOCTYPE html>")[1]
 
+        # 🛡️ [방어 로직] 응답이 잘리거나(truncated) 불완전한 HTML이면 성공으로 간주하지 않음
+        if "<!DOCTYPE html>" not in html_code or "</html>" not in html_code:
+            print("❌ Phase 5 failed: 생성된 HTML이 불완전합니다 (DOCTYPE 또는 종료 태그 누락). index.html을 덮어쓰지 않습니다.")
+            sys.exit(1)
+
         with open("index.html", "w", encoding="utf-8") as f:
             f.write(html_code)
+
+        # 🛡️ [방어 로직] Phase 5가 "오늘 날짜"로 실제 완료됐다는 것을 증명하는 마커 파일.
+        # 워크플로우의 "이미 완료됐는지" 체크가 data/*.txt(=Phase 5 이전에 저장됨)가 아니라
+        # 이 마커를 기준으로 판단하도록 하여, Phase 5 실패 시 다음 스케줄에서 재시도가 막히지 않게 함.
+        with open("data/.html_synced", "w", encoding="utf-8") as f:
+            f.write(today_str)
 
         print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
 
