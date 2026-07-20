@@ -1,0 +1,119 @@
+name: Run AI News Pipeline
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '37,57 21 * * *'
+    - cron: '17,37,57 22 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    env:
+      TZ: Asia/Seoul
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true" 
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if already completed today
+        id: check
+        run: |
+          TODAY=$(date +'%Y-%m-%d')
+          # 🛡️ [수정] data/$TODAY.txt는 Phase 5(HTML 생성) 이전에 저장되므로,
+          # 이 파일만으로는 "index.html까지 실제로 갱신됐는지"를 보장하지 못함.
+          # data/.html_synced 마커는 Phase 5가 완전히 성공했을 때만 오늘 날짜로 기록되므로
+          # 이걸 기준으로 판단해야 Phase 5 실패 시 다음 스케줄에서 재시도가 가능함.
+          if [ -f "data/.html_synced" ] && [ "$(cat data/.html_synced)" = "$TODAY" ]; then
+            echo "✅ 오늘($TODAY)자 index.html까지 정상 생성 완료. 실행을 건너뜁니다."
+            echo "SKIP_RUN=true" >> $GITHUB_ENV
+          else
+            echo "🚀 오늘자 파이프라인이 아직 완료되지 않았습니다. 시작합니다."
+            echo "SKIP_RUN=false" >> $GITHUB_ENV
+          fi
+
+      - name: Set up Python
+        if: env.SKIP_RUN == 'false'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        if: env.SKIP_RUN == 'false'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ⭐️ 수정된 로직: Git 커밋 날짜를 기준으로 어제 이전의 캐시만 삭제 (오늘의 부분 성과는 보존)
+      - name: Clean old caches (Preserve today's partial progress)
+        if: env.SKIP_RUN == 'false'
+        run: |
+          TODAY=$(date +'%Y-%m-%d')
+          if [ -d "trial" ]; then
+            for file in trial/*.txt; do
+              if [ -f "$file" ]; then
+                COMMIT_DATE=$(git log -1 --date=format:'%Y-%m-%d' --format="%cd" -- "$file")
+                if [ -n "$COMMIT_DATE" ] && [ "$COMMIT_DATE" != "$TODAY" ]; then
+                  echo "🧹 어제 이전 캐시 삭제: $file ($COMMIT_DATE)"
+                  rm "$file"
+                fi
+              fi
+            done
+          fi
+
+      - name: Run Main Pipeline
+        id: pipeline
+        if: env.SKIP_RUN == 'false'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PROMPT_URL: ${{ secrets.PROMPT_URL }}
+          HTML_PROMPT_URL: ${{ secrets.HTML_PROMPT_URL }}
+        run: python main.py
+
+      # 🛡️ [추가] 파이프라인이 실패했을 때 눈에 띄게 알림 (Actions 요약 화면에 붉은 에러로 표시됨).
+      # index.html은 갱신되지 않았지만, trial/의 부분 진행 상황(캐시)은 다음 스텝에서 커밋되어
+      # 다음 예약 실행 때 Phase 1~4를 반복하지 않고 이어서 재시도할 수 있음.
+      - name: Warn on partial failure
+        if: failure() && env.SKIP_RUN == 'false'
+        run: |
+          echo "::error::파이프라인이 실패해 index.html이 오늘자로 갱신되지 않았습니다. trial/의 부분 진행 상황은 저장되며, 다음 예약 실행에서 자동 재시도됩니다."
+
+      - name: Upload Pipeline Results
+        if: always() && env.SKIP_RUN == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-news-artifacts
+          path: |
+            trial/
+            data/
+            index.html
+            run_status.txt
+            ref.txt
+
+      - name: Commit and Push results
+        if: always() && env.SKIP_RUN == 'false'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          echo "Last Pipeline Run Attempt: $(date +'%Y-%m-%d %H:%M:%S KST')" > run_status.txt
+          
+          # ⭐️ ref.txt를 add 대상에 추가하여 비워진 상태를 저장소에 반영
+          git add trial/ data/ index.html run_status.txt ref.txt
+          
+          if ! git diff --staged --quiet; then
+            git commit -m "Auto-update AI news results ($(date +'%Y-%m-%d %H:%M KST'))"
+            git pull --rebase origin main
+            git push
+          else
+            echo "변경 사항이 없어 업데이트를 건너뜁니다."
+          fi
