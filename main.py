@@ -331,6 +331,9 @@ def main():
                 f"Therefore, all dates and events in the draft referencing {datetime.datetime.now().strftime('%Y')} "
                 f"are CURRENT, not future or fictional. "
                 f"Do NOT flag any {datetime.datetime.now().strftime('%Y')} dates as hypothetical or future scenarios. "
+                f"Note: most items must have an event date within the last 24 hours, EXCEPT items whose metadata "
+                f"shows slot_category: 6 (HW-Circuit-Research / academic-research items), which are allowed an event "
+                f"date up to 7 days old (event_within_7d_window: true). Do not flag those items as stale for that reason alone. "
                 f"Use your advanced reasoning capabilities to verify company names, "
                 f"product specs, statistics, and URLs before forming any judgment. "
                 f"Respond in Korean."
@@ -375,7 +378,9 @@ def main():
                 "위 피드백을 철저히 반영하여 [Initial Draft]를 다듬어 최종본을 작성하십시오.\n"
                 "1. 🚨 [조건 위반 및 사실 오류 수정] 피드백 내용 중 기사가 조건을 위반했거나 심각한 사실 오류가 있다면, 해당 항목을 전면 삭제(Drop)하십시오.\n"
                 "2. 💡 [품질 보완 제안 적극 반영] 피드백의 '품질 보완 제안(📌 보완 제안)' 파트에 명시된 개선 요청 사항들(누락된 하위 아키텍처 명시, 구체적인 파트너십 브랜드 보완, 교정 명칭 반영 등)을 본문에 완벽히 녹여내어 분석의 깊이를 극대화하십시오.\n"
-                "3. 삭제된 빈 슬롯 수만큼, 당신에게 부여된 'Google Search' 툴을 즉각 사용하여 최근 24시간 이내에 발생한 완전히 새로운 AI 인프라/하드웨어 뉴스를 직접 발굴하여 대체 작성하십시오. 최종 리포트는 무조건 5개의 항목으로 채워져야 합니다.\n"
+                "3. 삭제된 빈 슬롯 수만큼, 당신에게 부여된 'Google Search' 툴을 즉각 사용하여 완전히 새로운 AI 인프라/하드웨어 뉴스를 직접 발굴하여 대체 작성하십시오. "
+                "일반 슬롯(카테고리 1~5)은 최근 24시간 이내에 발생한 사건만 허용합니다. "
+                "단, 삭제된 항목이 카테고리 6(HW-Circuit-Research, 학술연구/미래 로드맵)이었다면, 대체 항목은 GLOBAL RULES에 명시된 대로 최근 7일 이내 발표/게시된 논문·컨퍼런스·기술 블로그를 기준으로 발굴하십시오. 최종 리포트는 무조건 5개의 항목으로 채워져야 합니다.\n"
                 "4. 피드백에서 지적되지 않은 정상 항목은 불필요한 재작성 없이 원문을 최대한 유지하십시오.\n"
                 "5. 인라인 수식 기호 절대 사용 금지. 벡터는 굵은 글씨, 변수는 일반 텍스트.\n"
                 "6. 기존 섹션 구조(Overview, Strategic Impact, Technical Deep Dive 등)를 정확히 유지하십시오."
@@ -383,7 +388,9 @@ def main():
             
             sys_instruction = (
                 "You are a top-tier AI Intelligence Analyst. You MUST use the Google Search tool to replace any outdated "
-                "or invalid news items (flagged by feedback) with breaking news strictly from the last 24 hours. "
+                "or invalid news items (flagged by feedback) with breaking news strictly from the last 24 hours — "
+                "EXCEPT for items whose slot_category metadata is 6 (HW-Circuit-Research), which instead follow a "
+                "7-day event-date window as defined in the GLOBAL RULES below. Do not apply the 24-hour cutoff to those items. "
                 "Ensure the final output always contains exactly 5 valid news items.\n\n"
                 f"[GLOBAL RULES & FORMAT]\n{base_prompt_content}"
             )
@@ -555,4 +562,5 @@ def main():
     print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
 
 if __name__ == "__main__":
+
     main()
