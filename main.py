@@ -522,7 +522,7 @@ def main():
         print("❌ Phase 5 failed: Anthropic client is required for Claude HTML generation. Please set CLAUDE_API_KEY.")
         sys.exit(1)
 
-    claude_model_id = "claude-opus-4-8"
+    claude_model_id = "claude-sonnet-5"
     print(f"Generating article content using model: {claude_model_id}...")
 
     user_prompt = f"다음 데이터를 바탕으로 시스템 지시사항에 맞춰 5개 기사(<article>) 블록만 생성하십시오:\n\n{final_content}"
@@ -562,5 +562,4 @@ def main():
     print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
 
 if __name__ == "__main__":
-
     main()
