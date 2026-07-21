@@ -1,344 +1,326 @@
 ## 종합 판정
 
-이 초안은 **현 상태로 발행하기 어렵습니다.** 확인되는 핵심 문제는 다음과 같습니다.
+초안은 그대로 배포하기 어렵습니다. 특히 다음 문제가 명확합니다.
 
-1. **24시간 시간창 판정이 최소 2건에서 명백히 잘못됨**
-   - 기준 시각: **2026-07-21 07:34 KST**
-   - 검증 시간창: **2026-07-20 07:34 KST ~ 2026-07-21 07:34 KST**
-   - 2번의 7월 19일 상하이 행사와 4번의 7월 16일 규제 결정은 이 범위 밖입니다.
-2. **5번 Gartner 수치가 초안 내부에서 충돌**
-   - 본문은 104.2%, Technical Deep Dive는 117%로 기재했습니다.
-3. **3번은 보도된 정책 검토를 이미 시행된 전면적 접근통제 체제로 과장**
-4. **2번은 아직 공개되지 않은 가중치를 제목과 전략 분석에서 이미 “open-weight”로 취급**
-5. 모든 Primary URL이 기사·발표문·결정문이 아닌 **홈페이지 또는 매체 루트 URL**이어서 엄격한 출처 검증 요건을 충족하지 못합니다.
+1. **KST 24시간/7일 판정에 시각과 시간대가 빠져 있어 `true`를 확정할 수 없음**
+2. **Cadence 항목의 제품명·제품군·NVIDIA 시스템명이 서로 뒤섞임**
+3. **Samsung 항목의 `sub-10nm micro-bump pitch`는 단위 오류**
+4. **DeepSWE를 벤치마크로 취급한 표현은 기존 공식 용례와 충돌**
+5. **Fluidstack과 Anthropic의 500억 달러 관계를 계약액으로 단정한 것은 과장 가능성이 큼**
+6. **마지막 일정표에는 출처가 전혀 없으며, 특히 Apple CEO 교체는 공식 근거 없이는 게재 불가**
+7. **7월 15일 Cadence 항목까지 포함하면서 전체를 “지난 24시간의 전개”라고 요약한 것은 내부 모순**
 
 ---
 
-## KST 기준 시간창
+# 1. 시간 윈도우 검증
 
-### 정확한 범위
+검증 기준 시각은 **2026-07-22 07:32 KST**입니다.
 
-- **시작:** 2026-07-20 07:34 KST
-- **종료:** 2026-07-21 07:34 KST
-- UTC 환산: **2026-07-19 22:34 ~ 2026-07-20 22:34 UTC**
-- 미국 동부시간 환산: **2026-07-19 18:34 ~ 2026-07-20 18:34 EDT**
-- 미국 서부시간 환산: **2026-07-19 15:34 ~ 2026-07-20 15:34 PDT**
+- 24시간 기준점: **2026-07-21 07:32 KST**
+- 7일 기준점: **2026-07-15 07:32 KST**
 
-따라서 단순히 `Publication Date: 2026-07-20`이라고 적는 것만으로는 충분하지 않습니다. 미국 동부시간으로 7월 20일 오후 6시 34분 이후에 게시된 기사는 브리핑 마감 시각 이후일 수 있습니다. 각 페이지의 실제 타임스탬프와 시간대를 기록해야 합니다.
+| 항목 | 기재 날짜 | 허용 윈도우 | 판정 |
+|---|---:|---:|---|
+| Google | 7월 21일 | 24시간 | **시각 누락으로 확정 불가** |
+| Fluidstack | 7월 21일 | 24시간 | **시각 누락으로 확정 불가** |
+| Poolside | 7월 21일 | 24시간 | **시각 누락으로 확정 불가** |
+| Cadence | 7월 15일 | 슬롯 6, 7일 | **시각 누락으로 확정 불가**. 단, 슬롯 6이므로 날짜만 보고 오래된 항목으로 배제하면 안 됨 |
+| Samsung | 7월 21일 | 슬롯 6, 7일 | 날짜상 7일 이내지만 **정확한 시각은 미제시** |
 
-| 항목 | 초안의 이벤트 날짜 | 24시간 내 판정 |
-|---|---:|---|
-| 1. OpenAI | 7월 20일 | **판정 불가** — 정확한 게시 시각 필요 |
-| 2. Alibaba | 7월 19일, 상하이 행사 | **False** |
-| 3. 미국 정부 | 7월 20일 | **판정 불가** — CNBC·Quartz 타임스탬프 필요 |
-| 4. EU 결정 | 7월 16일 | **False** |
-| 5. Gartner | 7월 20일 | **판정 불가** — Gartner 발표 시각 필요 |
+미국 현지 시각으로 7월 21일 발행된 기사라면 대체로 KST 기준점 이후일 가능성이 높지만, 날짜만으로 `event_within_24h_window: true`를 증명할 수는 없습니다. 각 항목에 다음 형식이 필요합니다.
 
----
+> `published_at: 2026-07-21Txx:xx:xx-07:00`  
+> `published_at_kst: 2026-07-22Txx:xx:xx+09:00`
 
-# 항목별 검증
-
-## 1. OpenAI 장기 실행 에이전트 안전 공개
-
-### 판정: **핵심 주장 검증 불충분 / 시간창 판정 보류**
-
-초안에 적힌 제목, 사건 세부사항 및 조치가 모두 사실일 가능성은 있으나, 제시된 출처 구조로는 이를 엄격하게 확인할 수 없습니다.
-
-### 문제점
-
-- Primary URL이 `https://openai.com`으로, 주장한 문서인  
-  **“Safety and alignment in an era of long-horizon models”**의 직접 URL이 아닙니다.
-- `daily.dev`와 `Glitchwire`도 개별 기사 URL이 제시되지 않았습니다.
-- 다음 세부사항이 하나의 에이전트 실행에서 발생했는지, 보고서에 등장한 여러 사례를 하나로 합친 것인지 구분되지 않습니다.
-  - 공개 GitHub PR 생성
-  - 토큰 분할 및 런타임 재조립
-  - 다른 pod에 대한 SSH 접속
-- “표준 사전 배포 평가가 완전히 놓쳤다”, “즉시 접근을 중단했다”, “재배포했다”는 표현은 공식 문서의 정확한 문장 또는 타임라인으로 확인해야 합니다.
-- 제목의 “Sandbox Escapes”는 실제로 샌드박스 경계를 돌파한 것인지, 허용되지 않은 네트워크 접근 또는 자격증명 오용인지 구분해야 합니다. 공개 PR 생성 자체는 반드시 샌드박스 탈출을 의미하지 않습니다.
-- `event_date: 2026-07-20`만으로는 07:34 KST 이후인지 알 수 없으므로 `event_within_24h_window: true`는 확정할 수 없습니다.
-
-### 품질 보완
-
-- OpenAI 문서의 **직접 URL, 게시 시각, 모델명 또는 내부 시스템 식별자**를 추가하십시오.
-- 각각의 행위가 동일 trajectory에서 발생했다는 근거가 없다면 “여러 장기 실행 에이전트 사례에서 관찰된 행동”으로 수정해야 합니다.
-- “air-gapped container” 수요 증가는 원문 사실이 아니라 분석입니다. 에어갭과 공개 GitHub 접근은 양립하기 어려우므로, 실제 권고안이 **egress control, zero-trust credentials, isolated execution** 중 무엇인지 구체화하는 편이 적절합니다.
-- “unprecedented moment”와 “catastrophic”는 분석적 수사이므로 사실 서술과 분리하십시오.
+또한 Cadence 항목은 슬롯 6 예외를 적용할 수 있지만, 7월 15일 **07:32 KST 이전** 사건이면 정확히 7일을 넘습니다.
 
 ---
 
-## 2. Alibaba Qwen 3.8
+# 2. 항목별 검증
 
-### 판정: **시간창 오류 + 출시 상태 모순 + 일부 기술·역사 주장 재검증 필요**
+## 1) Google Gemini 3.6 Flash / 3.5 Flash-Lite / 3.5 Flash Cyber
+
+### 판정: **핵심 출시 사실과 수치의 공식 원문 대조 필요, DeepSWE 설명은 수정 필요**
+
+### 명확한 문제
+
+- 초안은 DeepSWE를 다음과 같이 취급합니다.
+  - “DeepSWE by Datacurve”
+  - “DeepSWE benchmark”
+- 기존에 알려진 공식 용례에서 **DeepSWE는 Together AI와 Agentica 계열의 소프트웨어 엔지니어링 에이전트/모델 명칭**으로 사용됐으며, 일반적으로 독립 벤치마크 이름으로 분류되지 않습니다.  
+  2026년에 DataCurve가 같은 이름의 새 평가 체계를 발표했다면 그 공식 링크와 정확한 명칭이 필요합니다. 그렇지 않으면 **SWE-bench 계열 평가, 특정 DeepSWE agent run, 또는 DataCurve 평가 세트**를 혼동한 것입니다.
+
+### 수치상 보완 필요
+
+- `350 output tokens/sec`는 다음 조건 없이 비교 가능한 제품 사양이 아닙니다.
+  - 사용 하드웨어 또는 Google 서빙 티어
+  - 입력·출력 길이
+  - 배치 크기
+  - speculative decoding 적용 여부
+  - median인지 peak인지
+- `17% output-token reduction`과 `up to 65%`도 동일한 품질·성공률을 유지한 조건인지 밝혀야 합니다. 토큰 수가 줄었다는 사실만으로 비용 대비 작업 성공률이 개선됐다고 단정할 수 없습니다.
+- “TPU/GPU utilization을 최적화한다”는 것은 모델 출시 사실에서 바로 도출되지 않습니다. 출력 토큰 감소는 계산량을 줄일 수 있지만, 긴 컨텍스트의 prefill 비용이나 agent 재시도율이 증가하면 총 자원 사용량은 달라질 수 있습니다.
+- “일반 목적 모델은 매 단계 full-parameter inference를 요구한다”는 비교는 부정확합니다. 일반 목적 모델도 MoE일 수 있습니다.
+
+### URL 검증상 요구사항
+
+제시된 Google Blog URL의 페이지 제목·발행 시각·제품 표기가 본문과 일치해야 합니다. 특히 아래 세 모델 모두가 한 페이지에 공식 발표됐는지 확인해야 합니다.
+
+- Gemini 3.6 Flash
+- Gemini 3.5 Flash-Lite
+- Gemini 3.5 Flash Cyber
+- CodeMender와의 공식 결합 관계
+
+**권장 판정 문구:** 공식 페이지와 API 문서를 확인하기 전까지 `Official Release / Model Launch`를 확정하지 말고 `Reported official launch—canonical API documentation pending`으로 낮추는 것이 안전합니다.
+
+---
+
+## 2) Fluidstack 8.3억 달러 Series A
+
+### 판정: **펀딩 수치는 원문 확인 필요, Anthropic 500억 달러 표현은 과장 가능성이 큼**
+
+### 명확한 표현 문제
+
+> “Fluidstack, which contracted with Anthropic to construct 50 billion USD worth of U.S. AI infrastructure”
+
+이는 **Anthropic의 미국 컴퓨트 인프라 투자 계획 총액**과 **Fluidstack에 실제 발주된 계약액**을 동일시할 수 있는 표현입니다.
+
+공식 발표가 “Anthropic이 미국 AI 인프라에 최대 500억 달러를 투자하며 Fluidstack과 협력한다”는 구조라면 다음처럼 써야 합니다.
+
+> “Fluidstack is a development partner in Anthropic’s announced U.S. infrastructure program, whose overall planned investment was stated as up to $50 billion.”
+
+Fluidstack이 정확히 500억 달러의 계약을 수주했다는 별도 계약 공시가 없다면 `contracted ... $50 billion worth`는 삭제해야 합니다.
+
+### 추가 검증 필요
+
+- 8.3억 달러가 전액 **Series A equity**인지, 부채·프로젝트 파이낸싱·설비금융이 섞인 총조달액인지 확인해야 합니다.
+- 75억 달러가:
+  - post-money valuation인지
+  - pre-money valuation인지
+  - fully diluted 기준인지 확인해야 합니다.
+- Situational Awareness의 지위도 `led by`와 단순 주요 투자자를 구분해야 합니다.
+- “3~5년을 6개월로 단축”은 완공 기준이 불명확합니다.
+  - 공장 모듈 제작
+  - 건물 shell 준공
+  - 전력 인입
+  - GPU 설치
+  - 상업 가동  
+  가운데 무엇을 6개월로 본 것인지 명시해야 합니다.
+- `robotic assembly cells`가 Fluidstack의 공식 제조 공정인지, 기사 작성자의 일반적인 모듈 건설 설명인지 출처를 분리해야 합니다.
+
+### 전략 분석 보완
+
+초안의 Critical View는 적절합니다. 다만 6개월 주장을 유지하려면 전력망 연결과 장기 리드타임 장비를 제외한 **모듈 설치 기간**임을 분명히 해야 합니다.
+
+---
+
+## 3) Poolside Laguna S 2.1
+
+### 판정: **모델 사양과 공개 범위의 공식 검증 필요, 메모리 관련 해석은 수정 필요**
+
+### 기술적으로 잘못된 추론
+
+> “8B active parameter routing footprint permits deployment on mid-tier GPU inference clusters, lowering HBM memory overhead”
+
+118B MoE에서 토큰당 8B만 활성화되더라도, 일반적으로는 **전체 118B 가중치를 GPU/HBM 또는 계층형 메모리 어딘가에 저장해야 합니다**. 따라서 다음은 서로 다릅니다.
+
+- 토큰당 활성 연산량: 8B 상당
+- 전체 가중치 저장 용량: 118B 상당
+- expert parallelism 및 통신 비용
+- 실제 HBM 용량 요구량
+
+8B active라는 사실만으로 “중급 GPU 클러스터에 쉽게 배포 가능” 또는 “메모리 오버헤드 감소”라고 단정할 수 없습니다. 정확한 양자화, GPU 수, expert offloading 구성 및 처리량 수치가 필요합니다.
+
+### DeepSWE 문제
+
+이 항목도 DeepSWE를 “새 벤치마크”로 부르고 있습니다. 공식 페이지가 이를 실제 benchmark suite로 정의하지 않는다면 잘못된 분류입니다. 평가 대상이 다음 중 무엇인지 명확히 해야 합니다.
+
+- SWE-bench Verified
+- Terminal-Bench 2.1
+- DeepSWE agent/model trajectories
+- Poolside 자체 평가 세트
+
+### 추가 확인 사항
+
+- `118B total / 8B active`
+- `1M context`
+- `trained from scratch`
+- `<9 weeks`
+- `open weights`
+- `API live`
+- 모든 평가 trial의 전체 trajectory 공개
+
+이들은 각각 별개의 주장입니다. 블로그 공개만으로 `open weights`라고 할 수 없으며, 실제 모델 파일·라이선스·체크포인트 링크가 있어야 합니다.
+
+또한 “500B+ 모델과 동등”이라는 문장은 비교 모델명, 벤치마크, scaffold, reasoning budget이 없어 검증 불가능합니다.
+
+---
+
+## 4) Cadence AuraStack
+
+### 판정: **중대한 명칭 혼동 가능성이 높으며, NVIDIA 시스템명은 명확히 잘못됨**
 
 ### 명확한 오류
 
-#### ① 24시간 판정 오류
+> “NVIDIA Rubin NVL72”
 
-행사가 상하이에서 **2026-07-19**에 열렸다면, 그날 자정 직전이라도 KST 기준 7월 20일 00:59 이전입니다. 시간창 시작인 7월 20일 07:34 KST보다 최소 6시간 35분 이상 앞섭니다.
+**NVL72는 Blackwell 세대의 GB200/GB300 NVL72 명칭과 연결됩니다.** 공개 로드맵에서 Rubin 계열 랙 시스템은 일반적으로 **Vera Rubin NVL144**, Rubin Ultra는 더 큰 구성으로 구분됩니다. 따라서 `Rubin NVL72` 예시는 수정해야 합니다.
 
-따라서 다음 메타데이터는 잘못되었습니다.
+### 제품명·제품군 혼동
 
-```text
-event_date: 2026-07-19
-event_within_24h_window: true
-```
+초안의 다음 명칭 조합은 Cadence의 기존 공식 제품 체계와 맞지 않을 가능성이 큽니다.
 
-수정:
+- AuraStack
+- Allegro AI Studio
+- PCB·패키지용 “AI Super Agent”
+- NVIDIA·TSMC·Forvia Hella 공동 개발
+- Chip/package/board 성능 수치의 단일 제품 귀속
 
-```text
-event_within_24h_window: false
-```
+Cadence의 알려진 제품군에는 다음 명칭들이 존재하므로 혼동 여부를 확인해야 합니다.
 
-7월 20일에 새 기사가 게시됐다면 “관련 보도가 24시간 내 게시됨”이라고 할 수는 있지만, **7월 19일의 제품 발표 자체가 24시간 내 발생한 것은 아닙니다.**
+- Allegro X / Allegro X AI
+- Cerebrus AI Studio
+- Virtuoso Studio
+- Cadence.AI/JedAI 계열
+- ChipStack AI Super Agent 계열
 
-#### ② “open-weight model” 출시와 본문의 모순
+특히 “4일에서 4분” 같은 component placement 사례가 기존 **Allegro X AI 고객 사례**에서 나온 수치라면, 이를 신제품 AuraStack의 성능으로 재귀속하면 안 됩니다.
 
-제목은 Alibaba가 **2.4T open-weight 모델을 공개했다**고 단정하지만 본문은 다음과 같이 적습니다.
+### 성능 수치 문제
 
-- 현재는 Preview 서비스만 제공
-- 전체 open-weight 공개는 “soon”
-- 실제 가중치는 아직 공개되지 않음
+다음 세 수치는 서로 다른 워크로드일 수 있습니다.
 
-그러므로 현 단계의 정확한 표현은 다음과 같습니다.
+- 2× faster time-to-market
+- 15× task productivity
+- 20× multi-physics analysis speedup
 
-> “Alibaba previews Qwen3.8-Max and says an open-weight release will follow.”
+각 수치별로 고객, 설계 규모, baseline, 측정 대상과 원문 인용이 필요합니다. “4일→4분”은 1,440배의 경과시간 차이이므로 `15× productivity`와도 직접 호환되지 않습니다.
 
-실제 weight 파일과 라이선스가 공개되기 전에는 “open-weight model launch”나 “open-source commoditization”을 완료된 사실로 취급할 수 없습니다. 또한 **open-source와 open-weight는 동의어가 아닙니다.**
+### 시간 판정
 
-#### ③ “Alibaba 최초의 1조 파라미터 초과 모델” 주장
-
-Alibaba는 앞서 Qwen3-Max 계열을 1조 개가 넘는 파라미터를 가진 모델로 소개한 전례가 있으므로, Qwen 3.8을 “Alibaba's first model to exceed 1 trillion parameters”라고 서술하려면 계보와 정의를 다시 확인해야 합니다. 현재 문구는 적어도 **Qwen3-Max와 충돌할 가능성이 매우 높습니다.**
-
-### 추가 검증이 필요한 주장
-
-- 정확한 제품명: `Qwen 3.8`인지 `Qwen3.8-Max-Preview`인지 표기 통일 필요
-- 총 파라미터 2.4조
-- 컨텍스트 983,616토큰
-- 최대 출력 131,072토큰
-- Low/High/XHigh 추론 모드
-- `Token Plan`, `Qoder`, `QoderWork` 제공 범위
-- “Claude Fable 5에 이어 세계 2위”라는 발언의 주체와 원문
-- Alibaba 홍콩 주가 5% 상승이 Qwen 발표에 직접 기인했다는 인과관계
-
-`https://qwen.ai` 홈페이지만으로는 이 수치들을 입증할 수 없습니다. 모델 카드, API 문서, 공식 블로그, WAIC 발표 자료가 각각 필요합니다.
-
-### 분석 보완
-
-- MoE 모델의 인프라 부담은 **총 파라미터**보다 다음 수치가 중요합니다.
-  - 토큰당 활성 파라미터
-  - 전문가 수와 선택되는 전문가 수
-  - 정밀도
-  - KV-cache 규모
-  - expert-parallel 통신량
-- 따라서 “2.4T이므로 massive cluster가 필요하다”는 설명만으로는 부족합니다.
-- “open-weight가 미국 모델의 고마진 구조를 직접 붕괴시킨다”는 결론도 라이선스, 실제 추론비용, 품질, 기업 지원 수준을 확인한 뒤 제시해야 합니다.
+7월 15일 항목은 슬롯 6이므로 7일 예외 적용 대상입니다. 다만 정확한 발표 시각이 없어 `event_within_7d_window: true`를 확정할 수 없습니다.
 
 ---
 
-## 3. White House clearinghouse
+## 5) Samsung HBM·하이브리드 본딩 로드맵
 
-### 판정: **정책 범위와 시행 상태를 중대하게 과장**
-
-### 명확한 논리적 문제
-
-본문에는 다음 표현들이 함께 등장합니다.
-
-- “moving to take direct control”
-- “framework under active development”
-- “implementation guidelines being drafted”
-- 제목: “Seizes Control”
-- 전략 분석: “Marks the end of unregulated global access”
-
-아직 프레임워크가 개발 중이고 지침도 작성 중이라면, 정부가 이미 접근 통제권을 “장악했다”거나 비규제 접근이 “끝났다”고 단정할 수 없습니다.
-
-### 반드시 확인할 핵심
-
-“Clearinghouse”의 실제 범위가 다음 중 무엇인지 구분해야 합니다.
-
-1. 연방기관의 AI 모델 조달·사용을 중앙화하는 체계
-2. 정부 계약자나 특정 국가안보 프로젝트 접근을 관리하는 체계
-3. 해외 수출 또는 특정 외국 주체의 접근을 심사하는 체계
-4. 미국 내 모든 기업·개발자의 frontier model 접근을 사전 승인하는 체계
-
-초안은 근거 제시 없이 곧바로 4번으로 확대 해석합니다. CNBC나 Quartz 보도가 1~3번을 다룬 것이라면 초안의 핵심 서술은 잘못된 것입니다.
-
-또한 미국 정부가 민간 기업의 전체 고객 접근을 사전 승인하려면 법적 근거, 적용 대상, 관할 기관, 시행 명령 또는 규칙이 필요합니다. 현재 초안에는 다음이 없습니다.
-
-- 행정명령 번호
-- 법률 또는 규정
-- White House 공식 문서
-- 담당 기관
-- 시행일
-- “frontier model”의 법적 정의
-
-### 제품명 검증
-
-`GPT-5.6`과 `Claude Fable 5`는 단순 예시로 삽입해서는 안 됩니다. 해당 명칭과 존재가 각 회사의 공식 제품 페이지에서 확인되지 않는다면 삭제하거나 “예시”가 아닌 일반 표현으로 바꿔야 합니다.
-
-### URL 문제
-
-Primary URL `https://qz.com`은 Quartz 홈페이지일 뿐입니다. 최소한 다음 직접 링크가 필요합니다.
-
-- CNBC 원문
-- Quartz 원문
-- 가능하면 White House 또는 담당 부처 문서
-
-### 권장 제목
-
-공식 시행이 아니라 보도 단계라면 다음처럼 낮춰야 합니다.
-
-> “Trump Administration Reportedly Developing a Centralized Framework for Certain Frontier-AI Access”
-
----
-
-## 4. EU의 Android·검색 데이터 결정
-
-### 판정: **24시간 오류; 법적 사실과 해석을 분리해야 함**
+### 판정: **명확한 단위 오류가 있으며, 공식 발표와 업계 추정을 구분해야 함**
 
 ### 명확한 오류
 
-공식 결정일이 **2026-07-16**이라면 7월 21일 07:34 KST 기준 지난 24시간에 발생한 사건이 아닙니다.
+Overview에는 다음과 같이 적었습니다.
 
-```text
-event_date: 2026-07-16
-event_within_24h_window: true
-```
+> “sub-10-micron limits”
 
-는 명백히 모순됩니다. 7월 20일에 2차 보도가 나왔다고 해서 7월 16일 결정의 이벤트 날짜가 새로 갱신되지는 않습니다.
+그러나 Technical Deep Dive에는:
 
-### 출처 문제
+> “Sub-10nm micro-bump pitch”
 
-“Official Regulatory Action”이라고 분류했으면서 Primary URL은 EC 결정문이 아닌 `https://www.thurrott.com`입니다. 다음 자료를 직접 연결해야 합니다.
+라고 되어 있습니다. 이는 **1,000배 차이**입니다. 마이크로 범프 피치는 여기서 `sub-10 µm`가 맞는 맥락이며, `sub-10 nm`는 명백한 단위 오류입니다.
 
-- European Commission 보도자료
-- 각 specification decision의 결정 번호와 PDF
-- DMA 법적 근거 조항
-- 시행 일정이 들어 있는 annex
+### 상태 분류 오류 가능성
 
-### 법적 표현 보완
+출처가 Wccftech, SemiAnalysis, BusinessKorea뿐이고 Samsung 공식 자료가 없다면:
 
-다음 문구는 법률상 공식 분류라기보다 초안의 해석일 가능성이 큽니다.
+- `Samsung has updated its technical roadmap`
+- `Roadmap Disclosure`
+- `scheduled for 2029 mass production`
 
-> “the first time a major regulatory body has classified AI assistants as infrastructure rather than applications”
+처럼 공식 확정형으로 쓰면 안 됩니다.
 
-결정문에서 실제로 “infrastructure”라고 법적 분류하지 않았다면 다음처럼 바꿔야 합니다.
+다음처럼 낮춰 써야 합니다.
 
-> “The decision effectively treats certain AI-assistant capabilities as an interoperability layer.”
+> “Industry reports indicate that Samsung may extend micro-bump-based stacking through HBM4E and target hybrid bonding around 2029.”
 
-또한 DMA의 “effective interoperability” 의무가 항상 Gemini와 **“exact same”** 시스템 접근을 제공해야 한다는 뜻인지 확인해야 합니다. 보안·개인정보 보호상 정당화된 차등이나 구현 조건이 있을 수 있습니다.
+### NVIDIA Feynman 관련 과도한 단정
 
-### 세부사항 확인 필요
+다음 주장은 서로 별도 검증이 필요합니다.
 
-- 정확히 11개 기능인지
-- 음성 호출, 화면 맥락, cross-app action, on-device model 접근이 모두 결정문에 명시됐는지
-- 2027-01 검색 데이터 제공 개시
-- 2027-08-01 Android 18 기능 동등성
-- 2028-08-01 동시 wake-word detection
-- 데이터 수혜 대상에 일반적인 “AI chatbot”이 직접 포함되는지
-- `ranking, query, click, view data` 전체가 일률적으로 익명화되는지, 개인 데이터에 대해서만 익명화 의무가 적용되는지
+- Feynman의 실제 출하 연도
+- 2029 Samsung hybrid-bonding 양산과의 직접 연계
+- “true 3D logic-on-memory stacking”
+- Feynman이 Rubin Ultra의 직접 후속이라는 정확한 제품 구성
 
-이 부분은 결정문 문구를 그대로 인용하는 것이 안전합니다.
+공개 로드맵의 아키텍처 연도와 실제 시스템 출하 연도는 다를 수 있지만, 공식 NVIDIA 자료 없이 `2029 Feynman cycle`을 확정해서는 안 됩니다.
 
-### 분석 보완
+### 패키징 설명 보완
 
-- “Google의 모바일 광고·검색 독점에 bearish”는 영향 범위를 과장할 수 있습니다. EU 지역, 적용 서비스, 실제 이용자 기본값 변경 가능성, 전환비용을 따로 분석해야 합니다.
-- API 개방이 곧바로 임의의 third party에 대한 무제한 접근을 뜻하지는 않습니다. 인증, 권한, 사용자 동의, sandboxing 요건을 포함해야 합니다.
+- 하이브리드 본딩은 단순히 “구리끼리 직접 접합”하는 것만이 아니라 일반적으로 **Cu-Cu 접속과 dielectric-dielectric bonding을 함께 구현**합니다.
+- HBM 적층에 적용되는 방식은 제품 구조에 따라 die-to-wafer/chip-to-wafer가 중요합니다. 이를 모두 `wafer-to-wafer hybrid bonding`으로 묶는 것은 부정확할 수 있습니다.
+- “micro-bump reflow와 thermal compression bonding”은 대체로 별개의 접합 공정 경로이므로 하나의 동일 공정처럼 서술하지 않는 것이 좋습니다.
 
 ---
 
-## 5. Gartner AI 플랫폼·모델 시장 전망
+# 3. Summary의 내부 모순
 
-### 판정: **수치 내부 충돌; 시간창은 타임스탬프 확인 필요**
+다음 문장은 수정해야 합니다.
 
-### 명확한 수치 오류
+> “The developments over the past 24 hours…”
 
-본문:
+Summary에는 **7월 15일 Cadence 항목**이 포함돼 있습니다. 슬롯 6 규정상 최대 7일 된 연구·회로 항목을 포함할 수는 있지만, 그러면 전체를 “지난 24시간의 전개”라고 부를 수 없습니다.
 
-> Foundation Generative AI Models: **104.2% growth**, $23.4B
+권장 문구:
 
-Technical Deep Dive:
+> “The briefing primarily covers developments from the preceding 24 hours, supplemented by one hardware/circuit item from the permitted seven-day research window.”
 
-> GenAI Model Growth: **117%**
+Executive Summary의 다음 문구도 과도합니다.
 
-같은 지표라면 둘 중 하나는 틀렸습니다. 다른 지표라면 명칭을 분리해야 합니다. 현재 상태로는 수치가 자체 모순입니다.
+> “absolute temporal accuracy”
 
-반면 전체 시장 계산은 산술상 맞습니다.
-
-\[
-(64.2 - 39.3) / 39.3 \approx 63.36\%
-\]
-
-따라서 **$39.3B → $64.2B, 63.4% 증가**는 서로 일관됩니다.
-
-### 시간창
-
-Gartner 발표가 7월 20일 미국 업무시간 오전에 나왔다면 대체로 시간창 안에 들 가능성이 큽니다. 그러나 `https://www.gartner.com` 홈페이지만으로는 게시 시각을 확인할 수 없으므로 현재는 `true`로 확정할 수 없습니다.
-
-### 논리의 비약
-
-“DSLM이 210% 성장한다”는 전망만으로 기업이 범용 모델에서 적극적으로 이탈한다고 결론 내릴 수 없습니다.
-
-- DSLM은 작은 기저에서 출발하므로 성장률이 크게 나타날 수 있습니다.
-- 제시된 2026년 절대액도 DSLM $4.9B보다 foundation model $23.4B가 훨씬 큽니다.
-- 두 부문이 동시에 고성장할 수도 있습니다.
-
-권장 표현:
-
-> “The faster percentage growth of DSLMs suggests increasing demand for specialization, but does not by itself establish a broad displacement of general-purpose foundation models.”
-
-### URL·분류 보완
-
-- Gartner 직접 보도자료 또는 리서치 페이지의 URL과 발행 시각이 필요합니다.
-- `AI platforms and models`의 시장 정의와 하위 항목이 중복되지 않는지 표로 제시해야 합니다.
-- 보도자료가 forecast만 제공한 것인지, “ROI 중심 전환”까지 Gartner가 직접 언급했는지 구분하십시오.
+시각과 시간대가 없으므로 절대적 시간 정확성을 주장할 수 없습니다.
 
 ---
 
-# Upcoming Tech Calendar 검증
+# 4. Upcoming Tech Calendar 검증
 
-## 근거 부족
+현재 일정표는 **모든 항목에 URL과 발표 주체가 빠져 있어 게재 불가**입니다.
 
-다음 두 항목은 본문에 출처가 없습니다.
+### AMD Advancing AI 2026
 
-- Moonshot AI의 2026년 3분기 말 홍콩 IPO 신청
-- 2026년 9월 Qwen 4.0 및 “3D coding focus”
+- 날짜, 장소, Lisa Su keynote 모두 공식 행사 페이지가 필요합니다.
+- 등록 페이지 또는 AMD 공식 보도자료 URL을 붙여야 합니다.
 
-특히 “rumored release”는 확정 일정과 같은 형식으로 Upcoming Calendar에 넣으면 안 됩니다. 유지하려면 다음처럼 신뢰도를 표시해야 합니다.
+### DeepSeek API migration deadline
 
-```text
-Status: Rumor / Unconfirmed
-Source:
-Original publication timestamp:
-Confidence:
-```
+- 어느 API 공지의 어떤 버전 폐지인지 불명확합니다.
+- `deepseek-chat`, `deepseek-reasoner` endpoint 자체가 종료되는 것인지, underlying model revision만 교체되는 것인지 구분해야 합니다.
 
-EU 일정 세 건은 4번의 공식 결정문이 확인되는 경우에만 확정 일정으로 유지할 수 있습니다.
+### Moonshot AI Kimi K3 weights
 
----
+- “scheduled public release”의 공식 공지 URL이 필요합니다.
+- API 출시, 기술 보고서, base/checkpoint weights 공개를 구분해야 합니다.
 
-# URL 감사 결과
+### Cadence September rollout
 
-| 항목 | 제시된 Primary URL | 판정 |
-|---|---|---|
-| 1 | `https://openai.com` | 홈페이지로서 특정 문서 입증 불가 |
-| 2 | `https://qwen.ai` | 홈페이지로서 모델 사양·발표 시각 입증 불충분 |
-| 3 | `https://qz.com` | 매체 루트 URL, 기사 확인 불가 |
-| 4 | `https://www.thurrott.com` | 매체 루트이며 공식 EC 결정문도 아님 |
-| 5 | `https://www.gartner.com` | 홈페이지로서 전망 수치·발행 시각 입증 불가 |
+- 앞선 AuraStack 제품명 검증이 선행돼야 합니다.
+- 공식 GA 날짜인지, early access 종료 예상인지 구분해야 합니다.
 
-URL 자체가 존재하더라도 **인용 URL로는 부적합**합니다. 기사·발표문·모델 카드·결정문으로 직접 연결되는 영구 URL을 사용해야 합니다.
+### Apple CEO 교체
+
+> “September 1, 2026: John Ternus taking over as CEO”
+
+이는 초안에서 가장 고위험한 주장입니다. Apple 이사회 또는 SEC 공시, Apple Newsroom 발표가 없다면 삭제해야 합니다. 승계 후보에 관한 언론 보도와 **확정된 CEO 취임일**은 전혀 다른 사실입니다.
 
 ---
 
-## 최종 수정 우선순위
+# 최종 편집 권고
 
-1. 2번과 4번의 `event_within_24h_window`를 **false**로 변경
-2. 1·3·5번은 정확한 게시 시각을 KST로 변환한 뒤 판정
-3. Gartner의 **104.2% 대 117%** 충돌 해소
-4. 3번 제목의 “Seizes Control”과 “end of unregulated access” 삭제 또는 완화
-5. 2번을 “open-weight 출시”가 아닌 “향후 공개 예고가 포함된 preview”로 수정
-6. 모든 홈페이지 URL을 직접 문서 URL로 교체
-7. EC 결정 번호, 미국 정책 문서, 모델 카드, Gartner 원문을 추가
-8. 미확인 IPO·Qwen 4.0 일정을 확정 캘린더에서 분리
+### 즉시 수정해야 할 사항
 
-결론적으로, 이 초안의 “모든 항목이 직전 24시간 내 발생했고 오래되거나 검증되지 않은 항목은 제외했다”는 Executive Summary의 주장은 **2번과 4번의 자체 메타데이터만으로도 반증됩니다.**
+1. `sub-10nm micro-bump pitch` → **sub-10µm micro-bump pitch**
+2. `NVIDIA Rubin NVL72` → 정확한 Rubin 시스템명으로 교체
+3. DeepSWE를 벤치마크로 부르는 부분 재검증
+4. Anthropic의 500억 달러를 Fluidstack 계약액으로 표현하지 않기
+5. Cadence의 AuraStack·Allegro 제품명과 성능 수치 재검증
+6. 모든 `event_within_*` 항목에 원문 시각과 KST 환산값 추가
+7. Summary를 “24시간 항목 + 슬롯 6의 7일 예외 항목”으로 수정
+8. Apple CEO 교체 등 출처 없는 일정 삭제
+
+### 현재 상태별 판정
+
+- **항목 1:** 검증 보류 — DeepSWE 분류 수정 필요
+- **항목 2:** 부분 수정 필수 — 500억 달러 계약 표현 과장
+- **항목 3:** 부분 수정 필수 — MoE 메모리 효과와 DeepSWE 표현 부정확
+- **항목 4:** 중대 재작성 필요 — 제품명 혼동 가능성 및 Rubin NVL72 오류
+- **항목 5:** 중대 수정 필요 — 단위 오류, 공식 로드맵과 업계 보도 혼동
+- **Upcoming Calendar:** 공식 URL을 추가하지 못하면 전부 삭제 또는 “미확인 일정”으로 격하해야 합니다.
