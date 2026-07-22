@@ -541,12 +541,13 @@ def main():
 
     articles_content = _strip_markdown_fence(articles_content)
 
-    # 🛡️ [방어 로직] 템플릿에 기사 콘텐츠를 끼워넣어 최종 문서를 Python 쪽에서 조립.
+    # 🛡️ [방어 로직] 템플릿에 기사 콘텐츠 + 실제 생성 날짜를 끼워넣어 최종 문서를 Python 쪽에서 조립.
     # CSS/골격은 항상 template.html 그대로이므로 매일 CSS가 미세하게 달라질 위험이 원천 차단됨.
-    html_code = template_content.replace("{{ARTICLES_CONTENT}}", articles_content)
+    report_date_str = datetime.datetime.now().strftime("%B %d, %Y")
+    html_code = template_content.replace("{{ARTICLES_CONTENT}}", articles_content).replace("{{REPORT_DATE}}", report_date_str)
 
     # 🛡️ [방어 로직] 최종 안전망 - 조립 결과가 실제로 완전한 문서인지 마지막으로 확인
-    if "{{ARTICLES_CONTENT}}" in html_code or "<!DOCTYPE html>" not in html_code or "</html>" not in html_code:
+    if "{{ARTICLES_CONTENT}}" in html_code or "{{REPORT_DATE}}" in html_code or "<!DOCTYPE html>" not in html_code or "</html>" not in html_code:
         print("❌ Phase 5 failed: 최종 HTML 조립에 실패했습니다. index.html을 덮어쓰지 않습니다.")
         sys.exit(1)
 
@@ -562,4 +563,5 @@ def main():
     print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
 
 if __name__ == "__main__":
+
     main()
