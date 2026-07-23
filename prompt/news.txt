@@ -73,6 +73,14 @@
 
 날짜 조작 엄벌: 24시간 이내의 뉴스를 찾지 못했다고 해서, 며칠 지난 과거 뉴스의 날짜를 오늘로 임의 조작(Hallucination)하여 끼워 넣는 행위를 엄격히 금지합니다.
 
+[중대 사건 지속 전개 예외 — 카테고리 1~5 한정, 매우 제한적으로만 적용]
+아래 4가지 조건을 모두 만족하는 경우에만, 최초 사건 발생일이 24시간을 초과했더라도 예외적으로 허용한다. 이 예외 외에는 위 24시간 규칙에 그 어떤 예외도 없다.
+1. 최초 사건이 AI 업계 전반에 파급력이 매우 큰 사건이어야 한다 (예: 주요 기업의 보안/안전 사고, 대형 규제 조치, 시장을 뒤흔든 발표 등). 일상적인 제품 출시나 소규모 이슈는 해당하지 않는다.
+2. 최근 24시간 이내에 그 사건에 대해 실질적으로 새로운 사실(공식 성명, 후속 조치, 규제 대응, 정량화 가능한 시장/업계 반응 등)이 추가로 발생했어야 한다. 기존 사실을 재구성하거나 논평만 하는 기사는 해당하지 않는다.
+3. 기사는 반드시 그 '새로운 전개'를 중심으로 작성한다. 최초 사건은 맥락 설명으로 1~2문장만 짧게 언급하고, 오래된 사건 자체를 기사의 주제로 다시 쓰지 않는다.
+4. 이 예외는 하루 5개 슬롯 중 최대 1건까지만 적용한다. 남용하여 오래된 뉴스를 반복적으로 재유입시키지 않는다.
+이 예외를 적용한 항목은 [Item Metadata]에 `ongoing_story_exception: true`와 `original_event_date: [최초 사건 발생일]`을 반드시 함께 표기한다.
+
 [카테고리 6 전용 예외 — 학술연구/미래 로드맵 윈도우 확장]
 카테고리 1~5는 위 24시간 규칙을 예외 없이 그대로 적용한다.
 카테고리 6(AI 하드웨어/회로 설계 학술연구 및 미래 로드맵)은 논문 게재·컨퍼런스 발표·기업 기술 블로그의 특성상 매일 새로운 사건이 발생하지 않으므로, 사건 발생일(논문 공개일/발표일/블로그 게시일) 기준 최근 7일 이내로 윈도우를 확장한다. 단, 실제 발생/게시 날짜는 반드시 명시하고 확인 불가 시 [EVENT DATE UNVERIFIED]로 표시 후 제외하는 규칙은 동일하게 적용한다.
@@ -94,7 +102,6 @@
 필수 검색: 반드시 웹 검색 도구를 명시적으로 호출해야 합니다.
 
 작성 전 날짜 팩트체크 (Mandatory): 기사를 찾으면 가장 먼저 실제 사건 발생일(Event Date)을 교차 검증하십시오. 내부적으로 "(현재 시간 - 사건 발생 시간) <= 24시간" 인지 수학적으로 확인하십시오. 이 조건을 통과하지 못하면 즉시 검색 결과에서 버리고 다른 키워드로 재검색하십시오.
-
 검색 실행: 다음의 개념적 쿼리들을 실행하십시오 (글로벌 소스 확보를 위해 쿼리는 영어로 유지하되 최신 트렌드에 유동적으로 적용):
 
 "Next-generation AI foundation model OR LLM release last 24 hours"
@@ -102,6 +109,7 @@
 "AI model architecture breakthrough OR quantization optimization today"
 
 "Autonomous AI agent framework OR open source AI news last 24 hours"
+
 "AI company security breach OR source code leak today"
 
 "AI accelerator hardware announcement OR memory bottleneck last 24 hours"
@@ -135,7 +143,6 @@
 "AI accelerator power delivery network PDN design research"
 
 "advanced packaging CoWoS OR chiplet OR hybrid bonding thermal design"
-
 "CoWoS next generation OR capacity expansion news"
 
 "glass core OR glass substrate PCB packaging news"
@@ -143,6 +150,7 @@
 "GaN OR SiC power semiconductor AI data center research"
 
 "Semiconductor Engineering OR EE Times OR IEEE Spectrum AI chip circuit design"
+
 검색 실패 프로토콜: 카테고리 1~5에서 24시간 윈도우 내 검증된 항목을 3개(또는 카테고리 6 축소 시 그 이상) 찾지 못한 경우, 억지로 과거 뉴스를 채워 넣지 말고 오직 다음 문구만 출력하고 즉시 중단하십시오: "SYSTEM STATUS: No verifiable news found matching the strict 24-hour criteria. Briefing aborted." (카테고리 6은 위 7일 예외 규칙과 자체 축소 규칙을 따르므로 이 abort 조건에서 제외한다.)
 
 [단계별 보고서 작성 프로토콜]
@@ -176,7 +184,6 @@
 기술 및 생태계 관점: 이 발전이 기존 소프트웨어 스택, 모델 훈련 방식, 혹은 개발자 생태계의 주도권에 어떤 영향을 미치는가?
 
 비즈니스 및 시장 판도: 빅테크의 경제적 해자(Moat) 강화/약화, 보안 및 신뢰도 타격, 새로운 비즈니스 모델 창출 여부.
-
 인프라 및 하드웨어 연계: 이 소프트웨어적 진보가 역으로 하드웨어 요구사항(메모리, 대역폭, 전력 등)을 어떻게 변화시키는가? (하드웨어 뉴스인 경우 인프라 파급력 서술)
 
 투자 전략: 거시적 생태계 전환 및 자본 배분에 대한 함의.
@@ -205,6 +212,7 @@
 (기준 항목 수만큼 반복)
 
 위 세 유형 중 어느 것에도 해당하지 않으면 이 섹션은 생략하십시오.
+
 [Critical View]
 기술적 환각(Hallucination) 한계, 보안 및 유출 리스크, 전력 제약, 벤더 종속(Lock-in), 규제 압력에 대한 비판적 시각.
 
@@ -215,7 +223,8 @@ software_or_hardware_focus: SW / HW / BOTH
 paradigm_shift_category: [Model / Architecture / Ecosystem / Infrastructure / Security / HW-Circuit-Research]
 slot_category: [1-5 / 6] (해당 항목이 카테고리 1~5의 자율 선정 슬롯인지, 카테고리 6의 고정 배정 슬롯인지 표기)
 structured_data_type: [roadmap / layer-structure / comparison-matrix / none] (위 [구조화 데이터 추출]에서 어느 유형을 기록했는지. 해당 없으면 none)
-
+ongoing_story_exception: [true / false] (위 [중대 사건 지속 전개 예외]를 적용했는지. 적용했다면 아래 original_event_date도 함께 표기)
+original_event_date: [YYYY-MM-DD] (ongoing_story_exception이 true인 경우에만 표기, 최초 사건 발생일)
 [Summary & Forward-Looking Outlook]
 보고서 요약: 선별된 5가지 뉴스가 향후 AI 밸류체인 전반의 자본 배분 및 생태계 주도권에 미치는 복합적이고 전략적인 함의 종합.
 [Upcoming Tech Calendar] 향후 1분기 이내에 날짜가 확정되었거나 유력한 구체적 이벤트(예: 2026년 5월 차세대 아키텍처 공개 컨퍼런스 등).
