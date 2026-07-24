@@ -3,6 +3,7 @@ import time
 import sys
 import argparse
 import re
+import base64
 import datetime
 import random
 from dotenv import load_dotenv
@@ -127,13 +128,13 @@ def _strip_markdown_fence(text):
 
 def validate_articles_content(text):
     """🛡️ Phase 5용 검증 함수.
-    - <article> 열고 닫는 태그가 5쌍 이상 있어야 함
+    - <article> 열고 닫는 태그가 4쌍 이상 있어야 함
     - 문서 골격(DOCTYPE/head/style 등)이 실수로 포함되지 않았는지 확인
     """
     stripped = _strip_markdown_fence(text)
     open_count = stripped.count("<article")
     close_count = stripped.count("</article>")
-    if open_count < 5 or close_count < 5:
+    if open_count < 4 or close_count < 4:
         raise ValueError(f"기사 블록이 불완전합니다 (open={open_count}, close={close_count}). 응답이 잘렸을 수 있습니다.")
     for forbidden in ("<!DOCTYPE", "<head", "<style", "```"):
         if forbidden in stripped:
@@ -150,7 +151,7 @@ def run_grounded_research(client, model_id, system_rules, user_prompt, output_fi
             f"Current KST Time: {current_kst}. "
             f"CRITICAL DIRECTIVES:\n"
             f"1. You MUST aggressively use the Google Search tool to find the latest AI news.\n"
-            f"2. OVERRIDE PROMPT RULES: Ignore 'abort' commands from the user prompt. Just keep searching until you find 5 valid items.\n"
+            f"2. OVERRIDE PROMPT RULES: Ignore 'abort' commands from the user prompt. Just keep searching until you find 4 valid items.\n"
             f"3. NEVER use inline LaTeX. Use bold or plain text for all variables and symbols.\n\n"
             f"[GLOBAL RULES & FORMAT]\n{system_rules}"
         )
@@ -171,6 +172,57 @@ def run_grounded_research(client, model_id, system_rules, user_prompt, output_fi
     except Exception as e:
         print(f"Error in Phase 1: {e}")
         raise e
+
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(10), retry_error_callback=return_none_on_error)
+def generate_article_image_b64(g_client, title, summary_for_prompt):
+    """🖼️ Phase 6용: 기사 제목/요약을 바탕으로 Nano Banana(gemini-2.5-flash-image)로
+    이미지를 생성하고, HTML에 바로 넣을 수 있도록 base64 data URI 문자열을 반환한다.
+    실패 시(재시도 3회 후에도) None을 반환하며, 호출 측은 이미지 없이 진행해야 한다."""
+    image_prompt = (
+        "Editorial illustration for a professional AI/semiconductor industry briefing. "
+        "Minimalist, grayscale with a single blue accent color (#1a73e8), flat vector style, "
+        "no text or logos in the image, 16:9 composition. "
+        f"Topic: {title}. Context: {summary_for_prompt[:300]}"
+    )
+    response = g_client.models.generate_content(
+        model="gemini-2.5-flash-image",
+        contents=image_prompt,
+    )
+    for part in response.candidates[0].content.parts:
+        if getattr(part, "inline_data", None) and part.inline_data.data:
+            b64_str = base64.b64encode(part.inline_data.data).decode("utf-8")
+            mime = part.inline_data.mime_type or "image/png"
+            return f"data:{mime};base64,{b64_str}"
+    return None
+
+
+def inject_article_images(g_client, articles_html, article_meta):
+    """5(또는 4)개 기사 HTML에 순서대로 이미지를 생성해 <img> 태그로 삽입.
+    article_meta: [{"id": "art1", "title": "...", "summary": "..."}, ...]
+    개별 이미지 생성 실패는 전체 파이프라인을 막지 않고 해당 기사만 이미지 없이 넘어간다."""
+    result_html = articles_html
+    for meta in article_meta:
+        art_id = meta["id"]
+        print(f"🖼️ Generating image for {art_id}...")
+        try:
+            data_uri = generate_article_image_b64(g_client, meta["title"], meta["summary"])
+        except Exception as e:
+            print(f"⚠️ Image generation failed for {art_id}, skipping image: {e}")
+            data_uri = None
+
+        if not data_uri:
+            continue
+
+        img_tag = f'<img class="article-image" src="{data_uri}" alt="{meta["title"]}">'
+        marker = f'<article class="paper-section" id="{art_id}">'
+        h2_end_pattern = re.search(re.escape(marker) + r'\s*<h2>.*?</h2>', result_html, re.DOTALL)
+        if h2_end_pattern:
+            insert_at = h2_end_pattern.end()
+            result_html = result_html[:insert_at] + img_tag + result_html[insert_at:]
+        else:
+            print(f"⚠️ {art_id}의 <h2> 위치를 찾지 못해 이미지를 삽입하지 못했습니다.")
+    return result_html
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -219,13 +271,13 @@ def main():
             print(f"Warning: Could not read ref.txt: {e}")
 
     if ref_content:
-        auto_count = max(0, 5 - ref_count)
+        auto_count = max(0, 4 - ref_count)
         ref_instr = (
             f"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             f"[🎯 MANDATORY TARGET NEWS (최우선 반영 지시)]\n"
             f"사용자가 오늘 특별히 다음 **{ref_count}개**의 주제/사건에 대한 분석을 요청했습니다:\n"
             f"{ref_content}\n\n"
-            f"지시사항: 최종 5개의 주요 뉴스 중, 위 요청된 {ref_count}개의 주제를 빠짐없이 포함하고 나머지 {auto_count}개는 직접 발굴하십시오.\n"
+            f"지시사항: 최종 4개의 주요 뉴스 중, 위 요청된 {ref_count}개의 주제를 빠짐없이 포함하고 나머지 {auto_count}개는 직접 발굴하십시오.\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
         )
         phase1_prompt_content += ref_instr
@@ -249,7 +301,7 @@ def main():
         print(f"Starting Grounded Research (Model: {g_model})...")
         p1_start = time.time()
         
-        user_trigger = "시스템 지시사항(GLOBAL RULES)에 정의된 형식과 규칙에 따라 지금 바로 구글 검색을 통해 최신 AI 뉴스 5개를 발굴하고 보고서를 작성하십시오."
+        user_trigger = "시스템 지시사항(GLOBAL RULES)에 정의된 형식과 규칙에 따라 지금 바로 구글 검색을 통해 최신 AI 뉴스 4개를 발굴하고 보고서를 작성하십시오."
         initial_result = run_grounded_research(g_client, g_model, phase1_prompt_content, user_trigger, p1_cache_file)
         
         if not initial_result:
@@ -342,7 +394,7 @@ def main():
                 "일반 슬롯(카테고리 1~5)은 최근 24시간 이내에 발생한 사건만 허용합니다. "
                 "단, 삭제된 항목이 카테고리 6(HW-Circuit-Research, 학술연구/미래 로드맵)이었다면, 대체 항목은 GLOBAL RULES에 명시된 대로 최근 7일 이내 발표/게시된 논문·컨퍼런스·기술 블로그를 기준으로 발굴하십시오. "
                 "또한 GLOBAL RULES의 [중대 사건 지속 전개 예외] 조건을 모두 만족하는 항목이라면, 최초 사건이 24시간을 초과했더라도 유지하거나 대체 항목으로 채택할 수 있습니다 (단, 하루 최대 1건, ongoing_story_exception: true 표기 필수). "
-                "최종 리포트는 무조건 5개의 항목으로 채워져야 합니다.\n"
+                "최종 리포트는 무조건 4개의 항목으로 채워져야 합니다.\n"
                 "4. 피드백에서 지적되지 않은 정상 항목은 불필요한 재작성 없이 원문을 최대한 유지하십시오.\n"
                 "5. 인라인 수식 기호 절대 사용 금지. 벡터는 굵은 글씨, 변수는 일반 텍스트.\n"
                 "6. 기존 섹션 구조(Overview, Strategic Impact, Technical Deep Dive 등)를 정확히 유지하십시오."
@@ -355,7 +407,7 @@ def main():
                 "7-day event-date window as defined in the GLOBAL RULES below, and EXCEPT for at most one item per day "
                 "meeting the GLOBAL RULES' [중대 사건 지속 전개 예외] (ongoing major story with a genuinely new development "
                 "in the last 24 hours). Do not apply the 24-hour cutoff to those items. "
-                "Ensure the final output always contains exactly 5 valid news items.\n\n"
+                "Ensure the final output always contains exactly 4 valid news items.\n\n"
                 f"[GLOBAL RULES & FORMAT]\n{base_prompt_content}"
             )
 
@@ -483,7 +535,7 @@ def main():
     gpt_model_id = "gpt-5.6-terra"
     print(f"Generating article content using model: {gpt_model_id}...")
 
-    user_prompt = f"다음 데이터를 바탕으로 시스템 지시사항에 맞춰 5개 기사(<article>) 블록만 생성하십시오:\n\n{final_content}"
+    user_prompt = f"다음 데이터를 바탕으로 시스템 지시사항에 맞춰 4개 기사(<article>) 블록만 생성하십시오:\n\n{final_content}"
     messages = [{"role": "user", "content": user_prompt}]
 
     articles_content = run_gpt_chat(o_client, gpt_model_id, messages, system=html_prompt_content)
@@ -514,6 +566,27 @@ def main():
         f.write(today_str)
 
     print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
+
+    # ---------------------------------------------------------
+    # Phase 6: 기사 이미지 생성 (Nano Banana, base64 인라인 삽입)
+    # ---------------------------------------------------------
+    print("\n--- Phase 6: Article Image Generation ---")
+    p6_start = time.time()
+
+    article_meta = []
+    for m in re.finditer(r'<article class="paper-section" id="(art\d+)">\s*<h2>(.*?)</h2>.*?<p>(.*?)</p>', html_code, re.DOTALL):
+        article_meta.append({"id": m.group(1), "title": re.sub("<.*?>", "", m.group(2)), "summary": re.sub("<.*?>", "", m.group(3))})
+
+    if not article_meta:
+        print("⚠️ Phase 6 건너뜀: 기사 제목/요약을 파싱하지 못했습니다.")
+    else:
+        try:
+            html_code = inject_article_images(g_client, html_code, article_meta)
+            with open("index.html", "w", encoding="utf-8") as f:
+                f.write(html_code)
+            print(f"✅ Phase 6 complete. (Time: {time.time() - p6_start:.2f}s)")
+        except Exception as e:
+            print(f"⚠️ Phase 6 실패, 이미지 없이 index.html 유지: {e}")
 
 if __name__ == "__main__":
     main()
