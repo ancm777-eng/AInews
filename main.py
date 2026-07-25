@@ -3,7 +3,6 @@ import time
 import sys
 import argparse
 import re
-import base64
 import datetime
 import random
 from dotenv import load_dotenv
@@ -172,57 +171,6 @@ def run_grounded_research(client, model_id, system_rules, user_prompt, output_fi
     except Exception as e:
         print(f"Error in Phase 1: {e}")
         raise e
-
-@retry(stop=stop_after_attempt(3), wait=wait_fixed(10), retry_error_callback=return_none_on_error)
-def generate_article_image_b64(g_client, title, summary_for_prompt):
-    """🖼️ Phase 6용: 기사 제목/요약을 바탕으로 Nano Banana(gemini-2.5-flash-image)로
-    이미지를 생성하고, HTML에 바로 넣을 수 있도록 base64 data URI 문자열을 반환한다.
-    실패 시(재시도 3회 후에도) None을 반환하며, 호출 측은 이미지 없이 진행해야 한다."""
-    image_prompt = (
-        "Editorial illustration for a professional AI/semiconductor industry briefing. "
-        "Minimalist, grayscale with a single blue accent color (#1a73e8), flat vector style, "
-        "no text or logos in the image, 16:9 composition. "
-        f"Topic: {title}. Context: {summary_for_prompt[:300]}"
-    )
-    response = g_client.models.generate_content(
-        model="gemini-2.5-flash-image",
-        contents=image_prompt,
-    )
-    for part in response.candidates[0].content.parts:
-        if getattr(part, "inline_data", None) and part.inline_data.data:
-            b64_str = base64.b64encode(part.inline_data.data).decode("utf-8")
-            mime = part.inline_data.mime_type or "image/png"
-            return f"data:{mime};base64,{b64_str}"
-    return None
-
-
-def inject_article_images(g_client, articles_html, article_meta):
-    """5(또는 4)개 기사 HTML에 순서대로 이미지를 생성해 <img> 태그로 삽입.
-    article_meta: [{"id": "art1", "title": "...", "summary": "..."}, ...]
-    개별 이미지 생성 실패는 전체 파이프라인을 막지 않고 해당 기사만 이미지 없이 넘어간다."""
-    result_html = articles_html
-    for meta in article_meta:
-        art_id = meta["id"]
-        print(f"🖼️ Generating image for {art_id}...")
-        try:
-            data_uri = generate_article_image_b64(g_client, meta["title"], meta["summary"])
-        except Exception as e:
-            print(f"⚠️ Image generation failed for {art_id}, skipping image: {e}")
-            data_uri = None
-
-        if not data_uri:
-            continue
-
-        img_tag = f'<img class="article-image" src="{data_uri}" alt="{meta["title"]}">'
-        marker = f'<article class="paper-section" id="{art_id}">'
-        h2_end_pattern = re.search(re.escape(marker) + r'\s*<h2>.*?</h2>', result_html, re.DOTALL)
-        if h2_end_pattern:
-            insert_at = h2_end_pattern.end()
-            result_html = result_html[:insert_at] + img_tag + result_html[insert_at:]
-        else:
-            print(f"⚠️ {art_id}의 <h2> 위치를 찾지 못해 이미지를 삽입하지 못했습니다.")
-    return result_html
-
 
 def main():
     parser = argparse.ArgumentParser()
@@ -566,27 +514,6 @@ def main():
         f.write(today_str)
 
     print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
-
-    # ---------------------------------------------------------
-    # Phase 6: 기사 이미지 생성 (Nano Banana, base64 인라인 삽입)
-    # ---------------------------------------------------------
-    print("\n--- Phase 6: Article Image Generation ---")
-    p6_start = time.time()
-
-    article_meta = []
-    for m in re.finditer(r'<article class="paper-section" id="(art\d+)">\s*<h2>(.*?)</h2>.*?<p>(.*?)</p>', html_code, re.DOTALL):
-        article_meta.append({"id": m.group(1), "title": re.sub("<.*?>", "", m.group(2)), "summary": re.sub("<.*?>", "", m.group(3))})
-
-    if not article_meta:
-        print("⚠️ Phase 6 건너뜀: 기사 제목/요약을 파싱하지 못했습니다.")
-    else:
-        try:
-            html_code = inject_article_images(g_client, html_code, article_meta)
-            with open("index.html", "w", encoding="utf-8") as f:
-                f.write(html_code)
-            print(f"✅ Phase 6 complete. (Time: {time.time() - p6_start:.2f}s)")
-        except Exception as e:
-            print(f"⚠️ Phase 6 실패, 이미지 없이 index.html 유지: {e}")
 
 if __name__ == "__main__":
     main()
