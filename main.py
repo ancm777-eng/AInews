@@ -211,7 +211,22 @@ def main():
     if os.path.exists("ref.txt"):
         try:
             with open("ref.txt", "r", encoding="utf-8") as f:
-                ref_lines = [line.strip() for line in f.readlines() if line.strip()]
+                raw_text = f.read().strip()
+                ref_lines = []
+                if raw_text:
+                    for raw_line in raw_text.split("\n"):
+                        line = raw_line.strip()
+                        if not line:
+                            continue
+                        # 한 줄에 여러 항목이 마커로 붙어버린 경우를 대비한 안전장치(추가 분리)
+                        parts = re.split(r'(?:(?<=\S)\s+|^)(?=\d{1,2}[.\)]\s|[-•]\s)', line)
+                        parts = [p for p in parts if p.strip()] or [line]
+                        for part in parts:
+                            # "-" 등 앞 마커만 제거하고 실제 내용만 남긴다.
+                            # 템플릿의 빈 "-" 줄은 마커 제거 후 내용이 없으므로 자동으로 무시된다.
+                            content = re.sub(r'^(?:[-•]|\d{1,2}[.\)])\s*', '', part.strip()).strip()
+                            if content:
+                                ref_lines.append(content)
                 if ref_lines:
                     ref_content = "\n".join(f"▶ {line}" for line in ref_lines)
                     ref_count = len(ref_lines)
@@ -258,8 +273,8 @@ def main():
         
         if os.path.exists("ref.txt"):
             with open("ref.txt", "w", encoding="utf-8") as f:
-                pass
-            print("🧹 Phase 1 성공: 내일의 중복 검색 방지를 위해 ref.txt를 초기화했습니다.")
+                f.write("-\n-\n-\n-\n")
+            print("🧹 Phase 1 성공: 내일 바로 채워 쓸 수 있도록 ref.txt를 '-' 4줄 템플릿으로 초기화했습니다.")
 
         print(f"✅ Phase 1 complete. Saved to {p1_cache_file} (Time: {time.time() - p1_start:.2f}s)")
 
@@ -516,4 +531,5 @@ def main():
     print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
 
 if __name__ == "__main__":
+
     main()
