@@ -1,361 +1,373 @@
 ## 종합 판정
 
-**현 상태로는 발행을 권고하지 않습니다.**  
-특히 **Item 1은 URL과 거래 세부사항의 신뢰성이 무너져 있고**, Item 3·4에는 공식 발표가 존재하더라도 그대로 도출할 수 없는 기술적·상업적 과장이 섞여 있습니다. Item 2는 핵심 계약 수치가 원문과 일치한다는 전제에서 가장 개연성이 높지만, “확보·보장된 용량”이라는 표현은 계약상 옵션을 과대평가할 수 있습니다.
+초안은 **시간 윈도우 판정 3건이 증빙 부족**이며, 본문에는 몇 가지 **명확한 수치·기술적 모순**이 있습니다. 특히 다음 사항은 수정이 필요합니다.
+
+1. **Item 1·2:** `2026-07-28`이라는 날짜만으로는 24시간 내 사건이라고 확정할 수 없습니다.
+2. **Item 1:** 총사업비·출자·차입금 숫자가 서로 맞지 않으며, `80% 지분 이전 = 부채 80% 이전`으로 해석한 부분도 부정확합니다.
+3. **Item 2:** “차원 절반 → 비트 보안성 절반 → 키 크기 두 배”라는 결론은 수학적으로 자동 성립하지 않습니다. “AES-128이 수학적으로 안전하다”는 표현도 과도합니다.
+4. **Item 3:** `did:key` 자체에는 기본적인 폐기·키 회전 기능이 없으므로 “one-click revocation”을 DID 기능처럼 기술하면 안 됩니다.
+5. **Item 4:** `120×120 mm = 8× reticle size`는 표준 26×33 mm 노광 필드의 **면적 기준으로 계산하면 약 16.8배**라서 정의가 필요합니다. EMIB-T의 TSV를 “직접 후면 전력 공급”으로 단정한 것도 과도합니다.
+6. **행사 일정:** DAC 2026을 `7월 29~31일`로 기재한 일정은 본문의 “concluding tracks” 설명과도 맞지 않으며, 공식 일정 재확인이 필요합니다.
 
 ---
 
-## 1. 시간 윈도우 검증
+## 1. Meta–BlackRock El Paso JV
 
-### 기준 시각
-- 초안 기준: **2026-07-29 07:38 KST**
-- 실제 검증 기준: **2026-07-29 07:39 KST**
-- 일반 24시간 범위: **2026-07-28 07:39 KST 이후**
-  - UTC: **2026-07-27 22:39 UTC 이후**
+### 판정: **중대한 수치 모순 + 시간 윈도우 미입증**
 
-### 판정
+### 시간 검증
 
-| 항목 | 기재 이벤트 날짜 | 허용 범위 | 판정 |
-|---|---:|---:|---|
-| Item 1 | 2026-07-28 | 24시간 | **날짜만으로는 엄격히 입증 불가** |
-| Item 2 | 2026-07-28 | 24시간 | **날짜만으로는 엄격히 입증 불가** |
-| Item 3 | 2026-07-28 | 24시간 | **날짜만으로는 엄격히 입증 불가** |
-| Item 4 | 2026-07-28 | Category 6, 7일 | **허용 범위 충족** |
+기준 시각은 다음과 같습니다.
 
-Item 1~3의 미국 현지 7월 28일 보도라면 통상 KST 7월 28일 오후 이후이므로 실제로는 24시간 안일 가능성이 높습니다. 그러나 초안에는 **게시 시각과 시간대가 없으므로** `event_within_24h_window: true`를 엄격하게 확정할 수 없습니다. 각 원문에 표시된 게시 시각을 UTC 또는 KST로 정규화해야 합니다.
+- 기준: **2026-07-30 07:35 KST**
+- 일반 24시간 윈도우:  
+  **2026-07-29 07:35 KST ~ 2026-07-30 07:35 KST**
+- UTC 환산:  
+  **2026-07-28 22:35 UTC ~ 2026-07-29 22:35 UTC**
 
-Item 4는 `slot_category: 6`이고 `event_within_7d_window: true`이므로 날짜가 맞는 한 시의성 문제는 없습니다.
+초안에는 이벤트와 발행일이 모두 `2026-07-28`로만 적혀 있습니다. 따라서 다음 중 하나가 필요합니다.
 
----
+- 원문 발행 시각이 **7월 28일 22:35 UTC 이후**였다는 증빙
+- 또는 미국 현지 날짜 7월 28일에 발표됐지만 UTC로는 이미 7월 29일이었다는 증빙
 
-# 항목별 검증
+날짜만으로는 `event_within_24h_window: true`를 확정할 수 없습니다. **정확한 발표·게시 타임스탬프가 없으면 false 또는 unverified로 처리해야 합니다.**
 
-## Item 1 — Meta·BlackRock, El Paso 140억 달러 JV
+### 명확한 재무 수치 모순
 
-### 판정: **중대한 오류 및 출처 불일치 — 제외 또는 전면 재검증 필요**
+제시된 숫자는 다음과 같습니다.
 
-### 1) Primary URL이 2026년 발표와 맞지 않음
-제시된 URL:
+- BlackRock 현금 출자: **$4.9B**
+- 프로젝트 채권 부채: **$12.5B**
+- Meta 현물 출자: **$2.3B**
+- Meta가 받은 현금 분배: **$1.0B**
+- 주장된 총사업비: **$14B**
 
-> `https://www.prnewswire.com/news-releases/meta-announces-new-strategic-venture-with-blackrock-to-develop-data-center-in-el-paso-302208123.html`
+Meta의 순출자를 `2.3 - 1.0 = $1.3B`로 보면:
 
-PR Newswire의 `302208xxx` 문서 번호대는 **2024년 무렵의 배포물 번호 체계**와 대응합니다. 따라서 해당 번호를 붙인 URL이 “2026-07-28 Meta·BlackRock 발표”의 원문이라는 주장은 시간적으로 맞지 않습니다. 슬러그를 임의로 바꾼 URL이거나 존재하지 않는 페이지일 가능성이 큽니다.
+- 순자본 출자: `4.9 + 1.3 = $6.2B`
+- 여기에 부채 $12.5B를 더하면: **$18.7B**
 
-이 항목은 최소한 다음 공식 링크가 별도로 확인되기 전까지 사실로 취급하면 안 됩니다.
+즉, 본문의 모든 금액을 동일 프로젝트의 자금조달 원천으로 보면 **$14B와 맞지 않습니다**. 반대로 $14B가 평가가치나 특정 단계의 시설비라면, $12.5B 채권이 전체 프로젝트 부채인지 리파이낸싱 금액인지 등을 별도로 설명해야 합니다.
 
-- Meta Newsroom 원문
-- BlackRock 또는 GIP 공식 발표
-- Reuters 기사 원문
-- 거래 법인명 및 재무 구조를 설명하는 공시
+지분 비율 자체는 순출자 기준으로는 대략 맞습니다.
 
-### 2) 다른 Meta 데이터센터 금융 거래와 혼합됐을 가능성
-초안의 다음 요소들은 알려진 Meta의 다른 대형 데이터센터 금융 구조와 혼합된 흔적이 강합니다.
+- BlackRock: `4.9 / 6.2 ≈ 79%`
+- Meta: `1.3 / 6.2 ≈ 21%`
 
-- JV 방식
-- 약 4년이라는 기간
-- Meta의 장기 사용·운영 구조
-- 사모 인프라 자본 활용
-- 초대형 AI 데이터센터 캠퍼스
+따라서 **80/20 지분 구조는 가능하지만, 총사업비 및 부채와의 관계는 현재 서술로는 모순**입니다.
 
-반면 **El Paso, BlackRock, 140억 달러, “4년 운영 임대”**라는 조합을 뒷받침하는 검증 가능한 1차 자료가 제시되지 않았습니다. 특히 데이터센터의 “초기 운영 임대기간이 4년”이라는 설명은 초대형 캠퍼스의 경제수명과 어울리지 않으며, 원문의 **건설기간·보증기간·초기 약정기간**을 임대기간으로 잘못 해석했을 가능성이 있습니다.
+### 회계·법률 표현 오류
 
-### 3) GIP와 HPS를 BlackRock과 별개의 병렬 파트너처럼 기술
-초안은 다음과 같이 적었습니다.
+다음 문장은 부정확합니다.
 
-> BlackRock, partnering alongside Global Infrastructure Partners and HPS Investment Partners
+> shifting 80% of physical construction debt to institutional fund managers
 
-GIP는 BlackRock이 인수한 인프라 투자 플랫폼이며, HPS 역시 BlackRock 산하 또는 통합 관계를 고려해야 합니다. 따라서 이들을 아무 설명 없이 “BlackRock과 함께 참여하는 별개의 독립 파트너”처럼 나열하는 것은 현재 기업 구조를 오도할 수 있습니다.
+**80% 지분 보유와 프로젝트 부채의 80% 부담은 같은 개념이 아닙니다.** 프로젝트 법인이 차입자이고 비소구 또는 제한소구 구조라면, 지분율과 부채 부담은 별도로 설명해야 합니다.
 
-권장 표현:
+또한 “off-balance-sheet” 여부는 80%를 외부에 매각했다고 자동 확정되지 않습니다. Meta가 다음 중 하나에 해당하면 연결 또는 리스부채 인식 문제가 남습니다.
 
-> “BlackRock과 그 산하·통합 투자 플랫폼인 GIP/HPS가 참여한 구조”
+- 실질적 지배력 보유
+- 유일한 임차인으로서 자산 사용을 통제
+- 확정 구매·갱신 약정
+- 잔존가치 보증
+- 변동이익에 대한 실질적 노출
 
-단, 실제 참여 여부 자체를 공식 발표로 먼저 확인해야 합니다.
+따라서 공식 회계 공시가 없다면 **“off-balance-sheet” 대신 “potentially deconsolidated/project-finance structure”** 정도로 낮춰 써야 합니다.
 
-### 4) “Off-balance-sheet”와 “balance sheet 보존”은 회계적으로 부정확
-JV가 자산을 소유하더라도 Meta가 장기 임차·지급보증·구매약정을 부담하면 ASC 842 등에 따라 다음이 인식될 수 있습니다.
+### 추가로 수정할 부분
 
-- 사용권자산
-- 리스부채
-- 지급보증 또는 기타 약정
-- JV 지분법 투자
+- `$35B–$50B` 서버·가속기 비용은 계산 근거가 없습니다.  
+  1GW 전체가 IT 부하인지, PUE 포함 캠퍼스 전력인지, GPU당 전력 및 네트워크·CPU·스토리지 비용을 어떻게 잡았는지 제시해야 합니다.
+- “1GW IT capacity”와 “1GW campus power”는 동일하지 않습니다.
+- `Meta Compute`가 공식 조직·브랜드인지, 단순 전략적 표현인지 1차 자료에서 확인해야 합니다.
+- Bloomberg 외에 Reuters·Forbes·Meta 공시를 출처로 적었지만 해당 URL과 문서명이 없습니다. 엄격한 교차 검증 형식으로는 부족합니다.
 
-따라서 “operating lease이므로 대차대조표를 보존한다”는 비교표는 명백히 지나친 단순화입니다. **현금 CapEx 부담을 외부화하는 것**과 **재무상태표에서 제거되는 것**은 동일하지 않습니다.
+### 권고 판정
 
-### 5) 근거 없는 세부 주장
-다음은 제시된 출처만으로 확인되지 않습니다.
-
-- 경쟁입찰을 통해 BlackRock 선정
-- Meta가 “15년의 액체냉각 엔지니어링”을 결합
-- Mark Zuckerberg와 Larry Fink가 해당 의미를 직접 강조
-- “excess compute monetization”
-- 착공이 이미 진행 중
-- JV가 부동산과 전력 인프라를 소유
-- 초기 4년 운영 임대와 복수 연장 옵션
-
-### 수정 권고
-이 항목은 단순 문구 수정이 아니라 **거래 상대방·금액·지역·기간·URL을 처음부터 다시 확인**해야 합니다. 공식 원문이 확인되지 않으면 삭제하는 것이 적절합니다.
+- `event_within_24h_window`: **unverified**
+- 사실성: **재무 구조 수치 수정 전 게재 불가**
+- URL: URL 형식만으로 진위를 확인할 수 없으므로 실제 응답 상태와 기사 제목·타임스탬프를 기록해야 함
 
 ---
 
-## Item 2 — Core Scientific·AMD, 500MW/최대 2.5GW
+## 2. Anthropic Claude Mythos / HAWK / reduced AES
 
-### 판정: **핵심 발표 확인을 전제로 조건부 통과, 계약 의미는 하향 조정 필요**
+### 판정: **시간 미입증 + 암호학적 결론 과장**
 
-회사명과 기술 스택의 조합 자체에는 명확한 논리적 모순이 없습니다.
+### 시간 검증
 
-- Core Scientific
-- AMD Instinct
-- AMD EPYC
-- ROCm
-- 고밀도 액체냉각 데이터센터
+Item 1과 동일하게 `2026-07-28` 날짜만으로는 24시간 내 사건인지 판단할 수 없습니다. 해당 날짜 중 윈도우에 포함되는 UTC 구간은 **22:35~23:59 UTC**뿐입니다. 미국 현지 시간 기준 발표였다면 포함될 수도 있지만, 원문 시각이 필요합니다.
 
-또한 Mathew Hein을 AMD의 전략 담당 임원으로 지칭하는 것도 대체로 자연스럽습니다. 다만 다음 부분은 원문의 계약 용어를 정확히 옮겨야 합니다.
+따라서 `event_within_24h_window: true`는 현재 메타데이터만으로 입증되지 않습니다.
 
-### 1) “최대 2.5GW 확보”는 옵션일 수 있음
-초안에는 다음 표현이 혼재합니다.
+### HAWK 관련 논리적 비약
 
-- “secures”
-- “guaranteed infrastructure pipeline”
-- “contractual options to scale”
-- “maximum expandable capacity”
+다음 연쇄 결론은 자동으로 성립하지 않습니다.
 
-`500MW committed`와 `option up to 2.5GW`는 전혀 다른 경제적 의미입니다. 후자가 옵션이라면 2.5GW 전체가 다음 조건을 충족한 것이 아닙니다.
+> lattice dimension halved → effective key strength halved → key sizes must double
 
-- 확정 임대
-- 전력 계통연계 확보
-- 건설 금융 확정
-- 환경·지방정부 허가 완료
-- 실제 전력 공급 보장
+격자 문제의 공격 복잡도는 다음에 따라 달라집니다.
 
-권장 제목:
+- 격자 차원
+- BKZ 블록 크기와 비용 모델
+- root-Hermite factor
+- classical/quantum sieve 가정
+- 키 복구 성공 확률
+- 대상 파라미터 세트
 
-> “Core Scientific·AMD, 초기 500MW 협력 및 최대 2.5GW 확대 옵션 발표”
+따라서 “차원이 절반으로 감소했다”는 사실만으로 **비트 보안성이 정확히 절반**이라고 할 수 없고, 키 크기를 **정확히 두 배로 해야 한다**고도 단정할 수 없습니다. 기술 논문에 파라미터별 security estimate가 있다면 그 값을 직접 인용해야 합니다.
 
-“AMD가 2.5GW를 확보했다”는 제목은 공식 원문이 확정 약정이라고 명시하지 않는 한 피해야 합니다.
+또한 HAWK를 단순히 “Module Lattice Isomorphism Problem 기반”이라고 요약하는 것이 원 논문의 정확한 문제 정식화인지 확인해야 합니다. HAWK의 설계 기반과 새 공격의 환원 대상 문제를 구분해 써야 합니다.
 
-### 2) “운영 중인 500MW”와 “2027년부터 공급”의 구분
-`operational capacity beginning in 2027`은 현재 운영 중인 용량이 아니라 **2027년 가동 예정 용량**일 수 있습니다. 다음을 구분해야 합니다.
+### AES 표현 오류
 
-- 현재 energized capacity
-- 개발 중인 capacity
-- 계약된 capacity
-- 옵션이 설정된 capacity
-- 2027년 commissioning 목표
+다음 표현은 수정해야 합니다.
 
-### 3) AMD 고객에게 제공되는지 확인 필요
-AMD가 직접 데이터센터 용량을 쓰는 계약인지, AMD 고객을 Core Scientific과 연결하는 생태계 협약인지, 또는 공동 영업·설계 프레임워크인지 불명확합니다. 초안의 “AMD가 고객을 위해 보장된 인프라 파이프라인을 확보했다”는 서술은 계약 구조 확인 없이는 단정하기 어렵습니다.
+> full 10-round AES remains mathematically secure
 
-### 4) 기술 표현 보완
-- “isolated server racks”는 구체적 의미가 불명확합니다.
-- “liquid-to-liquid cooling” 적용이 공식 발표에 명시됐는지 확인해야 합니다.
-- “6th Gen EPYC”가 특정 배치 시점의 확정 제품인지, 포괄적 로드맵 언급인지 구분해야 합니다.
-- ROCm은 시설이 직접 “호스팅”하는 물리 규격이 아니라 소프트웨어 생태계이므로, 전력·냉각 공동 설계와 같은 수준의 시설 사양으로 나열하면 안 됩니다.
+AES-128의 절대적·수학적 안전성이 증명된 것은 아닙니다. 적절한 표현은 다음과 같습니다.
 
-### 전략 분석 보완
-투자 결론을 “overweight”로 바로 연결하려면 최소한 다음이 필요합니다.
+> 현재 공개된 연구 기준으로 full-round AES-128에 대한 실용적인 키 복구 공격은 알려져 있지 않다.
 
-- 500MW의 구속력 있는 매출 백로그
-- MW당 예상 CapEx
-- 고객 또는 AMD의 최소지급 의무
-- 전력 비용 전가 구조
-- 옵션 행사 기한
-- Core Scientific의 자금조달 부담
-- 기존 고객과의 용량 중복 여부
+7-round reduced AES에 대한 공격 개선은 중요한 연구 결과일 수 있으나, 이를 곧바로 운영 환경의 AES-128 위험으로 연결하면 안 됩니다.
 
-현재 전략 분석은 계약 규모를 투자 의견으로 곧바로 확대하고 있습니다.
+### 속도 향상 수치의 기준 불명확
 
----
+`200×–800× speedup`에는 최소한 다음 조건이 필요합니다.
 
-## Item 3 — MCP 2026-07-28 최종 사양
+- 비교 대상 논문 또는 기존 공격
+- time complexity 변화인지 실제 wall-clock인지
+- 데이터·메모리 복잡도
+- CPU/GPU 및 병렬화 조건
+- 200배와 800배가 각각 어떤 파라미터에서 나온 값인지
 
-### 판정: **공식 사양 원문 확인 전에는 보류; 여러 기술 표현이 과도하거나 부정확**
+복잡도식의 상수항 또는 guessing factor 제거를 실제 실행시간 배수로 표현했다면 과장될 수 있습니다.
 
-### 1) “완전한 stateless protocol core”는 엄밀히 설명해야 함
-MCP에서 다음은 별개의 상태입니다.
+### 모델·비용·심사 상태
 
-- HTTP 전송 계층의 세션 상태
-- 프로토콜 초기화 및 capability negotiation
-- 인증 토큰 상태
-- 장기 실행 Task의 서버 측 상태
-- 서버가 유지하는 리소스·작업 결과 상태
+다음 항목은 1차 자료에서 명시적으로 확인되어야 합니다.
 
-따라서 전송 계층이 stateless해졌다고 해서 MCP 전체가 상태를 보유하지 않는 것은 아닙니다. 특히 초안은 동시에 **Tasks를 통한 비동기 장기 작업**을 강조합니다. Task 자체는 식별자, 상태, 결과 또는 만료 정보를 서버 측에 보유할 수 있으므로 다음 표현은 과도합니다.
+- 공식 모델명: **Claude Mythos Preview**
+- `Möbius Bridge`가 논문상의 정식 공격명인지
+- `$100,000`이 실제 API 청구액인지, 내부 연산비용 환산값인지
+- Apache-2.0이 코드에만 적용되는지 논문·데이터에도 적용되는지
+- “peer-reviewed”가 학회·저널 심사를 통과했다는 의미인지
 
-> “fully stateless protocol core eliminating session handshakes and shared session memory stores”
+비공개 내부 모델을 사용했다면 “API compute cost”라는 표현은 모순 가능성이 있습니다. 외부 API 사용이 아니라면 **estimated compute cost**라고 써야 합니다.
 
-공식 사양이 정확히 무엇을 없앴는지 구분해야 합니다.
+### 과장된 비교
 
-### 2) MCP Apps는 “서버가 UI를 직접 렌더링”한다고 표현하면 부정확
-일반적으로 이런 앱 확장 구조에서는 서버가 UI 리소스나 메타데이터를 제공하고, **클라이언트/호스트가 보안 샌드박스 안에서 렌더링**합니다.
+> outpace years of expert human cryptographic review
 
-따라서:
+단일 결과만으로 일반화하기 어렵습니다. 연구자 유도 60시간, 문제 선택, 검증, 기존 문헌 제공 여부가 개입되었다면 “autonomous”보다 **researcher-guided AI-assisted cryptanalysis**가 적절할 수 있습니다.
 
-> “server-rendered interactive UIs”
+### 권고 판정
 
-보다 다음이 안전합니다.
-
-> “서버가 제공한 앱/UI 리소스를 MCP 호스트가 격리된 환경에서 렌더링”
-
-### 3) OAuth와 OIDC를 동일한 보안 표준처럼 묶음
-- OAuth 2.x: 권한 위임 및 액세스 토큰 프레임워크
-- OIDC: OAuth 기반 신원 인증 계층
-
-사양이 OIDC를 반드시 요구하는지, OAuth authorization server metadata나 protected resource metadata만 규정하는지 구분해야 합니다. “OAuth/OIDC enterprise authorization alignment”는 너무 포괄적입니다.
-
-### 4) 확인이 필요한 구체 기술 주장
-다음은 반드시 사양의 규범 문구와 대조해야 합니다.
-
-- `Mcp-Method` 헤더
-- `ttlMs`를 이용한 tool-list 캐싱
-- 모든 세션 handshake 제거
-- round-robin 로드밸런싱의 공식 보장
-- JSON Schema 2020-12 “full support”
-- Tasks의 experimental 졸업
-- Python·TypeScript·Kotlin SDK 동시 업데이트
-- Microsoft Foundry와 Google Cloud의 “즉시 통합”
-- Tina Schuchman 및 Anna Berenberg의 직함·인용
-
-이 중 하나라도 공식 문서에 없으면 기능 또는 인용을 만들어낸 것이 됩니다. 특히 사양 발표와 클라우드 제품의 즉시 상용 통합은 별도의 사건이므로 각각 공식 링크가 필요합니다.
-
-### 5) 기존 MCP를 지나치게 왜곡
-비교표의 다음 설명은 과도합니다.
-
-> “Legacy MCP required deep packet inspection and sticky gateway routing.”
-
-상태 유지가 필요한 배포였다고 해서 프로토콜이 반드시 **deep packet inspection**을 요구한 것은 아닙니다. DPI는 보안·네트워크 장비의 구현 선택이지, 일반적인 세션 라우팅과 동의어가 아닙니다.
-
-### 6) 비용 효과도 근거 부족
-Stateless 전송은 서버 수평 확장을 단순화할 수 있지만 다음을 자동으로 줄이지는 않습니다.
-
-- LLM token caching 비용
-- 모델 추론 비용
-- 도구 호출 자체의 지연
-- 인증 검증 비용
-- Task 저장 비용
-
-“token caching overhead를 낮춘다”는 주장은 삭제하거나 별도 벤치마크가 필요합니다.
-
-### 수정 권고
-공식 사양의 실제 변경 목록을 다음 네 층으로 나누는 것이 좋습니다.
-
-1. Transport 변경
-2. Protocol lifecycle 변경
-3. Authorization 변경
-4. Optional extension 변경
-
-그리고 “final specification”인지, release candidate인지, extension proposal인지 명시해야 합니다.
+- `event_within_24h_window`: **unverified**
+- “보안성 절반·키 크기 두 배”: **원 논문의 구체적 추정치가 없으면 삭제**
+- “mathematically secure”: **오류, 수정 필요**
+- 상태: 학회·저널 정보가 없다면 `Peer-Reviewed` 대신 `Corporate Research Disclosure`
 
 ---
 
-## Item 4 — Intel 18A·RAMP-C 완료
+## 3. Vouched / DIF KYA-OS v1.0.0
 
-### 판정: **프로그램 완료 사실이 확인되더라도 기술·생산성 결론은 과장**
+### 판정: **시간은 가능하지만 시각 필요; DID 폐기 설명은 기술적으로 부정확**
 
-Category 6의 7일 예외는 적절히 적용되어 있습니다. 따라서 시의성 자체는 문제가 아닙니다.
+### 시간 검증
 
-### 1) 프로그램 명칭의 역사적 정확성
-RAMP-C는 2021년 **미국 국방부(Department of Defense)** 체계에서 시작된 프로그램입니다. 2026년의 현행 기관 표기가 “Department of War”라고 하더라도, 역사적 설명에서는 다음과 같이 쓰는 편이 정확합니다.
+이벤트 날짜가 `2026-07-29`이므로 24시간 윈도우에 들어갈 가능성이 높지만, 날짜 전체가 포함되는 것은 아닙니다.
 
-> “당시 U.S. Department of Defense가 시작한 RAMP-C 프로그램”
+- KST 기준 7월 29일 **07:35 이전**이면 윈도우 밖
+- UTC 기준 7월 29일 **22:35 이후**면 기준 시각 이후
 
-또한 약어는 일반적으로 기관 명칭 변화와 무관하게 계약·프로그램의 공식 명칭을 따라야 합니다.
+따라서 Business Wire의 정확한 게시 시각을 기록해야 확정할 수 있습니다. 현재는 **probable but unverified**가 적절합니다.
 
-### 2) RAMP-C 완료가 Intel 18A 상업 양산 준비를 입증하지는 않음
-프로그램에서 test chip, prototype 또는 tape-out을 성공했다고 해도 다음을 자동으로 입증하지 않습니다.
+### 명칭 확인 필요
 
-- 상업적 대량생산 수율
-- 고객 제품의 qualification 완료
-- 목표 원가 달성
-- 고수율 HVM
-- 방산용 인증 완료
-- 장기 신뢰성 검증 완료
+`KYA-OS`의 OS가 실제로 다음 중 무엇인지 원문대로 통일해야 합니다.
 
-따라서 다음 문장은 논리적 비약입니다.
+- Operating System
+- Open Standard
+- Open Source
 
-> “confirms the commercial volume readiness”
+초안은 제목과 본문에서 이를 사실상 “Operating System”으로 풀고 있으나, 프로토콜 명칭이라면 약어를 임의로 확장하면 안 됩니다.
 
-권장 표현:
+### `did:key`와 폐기 기능
 
-> “Intel 18A 기반 고객 프로토타이핑과 설계 생태계의 주요 기술 이정표를 달성했다.”
+`did:key`는 공개키로부터 DID 문서를 자체 생성하는 방식이어서 일반적으로:
 
-### 3) Secure Enclave와 RAMP-C를 혼합
-Intel의 Secure Enclave 관련 정부 지원·생산 체계는 RAMP-C와 연관될 수 있지만 **동일 프로그램이라고 볼 수 없습니다**. RAMP-C 완료가 곧바로 “Secure Enclave 생산시설 내에서 전체 파이프라인이 검증됐다”는 뜻인지 공식 발표를 확인해야 합니다.
+- 외부 DID 레지스트리가 없음
+- DID 문서 업데이트 기능이 없음
+- 기본적인 키 회전·DID 폐기 메커니즘이 없음
 
-### 4) PowerVia 설명의 절대 표현은 잘못됨
-다음 표현은 지나치게 절대적입니다.
+따라서 다음 서술은 부정확합니다.
 
-- “moving power rails entirely to the rear”
-- “zero top-side power congestion”
-- “top-side metal layers exclusively for signal routing”
+> Identity Verification (`did:key`) … One-Click Revocation
 
-Backside power delivery는 주요 글로벌 전력 분배망을 후면으로 이동시켜 전면 배선 혼잡을 줄이는 기술이지만, 셀 내부 연결과 로컬 전원 연결까지 포함해 모든 전력 관련 구조가 전면에서 사라진다고 단정할 수 없습니다.
+폐기 기능은 별도 credential status list, issuer registry, denylist, delegation token 만료, 게이트웨이 정책 등으로 구현될 수 있지만 **`did:key` 자체가 즉시 폐기를 제공하는 것은 아닙니다.** 어떤 레이어가 폐기를 담당하는지 분리해서 써야 합니다.
 
-권장 표현:
+### 과도한 기능 주장
 
-> “주요 전력 분배를 웨이퍼 후면으로 이동해 전면 BEOL의 전력·신호 배선 경쟁을 크게 완화한다.”
+다음도 사양 문서에서 직접 확인해야 합니다.
 
-### 5) RibbonFET의 리본 수는 고정된 사양이 아님
-비교표의 다음 표현:
+- 모든 agent request마다 서명된 delegation credential을 첨부하는지
+- MCP 자체를 “확장”하는지, MCP 위에 별도 인증 계층을 제공하는지
+- “tamper-proof”인지, 보다 정확히는 “tamper-evident”인지
+- v1.0.0이 최종 표준인지, 초기 공개 사양 또는 community draft인지
+- DIF가 공동 출시 주체인지, 단순 작업반 호스팅·거버넌스 인수 주체인지
 
-> “gate fully surrounds 4 channel ribbons”
+감사 로그는 암호학적 서명만으로 삭제 방지까지 보장하지 않으므로 **tamper-proof보다 tamper-evident**가 안전한 표현입니다.
 
-GAA라는 “네 면을 감싼다”는 개념과 “채널 리본이 4개다”라는 물리적 개수를 혼동하고 있습니다. 나노리본 적층 수는 라이브러리·설계·공정 구현에 따라 달라질 수 있습니다.
+### `10,000+` 통계
 
-권장 표현:
+“Unique developer engagements”는 표준화된 측정치가 아닙니다. 다음 중 무엇인지 밝혀야 합니다.
 
-> “게이트가 적층된 나노리본 채널을 둘러싸는 GAA 구조”
+- GitHub unique visitors
+- repository clones
+- package downloads
+- documentation page views
+- stars/forks
+- 이벤트 참가자
 
-### 6) “sub-2nm”의 의미 보완
-Intel 18A를 sub-2nm급으로 분류하는 것은 업계 마케팅 분류상 가능하지만, `18A = 실제 1.8nm 게이트 길이`를 의미하지 않습니다. 노드명은 실제 단일 물리 치수와 일치하지 않는다는 설명이 필요합니다.
+Business Wire 보도자료의 마케팅 수치를 그대로 쓴 것이라면 독립 통계처럼 표현해서는 안 됩니다.
 
-### 7) “Fully domestic pipeline”도 범위 한정 필요
-미국 내 전공정 제조가 가능하다는 것과 모든 요소가 미국산이라는 것은 다릅니다.
+### 품질 보완
 
-- 소재
-- 제조 장비
-- 마스크
-- 패키징
-- HBM
-- 기판
-- 테스트
+- Business Wire는 보도자료 배포 채널이므로 독립 검증 매체로 보기는 어렵습니다.
+- DIF 사양 저장소, GitHub tag `v1.0.0`, release commit, LICENSE 파일을 직접 연결해야 합니다.
+- W3C VC 버전(예: VC Data Model 2.0), 서명 방식, credential status 방식, replay protection을 명시하면 기술적 가치가 높아집니다.
 
-따라서 “fully domestic U.S. production pipeline”보다는 다음이 정확합니다.
+### 권고 판정
 
-> “미국 내 첨단 로직 전공정 생산 역량과 신뢰 공급망을 강화”
+- `event_within_24h_window`: **probable but unverified**
+- `did:key` 기반 즉시 폐기: **수정 필요**
+- “final specification”: 실제 DIF 표준화 상태 확인 전에는 **v1.0.0 release**로만 표현
 
 ---
 
-# URL 및 출처 구성에 대한 공통 문제
+## 4. Cadence / Synopsys / Intel Foundry
 
-초안은 각 항목에 여러 출처명을 나열하지만 실제 링크는 하나만 제공합니다. 이 방식으로는 기업명·수치·직함·인용을 교차 검증할 수 없습니다.
+### 판정: **7일 예외 충족; reticle 배수와 EMIB-T 전력 설명 수정 필요**
 
-각 항목에 최소한 다음 링크를 별도로 제공해야 합니다.
+### 시간 검증
 
-1. 회사 공식 보도자료
-2. 상대 회사 공식 보도자료
-3. 정부 또는 표준 사양 원문
-4. Reuters 등 독립 매체
-5. 필요하면 SEC 공시·계약 문서
-6. 게시 시각이 표시된 원문
+이 항목은 `slot_category: 6`이고 `event_within_7d_window: true`이므로 일반 24시간 규칙을 적용할 필요가 없습니다.
 
-특히 “Source: Reuters”라고 적었다면 Reuters URL과 기사 게시 시각이 반드시 있어야 합니다.
+- 이벤트 날짜: **2026-07-29**
+- 기준 날짜: **2026-07-30**
+- 7일 내 조건: **충족**
+
+따라서 시간상 stale로 지적할 사안은 없습니다.
+
+### `120×120 mm = 8× reticle` 문제
+
+본문은 일반적인 reticle exposure field를 약 `858 mm²`라고 설명합니다.
+
+- 표준 필드: `26 × 33 mm = 858 mm²`
+- 패키지: `120 × 120 mm = 14,400 mm²`
+- 면적비: `14,400 / 858 ≈ 16.8`
+
+따라서 **패키지 외곽 면적을 기준으로 하면 8배가 아니라 약 16.8배**입니다.
+
+`8× reticle`이 다음 중 하나를 뜻할 수는 있습니다.
+
+- 실제 silicon-interposer 면적
+- 패키지 내부에서 사용 가능한 active area
+- 업계의 특정 interposer-size 등급
+- reticle stitching으로 구현한 유효 영역
+
+그러나 그 경우 `120×120 mm package size`와 `8× reticle silicon area`를 동일한 값처럼 병기하면 안 됩니다. **패키지 외형과 인터포저/브리지의 유효 실리콘 면적을 분리**해야 합니다.
+
+### EMIB-T 설명 과장
+
+EMIB-T의 TSV는 브리지의 수직 연결을 제공할 수 있지만, 이것을 곧바로 다음과 같이 표현하는 것은 과도합니다.
+
+> direct backside power delivery  
+> reduced vertical IR voltage drop via direct TSVs
+
+후면 전력 공급은 die-level backside power delivery network와 패키지 브리지 TSV를 구분해야 합니다. Intel 18A의 PowerVia와 EMIB-T의 TSV 기능도 동일하지 않습니다. 공식 문서가 전력 공급 경로를 명시하지 않았다면 다음처럼 낮춰 쓰는 편이 정확합니다.
+
+> EMIB-T adds vertical connectivity through TSV-equipped embedded bridges, potentially improving routing and power-delivery integration depending on the package implementation.
+
+### EDA 도구 분류 보완
+
+초안은 Cadence의 `Allegro and Virtuoso multiphysics stacks`라고 표현했지만, 실제 인증 도구는 기능별 제품명을 분리해야 합니다. 예를 들어:
+
+- 디지털 구현
+- custom/analog design
+- package/substrate design
+- SI/PI 분석
+- thermal analysis
+- 3D-IC system planning
+
+Synopsys도 `3DIC Compiler` 하나가 모든 물리해석을 직접 수행한다고 단순화하지 말고, 연동되는 분석·signoff 도구를 기재해야 합니다.
+
+### 근거 없는 기능 확대 가능성
+
+다음은 인증 발표에 명시되지 않았다면 삭제하거나 별도 전망으로 구분해야 합니다.
+
+- 최대 **12개 HBM4/HBM4e** 스택
+- HBM4e 공식 지원
+- `12× reticle by 2028`
+- 모든 툴에서 `SI/PI/thermal/EM`을 단일 환경으로 완전 통합
+- 전 세계에서 즉시 사용 가능한 14A production-ready flow
+
+특히 `Intel 14A PDK v0.5`는 통상 초기 개발 단계 의미가 강하므로, 이를 18A-P PDK 1.0과 같은 수준의 “certification complete”로 묶으면 성숙도를 과장할 수 있습니다.
+
+### 노드 표현
+
+Intel 18A·14A를 “sub-2nm”로 분류하는 업계 관행은 가능하지만, 숫자가 실제 게이트 길이나 물리적 치수라는 의미는 아닙니다. 다음 주석을 권합니다.
+
+> Node names are commercial process labels and do not denote a literal measured feature size.
+
+### 권고 판정
+
+- 7일 시간 조건: **통과**
+- `120×120 mm = 8× reticle`: **정의 없는 상태에서는 수치 불일치**
+- EMIB-T 직접 후면 전력 공급: **공식 자료 없으면 삭제 또는 완화**
+- 14A PDK 0.5: **초기 enablement와 production certification을 구분**
 
 ---
 
-# 요약 수정 판정표
+## Upcoming Tech Calendar 검증
 
-| 항목 | 사실성 판정 | 주요 조치 |
-|---|---|---|
-| 1. Meta–BlackRock | **중대한 오류 가능성 높음** | 잘못된 PR Newswire URL, 거래 상대·지역·금액·4년 조건 전면 재검증 |
-| 2. AMD–Core Scientific | **조건부 통과** | 500MW 확정분과 2.5GW 옵션 구분, “secured/guaranteed” 완화 |
-| 3. MCP 사양 | **보류/기술 수정 필요** | stateless 범위, Tasks 상태, MCP Apps 렌더링, OAuth/OIDC, 헤더·TTL 확인 |
-| 4. Intel RAMP-C | **부분 사실이나 결론 과장** | 프로그램 완료와 HVM 준비 분리, Secure Enclave 분리, PowerVia 절대 표현 수정 |
+### DAC 2026
 
-## 최종 결론
+초안의 다음 일정은 재확인이 필요합니다.
 
-- **Item 1:** 삭제 또는 공식 출처 확보 후 재작성  
-- **Item 2:** 원문 계약 용어에 맞춰 제목과 수치 의미를 수정하면 사용 가능  
-- **Item 3:** 공식 사양의 규범 문구와 SDK 릴리스를 각각 확인하기 전까지 게시 보류  
-- **Item 4:** 기술 이정표로는 사용 가능하지만 “상업 양산 검증”, “완전한 국내 공급망”, “전면 전력배선 0” 주장은 삭제  
-- **시간 메타데이터:** Item 1~3은 게시 시각·시간대를 추가해야 `within_24h`를 엄격히 확정할 수 있음; Item 4는 Category 6 예외에 부합함.
+> July 29–31, 2026: Concluding technical tracks at the 63rd DAC
+
+`7월 29~31일`을 “concluding tracks”라고 제시한 것은 일반적인 DAC 행사 일정 표기와 맞지 않을 가능성이 큽니다. 공식 DAC 사이트에서 다음을 각각 확인해야 합니다.
+
+- 전체 행사 날짜
+- 전시 날짜
+- 기술 세션 날짜
+- 마지막 날
+
+검증 전에는 해당 날짜를 삭제하거나 “late July 2026”으로 낮추는 것이 안전합니다.
+
+### FMS 2026
+
+`2026-08-04~06`은 달력상 화~목 구간이므로 형식적으로는 자연스럽지만, 공식 FMS 행사 페이지 URL을 첨부해야 합니다. 또한 HBM4e·CXL 전시 여부는 행사 일정이 아니라 예상 주제이므로 “expected focus”로 표현해야 합니다.
+
+---
+
+## 최종 항목별 등급
+
+| 항목 | 사실성 판정 | 시간 판정 | 핵심 조치 |
+|---|---|---|---|
+| Item 1 | **수치 모순 있음** | **미입증** | $14B와 출자·부채 재조정, 발표 시각 추가 |
+| Item 2 | **암호학적 결론 과장** | **미입증** | 보안성 절반·키 두 배 삭제 또는 논문 수치 인용 |
+| Item 3 | **부분 수정 필요** | **가능하지만 미확정** | `did:key`와 revocation 분리, KYA-OS 약어 확인 |
+| Item 4 | **기술 수치 수정 필요** | **7일 규칙 통과** | 8× reticle 정의, EMIB-T/PowerVia 구분 |
+| 행사 일정 | **DAC 일정 재검증 필요** | 해당 없음 | 공식 행사 페이지 기준으로 날짜 교체 |
+
+## 게재 전 필수 수정 우선순위
+
+1. Item 1의 **$14B 자금조달 산식**
+2. Item 1·2·3의 **원문 게시 시각 및 시간대**
+3. Item 2의 **“mathematically secure”와 “bit security halved”**
+4. Item 4의 **120×120 mm와 8× reticle 관계**
+5. Item 3의 **`did:key` revocation 설명**
+6. 모든 항목에 **독립 2차 출처 URL과 공식 1차 문서 URL을 각각 명시**
