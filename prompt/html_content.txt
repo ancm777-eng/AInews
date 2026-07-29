@@ -18,7 +18,6 @@
 각 기사(`<article class="paper-section" id="artN">`)는 다음 순서를 엄격히 따릅니다.
 
 0. [Title] - `<h2>` (논문/아티클 제목 스타일)
-
 1. [Abstract (Executive Summary)]
    - 헤더: `<h3 class="section-title">1. Abstract</h3>`
    - 내용: `<div class="abstract-quote"><p>...</p></div>`로 감싸, 배경과 핵심 아키텍처/비즈니스 성과를 1문단으로 간결히 요약.
@@ -29,8 +28,8 @@
 
 3. [Methodology & Architecture (Tech Deep Dive)]
    - 헤더: `<h3 class="section-title">2. Architecture & Performance</h3>`
-   - 데이터 성격에 따라 표(Table), 차트(Chart), 또는 스탯 카드 중 **기사당 1개만** 선택하십시오.
-   - 표: `<div class="table-wrapper"><table class="academic-table">...</table></div>`. 최대 5행 2~3열, 문장형 설명 금지.
+   - 【우선순위】 표(Table)는 최후의 수단입니다. 다음 순서로 우선 검토하십시오: ① ECharts 차트 (수치 비교, 트렌드, 비중) ② 스탯 카드/인포그래픽 (단일 또는 소수 KPI 강조) ③ 표 (그 외 방법으로 도저히 표현 안 되는 경우에만, 최대 4행 2열).
+   - 표를 쓸 수밖에 없는 경우: `<div class="table-wrapper"><table class="academic-table">...</table></div>`. 셀 하나당 **최대 6단어**, 완전한 문장 금지 (구/키워드/숫자만). 이 제한을 넘으면 반드시 차트나 스탯 카드로 대체하십시오.
    - 본문 내 추가 보조 설명이 필요한 경우 우측 사이드바 대신 본문 내 인라인 콜아웃 박스(`<div class="inline-callout">...</div>`)를 활용하십시오.
 
 4. [Limitations & Future Work (Risk & Outlook)]
@@ -40,16 +39,41 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
 【데이터 시각화 (ECharts & Infographics)】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- **ECharts 차트**: 4개 기사 중 최소 2개 이상에 적용.
+【필수】anthropic.com/news의 모델 발표 게시물처럼, 4개 기사 **전부** 최소 1개 이상의 시각 자료(차트, 스탯 카드, 인포그래픽 블록 중 하나)를 반드시 포함해야 합니다. 시각 자료가 하나도 없는 기사는 허용되지 않습니다. 표(table)는 시각 자료로 간주하지 않습니다 — 표와는 별개로 차트/스탯카드/인포그래픽 중 최소 1개가 있어야 합니다.
+
+- **여러 지표를 비교할 때 (2개 이상의 벤치마크/수치 계열)**: 표로 나열하지 말고 ECharts 차트를 **2~3개 나란히** 배치하십시오. 반드시 `<div class="chart-row">` 안에 각각을 `<div class="chart-container">`로 감싸 그리드로 배열합니다:
+  ```html
+  <div class="chart-row">
+    <div class="chart-container"><div class="chart-label">Benchmark A</div><div id="chart-art1-a" style="width:100%;height:100%"></div></div>
+    <div class="chart-container"><div class="chart-label">Benchmark B</div><div id="chart-art1-b" style="width:100%;height:100%"></div></div>
+  </div>
+  ```
+  - 각 chart-container 내부에는 반드시 고유 id를 가진 차트 div가 있어야 하며, 차트 id는 `chart-artN-x` 형식(N=기사번호, x=순번)으로 절대 중복되지 않게 하십시오.
+
+- **ECharts 차트**:
   - Anthropic 미니멀 스타일: 회색조 기반, 배경 투명/신선한 오프화이트, 얇은 1px 경계선.
   - 필수 포함: `title.text`, `xAxis.name` / `yAxis.name` (단위 필수), `series[].label: {show: true}`, `tooltip`.
-  - 초기화 코드: `<script>echarts.init(document.getElementById('chart-artN'), null, {renderer: 'svg'}).setOption({ ... });</script>`
+  - 초기화 코드는 각 차트 렌더링 직후, 해당 컨테이너가 DOM에 삽입된 뒤에 실행되도록 `<script>` 블록에서 다음 패턴을 사용하십시오 (컨테이너 크기가 아직 0일 때 초기화되는 것을 방지):
+    ```html
+    <script>
+    (function(){
+      var el = document.getElementById('chart-artN-x');
+      if (el && window.echarts) {
+        var chart = echarts.init(el, null, {renderer: 'svg'});
+        chart.setOption({ /* ... */ });
+        window.addEventListener('resize', function(){ chart.resize(); });
+      }
+    })();
+    </script>
+    ```
+  - 차트 하나에 데이터 포인트는 3~8개로 제한 (과밀 방지).
 
-- **스탯 카드 (Stat Card)**: 단일 KPI 강조 시 사용.
+- **스탯 카드 (Stat Card)**: 단일 KPI 강조 시 사용. 여러 개면 `stat-grid` 안에 2~4개를 나란히 배치.
   - `<div class="stat-grid"><div class="stat-card"><span class="stat-rank">1위</span><div class="stat-number">64<span class="stat-unit">%</span></div><div class="stat-label">설명</div></div></div>`
 
 - **인포그래픽 블록 (Infographic Block)**: 
   - 본문 핵심 수치 시각화용. 고정 아이콘 세트만 사용 (`#icon-chip`, `#icon-network`, `#icon-deal`, `#icon-security`, `#icon-regulation`, `#icon-packaging`, `#icon-robot`, `#icon-datacenter`, `#icon-research`).
+  - 숫자/비교 데이터가 3개 미만이고 차트로 표현하기엔 과한 경우 이 블록을 표 대신 사용하십시오.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
 【마무리 시사점 (Bento Grid)】
