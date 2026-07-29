@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily AI & Semiconductor Engineering Briefing</title>
+
+    <script async src="[https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28](https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28)"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NEQ3MVRM28');
+    </script>
+    <script src="[https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js](https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js)"></script>
+
+    <style>
+        /* Anthropic 브랜딩 느낌의 세련된 미니멀 타이포그래피 및 서식 */
+        @import url('[https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap)');
+
+        :root {
+            --bg-main: #fbfbfa;
+            --bg-card: #ffffff;
+            --text-main: #191919;
+            --text-muted: #666666;
+            --border-light: #e6e6e4;
+            --border-dark: #222222;
+            --accent-blue: #2563eb;
+            --accent-blue-soft: #f0f5ff;
+            --bg-surface: #f4f4f2;
+            --nav-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Newsreader', Georgia, serif; background-color: var(--bg-main); color: var(--text-main); line-height: 1.7; font-size: 16px; -webkit-font-smoothing: antialiased; }
+        h1, h2, h3, h4, .headline-font { font-family: 'Inter', -apple-system, sans-serif; }
+
+        /* ===== Top Nav ===== */
+        .top-nav { position: sticky; top: 0; z-index: 50; background: rgba(251, 251, 250, 0.85); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-light); height: var(--nav-height); display: flex; align-items: center; }
+        .top-nav-inner { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .top-nav-brand { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.95rem; color: var(--text-main); letter-spacing: -0.01em; }
+        .top-nav-brand span { color: var(--accent-blue); }
+        .top-nav-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--text-muted); }
+
+        /* ===== Layout shell ===== */
+        .layout-shell { display: flex; max-width: 1100px; margin: 0 auto; align-items: flex-start; }
+        .side-nav { width: 220px; flex-shrink: 0; position: sticky; top: var(--nav-height); height: calc(100vh - var(--nav-height)); overflow-y: auto; padding: 2.5rem 1.5rem 2rem 0; display: block; }
+        .side-nav-title { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.3rem; }
+        .side-nav-sub { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-muted); opacity: 0.75; margin-bottom: 1.4rem; }
+        .side-nav-list { list-style: none; display: flex; flex-direction: column; gap: 0.3rem; }
+        .side-nav-link { display: block; font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 500; color: var(--text-muted); text-decoration: none; padding: 0.4rem 0 0.4rem 0.8rem; border-left: 1.5px solid var(--border-light); line-height: 1.4; transition: all 0.15s ease; }
+        .side-nav-link:hover { color: var(--text-main); border-left-color: var(--text-muted); }
+        .side-nav-link.active { color: var(--text-main); border-left-color: var(--text-main); font-weight: 600; }
+        @media (max-width: 1023px) { .side-nav { display: none; } }
+
+        .content-wrap { flex: 1; min-width: 0; padding: 0 1.5rem; }
+
+        header.masthead { padding: 3rem 0 2rem 0; border-bottom: 1px solid var(--border-light); margin-bottom: 2.5rem; }
+        .doc-category { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.6rem; display: block; }
+        h1 { font-size: 2.2rem; font-weight: 600; color: var(--text-main); line-height: 1.25; margin-bottom: 0.8rem; letter-spacing: -0.02em; }
+        .meta-info { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 1rem; }
+
+        main { max-width: 100%; }
+
+        .paper-section { background: var(--bg-card); padding: 3rem; margin-bottom: 2.5rem; border: 1px solid var(--border-light); border-radius: 8px; scroll-margin-top: calc(var(--nav-height) + 1.5rem); }
+        .paper-section h2 { font-size: 1.6rem; font-weight: 600; margin-bottom: 1.8rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-light); line-height: 1.35; letter-spacing: -0.01em; }
+
+        .section-title { font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600; color: var(--text-main); margin: 2.2rem 0 1rem 0; text-transform: uppercase; letter-spacing: 0.06em; }
+
+        p { margin-bottom: 1.2rem; color: #2a2a2a; text-align: justify; }
+
+        /* Abstract quote block */
+        .abstract-quote { border-left: 2px solid var(--text-main); background: var(--bg-surface); padding: 1.2rem 1.5rem; margin: 0 0 1.8rem 0; border-radius: 0 4px 4px 0; }
+        .abstract-quote p { font-style: italic; color: #444444; margin-bottom: 0; text-align: left; }
+
+        /* Inline Callout Box (우측 마진 대신 본문 내 삽입) */
+        .inline-callout { background: var(--bg-surface); border: 1px solid var(--border-light); border-left: 3px solid var(--accent-blue); padding: 1.2rem 1.4rem; margin: 1.5rem 0; border-radius: 4px; }
+        .inline-callout-title { font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+        .inline-callout p { font-size: 0.9rem; color: var(--text-muted); text-align: left; margin-bottom: 0; }
+
+        /* Table Style */
+        .table-wrapper { overflow-x: auto; margin: 2rem 0; }
+        .academic-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left; font-family: 'Inter', sans-serif; table-layout: fixed; }
+        .academic-table th, .academic-table td { padding: 10px 14px; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; }
+        .academic-table td.num, .academic-table td code { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
+        .academic-table th { font-weight: 600; border-top: 1px solid var(--border-dark); border-bottom: 1px solid var(--border-dark); color: var(--text-main); background: var(--bg-surface); }
+        .academic-table td { border-bottom: 1px solid var(--border-light); color: #333333; }
+        .academic-table tr:last-child td { border-bottom: 1px solid var(--border-dark); }
+
+        /* Anthropic Style Chart Row (multiple charts side by side, like anthropic.com/news benchmark posts) */
+        .chart-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
+        .chart-row .chart-container { margin: 0; }
+        .chart-label { font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.6rem; text-align: center; }
+
+        /* Anthropic Style Chart Container */
+        .chart-container { width: 100%; min-height: 320px; height: 320px; margin: 2.2rem 0; border: 1px solid var(--border-light); background: #ffffff; padding: 1.2rem; border-radius: 6px; display: flex; flex-direction: column; overflow: hidden; }
+        .chart-container > div[id^="chart-"] { flex: 1; min-height: 0; width: 100%; }
+
+        @media (max-width: 640px) {
+            .chart-row { grid-template-columns: 1fr; }
+        }
+
+        .code-term { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; background: var(--bg-surface); border: 1px solid var(--border-light); padding: 2px 6px; border-radius: 4px; }
+
+        /* Concept Box */
+        .concept-box { background: var(--bg-surface); border: 1px solid var(--border-light); padding: 1.2rem 1.5rem; margin: 1.5rem 0 2rem 0; border-radius: 6px; }
+        .concept-box h4 { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-blue); margin-bottom: 0.8rem; }
+        .concept-box dl { display: grid; grid-template-columns: max-content 1fr; column-gap: 1rem; row-gap: 0.5rem; }
+        .concept-box dt { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.85rem; color: var(--text-main); }
+        .concept-box dd { font-size: 0.88rem; color: var(--text-muted); margin: 0; }
+
+        /* Stat Card Grid */
+        .stat-grid { display: flex; flex-wrap: wrap; gap: 1.2rem; margin: 2rem 0; }
+        .stat-card { flex: 1 1 200px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 6px; padding: 1.4rem 1.5rem; }
+        .stat-rank { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600; color: var(--text-main); background: var(--bg-surface); padding: 2px 8px; border-radius: 4px; margin-bottom: 0.6rem; }
+        .stat-number { font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 600; color: var(--text-main); line-height: 1; margin-bottom: 0.4rem; letter-spacing: -0.02em; }
+        .stat-number .stat-unit { font-size: 1.1rem; font-weight: 400; color: var(--text-muted); margin-left: 2px; }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); line-height: 1.45; font-family: 'Inter', sans-serif; }
+
+        /* Infographic Block */
+        .infographic-block { display: flex; flex-wrap: wrap; gap: 2rem; align-items: stroke; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 6px; margin: 2rem 0; padding: 1.8rem; }
+        .infographic-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--accent-blue); margin-bottom: 0.8rem; display: block; }
+        .infographic-hero { flex: 1 1 220px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid var(--border-light); padding-right: 2rem; }
+        .infographic-hero-icon { width: 36px; height: 36px; color: var(--text-main); margin-bottom: 0.8rem; }
+        .infographic-hero-number { font-family: 'Inter', sans-serif; font-size: 2.8rem; font-weight: 600; color: var(--text-main); line-height: 1; letter-spacing: -0.02em; }
+        .infographic-hero-number .stat-unit { font-size: 1.3rem; font-weight: 400; color: var(--text-muted); }
+        .infographic-hero-label { font-size: 0.88rem; color: var(--text-muted); margin-top: 0.6rem; font-family: 'Inter', sans-serif; }
+        .infographic-compare { flex: 1 1 260px; display: flex; flex-direction: column; gap: 1rem; justify-content: center; }
+        .infographic-compare-item { display: flex; align-items: center; gap: 0.8rem; }
+        .infographic-compare-value { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; color: var(--text-main); }
+        .infographic-compare-label { font-size: 0.82rem; color: var(--text-muted); font-family: 'Inter', sans-serif; }
+
+        /* Bento Grid */
+        .bento-grid-wrap { margin: 2rem 0 3rem 0; padding-top: 2.5rem; border-top: 1px solid var(--border-light); }
+        .bento-grid-title { font-size: 1.3rem; font-weight: 600; text-align: center; margin-bottom: 2rem; letter-spacing: -0.01em; }
+        .bento-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }
+        .bento-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 6px; padding: 1.6rem; transition: border-color 0.15s; }
+        .bento-card:hover { border-color: var(--text-main); }
+        .bento-card-icon { width: 26px; height: 26px; color: var(--text-main); margin-bottom: 1rem; }
+        .bento-card-title { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; }
+        .bento-card p { font-size: 0.85rem; color: var(--text-muted); text-align: left; margin-bottom: 0; font-family: 'Inter', sans-serif; }
+
+        .site-footer { border-top: 1px solid var(--border-light); padding: 2rem 0 3rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; justify-content: space-between; }
+        .site-footer a { color: var(--text-muted); text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .paper-section { padding: 1.8rem; }
+            h1 { font-size: 1.8rem; }
+            .content-wrap { padding: 0 1rem; }
+            .infographic-block { flex-direction: column; padding: 1.4rem; }
+            .infographic-hero { border-right: none; border-bottom: 1px solid var(--border-light); padding-right: 0; padding-bottom: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+            <symbol id="icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="6" width="12" height="12" rx="1"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></symbol>
+            <symbol id="icon-network" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="4" r="2"/><circle cx="4" cy="20" r="2"/><circle cx="20" cy="20" r="2"/><path d="M12 6v6M12 12l-6 6M12 12l6 6"/></symbol>
+            <symbol id="icon-deal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l4-4 4 4 6-6 4 4"/><path d="M13 6h4v4"/></symbol>
+            <symbol id="icon-security" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z"/></symbol>
+            <symbol id="icon-regulation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v3M5 8l14 0M5 8l-2 6h6l-2-6zM19 8l-2 6h6l-2-6zM8 21h8M12 11v10"/></symbol>
+            <symbol id="icon-packaging" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l9-5 9 5-9 5-9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></symbol>
+            <symbol id="icon-robot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="9" width="14" height="10" rx="1"/><path d="M12 5v4M9 5h6"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/></symbol>
+            <symbol id="icon-datacenter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="7" rx="1"/><rect x="4" y="13" width="16" height="7" rx="1"/><path d="M7 7.5h.01M7 16.5h.01"/></symbol>
+            <symbol id="icon-research" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2v6l-5 9a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-5-9V2"/><path d="M9 2h6"/></symbol>
+        </defs>
+    </svg>
+
+    <nav class="top-nav">
+        <div class="top-nav-inner">
+            <span class="top-nav-brand">AI<span>News</span> · Hardware Review</span>
+            <span class="top-nav-meta" id="report-date-top">July 29, 2026</span>
+        </div>
+    </nav>
+
+    <div class="layout-shell">
+        <aside class="side-nav">
+            <div class="side-nav-title">Briefing</div>
+            <div class="side-nav-sub">July 29, 2026</div>
+            <ul class="side-nav-list" id="side-nav-list"></ul>
+        </aside>
+
+        <div class="content-wrap">
+            <header class="masthead">
+                <span class="doc-category">AI Ecosystem & Hardware Review</span>
+                <h1>Daily AI & Semiconductor Engineering Briefing</h1>
+                <div class="meta-info">
+                    <span id="report-date">July 29, 2026</span> • Technical Report
+                </div>
+            </header>
+
+            <main>
+                <article class="paper-section" id="art1">
+  <h2>Open Secure AI Alliance: An Auditable Defense Stack for Agentic AI</h2>
+
+  <h3 class="section-title">1. Abstract</h3>
+  <div class="abstract-quote">
+    <p>On July 27, 2026, NVIDIA and 37 inaugural technology, cloud, and cybersecurity partners launched the Open Secure AI Alliance to move agentic AI security from opaque vendor APIs toward open, auditable, locally deployable defense stacks. Built on Linux Foundation Akrites and OpenSSF frameworks, the initiative couples open-weight investigation workflows with transparent agent harnesses, responding directly to the operational need for local forensic analysis during active incidents.</p>
+  </div>
+
+  <h3 class="section-title">2. Architecture &amp; Performance</h3>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-rank">FOUNDING COHORT</span>
+      <div class="stat-number">37</div>
+      <div class="stat-label">technology, cloud, and security organizations</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">FORENSIC SCALE</span>
+      <div class="stat-number">17,000<span class="stat-unit">+</span></div>
+      <div class="stat-label">recorded log actions analyzed locally</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">LICENSE</span>
+      <div class="stat-number">Apache<br>2.0</div>
+      <div class="stat-label">open-source research repositories</div>
+    </div>
+  </div>
+
+  <p>The alliance formalizes an open defense posture for autonomous agents and open-weight deployments. NVIDIA released the <span class="code-term">NOOA</span> Apache 2.0 research framework for tracing and auditing agent behavior; Microsoft contributed the <span class="code-term">MDASH</span> Multi-Model Agentic Scanning Harness; IBM and Red Hat expanded Lightwell supply-chain signing; HPE advanced <span class="code-term">SPIFFE/SPIRE</span> cryptographic agent identity; Hugging Face donated Safetensors to the PyTorch Foundation; and SpaceXAI open-sourced its Grok Build coding agent.</p>
+
+  <div class="inline-callout">
+    <strong>Incident-driven design premise.</strong> During a major July 2026 Hugging Face security incident, proprietary closed tools could not distinguish attacker payloads from defensive queries. A locally deployed open-weight <span class="code-term">GLM 5.2</span> model was used to analyze more than 17,000 recorded log actions and isolate the breach.
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-container">
+      <div class="chart-label">Alliance Contribution Surface</div>
+      <div id="chart-art1-a" style="width:100%;height:100%"></div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var el = document.getElementById('chart-art1-a');
+    if (el && window.echarts) {
+      var chart = echarts.init(el, null, {renderer: 'svg'});
+      chart.setOption({
+        title: {text: 'Initial open defense contributions', left: 'center', textStyle: {fontSize: 13, fontWeight: 500, color: '#222'}},
+        tooltip: {trigger: 'axis'},
+        grid: {left: 42, right: 18, top: 48, bottom: 42},
+        xAxis: {type: 'category', name: 'Contributor', nameLocation: 'middle', nameGap: 29, data: ['NVIDIA', 'Microsoft', 'IBM / Red Hat', 'HPE', 'Hugging Face', 'SpaceXAI'], axisLabel: {fontSize: 10, color: '#555'}},
+        yAxis: {type: 'value', name: 'Named contribution (count)', min: 0, max: 1, interval: 1, axisLabel: {color: '#555'}},
+        series: [{
+          type: 'bar',
+          data: [1, 1, 1, 1, 1, 1],
+          barMaxWidth: 32,
+          itemStyle: {color: '#4d5559'},
+          label: {show: true, position: 'top', color: '#222'},
+          emphasis: {itemStyle: {color: '#222'}}
+        }]
+      });
+      window.addEventListener('resize', function(){ chart.resize(); });
+    }
+  })();
+  </script>
+
+  <p>Compared with closed vendor API security tools, the framework permits inspectable open-weight models, on-premise or private-cloud execution, and unfiltered local investigation. This replaces remote log transmission and vendor-governed release cycles with community auditing through NOOA and MDASH, while cryptographic SPIFFE/SPIRE identities provide a zero-trust alternative to proprietary tokens and API keys.</p>
+
+  <h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>
+  <p>The alliance creates a credible counterweight to proprietary security platforms and should increase demand for self-hosted security LLMs, private-cloud compute, zero-trust identity, and AI audit tooling. Its central trade-off remains unresolved: the same open weights and transparent harnesses that empower defenders can be examined by threat actors for zero-day discovery or evasive attack construction. The absence of major frontier labs including Anthropic also signals a continuing policy divide over whether open-weight release reduces or amplifies systemic AI risk.</p>
+</article>
+
+<article class="paper-section" id="art2">
+  <h2>Core Scientific and AMD: A 15-Year Pathway from 529 MW to 2.5 GW</h2>
+
+  <h3 class="section-title">1. Abstract</h3>
+  <div class="abstract-quote">
+    <p>Core Scientific and AMD executed a binding 15-year infrastructure partnership on July 28, 2026, committing 529 MW of critical IT capacity across five U.S. campuses and more than $14 billion in potential base contracted revenue. The agreement combines 377 MW of direct AMD leases with 152 MW leased to an AMD credit-supported cloud provider, while reserving an exclusive pathway for up to 1,925 MW of additional capacity through December 28, 2028—bringing the relationship to a potential 2.5 GW.</p>
+  </div>
+
+  <h3 class="section-title">2. Architecture &amp; Performance</h3>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-rank">INITIAL COMMITMENT</span>
+      <div class="stat-number">529<span class="stat-unit"> MW</span></div>
+      <div class="stat-label">critical IT capacity across five campuses</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">BASE TERM</span>
+      <div class="stat-number">15<span class="stat-unit"> years</span></div>
+      <div class="stat-label">with three five-year extension options</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">BASE REVENUE</span>
+      <div class="stat-number">$14<span class="stat-unit">B+</span></div>
+      <div class="stat-label">potential contracted revenue</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">RENT ESCALATOR</span>
+      <div class="stat-number">2.5<span class="stat-unit">%</span></div>
+      <div class="stat-label">annual rent escalation</div>
+    </div>
+  </div>
+
+  <p>The executed structure spans Pecos and Hunt County, Texas; Muskogee, Oklahoma; Auburn, Alabama; and Dalton, Georgia. AMD directly leases 377 MW, while a third-party cloud provider leases 152 MW with AMD credit support. Facilities will be co-engineered for high-density liquid cooling and AMD Instinct GPUs, 6th Gen EPYC CPUs, and ROCm software environments. Initial commissioning begins at Pecos in H1 2027, with roughly half of the committed 529 MW expected during 2027 and the remainder in 2028.</p>
+
+  <div class="chart-row">
+    <div class="chart-container">
+      <div class="chart-label">Contractual Capacity Structure</div>
+      <div id="chart-art2-a" style="width:100%;height:100%"></div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-label">Expansion Pathway</div>
+      <div id="chart-art2-b" style="width:100%;height:100%"></div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var el = document.getElementById('chart-art2-a');
+    if (el && window.echarts) {
+      var chart = echarts.init(el, null, {renderer: 'svg'});
+      chart.setOption({
+        title: {text: 'Committed capacity allocation', left: 'center', textStyle: {fontSize: 13, fontWeight: 500, color: '#222'}},
+        tooltip: {trigger: 'axis', formatter: '{b}: {c} MW'},
+        grid: {left: 45, right: 20, top: 48, bottom: 42},
+        xAxis: {type: 'category', name: 'Lease structure', nameLocation: 'middle', nameGap: 29, data: ['Direct AMD', 'Credit-backed cloud', 'Total committed'], axisLabel: {fontSize: 10, color: '#555'}},
+        yAxis: {type: 'value', name: 'Capacity (MW)', axisLabel: {color: '#555'}},
+        series: [{type: 'bar', data: [377, 152, 529], itemStyle: {color: '#4d5559'}, label: {show: true, position: 'top', color: '#222'}, barMaxWidth: 42}]
+      });
+      window.addEventListener('resize', function(){ chart.resize(); });
+    }
+  })();
+  (function(){
+    var el = document.getElementById('chart-art2-b');
+    if (el && window.echarts) {
+      var chart = echarts.init(el, null, {renderer: 'svg'});
+      chart.setOption({
+        title: {text: 'Exclusive reservation pathway', left: 'center', textStyle: {fontSize: 13, fontWeight: 500, color: '#222'}},
+        tooltip: {trigger: 'axis', formatter: '{b}: {c} MW'},
+        grid: {left: 45, right: 20, top: 48, bottom: 42},
+        xAxis: {type: 'category', name: 'Contract stage', nameLocation: 'middle', nameGap: 29, data: ['Committed', 'Additional option', 'Potential total'], axisLabel: {fontSize: 10, color: '#555'}},
+        yAxis: {type: 'value', name: 'Capacity (MW)', axisLabel: {color: '#555'}},
+        series: [{type: 'bar', data: [529, 1925, 2500], itemStyle: {color: '#777f82'}, label: {show: true, position: 'top', color: '#222'}, barMaxWidth: 42}]
+      });
+      window.addEventListener('resize', function(){ chart.resize(); });
+    }
+  })();
+  </script>
+
+  <div class="inline-callout">
+    <strong>Capital and equity terms.</strong> Core Scientific estimates build-out capital expenditure at <span class="code-term">$11M–$12M per MW</span>. AMD received market-priced warrants to purchase up to <span class="code-term">30 million CORZ shares</span> at <span class="code-term">$23.47</span> per share, with 6.5 million shares vesting immediately upon lease execution.
+  </div>
+
+  <h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>
+  <p>The partnership converts long-dated power access into a strategic semiconductor distribution asset, reducing provisioning risk relative to conventional three-to-five-year colocation contracts and unreserved utility queues. It also validates Core Scientific’s pivot toward high-density AI colocation, contributing to more than $24 billion in total contracted revenue backlog across its 1.1 GW portfolio. Execution remains capital intensive: the stated $11M–$12M per MW range implies roughly $6 billion in construction costs, while transformer availability, liquid chiller supply, and grid interconnections could delay delivery or trigger lease penalties. The 1,925 MW expansion tranche remains an unexercised option contingent on future demand.</p>
+</article>
+
+<article class="paper-section" id="art3">
+  <h2>MCP 2026-07-28: Stateless Transport for Horizontally Scaled Agent Systems</h2>
+
+  <h3 class="section-title">1. Abstract</h3>
+  <div class="abstract-quote">
+    <p>The final Model Context Protocol <span class="code-term">MCP 2026-07-28</span> specification, released on July 28, 2026 under the Agentic AI Foundation and Linux Foundation, separates HTTP transport from mandatory session state. Standard load balancers can now route remote tool-server calls statelessly, while asynchronous agent state is managed through a formal Tasks extension and interactive MCP Apps are rendered inside host-sandboxed local web environments.</p>
+  </div>
+
+  <h3 class="section-title">2. Architecture &amp; Performance</h3>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-rank">TRANSPORT MODEL</span>
+      <div class="stat-number">Stateless<br>HTTP</div>
+      <div class="stat-label">request and response routing</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">TASK EXECUTION</span>
+      <div class="stat-number">Async</div>
+      <div class="stat-label">standardized long-running job management</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">SCHEMA BASELINE</span>
+      <div class="stat-number">2020-12</div>
+      <div class="stat-label">JSON Schema tool definitions</div>
+    </div>
+  </div>
+
+  <p>The specification eliminates mandatory sticky-session routing and transport-level initialization handshakes. Remote servers can operate behind standard round-robin HTTP load balancers, with server-defined <span class="code-term">ttlMs</span> parameters caching tool definitions across client applications. Application-level state is instead formalized through the <span class="code-term">Tasks</span> extension for asynchronous queues, status polling, and results. <span class="code-term">MCP Apps</span> allow servers to provide UI resources and schema metadata that IDEs and desktop agent environments render within isolated host-side sandboxes.</p>
+
+  <div class="chart-row">
+    <div class="chart-container">
+      <div class="chart-label">Architecture Transition</div>
+      <div id="chart-art3-a" style="width:100%;height:100%"></div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var el = document.getElementById('chart-art3-a');
+    if (el && window.echarts) {
+      var chart = echarts.init(el, null, {renderer: 'svg'});
+      chart.setOption({
+        title: {text: 'Protocol capabilities introduced or formalized', left: 'center', textStyle: {fontSize: 13, fontWeight: 500, color: '#222'}},
+        tooltip: {trigger: 'axis'},
+        grid: {left: 42, right: 18, top: 48, bottom: 52},
+        xAxis: {type: 'category', name: 'Capability', nameLocation: 'middle', nameGap: 37, data: ['Stateless routing', 'ttlMs caching', 'Tasks', 'MCP Apps', 'OAuth 2.0 / OIDC'], axisLabel: {fontSize: 10, color: '#555', interval: 0}},
+        yAxis: {type: 'value', name: 'Specification status (1 = included)', min: 0, max: 1, interval: 1, axisLabel: {color: '#555'}},
+        series: [{type: 'bar', data: [1, 1, 1, 1, 1], itemStyle: {color: '#4d5559'}, label: {show: true, position: 'top', color: '#222'}, barMaxWidth: 34}]
+      });
+      window.addEventListener('resize', function(){ chart.resize(); });
+    }
+  })();
+  </script>
+
+  <div class="inline-callout">
+    <strong>Security and compatibility baseline.</strong> MCP 2026-07-28 explicitly aligns granular resource scopes and access tokens with <span class="code-term">OAuth 2.0</span>, identity with <span class="code-term">OIDC</span>, and tool contracts with JSON Schema 2020-12. The final release also establishes a formal backward-compatibility deprecation policy; Python, TypeScript, and Kotlin SDKs have been updated in open-source repositories.
+  </div>
+
+  <p>Legacy implementations coupled tool context to persistent sessions, risking synchronous HTTP timeouts and requiring sticky gateway routing. The final architecture instead makes transport independently scalable while assigning durable workflow state to discrete Task IDs. This separation enables multi-cloud, serverless, and horizontally distributed orchestration without making application state disappear.</p>
+
+  <h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>
+  <p>The specification should lower adoption friction for enterprise agent systems by simplifying gateway configuration and standardizing delegated authorization, favoring serverless API gateways, orchestration platforms, and compliant developer tools. Migration is nonetheless non-trivial: teams must update server SDKs, reconfigure authentication middleware, and design persistent backing stores for distributed Tasks. Stateless routing solves connection affinity, but background state still requires disciplined database persistence, token rotation, task expiration, and failure recovery across microservices.</p>
+</article>
+
+<article class="paper-section" id="art4">
+  <h2>Intel 18A RAMP-C Completion: RibbonFET and PowerVia Validated on Advanced Test Silicon</h2>
+
+  <h3 class="section-title">1. Abstract</h3>
+  <div class="abstract-quote">
+    <p>Intel Foundry completed the U.S. Department of Defense Rapid Assured Microelectronics Prototypes – Commercial (<span class="code-term">RAMP-C</span>) program on July 28, 2026, validating Intel 18A PDK design rules and test-chip flows for two foundational sub-2nm innovations: <span class="code-term">RibbonFET</span> Gate-All-Around nanosheet transistors and <span class="code-term">PowerVia</span> Backside Power Delivery Network technology. The milestone establishes domestic prototyping readiness, while commercial high-volume manufacturing still depends on yield optimization.</p>
+  </div>
+
+  <div class="concept-box">
+    <p><span class="code-term">RibbonFET</span> — Intel’s Gate-All-Around transistor architecture, with a gate surrounding stacked nanosheet channel ribbons on all four sides.</p>
+    <p><span class="code-term">PowerVia</span> — A Backside Power Delivery Network that moves primary power wires to the reverse side of the silicon wafer.</p>
+    <p><span class="code-term">BEOL</span> — Back-end-of-line metal interconnect layers that carry power and high-speed signals.</p>
+    <p><span class="code-term">IR drop</span> — Resistive voltage loss across power-delivery pathways.</p>
+  </div>
+
+  <h3 class="section-title">2. Architecture &amp; Performance</h3>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-rank">PROCESS NODE</span>
+      <div class="stat-number">Intel<br>18A</div>
+      <div class="stat-label">leading-edge foundry process technology</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">GATE ENCLOSURE</span>
+      <div class="stat-number">4-sided</div>
+      <div class="stat-label">RibbonFET nanosheet gate control</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">PROGRAM START</span>
+      <div class="stat-number">2021</div>
+      <div class="stat-label">DoD Trusted and Assured Microelectronics initiative</div>
+    </div>
+  </div>
+
+  <p>At sub-2nm dimensions, conventional top-side power routing forces power rails and high-speed signal lines to share increasingly constrained <span class="code-term">BEOL</span> copper layers. This creates routing congestion and resistive IR drop. PowerVia relocates primary power distribution to the wafer backside, reserving top-side metal for signals; RibbonFET replaces three-sided FinFET gate control with a fully surrounding gate around stacked nanosheet ribbons, improving electrostatic control and minimizing subthreshold leakage.</p>
+
+  <div class="inline-callout">
+    <strong>Validation scope.</strong> RAMP-C enabled commercial designers including NVIDIA, Qualcomm, Microsoft, and IBM, alongside defense primes such as Boeing and Northrop Grumman, to tape out, prototype, and validate complex test chips on Intel 18A. Completion validates PDK and design-flow readiness—not yet full commercial HVM yield.
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-container">
+      <div class="chart-label">Power and Transistor Architecture</div>
+      <div id="chart-art4-a" style="width:100%;height:100%"></div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var el = document.getElementById('chart-art4-a');
+    if (el && window.echarts) {
+      var chart = echarts.init(el, null, {renderer: 'svg'});
+      chart.setOption({
+        title: {text: 'Validated Intel 18A architectural elements', left: 'center', textStyle: {fontSize: 13, fontWeight: 500, color: '#222'}},
+        tooltip: {trigger: 'axis'},
+        grid: {left: 42, right: 18, top: 48, bottom: 44},
+        xAxis: {type: 'category', name: 'Architecture element', nameLocation: 'middle', nameGap: 29, data: ['18A PDK', 'Test-chip flow', 'RibbonFET GAA', 'PowerVia PDN'], axisLabel: {fontSize: 10, color: '#555'}},
+        yAxis: {type: 'value', name: 'RAMP-C validation (1 = validated)', min: 0, max: 1, interval: 1, axisLabel: {color: '#555'}},
+        series: [{type: 'bar', data: [1, 1, 1, 1], itemStyle: {color: '#4d5559'}, label: {show: true, position: 'top', color: '#222'}, barMaxWidth: 40}]
+      });
+      window.addEventListener('resize', function(){ chart.resize(); });
+    }
+  })();
+  </script>
+
+  <p>The architectural distinction is structural rather than cosmetic: conventional FinFET flows place both power and data on top-side metal layers and use a gate that covers three sides of the channel fin. Intel 18A combines backside power delivery with a four-sided GAA nanosheet gate, relieving top-side routing congestion and targeting improved voltage stability. RAMP-C completion therefore establishes a domestic prototype benchmark alongside competing sub-2nm roadmaps from TSMC and Samsung.</p>
+
+  <h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>
+  <p>The milestone strengthens Intel Foundry’s position as a potential onshore manufacturing option for defense programs and commercial hyperscalers seeking supply-chain diversification, with implications for EDA, backside wafer polishing, and domestic packaging ecosystems. However, functional test silicon and validated design rules do not guarantee competitive high-volume manufacturing. Intel must still sustain defect density, yield, and cost targets across commercial fab lines before it can convert technical validation into multi-billion-dollar long-term production contracts.</p>
+</article>
+
+<section class="bento-grid-wrap">
+  <h2 class="bento-grid-title">Key Strategic Takeaways</h2>
+  <div class="bento-grid">
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-security"/></svg>
+      <div class="bento-card-title">Security becomes locally auditable</div>
+      <p>The 37-member Open Secure AI Alliance shifts incident response toward inspectable models, transparent agent harnesses, and zero-trust identities that can operate inside enterprise-controlled environments.</p>
+    </div>
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-datacenter"/></svg>
+      <div class="bento-card-title">Power capacity is a strategic contract asset</div>
+      <p>The AMD–Core Scientific agreement locks in 529 MW today and reserves a route to 2.5 GW, making power, cooling, and grid execution central constraints for AI deployment.</p>
+    </div>
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-network"/></svg>
+      <div class="bento-card-title">Agent infrastructure decouples transport from state</div>
+      <p>MCP 2026-07-28 enables standard horizontal HTTP scaling while moving long-running workflow durability into explicit asynchronous Task management.</p>
+    </div>
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-chip"/></svg>
+      <div class="bento-card-title">Sub-2nm readiness shifts to yield execution</div>
+      <p>Intel 18A validates RibbonFET and PowerVia on RAMP-C test silicon; the next strategic test is repeatable high-volume manufacturing economics and yield.</p>
+    </div>
+  </div>
+</section>
+            </main>
+
+            <footer class="site-footer">
+                <span>Generated daily via automated pipeline.</span>
+                <a href="[https://github.com/ancm777-eng/AInews](https://github.com/ancm777-eng/AInews)" target="_blank" rel="noopener">[github.com/ancm777-eng/AInews](https://github.com/ancm777-eng/AInews)</a>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Safety net: some article-level ECharts init scripts may fire before layout
+        // has fully settled (e.g. fonts still loading), leaving charts clipped or
+        // sized to 0. Force a resize pass on every echarts instance after full load
+        // and once more after webfonts finish, so charts never stay stuck at a bad size.
+        (function () {
+            function resizeAllCharts() {
+                if (!window.echarts) return;
+                document.querySelectorAll('.chart-container [id^="chart-"]').forEach(function (el) {
+                    var instance = echarts.getInstanceByDom(el);
+                    if (instance) instance.resize();
+                });
+            }
+            window.addEventListener('load', resizeAllCharts);
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(resizeAllCharts);
+            }
+            window.addEventListener('resize', resizeAllCharts);
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var list = document.getElementById('side-nav-list');
+            var articles = document.querySelectorAll('.paper-section');
+            var links = [];
+            articles.forEach(function (art) {
+                var h2 = art.querySelector('h2');
+                if (!h2 || !art.id) return;
+                var li = document.createElement('li');
+                var a = document.createElement('a');
+                a.href = '#' + art.id;
+                a.className = 'side-nav-link';
+                a.textContent = h2.textContent.length > 50 ? h2.textContent.slice(0, 50) + '…' : h2.textContent;
+                li.appendChild(a);
+                list.appendChild(li);
+                links.push({ id: art.id, el: a });
+            });
+            if (!links.length) return;
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    var match = links.find(function (l) { return l.id === entry.target.id; });
+                    if (!match) return;
+                    if (entry.isIntersecting) {
+                        links.forEach(function (l) { l.el.classList.remove('active'); });
+                        match.el.classList.add('active');
+                    }
+                });
+            }, { rootMargin: '-20% 0px -70% 0px' });
+            articles.forEach(function (art) { observer.observe(art); });
+        })();
+    </script>
+</body>
+</html>
