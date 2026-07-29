@@ -80,15 +80,25 @@
 
         /* Table Style */
         .table-wrapper { overflow-x: auto; margin: 2rem 0; }
-        .academic-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left; font-family: 'Inter', sans-serif; }
-        .academic-table th, .academic-table td { padding: 10px 14px; vertical-align: top; }
+        .academic-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left; font-family: 'Inter', sans-serif; table-layout: fixed; }
+        .academic-table th, .academic-table td { padding: 10px 14px; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; }
         .academic-table td.num, .academic-table td code { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
         .academic-table th { font-weight: 600; border-top: 1px solid var(--border-dark); border-bottom: 1px solid var(--border-dark); color: var(--text-main); background: var(--bg-surface); }
         .academic-table td { border-bottom: 1px solid var(--border-light); color: #333333; }
         .academic-table tr:last-child td { border-bottom: 1px solid var(--border-dark); }
 
+        /* Anthropic Style Chart Row (multiple charts side by side, like anthropic.com/news benchmark posts) */
+        .chart-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; margin: 2.2rem 0; }
+        .chart-row .chart-container { margin: 0; }
+        .chart-label { font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.6rem; text-align: center; }
+
         /* Anthropic Style Chart Container */
-        .chart-container { width: 100%; height: 360px; margin: 2.2rem 0; border: 1px solid var(--border-light); background: #ffffff; padding: 1.2rem; border-radius: 6px; }
+        .chart-container { width: 100%; min-height: 320px; height: 320px; margin: 2.2rem 0; border: 1px solid var(--border-light); background: #ffffff; padding: 1.2rem; border-radius: 6px; display: flex; flex-direction: column; overflow: hidden; }
+        .chart-container > div[id^="chart-"] { flex: 1; min-height: 0; width: 100%; }
+
+        @media (max-width: 640px) {
+            .chart-row { grid-template-columns: 1fr; }
+        }
 
         .code-term { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; background: var(--bg-surface); border: 1px solid var(--border-light); padding: 2px 6px; border-radius: 4px; }
 
@@ -190,6 +200,27 @@
             </footer>
         </div>
     </div>
+
+    <script>
+        // Safety net: some article-level ECharts init scripts may fire before layout
+        // has fully settled (e.g. fonts still loading), leaving charts clipped or
+        // sized to 0. Force a resize pass on every echarts instance after full load
+        // and once more after webfonts finish, so charts never stay stuck at a bad size.
+        (function () {
+            function resizeAllCharts() {
+                if (!window.echarts) return;
+                document.querySelectorAll('.chart-container [id^="chart-"]').forEach(function (el) {
+                    var instance = echarts.getInstanceByDom(el);
+                    if (instance) instance.resize();
+                });
+            }
+            window.addEventListener('load', resizeAllCharts);
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(resizeAllCharts);
+            }
+            window.addEventListener('resize', resizeAllCharts);
+        })();
+    </script>
 
     <script>
         (function () {
