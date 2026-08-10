@@ -1,354 +1,324 @@
 ## 종합 판정
 
-초안의 **“4개 항목 모두 유효 시간창 내에서 검증됐다”는 결론은 성립하지 않습니다.**
+초안은 **그대로 발행하기 어렵습니다.** 특히 1~3번은 공식 1차 출처와 제품·거래 식별자가 부족하고, 기사에서 확인될 수 있는 범위를 넘어선 세부사항을 확정 사실로 서술합니다. 4번은 실제 연구일 가능성이 높고 7일 예외에도 부합하지만, 논문 상태·성과와 AI 데이터센터 적용 효과가 과장되어 있습니다.
 
-기준 시각은 **2026-08-10 07:01 KST = 2026-08-09 22:01 UTC**이며, 일반 항목의 24시간 하한은 다음과 같습니다.
+또한 24시간 판정은 날짜만으로 할 수 없습니다.
 
-- **24시간 하한:** 2026-08-09 07:01 KST  
-- **UTC 하한:** 2026-08-08 22:01 UTC
-- **Category 6의 7일 하한:** 2026-08-03 07:01 KST
+- 실제 검증 시각: **2026-08-11 07:18 KST**
+- 일반 항목의 유효 구간: **2026-08-10 07:18 ~ 2026-08-11 07:18 KST**
+- UTC: **2026-08-09 22:18 ~ 2026-08-10 22:18 UTC**
+- 6번 카테고리의 7일 구간: **2026-08-04 07:18 KST 이후**
 
-| 항목 | 시간창 판정 | 사실·품질 판정 | 핵심 문제 |
-|---|---|---|---|
-| 1. NVIDIA NOOA | **입증 실패** | 수정 필요 | 8월 8일이라는 날짜만으로는 24시간 이내임을 증명하지 못함. 벤치마크 단위와 비교 기준도 불명확 |
-| 2. Managed Deep Agents | **실패** | 중대한 수정 필요 | 8월 7일 원 사건을 다루며, 최근 24시간의 새로운 발전이 확인되지 않음. Public Beta와 GA를 혼동 |
-| 3. Cloudflare 통합 | **실패** | 중대한 수정 필요 | 원 사건은 8월 7일이고 최근 24시간의 신규 개발이 없음. 여러 Cloudflare 기능을 하나의 출시로 합쳤을 가능성 |
-| 4. Samsung–POSTECH NAND 연구 | **7일 예외 통과** | 과장 수정 필요 | 연구 성과를 400+단 V10 양산 실현 및 AI KV 캐시 적용으로 과도하게 확대 |
+초안에 적힌 `2026-08-10`이라는 날짜만으로는 해당 사건이 07:18 KST 이후 발생했는지 알 수 없습니다. 따라서 1~3번의 `event_within_24h_window: true`는 현재 메타데이터만으로 입증되지 않습니다.
 
 ---
 
-# 항목별 검증
+## 항목별 판정
 
-## 1. NVIDIA Labs NOOA
-
-### 시간창
-
-**`event_within_24h_window: true`는 현재 정보로 검증되지 않습니다.**
-
-초안은 이벤트·게시일을 모두 **2026-08-08**로만 표시했습니다. 24시간 하한은 **2026-08-08 22:01 UTC**이므로 다음 중 하나가 필요합니다.
-
-- GitHub 릴리스·커밋·태그 시각이 **2026-08-08 22:01 UTC 이후**, 또는
-- 공식 발표 시각이 **2026-08-09 07:01 KST 이후**
-
-단순히 “August 8”이라는 날짜만으로는 이를 판정할 수 없습니다. 오히려 KST 날짜로 해석하면 8월 8일 전체가 시간창 밖입니다. GitHub의 `created_at` 또는 `published_at` UTC 타임스탬프를 기재해야 합니다.
-
-### 사실·수치 문제
-
-1. **토큰 수의 단위가 불분명합니다.**
-   - 본문은 `1.1 million tokens per task`라고 표현합니다.
-   - SWE-bench Verified는 보통 500개 인스턴스로 집계되므로, 1.1M이 전체 실행량인지 작업당 평균인지 반드시 구분해야 합니다.
-   - 작업당 110만 토큰이라면 “token-efficient”라는 표현은 별도 비용·성공률 정규화 없이는 설득력이 약합니다.
-
-2. **“2.2M tokens / 66 calls peer average”의 비교 집단이 없습니다.**
-   - 어느 하네스, 같은 모델, 같은 최대 토큰, 같은 retry 정책인지 제시되지 않았습니다.
-   - 이를 “traditional multi-file harnesses” 전체의 평균으로 일반화할 근거가 없습니다.
-   - 특히 코드 구성 방식이 토큰 절감의 직접 원인이라는 인과관계도 입증되지 않았습니다.
-
-3. **82.2%에는 재현 정보가 필요합니다.**
-   - SWE-bench Verified 버전·평가일
-   - 500개 전체 실행 여부
-   - 모델의 정확한 API 스냅샷
-   - pass@1인지 다중 시도 후 최고값인지
-   - 공개 trajectory와 제출 결과 링크  
-   위 정보 없이 GitHub README 또는 보도매체 수치만 인용하면 “독립 검증된 점수”로 쓰기 어렵습니다.
-
-4. **설치 명령이 잘못 표기됐습니다.**
-   - `pip install nooa v0.0.8`은 버전 고정 명령이 아닙니다.
-   - 올바른 형식은 보통 다음과 같습니다.  
-     `pip install nooa==0.0.8`
-
-5. **“runtime-enforced contracts”는 과장 가능성이 있습니다.**
-   - Python type annotation은 그 자체로 런타임 강제 기능이 아닙니다.
-   - NOOA가 Pydantic, `typeguard` 또는 자체 validator로 실제 검사하는 경우에만 이 표현이 정확합니다.
-
-6. **비교 대상 설명도 지나치게 단순화됐습니다.**
-   - LangGraph나 AutoGen이 반드시 여러 파일을 요구하는 것은 아닙니다.
-   - “별도 파일을 요구한다”보다는 “프롬프트·도구·상태·그래프를 별도 추상화로 관리하는 경우가 많다”가 정확합니다.
-
-### URL·출처 보완
-
-`https://github.com/nvidia-labs/nooa`만으로 다음 사항이 모두 입증되지는 않습니다.
-
-- 해당 GitHub 조직이 NVIDIA가 공식 관리하는 조직인지
-- Apache-2.0 라이선스가 실제 저장소 루트에 있는지
-- PyPI `nooa` 프로젝트의 소유자가 동일한지
-- v0.0.8이 8월 8일에 공개됐는지
-
-GitHub 릴리스·PyPI·공식 NVIDIA 도메인 링크를 각각 제시해야 합니다.
-
-### 판정
-
-**항목 자체의 존재 여부와 사양은 1차 출처 확인이 더 필요하며, 현재 상태에서 시간창 통과로 표시하면 안 됩니다.**  
-최소한 `event_timestamp_utc`를 추가하고 토큰 단위를 바로잡아야 합니다.
+| 항목 | 판정 | 핵심 문제 |
+|---|---|---|
+| 1. OpenAI Astra | **중대한 검증 실패** | OpenAI 공식 발표·모델 페이지가 없고, “Astra” 모델명과 제로데이 실증·CoT 전수감시 등 핵심 주장을 1차 출처로 뒷받침하지 못함 |
+| 2. Meta Muse Glimmer | **중대한 검증 실패** | Meta 공식 릴리스·Hugging Face 저장소·모델 카드·벤치마크 링크가 없음. 제품명·라이선스·성능 수치 모두 독립 검증 불가 |
+| 3. Archer–Boeing 자회사 인수 | **URL 및 거래 사실 검증 실패** | PR Newswire 식별번호가 2026년 보도자료와 맞지 않을 가능성이 매우 높고, 공식 Archer/Boeing 거래 링크와 SEC 공시가 없음 |
+| 4. SiC 레이저 연구 | **조건부 유지 가능** | 7일 예외에는 부합할 수 있으나, arXiv를 곧바로 동료심사 논문으로 표시하고 `<100 μm`, “defect-free”, 상용 검증을 확정한 부분은 수정 필요 |
 
 ---
 
-## 2. LangChain Managed Deep Agents
+# 1. OpenAI가 ‘Astra’를 중단했다는 항목
 
-### 시간창 및 ongoing-story 예외
+### 판정: 중대한 검증 실패
 
-이 항목은 **ongoing-story 예외 요건을 충족하지 못합니다.**
+### 확인되는 부분
 
-- 원 사건: **2026-08-07 Public Beta 출시**
-- 24시간 하한: **2026-08-09 07:01 KST**
-- 초안이 제시한 후속 내용: “detailed operator analysis published August 8–9”
+OpenAI Preparedness Framework에 **Critical** 위험 등급이 존재하고, 심각한 사이버 능력에 대해 배포 또는 개발 제한을 요구하는 체계 자체는 개념적으로 타당합니다. 그러나 이것이 곧 초안의 구체적 사건을 입증하지는 않습니다.
 
-최근에 나온 **제3자 분석 기사**는 새로운 제품 개발이나 공식 후속 발표가 아닙니다. ongoing-story 예외를 적용하려면 최근 24시간 내에 다음과 같은 실질적 발전이 있어야 합니다.
+### 문제가 되는 주장
 
-- 새 지역·기능 출시
-- 가격 또는 이용 조건 발표
-- 공식 문서의 중대한 변경
-- GA 전환
-- 신규 보안·컴플라이언스 기능 공개
+다음 핵심 사실을 확인할 수 있는 OpenAI 1차 출처가 없습니다.
 
-현재 본문은 처음의 Public Beta 발표에 초점을 맞추고 있으므로 **재탕에 해당**합니다. `original_event_date`가 있는 것만으로 충분하지 않습니다.
+- OpenAI의 차세대 모델 이름이 **Astra**라는 주장
+- 2026년 8월 10일 공식적으로 출시를 중단했다는 주장
+- 실제 hardened critical target에 대해 제로데이를 독립적으로 발견·작성·실행했다는 주장
+- “internal unisolated training activities”까지 중단했다는 주장
+- 전 Chain-of-Thought를 실시간으로 감시한다는 주장
+- 정부 AI 안전기관의 외부 감사가 의무화됐다는 주장
 
-### 명확한 논리적 모순
+특히 **Astra는 오랫동안 Google의 Project Astra에 사용된 명칭**이므로, OpenAI 모델명으로 사용할 경우에는 반드시 OpenAI 공식 발표로 식별해야 합니다. 단순히 이름이 겹친다는 이유만으로 허위라고 단정할 수는 없지만, 현 상태에서는 회사·제품 귀속 혼동 가능성이 큽니다.
 
-> “launched into public beta, transitioning its hosted runtime service from private beta to general availability”
+### 논리·기술적 문제
 
-이는 내부적으로 모순입니다.
+- Preparedness Framework의 “Critical” 정의와 특정 내부 평가 결과를 동일시했습니다. 프레임워크의 예시 능력과 실제 모델이 그 능력을 입증했다는 것은 별개입니다.
+- “Critical이므로 universal real-time CoT monitoring을 실시했다”는 인과관계가 성립하지 않습니다. CoT 원문은 모델 내부 상태를 완전하게 관찰하는 수단이 아니며, OpenAI가 모든 추론 토큰을 실시간 감독한다고 공개했다는 근거도 없습니다.
+- “상용 프런티어 모델이 사이버 능력 때문에 중단된 최초 사례”는 전 세계 선행사례 검토가 필요한 **최초성 주장**입니다.
+- “prior model pauses were triggered by hallucinations, bias, or biosecurity”도 구체적 사례와 출처가 없습니다.
 
-- **Private Beta → Public Beta**는 GA가 아닙니다.
-- 상태가 Public Beta라면 “general availability”를 삭제해야 합니다.
-- 실제 GA라면 제목과 Status를 모두 GA로 수정해야 합니다.
+### URL 판정
 
-### 제품 설명 보완
+제시된 Inc. URL은 2차 매체 기사입니다.
 
-1. **메모리 범위가 혼재돼 있습니다.**
-   - “durable execution threads”
-   - “deployment-wide persistent memory”
-   - “persistent thread memory”
-   - “shared across threads”
+`https://www.inc.com/kevin-haynes/openais-newest-model-triggers-a-critical-warning.html`
 
-   일반적으로 thread state와 cross-thread long-term store는 다른 계층입니다. 다음처럼 분리해야 합니다.
+이 기사가 존재하더라도 다음을 대신할 수 없습니다.
 
-   - 단기 상태: thread-scoped checkpoint
-   - 장기 메모리: namespace 또는 deployment-scoped store
-   - 파일 시스템: sandbox-local인지 영구 mount인지
+- OpenAI 공식 발표
+- Preparedness Framework 평가 보고서 또는 safeguards report
+- 모델 시스템 카드
+- 실제 모델명과 배포 상태
 
-2. **`mda deploy`, `uv`, `npm`, 미국 리전만 지원한다는 내용은 공식 문서 인용이 필요합니다.**
-   - Python과 TypeScript CLI가 동일한 명령·기능을 지원하는지도 확인해야 합니다.
-   - “underlying cloud infrastructure를 전혀 provision하지 않는다”는 문구도 네트워크·비밀키·IAM 설정까지 필요 없는 것으로 오해될 수 있습니다.
+TechCrunch, The Hacker News, Buttondown은 출처란에만 적혀 있고 개별 URL이 없습니다.
 
-3. **Harbor evals가 “built-in”인지 불명확합니다.**
-   - Managed Deep Agents 제품 기능인지,
-   - 별도 평가 저장소 또는 벤치마크인지,
-   - LangSmith evaluation과 연동 가능한 것인지  
-   구분해야 합니다.
+### 시간 윈도우
 
-### 명백히 부적절한 통계
+`2026-08-10`만 적혀 있으므로 24시간 이내 여부를 판정할 수 없습니다. 최소한 기사 게시 시각과 OpenAI 발표 시각, 해당 시각대가 필요합니다.
 
-> stat: 55,000+  
-> context: Employee size of enterprise organizations building internal autonomous agents...
+### 권고
 
-이 통계는 의미가 성립하지 않습니다.
+공식 OpenAI URL이 없으면 다음처럼 축소해야 합니다.
 
-- 특정 기업의 직원 수인지
-- 고객사들의 합산 직원 수인지
-- 웹 호스팅 고객의 직원 수인지
-- 55,000개의 조직을 뜻하는지  
-  알 수 없습니다.
+> “Inc.가 OpenAI의 한 내부 사이버 평가와 관련된 우려를 보도했다. 다만 모델명, Critical 등급 확정 여부, 출시 중단 범위와 구체적인 보호조치는 OpenAI 1차 문서에서 확인이 필요하다.”
 
-또한 “LangChain / Vercel Enterprise Deployment Analytics”라는 출처도 제품 발표와 직접 연결되지 않습니다. 이 Background Stat은 **삭제하는 것이 안전합니다.**
-
-### 판정
-
-**시간창 실패 및 본문 모순으로 인해 현 상태로는 게재 불가입니다.**  
-최근 24시간 내 공식 후속 개발이 없다면 이번 브리핑에서 제외해야 합니다.
+공식 발표가 확인되지 않으면 항목 자체를 제외하는 편이 안전합니다.
 
 ---
 
-## 3. Cloudflare Workers AI–AI Gateway 통합
+# 2. Meta ‘Muse Glimmer’ 항목
 
-### 시간창 및 ongoing-story 예외
+### 판정: 중대한 검증 실패
 
-항목 2와 동일하게 **ongoing-story 예외가 성립하지 않습니다.**
+### 핵심 검증 공백
 
-- 원 사건은 **2026-08-07**
-- “8월 8일 상세 문서 공개”만 제시됨
-- 기준 시각의 최근 24시간은 **8월 9일 07:01 KST 이후**
+다음 필수 1차 자료가 제시되지 않았습니다.
 
-문서가 늦게 게시됐더라도 정확한 게시 시각이 필요하며, 문서 추가가 단순 설명 보완인지 실제 기능 출시인지도 구분해야 합니다. 현재 기사는 통합 발표 자체를 재서술하고 있으므로 예외 대상이 아닙니다.
+- Meta AI 또는 Meta Newsroom 공식 발표
+- Hugging Face의 정확한 조직명과 저장소 URL
+- 모델 카드
+- Apache 2.0 `LICENSE` 파일
+- 30B dense 구조를 확인할 구성 파일
+- DFlash 구현 저장소 또는 논문
+- RTX 5090·M5 Max 벤치마크 조건
 
-### 기능 혼합 가능성
+“open weights published on Hugging Face”라고 했지만, 정작 가장 직접적인 증거인 Hugging Face URL이 없다는 점이 치명적입니다.
 
-다음 기능이 모두 동일한 Workers AI–AI Gateway 통합 릴리스에 포함됐다고 단정하기에는 근거가 부족합니다.
+### 명칭과 수치 문제
 
-- 통합 `env.AI.run()`
-- 외부 14+ 공급자 호출
-- 통합 선불 크레딧
-- 동적 다중 공급자 라우팅
-- User Insights
-- identity-aware agent risk scoring
-- insider-risk 탐지
+다음 명칭은 모두 독립 확인이 필요합니다.
 
-Cloudflare AI Gateway의 전통적인 기능에는 로깅, 분석, 캐싱, rate limiting, retry/fallback 등이 포함될 수 있지만, **사용자·에이전트의 행동 기준선을 만들고 내부자 위험을 점수화한다는 설명은 Cloudflare One, Zero Trust 또는 별도의 AI 보안 제품군 기능과 혼합됐을 가능성**이 있습니다. 공식 릴리스에서 해당 기능이 AI Gateway에 직접 귀속됐는지 확인해야 합니다.
+- **Muse Glimmer**
+- **Muse Spark 1.2**
+- **DFlash**
+- **Gemma4-31B**
+- **Qwen3.6-27B**
 
-### API 설명의 정확성
+제품명이 실재하더라도 정확한 표기, 모델 버전, 파라미터 산정 방식, dense 여부를 모델 카드와 대조해야 합니다.
 
-`env.AI.run()`이 다음 두 경로를 모두 동일하게 호출하는지 명확히 입증해야 합니다.
+### 기술 서술의 문제
 
-1. Workers AI에서 호스팅되는 모델
-2. OpenAI·Anthropic 등 외부 공급자 API
+- 30B 모델의 4비트 가중치는 이론상 약 15GB 수준이지만, 실제 추론에는 양자화 메타데이터, KV 캐시, 비전 인코더, 런타임 버퍼가 추가됩니다. 따라서 **“active memory footprint under 20GB”**는 컨텍스트 길이와 배치 크기 없이는 의미가 불완전합니다.
+- speculative decoding은 일반적으로 **속도 향상 기법**이지 모델의 기본 가중치 메모리를 20GB 이하로 만드는 핵심 기법은 아닙니다. 메모리 절감은 주로 4비트 양자화에서 옵니다.
+- `3.1x`, `1.8x`는 기준 디코더, 프롬프트·출력 길이, acceptance rate, 소프트웨어 버전이 없으므로 재현 가능한 통계가 아닙니다.
+- 로컬 모델이라는 이유만으로 “100% on-device, zero cloud transmission”을 보장할 수 없습니다. 배포 애플리케이션이나 에이전트 도구가 네트워크 API를 호출할 수 있기 때문입니다.
+- “단일 소비자 GPU”와 “Mac”을 동일한 하드웨어 범주로 표현하면 부정확합니다. Apple Silicon은 통합 메모리 구조이며 별도 GPU VRAM 방식이 아닙니다.
+- GPT-5·Claude 4와의 표는 모델 능력, 크기, 배포 목적이 다른 제품을 단순히 “클라우드 대 로컬”로만 비교합니다.
 
-기존 의미의 `env.AI.run()`은 Workers AI binding 호출과 연결되는 경우가 많습니다. 외부 공급자는 AI Gateway의 provider-specific REST URL 또는 OpenAI-compatible endpoint를 사용할 수도 있으므로, “단일 binding으로 14+ 공급자를 직접 실행한다”는 문구는 공식 코드 예제가 없으면 과장입니다.
+### URL 판정
 
-또한 `/ai/ REST endpoints`는 지나치게 모호합니다. 정확한 endpoint 형식을 적어야 합니다.
+`https://futurumresearch.com/research-notes/meta-releases-open-weight-muse-glimmer-model/`
 
-### 결제 표현
+2차 분석기관 URL만으로 Meta의 공식 출시를 확정하면 안 됩니다. 공식 Meta 페이지와 실제 모델 저장소가 반드시 필요합니다.
 
-“unified prepaid credit billing across edge GPUs and third-party providers”에는 다음 구분이 필요합니다.
+### 시간 윈도우
 
-- Cloudflare가 외부 공급자 사용료까지 재판매·통합 청구하는지
-- 사용자가 자신의 OpenAI/Anthropic 키를 연결하고 Cloudflare 사용료만 별도 부담하는지
-- 일부 공급자만 unified billing 대상인지
+기사와 모델 저장소의 정확한 게시 시각이 없으므로 `event_within_24h_window: true`는 입증되지 않았습니다.
 
-BYOK 방식이라면 “모든 외부 API의 통합 선불 결제”라는 설명은 틀립니다.
+### 권고
 
-### 분석상 과장
+다음 자료가 모두 확인될 때만 유지하십시오.
 
-- “Mitigates vendor lock-in”은 부분적으로만 맞습니다. 오히려 Cloudflare 고유 binding·라우팅 규칙에 의존하면 **제어면 수준의 종속성**이 생깁니다.
-- “all downstream workflows … disrupted simultaneously”도 절대적입니다. 애플리케이션이 Cloudflare를 우회하는 fallback 경로를 갖고 있다면 전부 중단되는 것은 아닙니다.
+1. Meta 공식 발표 URL  
+2. Hugging Face 저장소 URL  
+3. 모델 카드와 라이선스  
+4. 벤치마크 표 또는 기술 보고서  
+5. 발표 시각과 시간대  
 
-### 판정
-
-**시간창 실패로 이번 사이클에서는 제외하는 것이 원칙입니다.**  
-추후 사용하려면 기능별 공식 문서 링크를 분리하고, AI Gateway 기능과 Cloudflare 보안 제품 기능을 구분해야 합니다.
-
----
-
-## 4. Samsung Electronics–POSTECH 3D NAND 연구
-
-### 시간창
-
-이 항목은 `slot_category: 6`이고 `event_within_7d_window: true`이므로 **시간창상 유효합니다.**
-
-- 이벤트: 2026-08-07
-- 7일 하한: 2026-08-03 07:01 KST
-
-따라서 이 항목을 24시간 초과만으로 stale 처리해서는 안 됩니다.
-
-### 연구 발표 시점 구분
-
-IEEE VLSI Symposium은 일반적으로 8월 7일 당일 열린 행사가 아닐 수 있으므로 다음 날짜를 분리해야 합니다.
-
-- 논문이 실제 발표된 학회 날짜
-- Samsung/POSTECH 보도자료 날짜
-- *Nature Electronics* Research Highlight 게시일
-
-현재의 `event_date: 2026-08-07`은 **보도자료 또는 하이라이트 날짜**로는 가능하지만, “학회 발표일”로 읽히지 않게 해야 합니다.
-
-### 기술적 과장
-
-1. **“solves”와 “eliminating channel resistance”는 부정확합니다.**
-   - 채널 저항은 완전히 제거되지 않습니다.
-   - 결정립계 저항을 줄이거나 채널 이동도·전도성을 개선한 것으로 표현해야 합니다.
-
-2. **155단 시험 구조에서 400+단 양산 가능성을 직접 입증한 것은 아닙니다.**
-   - 155-layer test vehicle 결과를 400+단으로 확장하려면 깊은 채널의 균일성, 수율, 열 예산, nickel contamination, endurance 등이 추가 검증돼야 합니다.
-   - 따라서 “enabling 400-plus layer V10 BV-NAND mass production”은 지나친 결론입니다.
-   - 적절한 표현:  
-     **“400단 이상 세대에서 예상되는 채널 저항 문제를 완화할 잠재력을 제시했다.”**
-
-3. **“process integration active for commercial V10 manufacturing lines”는 별도의 공식 근거가 필요합니다.**
-   - 학회 발표나 research highlight만으로 양산라인 통합이 진행 중이라고 판단할 수 없습니다.
-   - 파일럿, 개발라인 검증, 양산 qualification 중 어느 단계인지 명시해야 합니다.
-
-4. **단일 방향 결정 배향과 단결정은 구분해야 합니다.**
-   - 동일한 우선 배향을 가진 poly-Si라도 결정립계가 완전히 사라지는 것은 아닙니다.
-   - “uniform, single-direction silicon crystal orientation throughout”가 실제 TEM·EBSD 결과를 얼마나 정확히 반영하는지 확인해야 합니다.
-
-### AI KV 캐시와의 연결
-
-이 연구에서 다음 결론으로 바로 이어지는 것은 논리적 비약입니다.
-
-- 장문맥 KV 캐시를 NAND에 직접 저장
-- HBF chiplet 활용
-- zNAND 활용
-- 패키지 열 스로틀링 해소
-- 수 GB/s 성능 보장
-
-KV 캐시는 지연시간과 쓰기 빈도 때문에 기본적으로 HBM·DRAM이 중심이며, NAND offload는 특정 계층형 메모리 소프트웨어와 workload에서만 가능합니다. 본 연구는 **NAND 셀 채널 저항 연구**이지 KV-cache 시스템 설계 연구가 아닙니다.
-
-권장 표현:
-
-> “향후 고용량 SSD와 계층형 AI 메모리 시스템의 용량·전력 효율 개선에 간접적으로 기여할 가능성이 있다.”
-
-### 레이어 도식 문제
-
-제시된 레이어 구조는 실제 3D NAND 단면으로 보기 어렵습니다.
-
-- nickel seed layer가 전체 wordline gate stack 아래의 독립 수평 레이어인지 불명확합니다.
-- seed 위치는 공정 방식에 따라 channel plug의 특정 위치나 결정 성장 시작점일 수 있습니다.
-- peripheral CMOS가 array 아래에 있으면 이를 BV-NAND/CMOS bonding 구조와 연결해 정확히 표시해야 합니다.
-
-논문의 실제 단면도 없이 “Top to Bottom” 물리 구조로 단정하지 않는 것이 좋습니다.
-
-### 출처·URL 보완
-
-이 항목은 학술 검증을 주장하므로 다음이 반드시 필요합니다.
-
-- IEEE 논문 제목과 DOI 또는 proceedings 링크
-- 저자 전체 명단
-- *Nature Electronics* Research Highlight의 정확한 제목·URL·게시일
-- Samsung 또는 POSTECH 공식 보도자료
-- 155단 시험 구조와 400+단 목표를 각각 뒷받침하는 문장
-
-현재 Samsung Newsroom URL 하나만으로 “peer-reviewed”, “Nature Highlight”, “V10 양산 적용”을 모두 입증할 수 없습니다.
-
-### 판정
-
-**시간창은 통과하지만, 연구 성과를 상용화·AI 시스템 효과로 확대하는 문구를 대폭 낮춰야 합니다.**  
-“400+단 V10 양산을 가능하게 했다”가 아니라 “고단화 시 채널 저항 완화 가능성을 실험적으로 제시했다”가 적절합니다.
+그 전에는 “공식 출시”가 아니라 **“2차 매체가 보도한 미확인 모델”**로 분류해야 합니다.
 
 ---
 
-# Executive Summary 수정 필요 사항
+# 3. Archer가 Wisk·Insitu·SkyGrid를 인수한다는 항목
 
-다음 문구는 삭제 또는 수정해야 합니다.
+### 판정: URL 및 거래 사실 검증 실패
 
-- **“all four items represent verified developments occurring within valid time windows”**  
-  → 항목 1은 시각 미확인, 항목 2·3은 시간창 실패입니다.
+### URL의 명백한 이상
 
-- **“NOOA … halving token footprint”**  
-  → 동일 조건 comparator와 토큰 단위 확인 전에는 “reported”로 한정해야 합니다.
+제시된 주소:
 
-- **“Managed Deep Agents … Public Beta”**  
-  → 최근 24시간의 공식 후속 개발이 없으면 이번 브리핑에서 제외합니다.
+`https://www.prnewswire.com/news-releases/archer-to-shape-physical-ai-future-of-aerospace-and-defense-with-acquisition-of-boeings-wisk-aero-insitu-and-skygrid-subsidiaries-302218888.html`
 
-- **“Cloudflare … identity-aware agent risk scoring”**  
-  → 제품 기능 혼합 여부를 검증한 뒤 유지해야 합니다.
+PR Newswire의 숫자 식별자 `302218888`은 **2026년 보도자료에 기대되는 번호대와 맞지 않을 가능성이 매우 높으며**, 2024년경 발행물에 대응할 수 있는 번호 형태입니다. PR Newswire에서는 슬러그보다 끝의 고유 번호가 문서를 식별하므로, 이 ID가 다른 과거 보도자료에 속한다면 해당 URL은 잘못 조합된 것입니다.
 
-- **“enabling 400-plus layer V10 BV-NAND mass production”**  
-  → “potentially applicable to future 400-plus-layer NAND” 수준으로 낮춰야 합니다.
+따라서 다음을 직접 확인해야 합니다.
+
+- URL이 실제로 해당 제목의 보도자료를 여는지
+- 페이지의 발행 연도·시각이 2026년인지
+- Archer IR과 Boeing MediaRoom에 동일 발표가 있는지
+
+### 대형 거래인데 필수 자료가 없음
+
+Wisk, Insitu, SkyGrid를 한꺼번에 넘기는 거래는 Boeing과 Archer 모두에 중대한 거래입니다. 그런데 다음 자료가 없습니다.
+
+- Archer Investor Relations 공식 발표
+- Boeing 공식 발표
+- 거래 금액과 결제 구조
+- 예상 종결 시점
+- 규제 승인 조건
+- Archer의 SEC 8-K
+- Boeing의 관련 공시
+- 각 법인의 정확한 매도 주체와 지분 구조
+
+“definitive agreements signed”라고 확정하려면 최소한 공식 계약 발표나 8-K가 있어야 합니다.
+
+### 통계 해석 오류 가능성
+
+- `2 million cumulative flight hours`가 있다 해도 이를 곧바로 **“ZEE 학습 데이터셋에 기여한 비행시간”**이라고 쓸 수 없습니다. 운항시간과 학습에 사용 가능한 정제·권리 확보 데이터는 다릅니다.
+- `200M+ revenue`가 전체 매출인지, 방산 매출인지, 연간 매출인지 표현이 일관되지 않습니다. Overview는 “annual revenue”, Technical Deep Dive는 “annual defense revenue”라고 서로 다르게 적었습니다.
+- SkyGrid는 항공교통·공역 플랫폼이므로 Wisk·Insitu와 같은 의미의 비행시간을 “combined flight hours”에 단순 합산하는 것도 확인이 필요합니다.
+- Boeing의 지분 취득과 “strategic partnership active”는 거래 종결 전후를 구분해야 합니다.
+
+### ZEE 관련 과장
+
+ZEE가 실제 발표된 플랫폼이더라도, 초안은 이를 다음 역할까지 수행하는 것으로 단정합니다.
+
+- 실시간 비행 안전 제어
+- 센서 융합
+- adaptive trajectory planning
+- autonomous airspace deconfliction
+- 항공기 flight-control backbone
+
+마케팅상의 “foundation model”과 안전 핵심 비행제어기가 동일하다는 근거는 없습니다. FAA 인증 환경에서는 생성형 또는 비결정적 모델이 직접 flight control을 담당하는지, advisory layer인지, 데이터 분석 모델인지 구분해야 합니다.
+
+또한 “수학적으로 신경망 출력의 무오류를 증명해야 한다”는 표현은 지나치게 절대적입니다. 실제 인증은 시스템 안전성, 개발보증, 검증 범위, 런타임 보증, 기능 분리 등을 종합적으로 다룹니다.
+
+### 시간 윈도우
+
+공식 발표의 시·분과 시간대가 없으므로 24시간 이내 여부를 판정할 수 없습니다.
+
+### 권고
+
+PR Newswire URL을 고치는 것만으로는 부족합니다. 다음 중 최소 2개가 필요합니다.
+
+- Archer IR 원문
+- Boeing 원문
+- SEC 8-K 또는 거래 관련 공시
+- 정확한 PR Newswire/Business Wire 원문
+
+확인 전에는 본 항목을 삭제하는 것이 타당합니다.
 
 ---
 
-# 메타데이터 권장 수정
+# 4. Texas A&M·KIMM·UST의 4H-SiC 연구
 
-```yaml
-item_1:
-  event_within_24h_window: unverified
-  required_field: event_timestamp_utc
+### 판정: 조건부 유지 가능, 다수 표현 수정 필요
 
-item_2:
-  event_within_24h_window: false
-  ongoing_story_exception: false  # 신규 공식 개발이 확인되지 않는 경우
+### 시간 윈도우
 
-item_3:
-  event_within_24h_window: false
-  ongoing_story_exception: false  # 신규 공식 개발이 확인되지 않는 경우
+이 항목은 `slot_category: 6`이므로 24시간이 아니라 **7일 예외**가 적용됩니다. arXiv 식별자 `2608.03814`는 2026년 8월 초 제출물 형식이므로, 최초 제출일이 8월 4일 이후라면 유효합니다.
 
-item_4:
-  event_within_7d_window: true
-  commercialization_status: research_only
-```
+따라서 이 항목을 24시간보다 오래됐다는 이유만으로 제외해서는 안 됩니다. 다만 다음 날짜는 구분해야 합니다.
 
-## 최종 결론
+- arXiv 최초 제출일
+- 최신 버전 수정일
+- Semiconductor Engineering 기사 게시일
+- 저널 온라인 게재일이 있다면 그 날짜
 
-- **통과 가능:** 항목 4 — 단, 상용화 및 AI KV-cache 연계 과장을 수정해야 함
-- **조건부 보류:** 항목 1 — 정확한 UTC 릴리스 시각과 벤치마크 원자료 필요
-- **이번 브리핑에서 제외 권고:** 항목 2, 3 — ongoing-story 예외를 뒷받침하는 최근 24시간 내 실질적 신규 개발이 없음
+`2026-08-10에 논문을 출판했다`는 표현은 arXiv 제출일과 기사 게시일을 혼동했을 수 있습니다.
 
-따라서 현재 초안은 **시간 검증을 통과한 4개 뉴스가 아니라, 1개 유효 연구 항목·1개 시각 미확인 항목·2개 시간창 초과 항목**으로 분류하는 것이 정확합니다.
+### 명확하게 수정해야 할 부분
+
+#### 1. “Peer-reviewed” 표시
+
+arXiv 등록 자체는 동료심사를 의미하지 않습니다. 저널명, 학회명, DOI, accepted manuscript 표기가 없다면:
+
+> `Peer-Reviewed Technical Paper Disclosure`
+
+를 다음으로 바꿔야 합니다.
+
+> `Technical Preprint / Research Disclosure`
+
+이미 심사를 통과한 논문이라면 해당 저널과 DOI를 명시해야 합니다.
+
+#### 2. `<100 μm`의 의미
+
+초안은 다음 세 개를 혼용합니다.
+
+- slicing depth precision
+- 최종 wafer/die thickness
+- 실제 달성한 thinning threshold
+
+논문이 “100 μm 미만 깊이에서 내부 변질층을 형성했다”는 결과를 냈다고 해서, 곧바로 “100 μm 미만의 완성 다이를 결함 없이 생산했다”는 뜻은 아닙니다. 실험 표의 실제 깊이, 오차, 표면거칠기, fracture 결과를 확인해야 합니다.
+
+#### 3. “defect-free” 과장
+
+레이저 stealth slicing은 의도적으로 내부 변질층과 균열 전파 경로를 형성합니다. 따라서 결함의 종류와 측정 방법 없이 **defect-free**라고 부르는 것은 부적절합니다. 다음 표현이 더 안전합니다.
+
+> “기계식 절단 대비 kerf와 표면 손상을 줄일 가능성을 제시했다.”
+
+#### 4. 상용화 단계 과장
+
+`processability map validated for commercial laser slicing equipment`는 논문이 실제 양산 장비, 처리량, 대구경 웨이퍼, 수율에서 검증했을 때만 쓸 수 있습니다. 실험실 장비에서 모델과 실험 결과를 비교했다면:
+
+> “laboratory-scale experimental validation”
+
+정도로 제한해야 합니다.
+
+### 응용 해석의 비약
+
+연구 결과에서 다음으로 바로 연결되는 부분은 전략적 추론이지 검증된 논문 결과가 아닙니다.
+
+- AI 서버용 수직 PMIC
+- 데이터센터 랙 전력밀도 증가
+- GPU용 multi-kilowatt power delivery
+- 3D 적층 SiC 전력변환기
+- 더 높은 switching frequency와 낮은 heat dissipation
+
+SiC 기판 박형화는 열저항과 패키지 기생성분 감소에 기여할 가능성이 있지만, 실제 효과는 소자 구조, backside metallization, die attach, 냉각 구조 및 패키지 신뢰성에 따라 달라집니다. 이를 **잠재적 응용**으로 명시해야 합니다.
+
+### 기계 공정 설명 보완
+
+초안은 mechanical grinding과 wafer slicing을 섞어 설명합니다.
+
+- grinding: 주로 두께 감소와 표면 평탄화
+- sawing/slicing: 웨이퍼 또는 다이 분리
+- stealth laser slicing: 내부 변질층을 형성한 뒤 분리
+
+“기계식 grinding이 severe kerf loss를 유발한다”는 표현은 부정확할 수 있습니다. Kerf loss는 통상 saw slicing과 더 직접적으로 연결됩니다.
+
+### 권장 수정 문장
+
+> 2026년 8월 초 공개된 arXiv 프리프린트 2608.03814에서 Texas A&M, KIMM 및 UST 연구진은 집속 펨토초 레이저가 4H-SiC 내부에서 보이는 Kerr 자기집속을 모델링하고, 펄스 에너지와 목표 깊이에 따른 내부 변질 영역을 예측하는 공정 지도를 제시했다. 연구는 실험실 조건에서 모델을 검증했지만, 100 μm 미만 완성 웨이퍼의 무결함 양산이나 AI 데이터센터용 3D 전력 패키지 적용을 직접 입증한 것으로 해석해서는 안 된다.
+
+---
+
+## Upcoming Tech Calendar
+
+제시된 세 행사 날짜는 공식 행사 페이지와 재확인이 필요하지만, 초안 내부에서 명백한 시간 모순은 보이지 않습니다. 다만 다음 표현은 공식 프로그램 링크가 없다면 확정하지 마십시오.
+
+- USENIX에서 “agentic AI sandbox isolation”을 중점적으로 다룬다는 주장
+- Hot Interconnects의 세부 세션 주제
+- Hot Chips의 keynote 및 세부 기술 주제
+
+행사 날짜와 “예상 관심 주제”를 분리하는 것이 좋습니다.
+
+---
+
+## 최종 편집 권고
+
+1. **1~3번은 공식 1차 URL이 확보될 때까지 발행 보류**
+2. 모든 일반 항목에 `event_timestamp`, `timezone`, `publication_timestamp` 추가
+3. 기사 게시일과 실제 사건 발생일을 분리
+4. 2차 매체를 “Official Corporate Announcement”로 표시하지 않기
+5. 모델 성능 수치에는 하드웨어, 정밀도, 컨텍스트 길이, baseline, 소프트웨어 버전 추가
+6. 거래 항목에는 거래가, 종결 조건, 공시 링크 추가
+7. 연구 항목은 arXiv와 동료심사 논문을 구분
+8. 연구 결과와 투자·데이터센터 응용 추론을 명시적으로 분리
+
+현재 상태에서 사실 기반 브리핑으로 유지할 수 있는 것은 **4번을 보수적으로 수정한 버전**이며, 1~3번은 핵심 주장과 URL이 확인되기 전까지 포함하지 않는 것이 안전합니다.
