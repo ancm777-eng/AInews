@@ -1,324 +1,420 @@
 ## 종합 판정
 
-초안은 **그대로 발행하기 어렵습니다.** 특히 1~3번은 공식 1차 출처와 제품·거래 식별자가 부족하고, 기사에서 확인될 수 있는 범위를 넘어선 세부사항을 확정 사실로 서술합니다. 4번은 실제 연구일 가능성이 높고 7일 예외에도 부합하지만, 논문 상태·성과와 AI 데이터센터 적용 효과가 과장되어 있습니다.
+**현재 상태로는 발행 부적합**입니다. 네 항목이 모두 허구라고 단정할 근거는 없지만, 다음 문제가 확인됩니다.
 
-또한 24시간 판정은 날짜만으로 할 수 없습니다.
-
-- 실제 검증 시각: **2026-08-11 07:18 KST**
-- 일반 항목의 유효 구간: **2026-08-10 07:18 ~ 2026-08-11 07:18 KST**
-- UTC: **2026-08-09 22:18 ~ 2026-08-10 22:18 UTC**
-- 6번 카테고리의 7일 구간: **2026-08-04 07:18 KST 이후**
-
-초안에 적힌 `2026-08-10`이라는 날짜만으로는 해당 사건이 07:18 KST 이후 발생했는지 알 수 없습니다. 따라서 1~3번의 `event_within_24h_window: true`는 현재 메타데이터만으로 입증되지 않습니다.
+1. **24시간 요건을 날짜만으로는 입증할 수 없습니다.**
+2. 항목 1에는 비용절감 수치의 **명시적 내부 모순**이 있습니다.
+3. 항목 2는 **200MW 확약과 1GW 목표를 혼동**합니다.
+4. 항목 3은 `open-source`와 `open-weight`를 혼용합니다.
+5. 항목 4는 회사의 법적·브랜드 명칭, 가격 단위, SpaceX 내부 사용 이력에 대한 **1차 출처가 제시되지 않았습니다**.
+6. “엄격한 1차 출처 검증”을 했다는 서문과 달리, 항목 2·4의 Primary URL은 VentureBeat 2차 보도이고 Reuters 기사 URL도 없습니다.
 
 ---
 
-## 항목별 판정
+## 1. 시간 윈도우 검증
 
-| 항목 | 판정 | 핵심 문제 |
-|---|---|---|
-| 1. OpenAI Astra | **중대한 검증 실패** | OpenAI 공식 발표·모델 페이지가 없고, “Astra” 모델명과 제로데이 실증·CoT 전수감시 등 핵심 주장을 1차 출처로 뒷받침하지 못함 |
-| 2. Meta Muse Glimmer | **중대한 검증 실패** | Meta 공식 릴리스·Hugging Face 저장소·모델 카드·벤치마크 링크가 없음. 제품명·라이선스·성능 수치 모두 독립 검증 불가 |
-| 3. Archer–Boeing 자회사 인수 | **URL 및 거래 사실 검증 실패** | PR Newswire 식별번호가 2026년 보도자료와 맞지 않을 가능성이 매우 높고, 공식 Archer/Boeing 거래 링크와 SEC 공시가 없음 |
-| 4. SiC 레이저 연구 | **조건부 유지 가능** | 7일 예외에는 부합할 수 있으나, arXiv를 곧바로 동료심사 논문으로 표시하고 `<100 μm`, “defect-free”, 상용 검증을 확정한 부분은 수정 필요 |
+검증 시각을 **2026-08-12 07:23 KST**로 적용하면 허용 범위는 다음과 같습니다.
 
----
+- **시작:** 2026-08-11 07:23 KST
+- **종료:** 2026-08-12 07:23 KST
+- UTC 환산: **2026-08-10 22:23 ~ 2026-08-11 22:23 UTC**
 
-# 1. OpenAI가 ‘Astra’를 중단했다는 항목
+초안은 모든 항목에 `2026-08-11`이라는 **날짜만** 제공하고 게시 시각과 시간대를 제공하지 않습니다. 따라서 `event_within_24h_window: true`는 네 항목 모두 엄격하게 검증되지 않았습니다.
 
-### 판정: 중대한 검증 실패
+특히:
 
-### 확인되는 부분
+- NVIDIA·IBM·VentureBeat가 미국 현지 날짜로 8월 11일을 표시했다면 대체로 윈도우 안일 가능성이 높지만, 정확한 게시 시각이 필요합니다.
+- Mistral의 발표일이 프랑스 현지 8월 11일이라면, **CEST 00:00~00:22경 발표분은 24시간 밖**일 수 있습니다.
+- “Publication Date”와 “Event Date”도 구분해야 합니다. 기사 게시가 윈도우 안이어도 실제 제품 출시나 계약 체결 시점이 그보다 오래됐다면 일반 항목으로는 부적격입니다.
 
-OpenAI Preparedness Framework에 **Critical** 위험 등급이 존재하고, 심각한 사이버 능력에 대해 배포 또는 개발 제한을 요구하는 체계 자체는 개념적으로 타당합니다. 그러나 이것이 곧 초안의 구체적 사건을 입증하지는 않습니다.
+### 필요한 메타데이터
 
-### 문제가 되는 주장
+각 항목에 다음을 추가해야 합니다.
 
-다음 핵심 사실을 확인할 수 있는 OpenAI 1차 출처가 없습니다.
+```text
+source_published_at:
+source_timezone:
+published_at_utc:
+event_timestamp:
+event_timezone:
+window_start_utc: 2026-08-10T22:23:00Z
+window_end_utc: 2026-08-11T22:23:00Z
+```
 
-- OpenAI의 차세대 모델 이름이 **Astra**라는 주장
-- 2026년 8월 10일 공식적으로 출시를 중단했다는 주장
-- 실제 hardened critical target에 대해 제로데이를 독립적으로 발견·작성·실행했다는 주장
-- “internal unisolated training activities”까지 중단했다는 주장
-- 전 Chain-of-Thought를 실시간으로 감시한다는 주장
-- 정부 AI 안전기관의 외부 감사가 의무화됐다는 주장
-
-특히 **Astra는 오랫동안 Google의 Project Astra에 사용된 명칭**이므로, OpenAI 모델명으로 사용할 경우에는 반드시 OpenAI 공식 발표로 식별해야 합니다. 단순히 이름이 겹친다는 이유만으로 허위라고 단정할 수는 없지만, 현 상태에서는 회사·제품 귀속 혼동 가능성이 큽니다.
-
-### 논리·기술적 문제
-
-- Preparedness Framework의 “Critical” 정의와 특정 내부 평가 결과를 동일시했습니다. 프레임워크의 예시 능력과 실제 모델이 그 능력을 입증했다는 것은 별개입니다.
-- “Critical이므로 universal real-time CoT monitoring을 실시했다”는 인과관계가 성립하지 않습니다. CoT 원문은 모델 내부 상태를 완전하게 관찰하는 수단이 아니며, OpenAI가 모든 추론 토큰을 실시간 감독한다고 공개했다는 근거도 없습니다.
-- “상용 프런티어 모델이 사이버 능력 때문에 중단된 최초 사례”는 전 세계 선행사례 검토가 필요한 **최초성 주장**입니다.
-- “prior model pauses were triggered by hallucinations, bias, or biosecurity”도 구체적 사례와 출처가 없습니다.
-
-### URL 판정
-
-제시된 Inc. URL은 2차 매체 기사입니다.
-
-`https://www.inc.com/kevin-haynes/openais-newest-model-triggers-a-critical-warning.html`
-
-이 기사가 존재하더라도 다음을 대신할 수 없습니다.
-
-- OpenAI 공식 발표
-- Preparedness Framework 평가 보고서 또는 safeguards report
-- 모델 시스템 카드
-- 실제 모델명과 배포 상태
-
-TechCrunch, The Hacker News, Buttondown은 출처란에만 적혀 있고 개별 URL이 없습니다.
-
-### 시간 윈도우
-
-`2026-08-10`만 적혀 있으므로 24시간 이내 여부를 판정할 수 없습니다. 최소한 기사 게시 시각과 OpenAI 발표 시각, 해당 시각대가 필요합니다.
-
-### 권고
-
-공식 OpenAI URL이 없으면 다음처럼 축소해야 합니다.
-
-> “Inc.가 OpenAI의 한 내부 사이버 평가와 관련된 우려를 보도했다. 다만 모델명, Critical 등급 확정 여부, 출시 중단 범위와 구체적인 보호조치는 OpenAI 1차 문서에서 확인이 필요하다.”
-
-공식 발표가 확인되지 않으면 항목 자체를 제외하는 편이 안전합니다.
+이번 네 항목은 모두 `slot_category: 1-5`, `ongoing_story_exception: false`이므로 7일 연구 예외나 ongoing-story 예외를 적용할 수 없습니다.
 
 ---
 
-# 2. Meta ‘Muse Glimmer’ 항목
+# 항목별 검증
 
-### 판정: 중대한 검증 실패
+## 2. NVIDIA Nemotron 3.5 Lightning / NeMo Switchyard
 
-### 핵심 검증 공백
+### 판정: **수정 필요 — 내부 수치 모순 및 하드웨어 표현 과장**
 
-다음 필수 1차 자료가 제시되지 않았습니다.
+회사명과 제품명은 초안 내에서는 일관되며, NVIDIA 블로그 형식의 1차 URL도 제시되었습니다. 다만 아래 오류는 명확합니다.
 
-- Meta AI 또는 Meta Newsroom 공식 발표
-- Hugging Face의 정확한 조직명과 저장소 URL
-- 모델 카드
-- Apache 2.0 `LICENSE` 파일
-- 30B dense 구조를 확인할 구성 파일
-- DFlash 구현 저장소 또는 논문
-- RTX 5090·M5 Max 벤치마크 조건
+### A. 비용절감 수치가 서로 모순됨
 
-“open weights published on Hugging Face”라고 했지만, 정작 가장 직접적인 증거인 Hugging Face URL이 없다는 점이 치명적입니다.
+초안은 동시에 다음을 주장합니다.
 
-### 명칭과 수치 문제
+- 비용이 “roughly one-third” → 약 **67% 절감**
+- Ramp: **58% 절감**
+- LangChain: **74% 절감**
+- 비교표: “up to 58% savings”
+- 비교분석: “up to 66%”
 
-다음 명칭은 모두 독립 확인이 필요합니다.
+`up to`는 제시된 사례 중 최대치를 의미하므로, 같은 문서에서 74% 사례를 제시하면서 “up to 58%”라고 쓰는 것은 명백한 오류입니다.
 
-- **Muse Glimmer**
-- **Muse Spark 1.2**
-- **DFlash**
-- **Gemma4-31B**
-- **Qwen3.6-27B**
+#### 권장 수정
 
-제품명이 실재하더라도 정확한 표기, 모델 버전, 파라미터 산정 방식, dense 여부를 모델 카드와 대조해야 합니다.
+벤치마크별로 분리하십시오.
 
-### 기술 서술의 문제
+> NeMo Switchyard reportedly reduced cost by 58% in the cited Ramp SWE-Bench configuration and by 74% in the cited LangChain multi-turn configuration. These results are workload-specific; they should not be summarized as a universal one-third cost level.
 
-- 30B 모델의 4비트 가중치는 이론상 약 15GB 수준이지만, 실제 추론에는 양자화 메타데이터, KV 캐시, 비전 인코더, 런타임 버퍼가 추가됩니다. 따라서 **“active memory footprint under 20GB”**는 컨텍스트 길이와 배치 크기 없이는 의미가 불완전합니다.
-- speculative decoding은 일반적으로 **속도 향상 기법**이지 모델의 기본 가중치 메모리를 20GB 이하로 만드는 핵심 기법은 아닙니다. 메모리 절감은 주로 4비트 양자화에서 옵니다.
-- `3.1x`, `1.8x`는 기준 디코더, 프롬프트·출력 길이, acceptance rate, 소프트웨어 버전이 없으므로 재현 가능한 통계가 아닙니다.
-- 로컬 모델이라는 이유만으로 “100% on-device, zero cloud transmission”을 보장할 수 없습니다. 배포 애플리케이션이나 에이전트 도구가 네트워크 API를 호출할 수 있기 때문입니다.
-- “단일 소비자 GPU”와 “Mac”을 동일한 하드웨어 범주로 표현하면 부정확합니다. Apple Silicon은 통합 메모리 구조이며 별도 GPU VRAM 방식이 아닙니다.
-- GPT-5·Claude 4와의 표는 모델 능력, 크기, 배포 목적이 다른 제품을 단순히 “클라우드 대 로컬”로만 비교합니다.
+“대략 3분의 1 비용”은 해당 결과를 낸 특정 벤치마크와 비교 대상 모델을 명시할 때만 유지해야 합니다.
 
-### URL 판정
+### B. 30B MoE의 Jetson 실행 주장은 조건이 빠짐
 
-`https://futurumresearch.com/research-notes/meta-releases-open-weight-muse-glimmer-model/`
+“3B active parameters”는 연산 시 활성화되는 파라미터 수이지, 전체 모델의 가중치 저장 공간이 3B 모델 수준이라는 뜻은 아닙니다. 30B 모델은 양자화를 해도 전체 가중치의 메모리 적재 또는 계층별 스트리밍 문제가 남습니다.
 
-2차 분석기관 URL만으로 Meta의 공식 출시를 확정하면 안 됩니다. 공식 Meta 페이지와 실제 모델 저장소가 반드시 필요합니다.
+따라서 다음 표현은 지나치게 포괄적입니다.
 
-### 시간 윈도우
+> Pinned to run locally on RTX PCs, DGX Spark, and Jetson devices
 
-기사와 모델 저장소의 정확한 게시 시각이 없으므로 `event_within_24h_window: true`는 입증되지 않았습니다.
+반드시 다음을 특정해야 합니다.
 
-### 권고
+- 지원 Jetson 모델
+- 메모리 용량
+- 양자화 정밀도
+- 컨텍스트 길이
+- CPU/NVMe 오프로딩 여부
+- NVIDIA가 공식적으로 검증한 구성인지 여부
 
-다음 자료가 모두 확인될 때만 유지하십시오.
+단순히 3B가 활성화된다는 이유만으로 일반적인 Jetson에서 원활히 실행된다고 추론하면 안 됩니다.
 
-1. Meta 공식 발표 URL  
-2. Hugging Face 저장소 URL  
-3. 모델 카드와 라이선스  
-4. 벤치마크 표 또는 기술 보고서  
-5. 발표 시각과 시간대  
+### C. 성능 비교 기준이 불명확함
 
-그 전에는 “공식 출시”가 아니라 **“2차 매체가 보도한 미확인 모델”**로 분류해야 합니다.
+“4x faster output throughput”과 “30% faster task completion”은 서로 다른 지표입니다. 각각 다음이 필요합니다.
 
----
+- 비교 모델의 정확한 이름과 버전
+- GPU 및 GPU 수
+- 입력·출력 토큰 길이
+- 배치 크기
+- 양자화 정밀도
+- TTFT인지 output tokens/sec인지
+- agent completion time 측정 방식
 
-# 3. Archer가 Wisk·Insitu·SkyGrid를 인수한다는 항목
+특히 **Qwen3.6-35B**라는 정확한 모델명을 원문과 모델 카드에서 재확인해야 합니다. 이름이 한 글자라도 다르면 비교 전체가 잘못됩니다.
 
-### 판정: URL 및 거래 사실 검증 실패
+### D. OpenRouter를 “open weights available” 채널로 묶으면 부정확
 
-### URL의 명백한 이상
+OpenRouter는 일반적으로 모델 가중치 저장소라기보다 모델 API 라우팅·제공 플랫폼입니다. 다음처럼 분리하는 편이 정확합니다.
 
-제시된 주소:
+- Hugging Face / ModelScope: weights 또는 model artifacts
+- NVIDIA Build: NIM/API 접근
+- OpenRouter: hosted API endpoint 또는 provider routing
 
-`https://www.prnewswire.com/news-releases/archer-to-shape-physical-ai-future-of-aerospace-and-defense-with-acquisition-of-boeings-wisk-aero-insitu-and-skygrid-subsidiaries-302218888.html`
+### E. Reuters의 “1조 파라미터 Nemotron 4” 주장
 
-PR Newswire의 숫자 식별자 `302218888`은 **2026년 보도자료에 기대되는 번호대와 맞지 않을 가능성이 매우 높으며**, 2024년경 발행물에 대응할 수 있는 번호 형태입니다. PR Newswire에서는 슬러그보다 끝의 고유 번호가 문서를 식별하므로, 이 ID가 다른 과거 보도자료에 속한다면 해당 URL은 잘못 조합된 것입니다.
+이 내용은 NVIDIA 발표와 별개의 비공개 개발 보도입니다. Reuters URL, 기사 제목, 게시 시각, 익명 소식통 여부가 필요합니다. 공식 출시 항목에 섞지 말고 다음처럼 표시해야 합니다.
 
-따라서 다음을 직접 확인해야 합니다.
+> Separately, Reuters reported—citing [source characterization]—that NVIDIA is developing…
 
-- URL이 실제로 해당 제목의 보도자료를 여는지
-- 페이지의 발행 연도·시각이 2026년인지
-- Archer IR과 Boeing MediaRoom에 동일 발표가 있는지
+### URL·출처 평가
 
-### 대형 거래인데 필수 자료가 없음
-
-Wisk, Insitu, SkyGrid를 한꺼번에 넘기는 거래는 Boeing과 Archer 모두에 중대한 거래입니다. 그런데 다음 자료가 없습니다.
-
-- Archer Investor Relations 공식 발표
-- Boeing 공식 발표
-- 거래 금액과 결제 구조
-- 예상 종결 시점
-- 규제 승인 조건
-- Archer의 SEC 8-K
-- Boeing의 관련 공시
-- 각 법인의 정확한 매도 주체와 지분 구조
-
-“definitive agreements signed”라고 확정하려면 최소한 공식 계약 발표나 8-K가 있어야 합니다.
-
-### 통계 해석 오류 가능성
-
-- `2 million cumulative flight hours`가 있다 해도 이를 곧바로 **“ZEE 학습 데이터셋에 기여한 비행시간”**이라고 쓸 수 없습니다. 운항시간과 학습에 사용 가능한 정제·권리 확보 데이터는 다릅니다.
-- `200M+ revenue`가 전체 매출인지, 방산 매출인지, 연간 매출인지 표현이 일관되지 않습니다. Overview는 “annual revenue”, Technical Deep Dive는 “annual defense revenue”라고 서로 다르게 적었습니다.
-- SkyGrid는 항공교통·공역 플랫폼이므로 Wisk·Insitu와 같은 의미의 비행시간을 “combined flight hours”에 단순 합산하는 것도 확인이 필요합니다.
-- Boeing의 지분 취득과 “strategic partnership active”는 거래 종결 전후를 구분해야 합니다.
-
-### ZEE 관련 과장
-
-ZEE가 실제 발표된 플랫폼이더라도, 초안은 이를 다음 역할까지 수행하는 것으로 단정합니다.
-
-- 실시간 비행 안전 제어
-- 센서 융합
-- adaptive trajectory planning
-- autonomous airspace deconfliction
-- 항공기 flight-control backbone
-
-마케팅상의 “foundation model”과 안전 핵심 비행제어기가 동일하다는 근거는 없습니다. FAA 인증 환경에서는 생성형 또는 비결정적 모델이 직접 flight control을 담당하는지, advisory layer인지, 데이터 분석 모델인지 구분해야 합니다.
-
-또한 “수학적으로 신경망 출력의 무오류를 증명해야 한다”는 표현은 지나치게 절대적입니다. 실제 인증은 시스템 안전성, 개발보증, 검증 범위, 런타임 보증, 기능 분리 등을 종합적으로 다룹니다.
-
-### 시간 윈도우
-
-공식 발표의 시·분과 시간대가 없으므로 24시간 이내 여부를 판정할 수 없습니다.
-
-### 권고
-
-PR Newswire URL을 고치는 것만으로는 부족합니다. 다음 중 최소 2개가 필요합니다.
-
-- Archer IR 원문
-- Boeing 원문
-- SEC 8-K 또는 거래 관련 공시
-- 정확한 PR Newswire/Business Wire 원문
-
-확인 전에는 본 항목을 삭제하는 것이 타당합니다.
+- NVIDIA 블로그 URL: 1차 출처 형식
+- VentureBeat·Reuters·Futurum: 실제 기사 URL이 없어 수치별 교차검증 불가
+- “Source”를 묶어서 쓰지 말고 주장마다 URL을 매핑해야 함
 
 ---
 
-# 4. Texas A&M·KIMM·UST의 4H-SiC 연구
+## 3. Mistral AI 1GW 유럽 인프라
 
-### 판정: 조건부 유지 가능, 다수 표현 수정 필요
+### 판정: **중요한 사실 왜곡 수정 필요**
 
-### 시간 윈도우
+핵심 문제는 **확약된 용량과 장기 목표의 혼동**입니다.
 
-이 항목은 `slot_category: 6`이므로 24시간이 아니라 **7일 예외**가 적용됩니다. arXiv 식별자 `2608.03814`는 2026년 8월 초 제출물 형식이므로, 최초 제출일이 8월 4일 이후라면 유효합니다.
+### A. 200MW와 1GW를 동일한 확약으로 서술함
 
-따라서 이 항목을 24시간보다 오래됐다는 이유만으로 제외해서는 안 됩니다. 다만 다음 날짜는 구분해야 합니다.
+Overview에서는 다음과 같이 비교적 신중하게 구분합니다.
 
-- arXiv 최초 제출일
-- 최신 버전 수정일
-- Semiconductor Engineering 기사 게시일
-- 저널 온라인 게재일이 있다면 그 날짜
+- 2027년까지 **200MW를 underwrite**
+- 2030년까지 **1GW로 확장하는 roadmap**
 
-`2026-08-10에 논문을 출판했다`는 표현은 arXiv 제출일과 기사 게시일을 혼동했을 수 있습니다.
+하지만 이후에는 다음과 같이 바뀝니다.
 
-### 명확하게 수정해야 할 부분
+- “coalition that locks in 1 GW of compute demand”
+- “backed by dedicated 1 GW capacity commitments”
+- “underwriting 1 Gigawatt”
 
-#### 1. “Peer-reviewed” 표시
+이는 초안 자체의 설명과 모순됩니다. **200MW 확약 + 1GW 목표**는 **1GW 확약**과 같지 않습니다.
 
-arXiv 등록 자체는 동료심사를 의미하지 않습니다. 저널명, 학회명, DOI, accepted manuscript 표기가 없다면:
+#### 권장 수정
 
-> `Peer-Reviewed Technical Paper Disclosure`
+> The coalition reportedly underwrites 200MW through 2027. Mistral’s 1GW figure is a 2030 expansion target, not a presently contracted or fully financed capacity commitment, unless the primary announcement explicitly states otherwise.
 
-를 다음으로 바꿔야 합니다.
+Background Stats도 다음처럼 바꿔야 합니다.
 
-> `Technical Preprint / Research Disclosure`
+- `stat: 200 MW`
+- `context: Reported capacity underwritten through 2027`
+- 별도:
+- `stat: 1 GW`
+- `context: Targeted European compute scale by 2030`
 
-이미 심사를 통과한 논문이라면 해당 저널과 DOI를 명시해야 합니다.
+### B. 전력 용량과 “compute demand”를 구분해야 함
 
-#### 2. `<100 μm`의 의미
+MW/GW는 일반적으로 데이터센터의 전력 또는 IT 부하 용량을 나타냅니다. 다음은 서로 다른 개념입니다.
 
-초안은 다음 세 개를 혼용합니다.
+- 확보된 계통 전력
+- 계획된 데이터센터 부지 용량
+- 실제 설치된 GPU IT load
+- 고객이 계약한 수요
+- 현재 가동 중인 추론 용량
 
-- slicing depth precision
-- 최종 wafer/die thickness
-- 실제 달성한 thinning threshold
+초안은 이들을 모두 “compute”, “demand”, “capacity commitment”로 혼용합니다. 원문이 어느 지표를 말하는지 명시해야 합니다.
 
-논문이 “100 μm 미만 깊이에서 내부 변질층을 형성했다”는 결과를 냈다고 해서, 곧바로 “100 μm 미만의 완성 다이를 결함 없이 생산했다”는 뜻은 아닙니다. 실험 표의 실제 깊이, 오차, 표면거칠기, fracture 결과를 확인해야 합니다.
+### C. Regional Endpoint가 곧 “strict data isolation”인지는 별도 확인 필요
 
-#### 3. “defect-free” 과장
+EU endpoint 선택이 다음을 모두 보장하는 것은 아닙니다.
 
-레이저 stealth slicing은 의도적으로 내부 변질층과 균열 전파 경로를 형성합니다. 따라서 결함의 종류와 측정 방법 없이 **defect-free**라고 부르는 것은 부적절합니다. 다음 표현이 더 안전합니다.
+- prompt와 output의 EU 내 처리
+- 로그와 telemetry의 EU 내 저장
+- 백업·재해복구 데이터의 EU 잔류
+- 지원 인력의 접근 지역 제한
+- 학습에 사용하지 않는다는 보장
+- 미국 모회사 또는 미국 법률 노출 배제
 
-> “기계식 절단 대비 kerf와 표면 손상을 줄일 가능성을 제시했다.”
+따라서 “without cross-border data leakage”는 지나치게 단정적입니다. Mistral의 데이터 처리 부속서와 SLA에 근거해 범위를 제한해야 합니다.
 
-#### 4. 상용화 단계 과장
+### D. “기업 연합이 1GW 수요를 잠갔다”는 전략 결론도 삭제 필요
 
-`processability map validated for commercial laser slicing equipment`는 논문이 실제 양산 장비, 처리량, 대구경 웨이퍼, 수율에서 검증했을 때만 쓸 수 있습니다. 실험실 장비에서 모델과 실험 결과를 비교했다면:
+이 문장은 위 수치 오류에서 파생된 분석입니다. 현재 확인 가능한 서술대로라면:
 
-> “laboratory-scale experimental validation”
+> 200MW 규모의 초기 수요 또는 용량 확약을 발판으로 1GW 장기 목표를 추진한다.
 
-정도로 제한해야 합니다.
+정도가 적절합니다.
 
-### 응용 해석의 비약
+### URL·출처 평가
 
-연구 결과에서 다음으로 바로 연결되는 부분은 전략적 추론이지 검증된 논문 결과가 아닙니다.
+Primary URL이 VentureBeat이므로 서문에서 주장한 **1차 출처 검증**을 충족하지 않습니다. 다음이 별도로 필요합니다.
 
-- AI 서버용 수직 PMIC
-- 데이터센터 랙 전력밀도 증가
-- GPU용 multi-kilowatt power delivery
-- 3D 적층 SiC 전력변환기
-- 더 높은 switching frequency와 낮은 heat dissipation
-
-SiC 기판 박형화는 열저항과 패키지 기생성분 감소에 기여할 가능성이 있지만, 실제 효과는 소자 구조, backside metallization, die attach, 냉각 구조 및 패키지 신뢰성에 따라 달라집니다. 이를 **잠재적 응용**으로 명시해야 합니다.
-
-### 기계 공정 설명 보완
-
-초안은 mechanical grinding과 wafer slicing을 섞어 설명합니다.
-
-- grinding: 주로 두께 감소와 표면 평탄화
-- sawing/slicing: 웨이퍼 또는 다이 분리
-- stealth laser slicing: 내부 변질층을 형성한 뒤 분리
-
-“기계식 grinding이 severe kerf loss를 유발한다”는 표현은 부정확할 수 있습니다. Kerf loss는 통상 saw slicing과 더 직접적으로 연결됩니다.
-
-### 권장 수정 문장
-
-> 2026년 8월 초 공개된 arXiv 프리프린트 2608.03814에서 Texas A&M, KIMM 및 UST 연구진은 집속 펨토초 레이저가 4H-SiC 내부에서 보이는 Kerr 자기집속을 모델링하고, 펄스 에너지와 목표 깊이에 따른 내부 변질 영역을 예측하는 공정 지도를 제시했다. 연구는 실험실 조건에서 모델을 검증했지만, 100 μm 미만 완성 웨이퍼의 무결함 양산이나 AI 데이터센터용 3D 전력 패키지 적용을 직접 입증한 것으로 해석해서는 안 된다.
+- Mistral 공식 발표 URL
+- Regional Endpoints 문서
+- Priority Tier 및 SLA 문서
+- 200MW와 1GW 수치가 기재된 공식 자료
+- GLM-5.2 지원 모델 목록
 
 ---
 
-## Upcoming Tech Calendar
+## 4. IBM–Together AI 2억4천만 달러 계약
 
-제시된 세 행사 날짜는 공식 행사 페이지와 재확인이 필요하지만, 초안 내부에서 명백한 시간 모순은 보이지 않습니다. 다만 다음 표현은 공식 프로그램 링크가 없다면 확정하지 마십시오.
+### 판정: **핵심 사건은 구조상 일관적이나 용어와 수치 출처 보완 필요**
 
-- USENIX에서 “agentic AI sandbox isolation”을 중점적으로 다룬다는 주장
-- Hot Interconnects의 세부 세션 주제
-- Hot Chips의 keynote 및 세부 기술 주제
+IBM Newsroom의 1차 URL이 제시되어 있다는 점은 긍정적입니다. 다만 URL의 실제 응답 여부와 본문은 별도 확인해야 합니다.
 
-행사 날짜와 “예상 관심 주제”를 분리하는 것이 좋습니다.
+### A. `open-source model` 대신 `open-weight model`이 안전함
+
+초안이 예로 든 Llama, DeepSeek, Qwen, Kimi 계열은 버전별 라이선스가 다르며, 모두가 OSI 의미의 오픈소스라고 단정할 수 없습니다.
+
+다음 표현을 일괄 수정하는 것이 좋습니다.
+
+- `open-source AI inference` → 원문 공식 명칭을 인용할 때만 유지
+- 본문 분석: `open-weight model inference`
+- `open-source models such as…` → `open or openly distributed model families such as…`
+
+특히 “open-source”는 가중치 접근 가능성만으로 충족되지 않습니다.
+
+### B. “IBM Cloud 최초”와 “세계 최초”를 혼동하지 않아야 함
+
+현재 Overview는 “inside IBM Cloud”라는 범위를 포함하지만, 제목이나 요약만 읽으면 세계 최초처럼 해석될 수 있습니다.
+
+권장 문구:
+
+> IBM Cloud’s first dedicated large-scale cluster of this type, according to IBM.
+
+### C. HGX B300의 정확한 시스템 명칭 필요
+
+`NVIDIA HGX B300 systems`가 공식 발표의 정확한 명칭인지 확인해야 합니다. 실제 구성에 따라 다음 정보가 필요합니다.
+
+- HGX B300 또는 HGX B300 NVL16
+- GPU 수와 GPU당 메모리
+- 랙 수 또는 총 GPU 수
+- Spectrum-X 스위치 및 NIC 구성
+- 네트워크 대역폭
+- 학습과 추론 중 어느 워크로드에 최적화됐는지
+
+현재 초안은 제품군만으로 “표준 하드웨어 아키텍처”가 검증됐다고 확대 해석합니다. 단일 계약은 채택 사례이지 업계 표준 확립의 증거는 아닙니다.
+
+### D. 400조 토큰/월 수치는 분모가 필요함
+
+매우 큰 운영 지표이므로 다음을 확인해야 합니다.
+
+- 입력+출력 토큰 합계인지
+- 캐시된 토큰 포함 여부
+- API 전체인지 특정 서비스인지
+- 현재 월간 run rate인지 누적 수치인지
+- “1M developers”가 가입자 수인지 활성 개발자인지
+
+초안의 “across its 1 million developer user base”는 두 독립 지표를 직접 결합한 표현일 수 있습니다. 원문이 실제로 연결하지 않았다면 다음처럼 분리해야 합니다.
+
+> Together AI reports more than 1 million developers and separately reports processing approximately 400 trillion tokens per month.
+
+### E. 자금조달 정보는 날짜를 붙여야 함
+
+“recently raised an $800 million Series C”는 상대적 표현입니다. 라운드 발표일, 투자자, valuation이 pre-money인지 post-money인지 출처를 붙여야 합니다. 핵심 계약과 직접 관련이 없다면 Background로 이동하는 편이 낫습니다.
+
+### URL·출처 평가
+
+- IBM Newsroom: 적절한 1차 출처 형식
+- PR Newswire: 보도자료 재배포일 가능성이 있어 독립 교차검증 출처가 아님
+- Reuters: URL·기사 제목·게시 시각 누락
+
+PR Newswire와 IBM 보도자료를 두 개의 독립 출처로 계산해서는 안 됩니다.
 
 ---
 
-## 최종 편집 권고
+## 5. SpaceXAI ‘Grok Bot’
 
-1. **1~3번은 공식 1차 URL이 확보될 때까지 발행 보류**
-2. 모든 일반 항목에 `event_timestamp`, `timezone`, `publication_timestamp` 추가
-3. 기사 게시일과 실제 사건 발생일을 분리
-4. 2차 매체를 “Official Corporate Announcement”로 표시하지 않기
-5. 모델 성능 수치에는 하드웨어, 정밀도, 컨텍스트 길이, baseline, 소프트웨어 버전 추가
-6. 거래 항목에는 거래가, 종결 조건, 공시 링크 추가
-7. 연구 항목은 arXiv와 동료심사 논문을 구분
-8. 연구 결과와 투자·데이터센터 응용 추론을 명시적으로 분리
+### 판정: **검증 취약 — 회사명·가격 단위·내부 개발 이력에 1차 출처 필요**
 
-현재 상태에서 사실 기반 브리핑으로 유지할 수 있는 것은 **4번을 보수적으로 수정한 버전**이며, 1~3번은 핵심 주장과 URL이 확인되기 전까지 포함하지 않는 것이 안전합니다.
+이 항목은 네 항목 중 출처 구조가 가장 약합니다. Primary URL은 VentureBeat 기사이고, 별도로 기재한 “SpaceXAI Announcement” URL이 없습니다.
+
+### A. 회사의 정확한 명칭과 법적 관계를 확인해야 함
+
+다음 표현은 공식 자료가 없으면 단정할 수 없습니다.
+
+> SpaceXAI—the artificial intelligence division of SpaceX (formerly xAI)
+
+확인해야 할 사항:
+
+- 공식 브랜드가 `SpaceXAI`, `SpaceX AI`, `xAI` 중 무엇인지
+- xAI가 소멸·개명된 것인지, SpaceX 산하 자회사로 존속하는지
+- 제품 판매 주체와 이용약관상 계약 법인
+- Grok 상표와 서비스 운영 주체
+
+인수 또는 합병이 있었다고 해서 자동으로 “formerly xAI”가 되는 것은 아닙니다.
+
+### B. `$120/month`와 `$120/month per bot`는 다른 주장
+
+VentureBeat URL 제목에서 확인되는 범위는 “for $120 per month”이지, 그 자체로 다음을 증명하지 않습니다.
+
+- 봇 한 개당 120달러
+- 사용자 한 명당 120달러
+- 워크스페이스당 120달러
+- 기본 플랜에 포함된 봇 수
+- 사용량·컴퓨트 비용 별도 여부
+
+초안은 이를 반복해서 “per active bot teammate” 및 “per digital coworker”로 해석합니다. 공식 가격 페이지나 결제 화면을 확인하기 전에는 다음처럼 써야 합니다.
+
+> The beta is advertised at $120 per month; the draft should verify whether this is priced per bot, per user, or per workspace.
+
+### C. SpaceX 내부 사용 이력은 강한 주장
+
+다음 두 주장은 별도 증거가 필요합니다.
+
+- “Originally developed as an internal automation tool across SpaceX engineering and operations”
+- “internal production validation complete across SpaceX teams”
+
+공식 발표의 직접 인용이나 담당자 인터뷰가 없다면 삭제해야 합니다. “내부에서 개발됐다”와 “여러 SpaceX 팀에서 production validation을 마쳤다”는 같은 주장이 아닙니다.
+
+### D. 클라우드 컴퓨터를 VDI로 단정하면 안 됨
+
+격리된 브라우저 VM이나 cloud computer runtime은 반드시 전통적인 VDI 제품을 의미하지 않습니다. 공식 아키텍처가 공개되지 않았다면:
+
+- `cloud VDI` → `isolated cloud-hosted execution environment`
+- `dedicated independent cloud computer instance` → 전용성 여부 확인 후 사용
+
+으로 수정해야 합니다.
+
+### E. 기존 챗봇 비교가 지나치게 일반화됨
+
+> Traditional Chatbot / Copilot: Stops when user closes tab
+
+이는 일반적으로 사실이 아닙니다. 이미 다수의 에이전트와 자동화 도구가 서버 측 비동기 작업, 예약 실행, background job을 지원합니다.
+
+더 정확한 비교:
+
+> Conventional interactive copilots are commonly optimized for synchronous, user-supervised sessions, whereas Grok Bot is presented as a persistent asynchronous runtime.
+
+### F. “edge inference” 수요 증가 결론은 근거 부족
+
+항목은 클라우드에서 지속 실행되는 에이전트를 설명하지만, Strategic Impact에서는 “lightweight edge inference endpoints” 수요를 도출합니다. 이는 직접 연결되지 않습니다. 오히려 명시적으로 예상할 수 있는 것은:
+
+- 장기 실행 VM·컨테이너
+- 브라우저 자동화 인프라
+- credential vault
+- audit logging
+- non-human identity 관리
+- egress 제어와 sandboxing
+
+입니다.
+
+---
+
+# URL 및 출처 관리 문제
+
+## 검증 가능한 형태로 제시된 URL
+
+- NVIDIA 공식 블로그 형식 URL
+- IBM Newsroom 형식 URL
+- VentureBeat 기사 URL 2개
+
+다만 초안만으로 HTTP 상태, 리디렉션, 본문 일치 여부까지 확정할 수는 없습니다.
+
+## 누락된 URL
+
+- NVIDIA 항목의 VentureBeat·Reuters·Futurum 기사
+- Mistral 공식 발표 및 제품 문서
+- IBM 항목의 Reuters 기사
+- SpaceXAI/xAI/SpaceX 공식 발표와 가격 페이지
+
+## 출처 표기 개선안
+
+현재처럼 여러 매체를 한 줄에 묶지 말고 주장마다 붙이십시오.
+
+```text
+claim:
+value:
+source_title:
+publisher:
+source_url:
+published_at:
+quoted_text:
+source_type: first-party / independent-reporting / analysis
+```
+
+보도자료와 그 PR Newswire 재배포본은 독립적인 두 개 출처로 취급하면 안 됩니다.
+
+---
+
+# Upcoming Tech Calendar 검토
+
+이 부분은 본문과 동일하게 공식 일정 URL이 필요합니다.
+
+- **Made by Google 2026:** 행사 날짜·장소는 Google 공식 이벤트 페이지로 확인해야 합니다.
+- **Pixel 11 / 2nm Tensor G6:** “Expected”라고 표시돼 있어 확정 사실은 아니지만, 루머 출처를 붙여야 합니다. 행사 일정과 제품 사양을 같은 확정 수준으로 표현하면 안 됩니다.
+- **Hot Interconnects 2026:** 공식 프로그램과 개최 형식 URL 필요
+- **Hot Chips 2026:** 공식 일정·장소 URL 필요
+- IBM–Together의 Q1 2027 일정은 계약 발표문의 표현이 `targeted`, `expected`, `planned` 중 무엇인지 그대로 반영해야 합니다.
+
+---
+
+## 최종 수정 우선순위
+
+### 반드시 수정
+
+1. 네 항목 모두 정확한 게시·이벤트 시각과 시간대를 추가
+2. NVIDIA의 “up to 58%”를 74% 사례와 정합되게 수정
+3. Mistral의 **200MW 확약 / 1GW 목표**를 분리
+4. IBM 항목의 `open-source`를 원칙적으로 `open-weight`로 변경
+5. Grok Bot의 **회사명과 $120 가격 단위**를 1차 자료로 검증
+6. 누락된 Reuters 및 기업 공식 URL 추가
+
+### 분석 품질 보완
+
+- 벤치마크 수치는 하드웨어·모델·정확도·워크로드 조건과 함께 제시
+- 목표, 계약, 설치, 가동 용량을 구분
+- 마케팅 표현인 “frontier-level”, “digital employee”, “sovereign”을 검증 가능한 운영 조건으로 풀어쓰기
+- 단일 계약이나 제품 발표를 곧바로 “업계 표준” 또는 “패러다임 전환”으로 일반화하지 않기
+
+**결론적으로 항목 1과 2에는 명시적으로 수정해야 할 내부 모순이 있고, 항목 3은 용어 교정이 필요하며, 항목 4는 핵심 주장 상당수가 1차 출처 없이 확정적으로 서술되어 있습니다. 또한 네 항목 모두 현 메타데이터만으로는 24시간 윈도우 충족을 확정할 수 없습니다.**
