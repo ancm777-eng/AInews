@@ -1,420 +1,286 @@
 ## 종합 판정
 
-**현재 상태로는 발행 부적합**입니다. 네 항목이 모두 허구라고 단정할 근거는 없지만, 다음 문제가 확인됩니다.
+**초안의 “4개 항목 모두 요구 시간창을 충족했다”는 선언은 사실이 아닙니다.**
 
-1. **24시간 요건을 날짜만으로는 입증할 수 없습니다.**
-2. 항목 1에는 비용절감 수치의 **명시적 내부 모순**이 있습니다.
-3. 항목 2는 **200MW 확약과 1GW 목표를 혼동**합니다.
-4. 항목 3은 `open-source`와 `open-weight`를 혼용합니다.
-5. 항목 4는 회사의 법적·브랜드 명칭, 가격 단위, SpaceX 내부 사용 이력에 대한 **1차 출처가 제시되지 않았습니다**.
-6. “엄격한 1차 출처 검증”을 했다는 서문과 달리, 항목 2·4의 Primary URL은 VentureBeat 2차 보도이고 Reuters 기사 URL도 없습니다.
+기준 시각은 **2026-08-13 07:22 KST = 2026-08-12 22:22 UTC**이며, 이에 따른 시간창은 다음과 같습니다.
+
+- 일반 항목 24시간창: **2026-08-12 07:22 KST ~ 2026-08-13 07:22 KST**
+  - UTC: **2026-08-11 22:22 ~ 2026-08-12 22:22**
+- Category 6 연구 항목 7일창: **2026-08-06 07:22 KST ~ 2026-08-13 07:22 KST**
+  - UTC: **2026-08-05 22:22 ~ 2026-08-12 22:22**
+
+| 항목 | 제공된 발행 시각 | KST 환산 | 경과 시간 | 시간창 판정 |
+|---|---:|---:|---:|---|
+| 1 | 8월 12일 10:14 UTC | 8월 12일 19:14 KST | 12시간 8분 | **충족** |
+| 2 | 8월 11일 16:00 UTC | 8월 12일 01:00 KST | 30시간 22분 | **미충족** |
+| 3 | 8월 11일 14:31 UTC | 8월 11일 23:31 KST | 31시간 51분 | **미충족** |
+| 4 | 8월 5일 00:00 UTC | 8월 5일 09:00 KST | 7일 22시간 22분 | **제공 시각상 미충족** |
+
+따라서 현재 메타데이터를 기준으로 하면 **항목 1만 명확하게 통과**합니다.
 
 ---
 
-## 1. 시간 윈도우 검증
+## 1. Google Pixel 11·Tensor G6
 
-검증 시각을 **2026-08-12 07:23 KST**로 적용하면 허용 범위는 다음과 같습니다.
+### 판정: **시간창 통과 / 기술적 표현 보완 필요**
 
-- **시작:** 2026-08-11 07:23 KST
-- **종료:** 2026-08-12 07:23 KST
-- UTC 환산: **2026-08-10 22:23 ~ 2026-08-11 22:23 UTC**
+`2026-08-12T10:14:00Z`는 기준 시간으로부터 12시간 8분 전이므로 24시간창 안에 있습니다. 메타데이터의 UTC 변환도 맞습니다.
 
-초안은 모든 항목에 `2026-08-11`이라는 **날짜만** 제공하고 게시 시각과 시간대를 제공하지 않습니다. 따라서 `event_within_24h_window: true`는 네 항목 모두 엄격하게 검증되지 않았습니다.
+다만 다음 부분은 공식 자료에서 기능별 처리 위치를 확인한 뒤 표현을 제한해야 합니다.
 
-특히:
+1. **모든 기능이 완전히 온디바이스라는 서술**
+   - 초안은 ASL 번역, Rambler, Circle to Search, Magic Capture를 사실상 모두 Tensor G6에서 로컬 실행하는 것으로 묶고 있습니다.
+   - Gemini Nano를 사용하는 기능이라고 해서 전체 파이프라인이 반드시 오프라인·온디바이스인 것은 아닙니다. 전처리나 일부 추론만 로컬이고 검색·생성 단계는 서버를 사용할 수도 있습니다.
+   - 특히 Circle to Search는 검색 서비스와 연결되므로 “직접 로컬 실행” 또는 “클라우드 오프로딩을 제거했다”는 표현은 기능별 공식 명시가 필요합니다.
 
-- NVIDIA·IBM·VentureBeat가 미국 현지 날짜로 8월 11일을 표시했다면 대체로 윈도우 안일 가능성이 높지만, 정확한 게시 시각이 필요합니다.
-- Mistral의 발표일이 프랑스 현지 8월 11일이라면, **CEST 00:00~00:22경 발표분은 24시간 밖**일 수 있습니다.
-- “Publication Date”와 “Event Date”도 구분해야 합니다. 기사 게시가 윈도우 안이어도 실제 제품 출시나 계약 체결 시점이 그보다 오래됐다면 일반 항목으로는 부적격입니다.
+2. **“Agentic”이라는 분류**
+   - 카메라 번역, 음성 입력, 검색 UI는 멀티모달 AI 기능이지만, 계획·도구 호출·다단계 자율 수행이 확인되지 않으면 곧바로 “agentic execution”이라고 부르기 어렵습니다.
+   - 권장 문구: **“온디바이스 멀티모달 AI 기능”**.
 
-### 필요한 메타데이터
+3. **제품군 전체 사양 일반화**
+   - 레이어 표는 Pixel 11, Pro, Pro XL, Fold 전체가 `Qi2.2`와 `3,600니트 디스플레이`를 공유하는 것처럼 읽힙니다.
+   - 기본형·Pro·Fold의 피크 밝기와 충전 규격이 같다는 제품별 사양표가 없으면 모델별로 분리해야 합니다.
+   - 표기는 통상 **Qi2.2**로 붙여 쓰는 것이 적절합니다.
 
-각 항목에 다음을 추가해야 합니다.
+4. **“50% TPU 성능”의 정확한 의미**
+   - 공식 발표가 “TPU performance”, “AI performance”, “peak compute” 중 무엇을 기준으로 했는지 명시해야 합니다.
+   - 이를 곧바로 일반적인 `AI compute throughput`으로 확장하면 모델·정밀도·워크로드 조건이 누락됩니다.
+
+5. **가격 인과관계**
+   - “128GB를 제거해 소비자가 AI 하드웨어 비용을 보조하게 했다”는 문장은 사실 진술이 아니라 해석입니다.
+   - 권장 문구:  
+     **“128GB 옵션 제거와 시작가 상승은 온디바이스 AI 기능 확대에 따른 원가 상승 가능성을 시사하지만, Google이 가격 인상의 원인을 AI 하드웨어라고 공식 확인한 것은 아니다.”**
+
+### URL 보완
+
+제시된 Google Blog URL이 실제 공식 페이지로 정상 연결되는지 확인하고, AP·CNET·Mashable의 개별 기사 URL도 붙여야 합니다. 현재는 여러 매체를 출처로 열거하면서 실제 URL은 하나뿐이어서, `50%`, `25%`, `15%`, 가격, 출하일 각각을 교차 검증하기 어렵습니다.
+
+---
+
+## 2. CME Group·Silicon Data GPU Compute Futures
+
+### 판정: **시간창 오류 / 발표와 출시를 구분해야 함**
+
+가장 명확한 오류는 시간창입니다.
+
+- 발행 시각: `2026-08-11T16:00:00Z`
+- 올바른 24시간창 시작: `2026-08-11T22:22:00Z`
+- 발행 시각은 시작점보다 **6시간 22분 빠르며**, 기준 시각으로부터는 **30시간 22분 전**입니다.
+
+따라서:
 
 ```text
-source_published_at:
-source_timezone:
-published_at_utc:
-event_timestamp:
-event_timezone:
-window_start_utc: 2026-08-10T22:23:00Z
-window_end_utc: 2026-08-11T22:23:00Z
+event_within_24h_window: true
 ```
 
-이번 네 항목은 모두 `slot_category: 1-5`, `ongoing_story_exception: false`이므로 7일 연구 예외나 ongoing-story 예외를 적용할 수 없습니다.
+는 잘못되었습니다.
+
+초안은 이 항목에만 별도로:
+
+```text
+window_start_utc: 2026-08-10T22:22:00Z
+window_end_utc:   2026-08-11T22:22:00Z
+```
+
+를 적용했는데, 이는 브리핑 기준 시각이 아니라 **항목의 날짜에 맞춰 시간창을 하루 뒤로 이동시킨 것**입니다. 모든 일반 항목에는 동일한 기준창인 `2026-08-11T22:22Z~2026-08-12T22:22Z`를 적용해야 합니다.
+
+“8월 12일 보도”는 새로운 사건이 아니라 기존 8월 11일 발표를 재보도한 것일 수 있으므로, 그 자체만으로 시간창을 갱신할 수 없습니다. 이 항목은 `ongoing_story_exception: false`이기도 합니다.
+
+### 내용상 수정 사항
+
+1. **아직 ‘출시’된 상품이 아님**
+   - 본문 자체가 `pending regulatory review`와 10월 5일 예정이라고 설명합니다.
+   - 따라서 현재 상태는 **“선물계약 출시 계획 발표”**이지 “공식 금융상품 출시”가 아닙니다.
+   - Executive Summary의 “official October 5 launch”도 **“planned October 5 launch, pending regulatory review”**로 바꾸는 편이 정확합니다.
+
+2. **“세계 최초”**
+   - 이는 엄격한 선행상품 조사 없이는 확정하기 어려운 표현입니다.
+   - CME 공식 발표의 직접 인용이라면 **“CME가 세계 최초라고 주장한”**으로 귀속시키십시오.
+
+3. **계약 단위**
+   - “one month of hourly rental compute”는 모호합니다. 계약 승수, 정산 단위, 지수 산식, 결제월, 최종 정산일을 CME 규격서 그대로 적어야 합니다.
+   - 선물계약은 물리적으로 한 달간 GPU를 제공하는 권리가 아니라 **현금결제 지수 파생상품**이므로 오해를 막아야 합니다.
+
+4. **법적 자산분류 과장**
+   - 거래소 상장 선물이 된다고 해서 GPU 컴퓨트가 곧바로 원유와 동일한 의미의 독립적 “commodity asset class”로 확립됐다고 단정하기는 이릅니다.
+   - 권장 문구: **“GPU 임대가격에 대한 거래소 상장 위험관리 수단을 제공한다.”**
+
+5. **9월 28일과 10월 5일 불일치**
+   - 본문은 10월 5일을 GPU 선물 거래 개시일로 제시하지만 달력에는 별도 설명 없이 9월 28일 “new performance index futures”를 넣었습니다.
+   - 다른 상품이라면 상품명을 밝혀야 하고, 같은 상품이라면 날짜가 모순되므로 하나를 삭제해야 합니다.
+
+### URL 문제
+
+제시 URL:
+
+```text
+https://www.cmegroup.com/news-releases/2026/08/11/cme-group-silicon-data-compute-futures.html
+```
+
+은 CME가 통상 사용하는 `media-room/press-releases/...` 계열 공식 보도자료 구조와 다를 가능성이 있습니다. 실제 응답 여부와 canonical URL을 확인해야 합니다. 링크가 유효하지 않다면 CME 공식 발표 페이지 및 계약명세서 URL로 교체하십시오.
 
 ---
 
-# 항목별 검증
+## 3. River AI·Igor Babuschkin
 
-## 2. NVIDIA Nemotron 3.5 Lightning / NeMo Switchyard
+### 판정: **시간창 오류 / 투자자·제품 주장 정리 필요**
 
-### 판정: **수정 필요 — 내부 수치 모순 및 하드웨어 표현 과장**
+발행 시각 `2026-08-11T14:31:00Z`는 기준 시각으로부터 **31시간 51분 전**입니다.
 
-회사명과 제품명은 초안 내에서는 일관되며, NVIDIA 블로그 형식의 1차 URL도 제시되었습니다. 다만 아래 오류는 명확합니다.
+올바른 24시간창 시작인 `2026-08-11T22:22:00Z`보다도 7시간 51분 빠르므로:
 
-### A. 비용절감 수치가 서로 모순됨
+```text
+event_within_24h_window: true
+```
 
-초안은 동시에 다음을 주장합니다.
+는 명백히 잘못되었습니다.
 
-- 비용이 “roughly one-third” → 약 **67% 절감**
-- Ramp: **58% 절감**
-- LangChain: **74% 절감**
-- 비교표: “up to 58% savings”
-- 비교분석: “up to 66%”
+이 항목도 자체 시간창을 `2026-08-10T22:22Z~2026-08-11T22:22Z`로 옮겨 놓았는데, 브리핑 전체의 기준 시간창과 일치하지 않습니다. 8월 12일의 “expanded technical coverage”가 독립적인 신제품 출시나 API 공개처럼 새로운 사건이었다면 그 사건의 정확한 시각과 직접 출처를 제시하고 `event_date`를 수정해야 합니다. 단순 후속 보도라면 포함할 수 없습니다.
 
-`up to`는 제시된 사례 중 최대치를 의미하므로, 같은 문서에서 74% 사례를 제시하면서 “up to 58%”라고 쓰는 것은 명백한 오류입니다.
+### 내부 불일치
 
-#### 권장 수정
+Executive Summary와 본문에서 투자자 역할이 다르게 표현됩니다.
 
-벤치마크별로 분리하십시오.
+- 본문: **General Catalyst와 AMP PBC가 주도**
+- 최종 요약: **General Catalyst, NVIDIA, AMD가 주도**
 
-> NeMo Switchyard reportedly reduced cost by 58% in the cited Ramp SWE-Bench configuration and by 74% in the cited LangChain multi-turn configuration. These results are workload-specific; they should not be summarized as a universal one-third cost level.
+NVIDIA와 AMD Ventures가 전략적 참여자라면 “led by”로 승격해서는 안 됩니다. 최종 요약은 다음과 같이 고쳐야 합니다.
 
-“대략 3분의 1 비용”은 해당 결과를 낸 특정 벤치마크와 비교 대상 모델을 명시할 때만 유지해야 합니다.
+> “General Catalyst와 AMP PBC가 주도하고 NVIDIA 및 AMD Ventures 등이 참여했다.”
 
-### B. 30B MoE의 Jetson 실행 주장은 조건이 빠짐
+### 기술·사업 주장 보완
 
-“3B active parameters”는 연산 시 활성화되는 파라미터 수이지, 전체 모델의 가중치 저장 공간이 3B 모델 수준이라는 뜻은 아닙니다. 30B 모델은 양자화를 해도 전체 가중치의 메모리 적재 또는 계층별 스트리밍 문제가 남습니다.
+1. **“15~20분 RL run”의 범위**
+   - 모델 크기, 토큰 수, rollout 수, GPU 종류, 알고리즘, 검증 데이터가 없습니다.
+   - 소형 모델에 대한 짧은 post-training 실험인지, 대규모 온라인 RL인지 구분하지 않으면 비교 가능한 성능 수치가 아닙니다.
 
-따라서 다음 표현은 지나치게 포괄적입니다.
+2. **“복잡한 RL run”**
+   - 초안의 Critical View에서 원문의 단순한 “RL run”을 “complex RL runs”로 확대했습니다. 출처가 복잡성을 명시하지 않았다면 삭제해야 합니다.
 
-> Pinned to run locally on RTX PCs, DGX Spark, and Jetson devices
+3. **“사용자 소유”의 의미**
+   - API에서 학습한다고 해서 이용자가 기반 모델과 파생 가중치의 완전한 법적 소유권을 자동으로 갖는 것은 아닙니다.
+   - 다운로드 가능 여부, 체크포인트 반출권, 데이터 보존정책, 라이선스 조건을 확인해야 합니다.
 
-반드시 다음을 특정해야 합니다.
+4. **폐쇄형 API 비교**
+   - “base model weights remain immutable”는 부정확합니다. OpenAI 등도 제한적인 파인튜닝 서비스를 제공할 수 있습니다.
+   - 정확한 차이는 **기반 가중치의 비공개성 및 사용자의 직접 통제 제한**입니다.
 
-- 지원 Jetson 모델
-- 메모리 용량
-- 양자화 정밀도
-- 컨텍스트 길이
-- CPU/NVMe 오프로딩 여부
-- NVIDIA가 공식적으로 검증한 구성인지 여부
+5. **2~4배 비용절감**
+   - 본문에 직접 출처와 산정 기준이 없습니다. 비교 대상 모델, GPU, 사용률, 토큰량을 제시하지 못하면 마케팅 주장으로 명시해야 합니다.
 
-단순히 3B가 활성화된다는 이유만으로 일반적인 Jetson에서 원활히 실행된다고 추론하면 안 됩니다.
+6. **AMD 명칭**
+   - `AMD Ventures`가 공식 법인·펀드 명칭인지, 아니면 단순히 AMD가 투자한 것인지 원문 표기를 따라야 합니다.
 
-### C. 성능 비교 기준이 불명확함
+7. **배포 상태**
+   - `Preview API active` 및 `enterprise developer rollout underway`는 공식 제품 페이지나 문서 링크가 필요합니다. 단순 회사 소개만으로는 확인되지 않습니다.
 
-“4x faster output throughput”과 “30% faster task completion”은 서로 다른 지표입니다. 각각 다음이 필요합니다.
+### URL 보완
 
-- 비교 모델의 정확한 이름과 버전
-- GPU 및 GPU 수
-- 입력·출력 토큰 길이
-- 배치 크기
-- 양자화 정밀도
-- TTFT인지 output tokens/sec인지
-- agent completion time 측정 방식
+```text
+https://river.ai/introducing-river-ai
+```
 
-특히 **Qwen3.6-35B**라는 정확한 모델명을 원문과 모델 카드에서 재확인해야 합니다. 이름이 한 글자라도 다르면 비교 전체가 잘못됩니다.
+에는 발표 시각과 투자 라운드 조건을 입증하는 보도자료 또는 공식 포스트 메타데이터가 있어야 합니다. 또한 WSJ·TechCrunch·FinSMEs를 출처로 제시했으므로 각각의 직접 링크를 추가해 다음을 별도로 검증해야 합니다.
 
-### D. OpenRouter를 “open weights available” 채널로 묶으면 부정확
-
-OpenRouter는 일반적으로 모델 가중치 저장소라기보다 모델 API 라우팅·제공 플랫폼입니다. 다음처럼 분리하는 편이 정확합니다.
-
-- Hugging Face / ModelScope: weights 또는 model artifacts
-- NVIDIA Build: NIM/API 접근
-- OpenRouter: hosted API endpoint 또는 provider routing
-
-### E. Reuters의 “1조 파라미터 Nemotron 4” 주장
-
-이 내용은 NVIDIA 발표와 별개의 비공개 개발 보도입니다. Reuters URL, 기사 제목, 게시 시각, 익명 소식통 여부가 필요합니다. 공식 출시 항목에 섞지 말고 다음처럼 표시해야 합니다.
-
-> Separately, Reuters reported—citing [source characterization]—that NVIDIA is developing…
-
-### URL·출처 평가
-
-- NVIDIA 블로그 URL: 1차 출처 형식
-- VentureBeat·Reuters·Futurum: 실제 기사 URL이 없어 수치별 교차검증 불가
-- “Source”를 묶어서 쓰지 말고 주장마다 URL을 매핑해야 함
+- 총 조달액과 라운드 구성
+- 기업가치
+- Babuschkin의 개인 출자액
+- 공동 주도 투자자
+- NVIDIA·AMD·Temasek·YC 참여 여부
+- 15~20분 성능 주장
 
 ---
 
-## 3. Mistral AI 1GW 유럽 인프라
+## 4. DiffPower 연구
 
-### 판정: **중요한 사실 왜곡 수정 필요**
+### 판정: **제공된 정확한 시각 기준 7일창 미충족 / ‘동료평가’ 표기 오류**
 
-핵심 문제는 **확약된 용량과 장기 목표의 혼동**입니다.
+Category 6이므로 7일창 적용 자체는 맞습니다. 하지만 정확한 창은:
 
-### A. 200MW와 1GW를 동일한 확약으로 서술함
-
-Overview에서는 다음과 같이 비교적 신중하게 구분합니다.
-
-- 2027년까지 **200MW를 underwrite**
-- 2030년까지 **1GW로 확장하는 roadmap**
-
-하지만 이후에는 다음과 같이 바뀝니다.
-
-- “coalition that locks in 1 GW of compute demand”
-- “backed by dedicated 1 GW capacity commitments”
-- “underwriting 1 Gigawatt”
-
-이는 초안 자체의 설명과 모순됩니다. **200MW 확약 + 1GW 목표**는 **1GW 확약**과 같지 않습니다.
-
-#### 권장 수정
-
-> The coalition reportedly underwrites 200MW through 2027. Mistral’s 1GW figure is a 2030 expansion target, not a presently contracted or fully financed capacity commitment, unless the primary announcement explicitly states otherwise.
-
-Background Stats도 다음처럼 바꿔야 합니다.
-
-- `stat: 200 MW`
-- `context: Reported capacity underwritten through 2027`
-- 별도:
-- `stat: 1 GW`
-- `context: Targeted European compute scale by 2030`
-
-### B. 전력 용량과 “compute demand”를 구분해야 함
-
-MW/GW는 일반적으로 데이터센터의 전력 또는 IT 부하 용량을 나타냅니다. 다음은 서로 다른 개념입니다.
-
-- 확보된 계통 전력
-- 계획된 데이터센터 부지 용량
-- 실제 설치된 GPU IT load
-- 고객이 계약한 수요
-- 현재 가동 중인 추론 용량
-
-초안은 이들을 모두 “compute”, “demand”, “capacity commitment”로 혼용합니다. 원문이 어느 지표를 말하는지 명시해야 합니다.
-
-### C. Regional Endpoint가 곧 “strict data isolation”인지는 별도 확인 필요
-
-EU endpoint 선택이 다음을 모두 보장하는 것은 아닙니다.
-
-- prompt와 output의 EU 내 처리
-- 로그와 telemetry의 EU 내 저장
-- 백업·재해복구 데이터의 EU 잔류
-- 지원 인력의 접근 지역 제한
-- 학습에 사용하지 않는다는 보장
-- 미국 모회사 또는 미국 법률 노출 배제
-
-따라서 “without cross-border data leakage”는 지나치게 단정적입니다. Mistral의 데이터 처리 부속서와 SLA에 근거해 범위를 제한해야 합니다.
-
-### D. “기업 연합이 1GW 수요를 잠갔다”는 전략 결론도 삭제 필요
-
-이 문장은 위 수치 오류에서 파생된 분석입니다. 현재 확인 가능한 서술대로라면:
-
-> 200MW 규모의 초기 수요 또는 용량 확약을 발판으로 1GW 장기 목표를 추진한다.
-
-정도가 적절합니다.
-
-### URL·출처 평가
-
-Primary URL이 VentureBeat이므로 서문에서 주장한 **1차 출처 검증**을 충족하지 않습니다. 다음이 별도로 필요합니다.
-
-- Mistral 공식 발표 URL
-- Regional Endpoints 문서
-- Priority Tier 및 SLA 문서
-- 200MW와 1GW 수치가 기재된 공식 자료
-- GLM-5.2 지원 모델 목록
-
----
-
-## 4. IBM–Together AI 2억4천만 달러 계약
-
-### 판정: **핵심 사건은 구조상 일관적이나 용어와 수치 출처 보완 필요**
-
-IBM Newsroom의 1차 URL이 제시되어 있다는 점은 긍정적입니다. 다만 URL의 실제 응답 여부와 본문은 별도 확인해야 합니다.
-
-### A. `open-source model` 대신 `open-weight model`이 안전함
-
-초안이 예로 든 Llama, DeepSeek, Qwen, Kimi 계열은 버전별 라이선스가 다르며, 모두가 OSI 의미의 오픈소스라고 단정할 수 없습니다.
-
-다음 표현을 일괄 수정하는 것이 좋습니다.
-
-- `open-source AI inference` → 원문 공식 명칭을 인용할 때만 유지
-- 본문 분석: `open-weight model inference`
-- `open-source models such as…` → `open or openly distributed model families such as…`
-
-특히 “open-source”는 가중치 접근 가능성만으로 충족되지 않습니다.
-
-### B. “IBM Cloud 최초”와 “세계 최초”를 혼동하지 않아야 함
-
-현재 Overview는 “inside IBM Cloud”라는 범위를 포함하지만, 제목이나 요약만 읽으면 세계 최초처럼 해석될 수 있습니다.
-
-권장 문구:
-
-> IBM Cloud’s first dedicated large-scale cluster of this type, according to IBM.
-
-### C. HGX B300의 정확한 시스템 명칭 필요
-
-`NVIDIA HGX B300 systems`가 공식 발표의 정확한 명칭인지 확인해야 합니다. 실제 구성에 따라 다음 정보가 필요합니다.
-
-- HGX B300 또는 HGX B300 NVL16
-- GPU 수와 GPU당 메모리
-- 랙 수 또는 총 GPU 수
-- Spectrum-X 스위치 및 NIC 구성
-- 네트워크 대역폭
-- 학습과 추론 중 어느 워크로드에 최적화됐는지
-
-현재 초안은 제품군만으로 “표준 하드웨어 아키텍처”가 검증됐다고 확대 해석합니다. 단일 계약은 채택 사례이지 업계 표준 확립의 증거는 아닙니다.
-
-### D. 400조 토큰/월 수치는 분모가 필요함
-
-매우 큰 운영 지표이므로 다음을 확인해야 합니다.
-
-- 입력+출력 토큰 합계인지
-- 캐시된 토큰 포함 여부
-- API 전체인지 특정 서비스인지
-- 현재 월간 run rate인지 누적 수치인지
-- “1M developers”가 가입자 수인지 활성 개발자인지
-
-초안의 “across its 1 million developer user base”는 두 독립 지표를 직접 결합한 표현일 수 있습니다. 원문이 실제로 연결하지 않았다면 다음처럼 분리해야 합니다.
-
-> Together AI reports more than 1 million developers and separately reports processing approximately 400 trillion tokens per month.
-
-### E. 자금조달 정보는 날짜를 붙여야 함
-
-“recently raised an $800 million Series C”는 상대적 표현입니다. 라운드 발표일, 투자자, valuation이 pre-money인지 post-money인지 출처를 붙여야 합니다. 핵심 계약과 직접 관련이 없다면 Background로 이동하는 편이 낫습니다.
-
-### URL·출처 평가
-
-- IBM Newsroom: 적절한 1차 출처 형식
-- PR Newswire: 보도자료 재배포일 가능성이 있어 독립 교차검증 출처가 아님
-- Reuters: URL·기사 제목·게시 시각 누락
-
-PR Newswire와 IBM 보도자료를 두 개의 독립 출처로 계산해서는 안 됩니다.
-
----
-
-## 5. SpaceXAI ‘Grok Bot’
-
-### 판정: **검증 취약 — 회사명·가격 단위·내부 개발 이력에 1차 출처 필요**
-
-이 항목은 네 항목 중 출처 구조가 가장 약합니다. Primary URL은 VentureBeat 기사이고, 별도로 기재한 “SpaceXAI Announcement” URL이 없습니다.
-
-### A. 회사의 정확한 명칭과 법적 관계를 확인해야 함
-
-다음 표현은 공식 자료가 없으면 단정할 수 없습니다.
-
-> SpaceXAI—the artificial intelligence division of SpaceX (formerly xAI)
-
-확인해야 할 사항:
-
-- 공식 브랜드가 `SpaceXAI`, `SpaceX AI`, `xAI` 중 무엇인지
-- xAI가 소멸·개명된 것인지, SpaceX 산하 자회사로 존속하는지
-- 제품 판매 주체와 이용약관상 계약 법인
-- Grok 상표와 서비스 운영 주체
-
-인수 또는 합병이 있었다고 해서 자동으로 “formerly xAI”가 되는 것은 아닙니다.
-
-### B. `$120/month`와 `$120/month per bot`는 다른 주장
-
-VentureBeat URL 제목에서 확인되는 범위는 “for $120 per month”이지, 그 자체로 다음을 증명하지 않습니다.
-
-- 봇 한 개당 120달러
-- 사용자 한 명당 120달러
-- 워크스페이스당 120달러
-- 기본 플랜에 포함된 봇 수
-- 사용량·컴퓨트 비용 별도 여부
-
-초안은 이를 반복해서 “per active bot teammate” 및 “per digital coworker”로 해석합니다. 공식 가격 페이지나 결제 화면을 확인하기 전에는 다음처럼 써야 합니다.
-
-> The beta is advertised at $120 per month; the draft should verify whether this is priced per bot, per user, or per workspace.
-
-### C. SpaceX 내부 사용 이력은 강한 주장
-
-다음 두 주장은 별도 증거가 필요합니다.
-
-- “Originally developed as an internal automation tool across SpaceX engineering and operations”
-- “internal production validation complete across SpaceX teams”
-
-공식 발표의 직접 인용이나 담당자 인터뷰가 없다면 삭제해야 합니다. “내부에서 개발됐다”와 “여러 SpaceX 팀에서 production validation을 마쳤다”는 같은 주장이 아닙니다.
-
-### D. 클라우드 컴퓨터를 VDI로 단정하면 안 됨
-
-격리된 브라우저 VM이나 cloud computer runtime은 반드시 전통적인 VDI 제품을 의미하지 않습니다. 공식 아키텍처가 공개되지 않았다면:
-
-- `cloud VDI` → `isolated cloud-hosted execution environment`
-- `dedicated independent cloud computer instance` → 전용성 여부 확인 후 사용
-
-으로 수정해야 합니다.
-
-### E. 기존 챗봇 비교가 지나치게 일반화됨
-
-> Traditional Chatbot / Copilot: Stops when user closes tab
-
-이는 일반적으로 사실이 아닙니다. 이미 다수의 에이전트와 자동화 도구가 서버 측 비동기 작업, 예약 실행, background job을 지원합니다.
-
-더 정확한 비교:
-
-> Conventional interactive copilots are commonly optimized for synchronous, user-supervised sessions, whereas Grok Bot is presented as a persistent asynchronous runtime.
-
-### F. “edge inference” 수요 증가 결론은 근거 부족
-
-항목은 클라우드에서 지속 실행되는 에이전트를 설명하지만, Strategic Impact에서는 “lightweight edge inference endpoints” 수요를 도출합니다. 이는 직접 연결되지 않습니다. 오히려 명시적으로 예상할 수 있는 것은:
-
-- 장기 실행 VM·컨테이너
-- 브라우저 자동화 인프라
-- credential vault
-- audit logging
-- non-human identity 관리
-- egress 제어와 sandboxing
+```text
+2026-08-05T22:22:00Z ~ 2026-08-12T22:22:00Z
+```
 
 입니다.
 
----
-
-# URL 및 출처 관리 문제
-
-## 검증 가능한 형태로 제시된 URL
-
-- NVIDIA 공식 블로그 형식 URL
-- IBM Newsroom 형식 URL
-- VentureBeat 기사 URL 2개
-
-다만 초안만으로 HTTP 상태, 리디렉션, 본문 일치 여부까지 확정할 수는 없습니다.
-
-## 누락된 URL
-
-- NVIDIA 항목의 VentureBeat·Reuters·Futurum 기사
-- Mistral 공식 발표 및 제품 문서
-- IBM 항목의 Reuters 기사
-- SpaceXAI/xAI/SpaceX 공식 발표와 가격 페이지
-
-## 출처 표기 개선안
-
-현재처럼 여러 매체를 한 줄에 묶지 말고 주장마다 붙이십시오.
+초안의 발행 시각은:
 
 ```text
-claim:
-value:
-source_title:
-publisher:
-source_url:
-published_at:
-quoted_text:
-source_type: first-party / independent-reporting / analysis
+2026-08-05T00:00:00Z
 ```
 
-보도자료와 그 PR Newswire 재배포본은 독립적인 두 개 출처로 취급하면 안 됩니다.
+로, 7일창 시작보다 **22시간 22분 빠릅니다**. 따라서 제공된 타임스탬프에 따르면:
+
+```text
+event_within_7d_window: true
+```
+
+는 성립하지 않습니다.
+
+실제 arXiv 게시 시각이 8월 5일 22:22 UTC 이후라면 그 정확한 시각으로 교체할 수 있지만, 현재처럼 `00:00Z`를 사용하면서 통과로 표시할 수는 없습니다. 날짜만 알고 시각을 모른다면 `true`가 아니라 **“exact time unverified”**로 처리해야 합니다.
+
+### 명확한 양식·사실 오류
+
+`Status: Peer-Reviewed Academic Research & Technical Paper Release`는 부정확합니다.
+
+- arXiv는 일반적으로 **프리프린트 저장소**이며 동료평가 완료를 의미하지 않습니다.
+- Semiconductor Engineering 소개 기사도 동료평가를 대체하지 않습니다.
+- 학회나 저널의 채택 정보가 없다면 다음처럼 수정해야 합니다.
+
+> **Status: arXiv Preprint / Academic Research Release**
+
+### 기술적 과장 가능성
+
+1. **1,002배 기준**
+   - “단일 스레드 CPU 기준”이라는 조건을 제목과 요약에도 함께 붙여야 합니다.
+   - 멀티스레드 상용 EDA 도구 대비 1,002배로 오해되지 않도록 해야 합니다.
+
+2. **“정확도 유지”**
+   - `maintaining toggle-rate correlation`은 정확도 보존과 동일하지 않습니다. 상관계수, 평균오차, 최대오차와 비교 기준이 필요합니다.
+
+3. **PDN·디커플링 커패시터 배치**
+   - 스위칭 활동 분석에서 PDN decap placement, IR drop 방지, 열점 제거까지 직접 수행한다고 확대하면 안 됩니다.
+   - 논문이 실제로 제공하는 최적화 변수와 실험이 power-virus generation 또는 cell sizing에 한정된다면, PDN 배치는 **가능한 후속 응용**으로 분리해야 합니다.
+
+4. **CUDA 한정 여부**
+   - “CUDA hardware”, “thousands of CUDA cores”는 구현이 NVIDIA CUDA에 명시적으로 종속될 때만 사용해야 합니다. 단순 GPU 가속이라면 하드웨어 중립적으로 쓰는 편이 정확합니다.
+
+5. **Synopsys 제품화 추론**
+   - 공동 저자나 소속만으로 Synopsys 상용 제품 통합을 단정할 수 없습니다.
+   - `methodology under evaluation for integration`은 공식 제품 로드맵 근거가 없다면 삭제하고 **“상용 통합 여부는 공개되지 않았다”**로 바꾸십시오.
+
+### URL 보완
+
+연구의 1차 출처는 Semiconductor Engineering 기사보다 다음 arXiv 페이지가 적절합니다.
+
+```text
+https://arxiv.org/abs/2608.03778
+```
+
+논문 PDF, 저자·소속, 최초 제출일, 수정 이력, 벤치마크 표를 이 URL에서 직접 인용하고 Semiconductor Engineering은 2차 해설 출처로 두는 것이 바람직합니다.
 
 ---
 
-# Upcoming Tech Calendar 검토
+## 필수 수정 요약
 
-이 부분은 본문과 동일하게 공식 일정 URL이 필요합니다.
+1. **항목 2·3**
+   - `event_within_24h_window: false`로 변경하거나 제외.
+   - 모든 항목에 공통 창 `2026-08-11T22:22Z~2026-08-12T22:22Z` 적용.
+   - 8월 12일의 진짜 새 사건이 있었다면 해당 시각·URL을 제시하고 메타데이터를 재작성.
 
-- **Made by Google 2026:** 행사 날짜·장소는 Google 공식 이벤트 페이지로 확인해야 합니다.
-- **Pixel 11 / 2nm Tensor G6:** “Expected”라고 표시돼 있어 확정 사실은 아니지만, 루머 출처를 붙여야 합니다. 행사 일정과 제품 사양을 같은 확정 수준으로 표현하면 안 됩니다.
-- **Hot Interconnects 2026:** 공식 프로그램과 개최 형식 URL 필요
-- **Hot Chips 2026:** 공식 일정·장소 URL 필요
-- IBM–Together의 Q1 2027 일정은 계약 발표문의 표현이 `targeted`, `expected`, `planned` 중 무엇인지 그대로 반영해야 합니다.
+2. **항목 4**
+   - 현재 타임스탬프 기준 `event_within_7d_window: false`.
+   - 정확한 게시 시각을 확인하기 전에는 통과 선언 금지.
+   - “Peer-Reviewed”를 “arXiv Preprint”로 수정.
 
----
+3. **항목 1**
+   - 시간창은 통과.
+   - 기능별 완전 온디바이스 실행 여부를 구분하고 “agentic” 표현을 완화.
+   - 디스플레이·충전·가격 사양을 모델별로 분리.
 
-## 최종 수정 우선순위
+4. **CME 달력**
+   - 9월 28일과 10월 5일의 관계를 설명하거나 9월 28일 항목 삭제.
 
-### 반드시 수정
-
-1. 네 항목 모두 정확한 게시·이벤트 시각과 시간대를 추가
-2. NVIDIA의 “up to 58%”를 74% 사례와 정합되게 수정
-3. Mistral의 **200MW 확약 / 1GW 목표**를 분리
-4. IBM 항목의 `open-source`를 원칙적으로 `open-weight`로 변경
-5. Grok Bot의 **회사명과 $120 가격 단위**를 1차 자료로 검증
-6. 누락된 Reuters 및 기업 공식 URL 추가
-
-### 분석 품질 보완
-
-- 벤치마크 수치는 하드웨어·모델·정확도·워크로드 조건과 함께 제시
-- 목표, 계약, 설치, 가동 용량을 구분
-- 마케팅 표현인 “frontier-level”, “digital employee”, “sovereign”을 검증 가능한 운영 조건으로 풀어쓰기
-- 단일 계약이나 제품 발표를 곧바로 “업계 표준” 또는 “패러다임 전환”으로 일반화하지 않기
-
-**결론적으로 항목 1과 2에는 명시적으로 수정해야 할 내부 모순이 있고, 항목 3은 용어 교정이 필요하며, 항목 4는 핵심 주장 상당수가 1차 출처 없이 확정적으로 서술되어 있습니다. 또한 네 항목 모두 현 메타데이터만으로는 24시간 윈도우 충족을 확정할 수 없습니다.**
+5. **전체 Executive Summary**
+   - “All four items represent verified developments occurring within their required temporal windows”를 삭제.
+   - 현재 메타데이터로는 **1개 통과, 2개 명백한 24시간창 실패, 1개 정확 시각상 7일창 실패**입니다.
