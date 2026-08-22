@@ -1,377 +1,305 @@
 ## 종합 판정
 
-**현 상태로는 발행 부적합**입니다. 시간 윈도우 계산 자체는 맞지만, 1·2·3번의 이벤트 시점 또는 신규성 입증이 부족합니다. 특히:
+이 초안은 **현 상태로는 배포 부적합**입니다.
 
-- **1번:** 워런트 발행 주체가 제목·요약에서 반대로 적혔고, **$12.18B를 워런트 가치로 표현한 것은 잘못**입니다. 또한 원계약일이 8월 18일이라면 24시간 밖입니다.
-- **2번:** 제시된 PR Newswire URL은 **2024년 8월 21일 발표 자료**에 해당하는 것으로 보이며, 2026년 신규 발표의 근거로 사용할 수 없습니다.
-- **3번:** 자체 본문에서도 NVIDIA는 “입찰 예상 업체”일 뿐인데, 제목과 표에서는 이미 확정된 분할·파트너십처럼 서술합니다.
-- **4번:** Category 6의 7일 규칙에는 들어오지만, 프로그램에 두 회사 발표자가 있다는 사실만으로 **Meta와 d-Matrix가 공동 개발한 Raptor 제품**이라고 결론 내릴 수 없습니다. 기술 설명에도 HBM·SerDes 및 에너지 수치상의 문제가 있습니다.
-
----
-
-## 시간 윈도우 검증
-
-초안의 기준 시각인 **2026-08-22 06:56 KST = 2026-08-21 21:56 UTC**를 적용하면:
-
-- 표준 24시간: **2026-08-20 21:56 UTC 이후**
-  - KST: **2026-08-21 06:56 이후**
-- Category 6의 7일: **2026-08-15 06:56 KST 이후**
-
-산술은 정확합니다. 다만 `event_date: 2026-08-20`처럼 **날짜만 있고 시각·시간대가 없는 메타데이터로는 24시간 내 이벤트라고 판정할 수 없습니다.** 8월 20일 이벤트가 윈도우에 들어오려면 UTC 기준 그날 21:56 이후여야 합니다.
-
-현재 실제 검증 기준 시각 06:57 KST를 엄밀히 적용하면 경계가 1분 이동하지만, 아래 결론에는 영향을 주지 않습니다.
+- **항목 1:** 가격 인상 보도의 실재 여부와 별개로, 초안이 출처에서 확인되지 않은 부품·패키징·BOM 수치를 대량으로 확장했습니다.
+- **항목 2:** 제품·기반 모델·비교 대상·벤치마크 조건을 검증할 1차 자료가 부족하며, “27B 모델이 프런티어 모델을 능가했다”는 결론도 시스템 구성상 성립하지 않습니다.
+- **항목 3:** Anthropic의 모델명과 정책 범위가 검증되지 않았고, “Anthropic은 데이터에 접근하지 않으면서 의무적 안전 분석을 수행한다”는 구조에 내부 모순이 있습니다.
+- **항목 4:** Hot Chips 세션 제목이 실제라고 하더라도, 이를 PCIe 6.0·CXL·NVLink 캐시 일관성 플랫폼 공개로 해석한 부분은 과도합니다. 특히 **Arm 기반 Vera CPU와 RISC-V 호스트를 동일 계층으로 취급한 것은 명백한 아키텍처 오류**입니다.
+- 시간 기준으로는 항목 3의 24시간 충족이 입증되지 않았습니다. 항목 4는 Category 6의 7일 예외를 적용할 수 있으나, 실제 프로그램 공개일을 확인해야 합니다.
 
 ---
 
-# 항목별 검증
+# 1. KST 시간 윈도우 검증
 
-## 1. Google–Marvell 워런트 및 맞춤형 실리콘 계약
+기준 시각:
 
-### 판정: **중대한 표현 오류 + 시간 윈도우 미입증**
+- **2026-08-23 06:54 KST**
+- **2026-08-22 21:54 UTC**
 
-### 명확한 오류
+일반 항목의 24시간 허용 구간:
 
-#### ① 워런트 발행 주체가 반대로 적힘
+- **2026-08-22 06:54 KST부터 2026-08-23 06:54 KST까지**
+- UTC 기준 **2026-08-21 21:54부터 2026-08-22 21:54까지**
 
-초안 내부에서도 Overview에는 다음과 같이 적혀 있습니다.
+| 항목 | 기재 날짜 | 판정 |
+|---|---:|---|
+| 1 | 2026-08-22 | **조건부 충족**. 날짜만 있고 정확한 발표·기사 게시 시각이 없어 엄격하게는 입증 불충분 |
+| 2 | 2026-08-22 | **조건부 충족**. 공식 발표 시각 또는 TechCrunch 타임스탬프 필요 |
+| 3 | 2026-08-21 | **24시간 충족 입증 실패**. 8월 21일 21:54 UTC 이후라는 증거가 필요 |
+| 4 | 2026-08-22 | **Category 6의 7일 예외상 허용 가능**. 다만 실제 advance program의 게시·갱신일을 확인해야 함 |
 
-> “Marvell granted Google a stock warrant”
+### 항목 3의 메타데이터 오류
 
-따라서 제목의:
+`event_date: 2026-08-21`만 제시하면서 `event_within_24h_window: true`로 단정할 수 없습니다. 발표가 8월 21일 미국 시간이었다면 범위 안일 가능성이 있지만, 정확한 시간대와 시각이 필수입니다.
 
-> “Google Issues $12.2 Billion Warrant to Marvell”
+다음 중 하나로 수정해야 합니다.
 
-및 Executive Summary의:
-
-> “$12.2 billion stock warrant issuance to Marvell Technology”
-
-는 발행 방향이 반대입니다. 정확한 구조는 **Marvell이 Google에 Marvell 보통주를 살 수 있는 워런트를 부여**한 것입니다.
-
-권장 제목:
-
-> **Marvell Grants Google Performance-Linked Warrants Under Expanded Custom-Silicon Agreement**
-
-#### ② $12.18B는 워런트의 “가치”가 아님
-
-계산 자체는 맞습니다.
-
-- 58,970,907주 × $206.58 ≈ **$12.18B**
-
-하지만 이것은 모든 워런트가 행사될 경우 Google이 지급하는 **총 행사가격 또는 Marvell의 잠재적 행사대금**입니다. 워런트의 공정가치는 주가, 변동성, 만기, 베스팅 가능성 등을 반영해 별도로 계산하며 일반적으로 단순한 `주식 수 × 행사가격`과 같지 않습니다.
-
-따라서 다음 표현은 부정확합니다.
-
-- “warrants valued at up to $12.18 billion”
-- “$12.2 billion warrant deal”
-- “potential equity value of approximately $12.18 billion”
-
-권장 표현:
-
-> “warrants covering up to 58.97 million shares, with an aggregate exercise price of approximately $12.18 billion if fully vested and exercised”
-
-#### ③ “Google이 Marvell의 다섯 번째로 큰 기관투자자”라는 표현
-
-Google은 통상적인 의미의 **institutional shareholder** 분류와 맞지 않습니다. 더구나 순위는 행사 시점의 Marvell 주주구성에 따라 바뀌므로 현재 확정할 수 없습니다.
-
-> “potentially one of Marvell’s largest shareholders” 정도로 제한해야 합니다.
-
-### 시간 문제
-
-제시된 SEC 문서명은:
-
-> `mrvl-20260818.htm`
-
-으로, 계약 또는 보고 대상 사건이 **8월 18일**과 관련됐을 가능성을 강하게 시사합니다. 계약 체결일이 8월 18일이면 원 이벤트는 명백히 24시간 밖입니다.
-
-SEC 제출 또는 공개 자체를 신규 이벤트로 삼으려면 다음이 필요합니다.
-
-1. SEC `ACCEPTANCE-DATETIME`
-2. 계약 체결일과 공시일 구분
-3. 공시 시간이 **2026-08-20 21:56 UTC 이후**인지 확인
-
-초안에는 시간 정보가 없으므로 `event_within_24h_window: true`는 입증되지 않았습니다. 파일명이 가리키는 8월 18일이 원계약일이라면 `ongoing_story_exception: false` 상태로는 포함하기 어렵습니다.
-
-### 추가 과장 또는 근거 부족
-
-SEC 계약이 실제로 다음 모든 제품군을 명시하는지 확인해야 합니다.
-
-- TPU inference accelerator
-- storage controller
-- custom NIC
-- memory interface controller
-- near-memory-compute module
-- optical interconnect
-
-일반적인 “custom silicon products” 계약을 위 목록으로 확장했다면 사실과 전략적 추론을 분리해야 합니다. 특히 **Google TPU의 본체를 Marvell이 공동 개발한다는 주장**과 TPU 주변 연결·I/O 칩을 공급한다는 주장은 의미가 크게 다릅니다.
-
-또한 다음도 확정 사실보다는 분석 또는 전망입니다.
-
-- Broadcom과 Marvell의 “dual-pillar” 구조
-- Google Cloud의 토큰당 TCO 하락
-- Q3 FY2027 생산 출하
-- AMD–OpenAI 구조와의 직접적 동등 비교
-
-### URL 판정
-
-SEC URL 형식은 EDGAR 문서 형식에 부합하지만, 기사에서 인용한 수치와 제품 범위를 뒷받침하는 **정확한 8-K 항목·계약 부속서 링크**를 함께 제공해야 합니다. Reuters·ForkLog·Evertiq URL도 누락되어 있어 교차 검증성이 낮습니다.
+1. 공식 발표 시각과 시간대를 추가해 24시간 범위를 입증하거나,
+2. 8월 22일의 별도 공식 확인을 새로운 사건으로 정의하고 해당 시각을 기재하거나,
+3. 입증할 수 없다면 `event_within_24h_window: false`로 변경.
 
 ---
 
-## 2. NVIDIA–Cloverleaf Infrastructure
+# 2. 항목별 사실 검증
 
-### 판정: **시간상 실패 가능성이 매우 높고, Primary URL이 2026년 근거가 아님**
+## 항목 1 — NVIDIA 서버 가격 15% 이상 인상
 
-### 핵심 오류: 제시한 PR Newswire 링크는 2024년 자료
+### 판정: 핵심 보도는 추가 확인 필요, 기술 세부사항은 다수 미입증
 
-제시된 URL:
+제시된 Bloomberg URL 형식은 Bloomberg 기사 URL 구조와 양립하지만, URL 문자열만으로 기사 존재와 본문 내용을 검증할 수는 없습니다. Reuters, Investing.com, TNW를 “교차 확인” 출처로 적었지만 해당 기사 URL과 제목이 하나도 없습니다. 따라서 현재 자료는 **다중 출처 검증 상태가 아닙니다.**
 
-> `https://www.prnewswire.com/news-releases/...-302227891.html`
+### 명확하거나 중대한 문제
 
-의 릴리스 번호와 제목은 **2024년 8월 21일의 Cloverleaf–NVIDIA 전략적 파트너십 발표**에 대응하는 것으로 보입니다. 즉, 이를 2026년 8월 21일의 신규 공식 발표로 제시한 것은 날짜 오류입니다.
+1. **“formal notification” 표현이 과도합니다.**  
+   “people familiar with the notifications”에 근거한 익명 취재 보도라면 “NVIDIA가 공식 발표했다”거나 “formal notification이 확인됐다”고 쓰면 안 됩니다.  
+   적절한 표현은 다음과 같습니다.
 
-따라서 아래 메타데이터는 성립하지 않습니다.
+   > Bloomberg가 관계자를 인용해 NVIDIA가 일부 대형 고객에게 가격 조정을 통보했다고 보도했다.
 
-- `event_date: 2026-08-21`
-- `event_within_24h_window: true`
-- `ongoing_story_exception: false`
+2. **가격 인상 적용 범위가 지나치게 넓습니다.**  
+   NVIDIA는 DGX 같은 완제품도 판매하지만, 많은 Grace Blackwell·Vera Rubin 랙 시스템은 OEM·ODM·클라우드 사업자 구성에 따라 가격과 BOM이 달라집니다. 특정 고객 견적을 근거로 모든 “Vera Rubin 및 Grace Blackwell 서버” 가격이 15% 이상 오른다고 일반화하려면 SKU, 지역, 계약 유형과 공급 주체가 필요합니다.
 
-만약 2026년 8월 21일에 별도의 **신규 지분투자**가 있었다면, 그 신규 거래의 NVIDIA/Cloverleaf 공시나 WSJ·Reuters 기사 URL을 Primary URL로 제시해야 합니다. 2024년 파트너십 발표를 신규 지분투자 근거로 재사용할 수 없습니다.
+3. **Rubin과 Rubin Ultra의 메모리 구성이 혼재했을 가능성이 큽니다.**  
+   “HBM4 12-high/16-high stacks”를 Vera Rubin 전체의 확정 사양처럼 쓰면 안 됩니다. 세대별로 Rubin, Rubin Ultra, 개별 GPU와 랙 시스템 사양을 구분해야 합니다.
 
-### 신규 지분투자와 기존 파트너십이 혼합됨
+4. **SoIC 적용은 제시된 자료로 확인되지 않습니다.**  
+   `Advanced 3D Hybrid Packaging / SoIC`는 특정 패키지 기술을 확정한 표현입니다. 출처가 가격 기사라면 이런 패키징 세부사항까지 보도했는지 확인해야 합니다. 확인되지 않으면 삭제하십시오.
 
-초안은 다음을 하나의 2026년 발표처럼 합칩니다.
+5. **“>35% of silicon BOM”은 정의가 모순적·불명확합니다.**  
+   HBM은 패키지 또는 시스템 BOM 구성품인데 “silicon BOM”의 35%라고 하면 분모가 무엇인지 알 수 없습니다. GPU 패키지 원가, 가속기 보드 BOM, 서버 BOM, 랙 BOM은 서로 다릅니다. 원문 통계와 원가 기준을 제시하지 않으면 삭제해야 합니다.
 
-- 기존 Cloverleaf–NVIDIA 파트너십
-- NVIDIA의 신규 minority equity investment
-- 수억 달러 규모라는 WSJ 보도
-- 10GW 이상 파이프라인
-- NVIDIA DSX 도입
+6. **Hopper 표기는 정교화가 필요합니다.**  
+   “HBM3/HBM3e, 최대 141GB”는 H100과 H200을 한 칸에 합친 표현입니다. H100과 H200의 메모리 세대·용량을 별도 행으로 분리하는 편이 정확합니다.
 
-이 중 어느 요소가 2026년의 신규 개발인지 명확히 분리되지 않았습니다. 신규 지분투자 보도가 실제로 있다면 다음처럼 작성해야 합니다.
+### 통계 검증
 
-- **원 이벤트:** 2024-08-21 전략적 파트너십
-- **신규 개발:** 2026-08-21 NVIDIA의 지분투자 또는 투자 확대
-- `ongoing_story_exception: true`
-- `original_event_date: 2024-08-21`
+`2026년 세계 HBM 생산의 70%가 AI 데이터센터 프로세서에 소비`된다는 수치는 다음이 누락되어 검증 불가입니다.
 
-현재 메타데이터에는 그 예외 처리가 없습니다.
+- TrendForce의 정확한 보고서명과 날짜
+- 생산량 기준이 bit, wafer, stack, 매출 중 무엇인지
+- “AI 데이터센터 프로세서”의 범위
+- Bloomberg와 Goldman Sachs가 같은 70% 수치를 인용했는지 여부
 
-### 기술 설명 보완
+“TrendForce / Bloomberg / Goldman Sachs”처럼 서로 다른 출처를 슬래시로 묶는 것은 출처 표기로 충분하지 않습니다.
 
-#### NVIDIA DSX 정의
+### 전략 분석 보완
 
-DSX를 단순히:
-
-> “a full-stack digital twin and simulation engine”
-
-이라고 정의하는 것은 과도하게 단정적입니다. 사이트·전력·냉각의 물리적 디지털 트윈은 NVIDIA Omniverse 및 관련 AI-factory 설계 도구와 구분해 설명해야 합니다. DSX가 정확히 어떤 제품·참조 아키텍처·서비스 스택인지 공식 자료의 표현을 따라야 합니다.
-
-#### “utility queue를 우회한다”는 주장
-
-NVIDIA의 투자나 디지털 트윈 사용은 설계와 검토를 효율화할 수 있지만, 규제기관과 전력회사의 계통연계 절차를 법적으로 **bypass**하지는 못합니다.
-
-> “may improve project readiness and reduce redesign risk” 정도가 적절합니다.
-
-#### “10GW의 powered, shovel-ready sites”
-
-“development pipeline >10GW”와 “10GW 전체가 powered and shovel-ready”는 같은 의미가 아닙니다. 파이프라인에는 초기 단계 부지나 미확정 계통연계가 포함될 수 있습니다. 공식 발표가 각 단계별 용량을 구분하지 않았다면 “powered, shovel-ready”를 전체 10GW에 적용하면 안 됩니다.
+- 가격 상승이 NVIDIA 마진 확대인지, HBM·패키징 원가 전가인지 구분해야 합니다.
+- CSP가 부담하는 것은 GPU 가격뿐 아니라 전력, 냉각, 네트워크, 랙 통합비입니다. 15% 시스템 가격 상승을 전체 토큰 원가 상승률로 바로 연결하면 안 됩니다.
+- “HBM 업체 비중 확대” 투자 결론에는 장기 공급계약, 고객사별 점유율, HBM4 수율과 선단 패키징 병목을 함께 반영해야 합니다.
 
 ---
 
-## 3. 브라질 R$2.3B AI·슈퍼컴퓨팅 프로그램
+## 항목 2 — Inherent Faraday 과학 에이전트
 
-### 판정: **금액 산술은 일관되지만, NVIDIA 확정 서술과 24시간 판정은 부적절**
+### 판정: 핵심 제품·사양·벤치마크 모두 1차 자료 확인 필요
 
-### 수치 검증
+TechCrunch 이외의 Techmeme, BitcoinWorld, LLM Stats는 독립적인 1차 검증 출처로 보기 어렵습니다. Techmeme는 기사 집계 서비스이고, 나머지는 원 발표를 재인용했을 가능성이 큽니다. Inherent의 공식 발표, 모델 카드, 논문, 벤치마크 데이터셋과 평가 코드를 제시해야 합니다.
 
-초안 내부 환율은 일관됩니다.
+### 확인되지 않은 핵심 주장
 
-- R$2.3B ÷ 약 5.18 = 약 **US$444.2M**
-- R$1.3B ÷ 약 5.18 = 약 **US$251M**
-- R$1.0B ÷ 약 5.18 = 약 **US$193.1M**
+다음은 공식 기술 문서 없이는 사실로 단정할 수 없습니다.
 
-합계도 대체로 일치합니다. 다만 환산액은 기사 작성 시점의 환율임을 명시해야 하며, 고정된 정부 예산의 공식 달러 표시처럼 쓰면 안 됩니다.
+- Faraday의 정확한 파라미터 수가 27B인지
+- 기반 모델이 정확히 `Qwen 3.6`인지
+- Edward Hughes의 공식 직책이 Chief Scientist인지
+- GPT-5.5 Codex를 외부 코드 실행 모델로 사용했는지
+- Claude Opus 4.8과 GPT-5.5가 실제 비교 대상이었는지
+- 상용 API가 출시됐는지, 제한적 연구 프리뷰인지
 
-### 명확한 논리적 모순: NVIDIA는 예상 업체인데 이미 선정된 것처럼 표시
+특히 모델명과 버전 번호는 보도기사보다 각 공급사의 공식 모델 문서로 확인해야 합니다.
 
-본문은 다음과 같이 인정합니다.
+### 논리·평가 설계 문제
 
-> “competitive public tender”  
-> “NVIDIA is anticipated to secure the hardware deployment”
+1. **“논문을 읽는다”와 “결과를 모른 채 blind replication한다”가 충돌합니다.**  
+   출판된 논문의 전체 본문을 읽었다면 결과 섹션도 볼 수 있습니다. 실제로 결과를 가리고 methods/data만 제공했다면 그 평가 프로토콜을 명시해야 합니다.
 
-즉 NVIDIA 선정은 아직 확정되지 않았습니다. 그런데 제목과 표는:
+2. **27B 모델 자체와 전체 에이전트 시스템의 성능을 혼동했습니다.**  
+   Faraday가 GPT-5.5 Codex 같은 외부 모델을 호출한다면 성능은 다음의 결합 결과입니다.
 
-- “splitting infrastructure between Huawei and NVIDIA”
-- “Hardware Partners: NVIDIA”
-- “Compute Stack: NVIDIA / CUDA”
-- “Brazil committing R$2.3 billion across Huawei and NVIDIA”
+   - 27B 오케스트레이터
+   - 외부 코딩 모델
+   - 실행 환경
+   - 검색·도구 사용
+   - 재시도 예산
+   - 총 토큰 및 연산 비용
 
-처럼 NVIDIA가 이미 계약을 수주한 것으로 표현합니다.
+   따라서 “27B 모델이 GPT-5.5를 능가했다”는 결론은 동등한 도구·예산 조건의 모델 단독 비교가 아닌 이상 성립하지 않습니다. “Faraday 에이전트 시스템이 해당 평가에서 비교 시스템보다 높은 점수를 기록했다” 정도로 제한해야 합니다.
 
-권장 수정:
+3. **“낮은 추론 비용”도 입증되지 않았습니다.**  
+   작은 오케스트레이터가 대형 외부 코딩 모델을 여러 번 호출하면 총 비용과 지연시간이 오히려 커질 수 있습니다. 모델 파라미터 수만으로 시스템 비용을 판단하면 안 됩니다.
 
-> “Brazil Announces R$2.3B Dual-Track AI Infrastructure Program; NVIDIA Seen as a Potential Bidder for One Tender”
+4. **“replication”의 정의가 필요합니다.**  
+   코드 재실행, 결과 수치 재현, 방법론 검증, 통계적 재분석, 물리 실험 재현은 서로 다른 과제입니다. 초안은 이를 모두 “과학 논문 복제”로 묶고 있습니다.
 
-표에는 다음처럼 표시해야 합니다.
+### 권고 수정
 
-- Supplier: **TBD through public tender**
-- NVIDIA status: **expected bidder / market expectation, not awarded**
-- Compute stack: **not yet determined**
+최소한 다음 벤치마크 정보를 추가해야 합니다.
 
-### Huawei/iFlytek 관련 확인 필요
-
-다음 사항은 정부 원문 또는 계약 자료가 필요합니다.
-
-- R$1.3B 전액이 Huawei/iFlytek에 직접 배정됐는지
-- 두 회사가 확정 장비 공급자인지, 기술협력 기관인지
-- 실제 하드웨어가 Huawei Ascend인지
-- iFlytek의 역할이 모델·소프트웨어인지 하드웨어인지
-- Rio de Janeiro 시설이 이미 착공 또는 engineering commenced 상태인지
-
-Huawei와 iFlytek이 참여한다는 사실만으로 **Ascend/CANN 기반 스택**이라고 확정할 수 없습니다.
-
-### 전략적 추론의 과도한 확대
-
-다음은 발표 내용에서 직접 도출되지 않습니다.
-
-- 브라질이 Ascend/CANN과 CUDA에서 “동시에” 실행되는 dual-stack framework를 구축
-- 단일 국가 AI 워크로드를 두 아키텍처 사이에서 이식 가능하게 운용
-- 이 정책이 수출통제·제재를 의도적으로 회피하기 위한 설계
-- Rio Grande do Norte 사이트가 풍력·태양광 마이크로그리드에 직접 연결
-
-이는 가능성 있는 전략 분석이지만, **확정된 정책 목표 또는 기술 사양과 분리**해야 합니다.
-
-### 시간 윈도우
-
-`event_date: 2026-08-20`만으로는 24시간 내임을 확인할 수 없습니다. 브라질 현지 8월 20일 공식 발표가 현지 저녁 18:56 이전이었다면 UTC 기준 컷오프보다 앞섭니다.
-
-8월 21일 기사 게재는 별도 신규 정부 조치가 없는 한 이벤트 날짜를 8월 21일로 바꾸지 않습니다. 따라서 다음 중 하나가 필요합니다.
-
-- 8월 20일 공식 발표의 정확한 시각
-- 8월 21일에 이루어진 예산 승인·입찰 개시 등 별도 신규 조치
-- 아니면 24시간 밖으로 판정
-
-Al Jazeera URL 경로는 2026-08-21 기사 형식과 일치하지만, 브라질 정부·MCTI·FNDCT의 원문 URL이 Primary Source로 추가되어야 합니다.
+- 평가 논문 수와 분야
+- 데이터 유출 방지 방식
+- 결과 섹션 마스킹 여부
+- 성공 판정 기준
+- 모델별 도구 접근 권한
+- 실행 시간·토큰·API 비용
+- 통계적 유의성 및 인간 평가 방식
+- Inherent 자체 평가인지 제3자 평가인지
 
 ---
 
-## 4. d-Matrix·Meta·Raptor 3D DRAM
+## 항목 3 — Anthropic Mythos/Fable 데이터 보존 정책
 
-### 판정: **7일 시간 규칙은 충족 가능하나, 제품 귀속과 기술 사양이 입증되지 않음**
+### 판정: 가장 신뢰 위험이 높은 항목
 
-### 시간 윈도우
+Anthropic의 공식 발표 URL이 없고, The Decoder 기사만 제시됐습니다. Bloomberg 기사 URL, Anthropic 정책 문서, Boris Cherny의 원문 게시물도 없습니다. 특히 `Mythos-class`, `Fable`, `Claude Security`라는 명칭과 정확한 제품 범위를 공식 자료로 확인해야 합니다.
 
-Category 6이므로 8월 20일 이벤트는 허용된 7일 범위에 들어옵니다. 이 항목을 24시간 밖이라는 이유로 제외해서는 안 됩니다.
+### 명백한 내부 모순
 
-다만 다음을 구분해야 합니다.
+초안은 동시에 다음 세 가지를 주장합니다.
 
-- Hot Chips 프로그램 페이지가 실제로 갱신된 날짜
-- 발표자료 또는 proceedings 공개 날짜
-- 단순 프로그램 등재 날짜
-- 실제 발표일인 8월 23–25일
+1. 고객이 30일간 데이터를 의무 보존한다.
+2. 이 데이터가 사이버 위협 분석에 사용된다.
+3. Anthropic은 데이터에 전혀 접근하지 않고 중앙 서버에도 보존하지 않는다.
 
-현재 Primary URL은 변경 가능한 일반 `advance-program` 페이지로, **8월 20–21일 공개라는 날짜와 Raptor 세부 사양을 독립적으로 입증하지 못합니다.**
+Anthropic이 데이터에 접근하지 않는다면 누가, 어디서, 어떤 소프트웨어로 안전 분석을 수행하는지 설명되어야 합니다. 가능한 구조는 서로 다릅니다.
 
-### 가장 큰 귀속 오류
+- 고객 환경에서 Anthropic 제공 스캐너가 로컬 분석
+- 고객이 분석 후 집계·비식별화된 신호만 전송
+- Anthropic이 고객 VPC에 제한적으로 접근
+- 단순 보존만 하고 사고 발생 시 고객이 제출
 
-초안에 적힌 근거는:
+현재 초안은 이 중 어떤 방식인지 밝히지 않은 채 “zero vendor access”와 “mandatory threat analysis”를 동시에 단정합니다.
 
-> “Presented by Sudeep Bhoja, d-Matrix & Aayush Ankit, Meta”
+### 추가 오류 또는 과장
 
-입니다. 서로 다른 회사 소속 발표자가 같은 튜토리얼에 참여한다는 사실은 다음을 입증하지 않습니다.
+1. **“zero retention”과 “zero access”는 다릅니다.**  
+   Anthropic 중앙 서버에 영구 저장하지 않는다고 해서 추론 과정의 일시 처리나 고객 VPC 내 분석 접근까지 전혀 없다는 뜻은 아닙니다.
 
-- Meta와 d-Matrix가 Raptor를 공동 개발
-- Raptor가 d-Matrix의 공식 차세대 제품 코드명
-- Meta가 해당 칩의 고객 또는 설계 파트너
-- 발표된 일반 3D DRAM 기술이 Raptor 제품에 구현됨
+2. **HIPAA·GDPR·FINRA에 ‘aligned’됐다는 포괄적 판정은 부정확합니다.**  
+   고객 클라우드 보관만으로 규정 준수가 자동 달성되지 않습니다. 데이터 처리계약, 접근 통제, 지역성, 삭제 정책, 감사 로그, BAA, 기록보존 의무 등이 각각 필요합니다.
 
-따라서 제목의:
+3. **CRA와 데이터 보존 정책의 연결이 약합니다.**  
+   EU Cyber Resilience Act의 2026년 9월 11일은 일반적으로 취약점·중대 사고 보고 의무의 적용 시점으로 설명해야 합니다. 이는 고객 프롬프트나 코드의 30일 보존을 요구하는 규정이 아닙니다. “CRA enforcement date”라고 포괄적으로 표현하면 전체 법률이 그날 전면 적용되는 것처럼 오해될 수 있습니다.
 
-> “d-Matrix and Meta Detail … Accelerator ‘Raptor’”
+4. **100개 이상 고객과 Salesforce 참여는 별도 근거가 필요합니다.**  
+   참여 기업 명단과 프로그램 성격이 확인되지 않으면 “including Salesforce”를 삭제해야 합니다.
 
-및 Overview의:
+5. **`Mythos-class`는 정식 제품명인지 내부 분류인지 구분해야 합니다.**  
+   정식 Anthropic 명칭이 아니라 기사나 초안 작성자가 만든 분류라면 제목과 본문에서 제거해야 합니다.
 
-> “developed in technical collaboration with Meta”
+### 권고 제목
 
-는 세션 제목이나 논문 본문에 명시적 공동 개발 문구가 없는 한 삭제해야 합니다.
+공식 확인이 확보되기 전에는 다음처럼 낮춰 쓰는 것이 안전합니다.
 
-### HBM 설명의 기술 오류
+> 보도: Anthropic, 일부 기업 배포에서 고객 관리형 데이터 보존 방안 검토
 
-초안은 HBM이:
-
-> “2.5D silicon interposers and high-speed SerDes”
-
-에 의존한다고 설명합니다.
-
-일반적인 HBM 인터페이스는 인터포저를 통한 **매우 넓은 병렬 인터페이스**가 핵심이며, GPU와 HBM 사이의 데이터 경로를 통상적인 고속 직렬 SerDes 링크로 설명하는 것은 부정확합니다. SerDes는 PCIe, Ethernet, die-to-die 직렬 링크 등의 설명에는 적절하지만 HBM의 본질적 인터페이스 설명에는 맞지 않습니다.
-
-권장 설명:
-
-> “HBM reduces I/O energy through a wide, relatively low-frequency parallel interface over a 2.5D interposer, but still incurs package-area, routing, controller and data-movement costs compared with denser logic-on-memory integration.”
-
-### 에너지 수치의 내부 불일치
-
-초안은:
-
-- HBM: **4–7 pJ/bit**
-- 3D DRAM: **sub-1 pJ/bit**
-- 효과: **orders-of-magnitude reduction**
-
-이라고 적었습니다.
-
-4–7 pJ/bit에서 1 pJ/bit 미만으로 줄어드는 것은 제시된 수치만으로는 대체로 수 배 개선이며, 최소 두 자릿수 이상을 뜻하는 “orders of magnitude”를 뒷받침하지 못합니다. 예를 들어 0.5 pJ/bit라면 약 8–14배이지 복수 자릿수 규모의 감소라고 단정하기 어렵습니다.
-
-“several-fold to potentially over an order of magnitude, depending on measurement boundary”처럼 측정 범위를 명시해야 합니다.
-
-### 입증되지 않은 제품 사양
-
-Advance Program만으로는 다음을 확정 사양으로 쓰기 어렵습니다.
-
-- custom DRAM dies directly over tensor cores
-- sub-millisecond first-token latency
-- PCIe Gen 6/CXL
-- direct hybrid bonding
-- dynamic KV-cache paging
-- 표준 공랭 환경에서 운용 가능
-- customer evaluation 및 후속 tape-out 일정
-
-특히 **긴 컨텍스트의 prefill을 포함한 first-token latency가 sub-millisecond**라는 표현은 워크로드·모델 크기·입력 토큰 수 없이 의미가 없으며, 수십만 토큰 문맥에 일반적으로 적용한다면 신뢰하기 어렵습니다.
-
-### 패키징 용어 보완
-
-“micro-TSV”와 “direct hybrid bonding”은 동일한 접속 방식이 아닙니다.
-
-- TSV: 실리콘을 관통하는 수직 배선
-- micro-bump: 다이 간 솔더 또는 금속 범프 접속
-- hybrid bonding: 미세 피치의 Cu-Cu 및 절연막 직접 접합
-
-실제 아키텍처가 TSV, micro-bump, hybrid bonding 중 무엇을 어느 계층에서 사용하는지 발표 자료에 맞춰 구분해야 합니다.
-
-또한 `microscopic microscopic metal traces`는 단순 중복 오탈자입니다.
+다만 이것도 공식 정책 문서와 대상 제품 범위가 확인될 때만 사용할 수 있습니다.
 
 ---
 
-# 요약표
+## 항목 4 — Hot Chips 2026 NVIDIA RISC-V 및 Vera CPU
 
-| 항목 | 사실성 판정 | 시간 판정 | 핵심 조치 |
-|---|---|---|---|
-| 1. Google–Marvell | 중대한 표현 오류 | 24시간 내 미입증; 원계약일 8/18 가능성 | 발행 주체 수정, $12.18B를 총 행사가격으로 수정, SEC 접수 시각 확인 |
-| 2. NVIDIA–Cloverleaf | Primary URL 연도 오류 | 제시 자료는 2024년 사건으로 보임 | 2026년 신규 지분투자 원문 제시 또는 ongoing-story 예외 처리 |
-| 3. 브라질 | 금액은 일관되나 공급자 확정 과장 | 8/20 날짜만으로 미입증 | NVIDIA를 예상 입찰자로 수정, 정부 원문 및 정확한 발표 시각 제시 |
-| 4. d-Matrix/Meta | 공동개발·제품 사양 미입증, 기술 오류 포함 | Category 6의 7일 범위에는 해당 | 세션별 링크·자료 제시, Raptor 귀속 재검증, HBM/SerDes 및 에너지 표현 수정 |
+### 판정: 세션 존재 가능성과 기술 해석을 분리해야 함
+
+Hot Chips advance program은 행사 프로그램 확인에는 적절하지만, 현재 URL은 세션별 영구 링크나 기술 논문 링크가 아닌 일반 페이지입니다. 다음을 별도로 확인해야 합니다.
+
+- 정확한 세션 제목
+- 발표자 이름과 철자
+- 발표 날짜와 세션 유형
+- 초록 또는 슬라이드 공개 여부
+- advance program의 최초 게시 또는 8월 22일 갱신 시각
+
+### 명백한 아키텍처 오류
+
+1. **Vera CPU와 RISC-V 호스트를 동일한 것으로 취급했습니다.**  
+   NVIDIA Vera CPU는 공개 로드맵상 **커스텀 Arm CPU 아키텍처**로 알려져 있습니다. 따라서 계층도에서 다음 표현은 잘못됐습니다.
+
+   > `NVIDIA Vera CPU / RISC-V Host`
+
+   이는 다음처럼 분리해야 합니다.
+
+   - Vera CPU: NVIDIA의 Arm 기반 호스트 CPU
+   - RISC-V profile/platform: NVIDIA GPU와 상호운용할 수 있는 별도 RISC-V 구현 조건 또는 소프트웨어·플랫폼 규격
+
+2. **기존 NVIDIA GPU가 전용 x86/Arm 호스트만 요구했다는 설명은 틀렸습니다.**  
+   NVIDIA GPU는 오랫동안 표준 PCIe 기반으로 여러 호스트 아키텍처와 연결돼 왔습니다. 과거에는 POWER 호스트 지원 사례도 있습니다. 문제는 “전용 ISA만 가능”이 아니라 드라이버, IOMMU, 원자 연산, 메모리 순서, 펌웨어, 부트 및 플랫폼 검증 지원 범위입니다.
+
+3. **NVLink를 CXL·PCIe와 같은 ‘open interface standard’로 묶으면 안 됩니다.**  
+   CXL과 PCIe는 산업 표준이지만 NVLink는 NVIDIA의 독자 인터커넥트입니다.
+
+### 출처에서 확인되지 않은 기술 확장
+
+세션 제목만으로 다음을 확정할 수 없습니다.
+
+- PCIe Gen 6 지원
+- CXL 캐시 일관성
+- RISC-V와 NVIDIA GPU 간 coherent memory
+- 제3자 RISC-V CPU의 NVLink 직접 연결
+- 표준화된 SI 신호 제약
+- reference platform specification 제공
+- 패키지 수준 멀티소켓 CPU-GPU substrate
+- Rubin용 맞춤형 메모리 컨트롤러 세부사항
+
+“interoperability”는 표준 PCIe 장치 열거, 드라이버 ABI, 메모리 모델, 원자 연산, IOMMU 및 CUDA 지원 요건을 의미할 수도 있습니다. 초록이나 슬라이드에 CXL·NVLink coherence가 명시되지 않았다면 삭제해야 합니다.
+
+### 시간 표현의 모순
+
+기준 시각은 미국 태평양시간으로 8월 22일 오후에 해당하므로 행사는 아직 시작 전입니다. 그런데 Release Stage에는 다음과 같이 완료형으로 적혀 있습니다.
+
+> “presented at Hot Chips 2026”
+
+이는 다음으로 고쳐야 합니다.
+
+> “Hot Chips 2026에서 발표 예정이며, advance program에 세션이 등재됨”
+
+또한 “technical proceedings released on August 22”는 프로그램 페이지의 실제 게시·갱신 기록이 있어야 합니다. advance program이 수주 전에 공개됐다면 8월 22일을 사건일로 잡을 수 없습니다. Category 6의 7일 예외가 있어도 **실제 공개일을 임의로 오늘 날짜로 바꾸면 안 됩니다.**
+
+### 추천 계층도 수정
+
+| 계층 | 구성요소 | 정확한 설명 |
+|---|---|---|
+| 소프트웨어 | CUDA 드라이버·런타임 | 지원되는 호스트 ISA 및 OS에서 GPU 작업 제출 |
+| 호스트 CPU | Vera CPU 또는 검증된 타사 CPU | Vera는 Arm 기반이며, RISC-V는 별도 상호운용 프로파일 대상일 수 있음 |
+| 장치 연결 | PCIe, NVLink-C2C 등 실제 발표된 인터페이스 | 표준 PCIe와 NVIDIA 독자 링크를 구분 |
+| 가속기 | Rubin GPU | 공식 공개 사양만 기재 |
+| 노드·클러스터 패브릭 | NVLink Switch, Spectrum-X 등 | scale-up과 scale-out을 구분 |
 
 ---
 
-## 향후 일정 부분의 추가 주의점
+# 3. URL 및 출처 품질 판정
 
-다음 일정은 정확한 공식 링크가 없어 별도 검증이 필요합니다.
+| 항목 | URL 상태 및 문제 |
+|---|---|
+| Bloomberg | URL 형식은 가능해 보이나 본문·게시 시각 확인 필요. Reuters 등 교차 출처 URL 누락 |
+| TechCrunch | 기사 URL만 제시. Inherent 공식 발표·모델 카드·벤치마크 링크 누락 |
+| The Decoder | 2차 매체 기사만 제시. Anthropic 및 Bloomberg 원문 URL 누락 |
+| Hot Chips | 일반 advance-program 페이지로, 세션별 영구 링크·게시일·슬라이드 링크가 아님 |
 
-- Meta @Scale 2026의 날짜·장소
-- GLM-5.3 open-weight 공개일과 “two-week safety hardening review” 근거
-- VMware Explore 2026 날짜·브랜드 표기
-- Hot Chips 발표 목록의 Google TPUv8, Rubin, Samsung 및 SK hynix 세션
-- NVIDIA FY2027 Q2 실적발표 시각
+“Source” 칸에 매체 이름을 여러 개 적는 것만으로는 교차 검증이 아닙니다. 각 출처마다 최소한 다음이 필요합니다.
 
-특히 **GLM-5.3의 8월 28일 공개 일정**은 매우 구체적이므로 Z.ai 공식 공지 URL 없이는 캘린더에서 제거하는 편이 안전합니다.
+- 정확한 기사 제목
+- URL
+- 게시 시각 및 시간대
+- 해당 주장을 뒷받침하는 인용문
+- 1차 출처인지 재인용인지
 
-최종적으로는 2번을 교체하거나 신규 2026년 근거로 재작성하고, 1·3번의 정확한 이벤트 시각을 확보한 뒤, 4번의 공동개발·제품 사양을 세션 원문 수준으로 낮춰야 합니다.
+Techmeme처럼 원 기사를 모아 보여주는 서비스와 원 기사를 각각 독립 출처로 세면 안 됩니다.
+
+---
+
+# 4. Upcoming Tech Calendar 검증상 주의점
+
+- **Hot Chips 2026:** 일정과 장소는 공식 프로그램 링크로 재확인하고, 개별 발표 항목도 세션명과 날짜를 대조해야 합니다.
+- **NVIDIA FY2027 Q2 실적:** 8월 26일이 NVIDIA IR에서 공식 확정된 날짜인지 링크를 붙여야 합니다. 회계연도 표기 `Q2 FY2027` 자체는 2026년 일정과 양립 가능합니다.
+- **EU CRA:** 2026년 9월 11일은 법 전체의 전면 적용일이라기보다 특정 취약점·중대 사고 보고 의무의 적용 시점으로 정교하게 표현해야 합니다. CRA의 일반 적용 시점과 구분하십시오.
+
+---
+
+## 최종 권고
+
+1. **항목 3은 공식 Anthropic 자료와 정확한 발표 시각이 확보되지 않으면 삭제**하십시오.
+2. **항목 2는 “27B 모델이 프런티어 모델을 능가”가 아니라 “외부 도구를 포함한 에이전트 시스템의 자체 평가 결과”로 낮춰야** 합니다.
+3. **항목 4에서 Vera=Arm, RISC-V 프로파일=별도 상호운용 주제라는 구분을 명시**하고, PCIe 6.0·CXL·NVLink coherence 주장은 슬라이드 확인 전 삭제하십시오.
+4. **항목 1의 15%는 적용 SKU와 고객 범위를 명시**하고, `>35% BOM`, SoIC, 12/16-high 같은 미입증 세부사항은 제거하십시오.
+5. 모든 일반 항목에 **KST 또는 UTC 기준의 분 단위 게시·발표 시각**을 추가해야 24시간 메타데이터를 유효하게 검증할 수 있습니다.
