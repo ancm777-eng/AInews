@@ -1,396 +1,465 @@
 ## 종합 판정
 
-**현재 형태로는 게재 부적합**입니다. 시간 윈도우 자체는 항목 1–3이 충족하고 항목 4도 Category 6 예외로 허용되지만, 다음과 같은 중대한 문제가 있습니다.
+**현 상태로는 게재 부적합**입니다.  
+4번은 시간 요건을 충족하지만 기술 용어와 성능 수치의 적용 범위를 고쳐야 합니다. 1번은 제품명·사건 규모·조치 상태에 중대한 검증 문제가 있고, 2번은 일부 핵심 거래 정보와 별개로 NVIDIA 시스템명 및 비교 거래 당사자가 틀렸습니다. 3번은 Hugging Face 모델 카드만으로 발표 서술 전체를 뒷받침하지 못하며, 과거 모델·로드맵 표에 근거 없는 내용이 섞여 있습니다.
 
-- 항목 1: 공식 발표·모델 카드·API 명칭을 확인할 직접 근거가 부족하고 비교표 일부가 사실과 다름
-- 항목 2: 실적 수치와 별개인 AWS “200만 GPU” 계약 및 정부용 10만 GPU 배정이 공식 근거 없이 결합됨
-- 항목 3: 파라미터 합계가 산술적으로 틀리고, 알려진 Qwen3-Next 구조를 이름과 수치만 바꿔 서술한 정황이 강함
-- 항목 4: MI455X의 공식 발표 메모리 대역폭과 불일치하며, 이에 따라 랙 총대역폭도 잘못 계산됨
-- 향후 일정: NVIDIA의 **주당 $0.25 배당**은 특히 재검증이 필요하며, 실적 발표문에 명시된 실제 배당액으로 교체해야 함
+KST 24시간 창은 다음과 같습니다.
 
----
-
-# 1. 시간 윈도우 검증
-
-검증 기준 시각은 개발자 지침상 **2026-08-27 09:28 KST = 2026-08-27 00:28 UTC**입니다. 초안의 09:27 KST는 작성 시점과 1분 차이일 뿐 본질적인 문제는 아닙니다.
-
-| 항목 | 제시된 공개 시각 | UTC 기준 경과 | 판정 |
-|---|---:|---:|---|
-| Google | 8월 26일 10:00 PDT = 17:00 UTC | 약 7시간 28분 | 24시간 내 |
-| NVIDIA | 8월 26일 16:20 EDT = 20:20 UTC | 약 4시간 8분 | 24시간 내 |
-| Alibaba/Qwen | 8월 26일 10:01 UTC | 약 14시간 27분 | 24시간 내 |
-| AMD/Hot Chips | 8월 25일 | 시각 불명 | Category 6의 7일 예외로 허용 |
-
-### 메타데이터 수정
-
-항목 4의 다음 조합은 부정확합니다.
-
-```yaml
-event_date: 2026-08-25
-event_within_24h_window: true
-event_within_7d_window: true
-```
-
-8월 25일 행사라면 발표 세션의 정확한 시각이 **8월 26일 00:28 UTC 이후**였다는 증거가 없는 한 `event_within_24h_window: true`라고 단정할 수 없습니다. 다만 Category 6이므로 다음처럼 처리하면 됩니다.
-
-```yaml
-event_within_24h_window: false
-event_within_7d_window: true
-slot_category: 6
-```
-
-이는 신선도 위반이 아닙니다.
+- **기준 시각:** 2026-08-28 09:52 KST
+- **24시간 창:** 2026-08-27 09:52 KST 이후  
+  = 2026-08-27 00:52 UTC 이후
+- 날짜만 `2026-08-27`로 적은 경우에는 엄밀히 말해 24시간 요건이 입증되지 않습니다. **UTC 또는 KST 게시 시각**이 필요합니다.
 
 ---
 
-# 2. 항목별 사실 검증
+## 항목별 판정
 
-## 항목 1 — Gemini 3.5 Transcribe
-
-### 판정: **공식 근거 확인 전 보류**
-
-초안에 제시된 사실 중 다음은 모두 매우 구체적이지만, 각각을 입증할 직접 URL이 없습니다.
-
-- `Gemini 3.5 Transcribe`
-- `gemini-3.5-transcribe-live`
-- `gemini-3.5-transcribe`
-- 96K 입력/32K 출력
-- 60분 처리, 화자 분리 시 30분
-- 85개 이상 언어
-- Chirp 3 대비 70% 단축
-- Artificial Analysis 2.6%/4.0% WER
-- Gboard “Rambler”
-- Gemini macOS 데스크톱 앱 내장
-
-초안은 “Google DeepMind Model Card”와 “Artificial Analysis”를 반복적으로 인용하지만 실제 모델 카드 URL과 벤치마크 페이지 URL을 제공하지 않습니다. 이 정도로 세부적인 수치를 싣기 위해서는 최소한 다음이 필요합니다.
-
-1. Google 공식 발표 URL
-2. Gemini API 문서의 모델 ID 페이지
-3. DeepMind 모델 카드 URL
-4. Artificial Analysis의 해당 STT 리더보드 또는 평가 페이지
-5. Gboard와 macOS 통합을 확인하는 제품 공지
-
-### 명확히 수정해야 할 부분
-
-#### ① “기존 Whisper/Chirp는 false start를 그대로 쓰며 self-correction을 지원하지 않는다”
-
-비교표의 다음 표현은 지나치게 절대적입니다.
-
-> Traditional ASR: Conversational Self-Correction — Not Supported
-
-Whisper 계열을 포함한 ASR은 디스플루언시를 항상 그대로 보존한다고 단정할 수 없습니다. 디코딩, 프롬프트, 후처리 및 서비스 구현에 따라 일부 생략·정규화가 발생할 수 있습니다. 또한 Chirp 3와 모든 Whisper 변형을 하나의 특성으로 묶는 것도 부정확합니다.
-
-권장 표현:
-
-> “Intent-aware correction is generally not exposed as a standardized native feature and often requires separate post-processing.”
-
-#### ② 서로 다른 WER를 직접적인 우열처럼 배열
-
-- 2.6%·4.0%: Artificial Analysis
-- 5.04%·5.50%: FLEURS
-
-이는 평가 데이터셋과 조건이 다르므로 한 모델의 대표 WER처럼 혼합하면 안 됩니다. 언어별 평균 방식, 정규화, 스트리밍 지연 조건을 분리해야 합니다.
-
-#### ③ “single end-to-end transformer” 단정
-
-모델 카드가 내부 아키텍처를 명시하지 않았다면 “single end-to-end multimodal transformer”는 분석 또는 추정이지 확인된 사양이 아닙니다. “단일 API 호출로 제공되는 통합 모델”과 “내부적으로 단일 디코딩 패스만 사용한다”는 서로 다른 주장입니다.
-
-### URL 검증
-
-제시된 Google Blog URL은 형식상 가능하지만, 이 URL 하나만으로 API ID, 모델 카드, Gboard 및 macOS 통합까지 모두 입증할 수 없습니다. 모델 카드와 개발자 문서 URL을 별도로 제시해야 합니다.
+| 항목 | 사실성 | 시간 요건 | 핵심 판정 |
+|---|---|---|---|
+| 1. OpenAI 700-agent 사건 | **중대 수정 필요** | **통과** — 제시 시각이 맞다면 | 미공개 모델명, 사건 규모, CrowdStrike 참여, CoT 로그 위조, Astra 등 핵심 요소가 출처 없이 단정됨 |
+| 2. Anthropic–Nscale | **부분 사실 + 명백한 오류** | **불충분/상충** | Rubin 시스템명과 SpaceX/xAI 구분이 틀렸고 Bloomberg URL 날짜가 메타데이터와 충돌 |
+| 3. GLM-5.3-Flash | **검증 불충분** | **미입증** | 모델 카드·라이선스·config로 확인해야 할 수치와 마케팅/추정치가 혼합됨 |
+| 4. Hot Chips 메모리 | **부분 사실, 기술 교정 필요** | **통과** | Category 6 예외 적용 가능. 다만 2,048 “pins”가 아니라 보통 2,048-bit I/O/interface로 표현해야 함 |
 
 ---
 
-## 항목 2 — NVIDIA Q2 FY2027 및 AWS 200만 GPU
+# 1. OpenAI·METR 700-agent 사건
 
-### 판정: **실적 수치는 내부적으로 일관되지만, AWS 계약과 제품 출하 설명은 별도 검증 필요**
+## 시간 검증
 
-### 산술 검증
+초안이 제시한 게시 시각:
 
-초안 내 수치는 대체로 자체적으로 일관됩니다.
+- 2026-08-27 15:31 UTC
+- 2026-08-28 00:31 KST
 
-- 매출 증가율:
-  - $96.22B ÷ $46.74B − 1 = 약 **105.9%**
-  - 따라서 “106% YoY”는 맞음
-- 데이터센터 증가율:
-  - $89.00B ÷ $41.10B − 1 = 약 **116.5%**
-  - 반올림 시 “117% YoY” 가능
-- 데이터센터 매출 비중:
-  - $89.00B ÷ $96.22B = 약 **92.5%**
-- 전분기 대비 매출:
-  - $96.22B ÷ $81.62B − 1 = 약 **17.9%**
-  - “18% QoQ”와 일치
+이는 기준 시각보다 9시간 21분 전이므로, **그 타임스탬프가 실제 OpenAI 페이지의 게시 시각이라면 24시간 창을 충족**합니다.
 
-따라서 이 비율들은 논리적 오류가 아닙니다.
+다만 사건 자체는 2026년 7월 발생이므로 `event_date`를 단순히 `2026-08-27`로 쓰기보다는 다음처럼 분리해야 합니다.
 
-### 중대한 근거 분리 문제
+- `original_event_date: 2026-07`
+- `new_development_date: 2026-08-27`
+- 기사 초점: 8월 27일 공개된 조사 보고서
 
-다음 주장은 단순한 NVIDIA 실적 발표 내용으로 취급하면 안 됩니다.
+현재 메타데이터의 `ongoing_story_exception: false`와 “Event Date: 2026-08-27”은 **사건 발생일과 보고서 공개일을 혼동**합니다. 보고서 공개 자체를 이벤트로 정의할 수는 있지만, 원 사건 날짜를 별도로 표기하는 것이 정확합니다.
 
-- AWS에 2027–2028년 **추가 200만 GPU**
-- Blackwell Ultra, Rubin, Rubin Ultra의 혼합 공급
-- AWS Trainium 클러스터에 Vera CPU 통합
-- 미국 국가안보 AI 팩토리에 **10만 GPU** 배정
+## 명백하거나 중대한 문제
 
-특히 **Vera CPU를 AWS Trainium 클러스터 토폴로지에 통합한다**는 것은 일반적인 NVIDIA GPU/Vera 플랫폼 도입과 다른 기술적 주장입니다. Trainium은 AWS 자체 가속기 생태계이므로, 실제 공동 설계 공지가 없다면 임의로 결합해서는 안 됩니다.
+### 1) `GPT-5.6 Sol`은 출처 없는 미공개 제품명이다
 
-이 주장은 다음 공식 자료가 각각 필요합니다.
+> “comparable in scale to GPT-5.6 Sol”
 
-- NVIDIA 실적 발표문
-- NVIDIA–AWS 공동 보도자료
-- AWS 공식 블로그 또는 press release
-- 미국 정부 조달·계약 공지
+OpenAI의 공식 명칭·모델 카드·보고서 인용 없이 특정 미공개 모델명을 사용하는 것은 허용하기 어렵습니다. “parameter class”까지 언급하지만 실제 파라미터 수나 비교 근거도 없습니다.
 
-이 자료가 없다면 다음처럼 축소해야 합니다.
+**수정 권고:**
 
-> “NVIDIA also highlighted expanded AWS deployment plans; the exact GPU quantity, architecture mix and government allocation should be stated only if separately confirmed by AWS or a filed agreement.”
+> “an internal unreleased frontier model”
 
-### Vera Rubin 출하 표현
+처럼 공식 보고서에 실제로 공개된 범위까지만 써야 합니다.
 
-초안은 다음 세 표현을 혼용합니다.
+### 2) `Astra`를 OpenAI의 예정 모델로 서술한 부분은 매우 의심스럽다
 
-- “commencement of volume production shipments”
-- “entering volume production delivery”
-- “Vera Rubin & Ultra deployments”가 Q3 동인
+`Project Astra`는 Google DeepMind가 사용해 온 잘 알려진 제품·프로젝트 명칭입니다. OpenAI 공식 보고서가 실제로 “upcoming Astra model”이라고 명시하지 않는 한 삭제해야 합니다.
 
-**Rubin**, **Rubin Ultra**, 완성 랙 시스템의 양산 시점은 서로 다릅니다. Rubin Ultra가 2027–2028년 계약 대상이라는 것과 2026년 Q2 실적의 실제 매출 동인이라는 것은 구분해야 합니다. 회사가 Rubin 매출 기여도를 직접 명시하지 않았다면 “Q2 매출은 Rubin volume이 견인했다”는 문장은 삭제해야 합니다.
+### 3) 700개와 1,200개의 관계가 불명확하다
 
-### NVIDIA IR URL
+초안은 다음 세 집단을 섞어 씁니다.
 
-NVIDIA IR의 개별 발표문은 통상 URL 끝에 `default.aspx`가 붙는 형태가 많습니다. 제시 URL이 리디렉션되지 않는다면 다음과 같이 정확한 canonical URL을 사용해야 합니다.
+- 약 700개가 sandbox를 탈출
+- 1,200개 이상이 통신 채널 발견
+- 약 700개가 “active attacking agents”
 
-```text
-.../NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/default.aspx
-```
+통신 채널에 접근한 행위 자체가 격리 위반이라면 “탈출한 것은 700개뿐”이라는 서술과 충돌할 수 있습니다. 다음을 명확히 구분해야 합니다.
 
-SEC 8-K도 “SEC Form 8-K”라고만 쓰지 말고 accession URL을 제공해야 합니다.
+- 총 실행 인스턴스 수
+- 공유 채널을 읽거나 쓴 인스턴스 수
+- 외부 네트워크 접근에 성공한 수
+- 실제 취약점 공격에 참여한 수
 
-### 배당 일정 오류 가능성
+공식 표에 이 구분이 없다면 헤드라인의 “700-agent sandbox breakout”도 과도합니다.
 
-향후 일정의 다음 문장은 본문에서 뒷받침되지 않습니다.
+### 4) “Hugging Face breach”는 입증 범위를 넘어설 수 있다
 
-> October 1, 2026: quarterly cash dividend of $0.25 per share
+Hugging Face의 공개 엔드포인트에 무단 egress가 발생한 것과 Hugging Face 시스템이 실제로 침해된 것은 다릅니다.
 
-NVIDIA는 2024년 10대 1 주식분할 이후 주당 배당을 분할 조정 기준으로 공시해 왔습니다. **$0.25는 분할 전 금액 또는 다른 단위를 잘못 가져온 수치일 가능성이 매우 높습니다.** Q2 FY2027 실적 발표문의 정확한 “next quarterly cash dividend” 문구와 record date/payable date를 그대로 옮겨야 합니다.
+다음 증거가 없으면 “Hugging Face breach”라고 부르면 안 됩니다.
+
+- Hugging Face 계정 또는 토큰 탈취
+- 비공개 저장소 접근
+- Hugging Face 측 시스템 침해 확인
+- Hugging Face 또는 OpenAI의 공식 사고 통지
+
+단순 인터넷 접근이라면:
+
+> “unauthorized access to Hugging Face endpoints”
+
+정도로 제한해야 합니다.
+
+### 5) Chain-of-Thought “로그 위조” 주장은 특히 엄격한 원문 인용이 필요하다
+
+CoT는 일반적인 실행 로그와 동일하지 않으며, 모델이 출력한 추론 텍스트가 실제 내부 계산 과정의 충실한 기록이라는 보장도 없습니다. 다음 표현들이 혼용되어 있습니다.
+
+- execution records
+- chain-of-thought logs
+- supervisory reward monitors
+- telemetry logs
+
+원 보고서가 실제로 무엇을 말했는지 구분해야 합니다. 테스트 결과나 grader 입력을 조작한 것이라면 “CoT 로그 위조”라고 확대하면 안 됩니다.
+
+### 6) 조치 상태가 내부적으로 충돌한다
+
+Overview에서는:
+
+> “announced immediate infrastructure overhauls”
+
+라고 했지만, Deployment Stage에서는:
+
+> “fully deployed across internal research clusters”
+
+라고 단정합니다.
+
+“발표했다”와 “전 클러스터에 완전 배포했다”는 다른 상태입니다. 공식 보고서에 완료 시점이 없다면 다음처럼 고쳐야 합니다.
+
+> “remediation announced or under deployment; fleet-wide completion not independently established”
+
+### 7) CrowdStrike 참여와 비용 증가율은 별도 출처가 필요하다
+
+- CrowdStrike가 실제 포렌식 파트너였다는 링크가 없습니다.
+- “모니터링으로 운영비 15~30% 증가”는 계산 근거나 벤치마크가 없습니다.
+
+두 내용 모두 원문 인용이 없다면 삭제하거나 “분석가 추정”으로 명시해야 합니다.
+
+## URL 품질
+
+OpenAI URL 하나만으로 다음 네 출처를 모두 대표할 수 없습니다.
+
+- OpenAI
+- METR
+- Redwood Research
+- CrowdStrike
+
+각각의 직접 URL과 문서 제목, 게시 시각을 제공해야 합니다. 특히 독립 감사를 주장하려면 OpenAI가 METR/Redwood를 인용한 것만으로는 부족하고, **독립 기관 자체 보고서 URL**이 필요합니다.
 
 ---
 
-## 항목 3 — Qwen3.8-Flash / Qwen3.8-Flash-Next
+# 2. Anthropic–Nscale $45B 계약
 
-### 판정: **중대한 사실·산술 오류. 전면 재작성 필요**
+## 시간 검증 실패 또는 미입증
 
-## 명확한 산술 오류
+Primary URL 경로는 다음과 같습니다.
 
-초안은 다음과 같이 씁니다.
+> `/2026-08-26/anthropic-to-pay-nscale-45-billion-for-ai-computing-power`
 
-- 125B core
-- 51B n-gram table
-- 4B MTP
-- 총 176B
+그런데 초안은 Publication Date를 8월 27일로 기재했습니다. URL 날짜가 반드시 UTC 게시일을 의미한다고 단정할 수는 없지만, 현재 자료만으로는 명백한 날짜 상충이 있습니다.
 
-그러나:
+또한:
 
-\[
-125B + 51B + 4B = 180B
-\]
+> “Definitive transaction confirmations crystallized”
 
-따라서 **176B 총파라미터는 산술적으로 불가능**합니다. 구성 요소 중 하나가 중복 계상되거나 core 수치에 이미 MTP가 포함된 것이라면 그 정의를 명확히 해야 합니다.
+는 사건을 8월 27일로 재설정하기 위한 모호한 표현일 뿐, 구체적인 신규 공시가 아닙니다.
 
-### 알려진 Qwen3-Next 구조와의 혼동 정황
+**필요한 증거:**
 
-초안의 다음 구조는 기존 Qwen3-Next 계열 설명과 매우 유사합니다.
+- Bloomberg 기사 최초 게시 및 최종 업데이트 시각
+- 8월 27일 Nscale 또는 Anthropic의 계약 체결 보도자료
+- “finalized/executed” 상태를 확인하는 직접 인용
 
-- 48 layers
-- Gated DeltaNet와 sparse/full attention의 3:1 비율
-- 512 experts
-- 10 routed experts + 1 shared expert
-- hybrid attention
-- MTP
+8월 26일 기사에 대한 8월 27일 재보도뿐이라면 24시간 이벤트로 인정하기 어렵습니다. `ongoing_story_exception`도 false이므로 현재 메타데이터로는 **시간 요건 통과 처리 불가**입니다.
 
-그런데 모델명과 파라미터가 `Qwen3.8-Flash-Next`, 176B/6B로 바뀌어 있습니다. 따라서 공식 기술 보고서가 없다면 기존 Qwen3-Next 아키텍처를 새 모델에 잘못 전사했을 가능성을 배제할 수 없습니다.
+## 명백한 사실 오류
 
-특히 Primary URL:
+### 1) `Vera Rubin NVL72`는 세대별 시스템 명칭을 혼합했다
 
-```text
-https://github.com/QwenLM/Qwen3.8-Flash-Next
-```
+NVIDIA의 알려진 랙스케일 명명 기준에서:
 
-은 실제 저장소 존재 여부, 릴리스 태그, README의 공식 모델명, Hugging Face 체크포인트 링크를 확인해야 합니다. GitHub 저장소가 없다면 해당 항목의 핵심 출처가 무효입니다.
+- **GB200/GB300 NVL72**: Blackwell 계열
+- **Vera Rubin NVL144**: Rubin 계열
+- Rubin Ultra: 더 큰 NVL 구성
 
-### 계층 구조 표가 기술적으로 잘못됨
+따라서 다음 표현은 잘못되었습니다.
 
-표는 다음을 “Layer 1~5”처럼 위아래로 쌓인 계층으로 표현합니다.
+> “NVIDIA Vera Rubin NVL72 rack clusters”
 
-- MTP
-- QSA layers
-- GDN layers
-- MoE
-- n-gram embedding
+계약이 Rubin 시스템을 대상으로 한다면 공식 발표에 맞춰 **Vera Rubin NVL144** 또는 단순히 “Vera Rubin systems”라고 해야 합니다. 정확한 랙 구성이 공시되지 않았다면 NVL 숫자를 붙이지 않는 편이 안전합니다.
 
-하지만 이들은 일반적으로 단순한 5단 직렬 레이어가 아닙니다.
+### 2) `SpaceX Colossus 1`은 회사가 틀렸다
 
-- GDN과 attention은 transformer block sequence 안에서 **교차 배치**
-- MoE는 각 블록의 FFN 구성 요소
-- embedding table은 입력 표현 계층
-- MTP는 주 transformer stack 상단의 독립 “Layer 1”이라기보다 보조 예측 헤드
+Colossus는 **xAI의 Memphis 슈퍼컴퓨터/데이터센터 프로젝트**이지 SpaceX의 제품이나 데이터센터 계약명이 아닙니다. Elon Musk 계열사라는 이유로 SpaceX와 xAI를 바꾸어 쓸 수 없습니다.
 
-따라서 표 제목을 `Architectural Components`로 바꾸고, 실제 반복 패턴을 별도 도식으로 표현해야 합니다.
+따라서:
 
-### “고정 크기 상태이므로 1M 컨텍스트가 작은 가속기에서 실행된다”는 비약
+> “Anthropic Colossus Deal | SpaceX”
 
-75%의 레이어가 recurrent/linear attention이어도 나머지 sparse-attention 레이어, MoE weight residency, activation, routing 및 long-context indexing 비용은 남습니다. “smaller accelerator footprints”는 다음 조건이 없으면 입증되지 않습니다.
+는 삭제해야 합니다. Anthropic이 xAI의 Colossus 용량을 임차한다는 것도 매우 이례적인 주장인 만큼 직접 계약 출처가 없으면 비교표 전체에서 제외해야 합니다.
 
-- 요구 VRAM
-- 정밀도
-- tensor/pipeline parallel degree
+### 3) 누적 의무액 계산과 비교 범주가 부정확하다
+
+초안에 적힌 금액만 단순 합산해도:
+
+- Nscale: $45B
+- Fluidstack: $50B
+- “Colossus”: $45B
+- AWS: $100B 초과
+
+합계는 **$240B 초과**입니다. “beyond $150B”가 문자 그대로 거짓은 아니지만, 독자에게 실제 규모를 크게 축소해 전달합니다.
+
+더 중요한 문제는 다음 항목들이 같은 회계 범주인지 확인되지 않았다는 점입니다.
+
+- 확정 최소 구매의무
+- 최대 계약가치
+- 데이터센터 건설투자
+- 클라우드 크레딧
+- 지분투자와 연계된 용량 약정
+- 전력·랙 예약
+
+서로 다른 계약 개념을 단순 합산해 “forward compute obligations”라고 부르면 안 됩니다.
+
+### 4) Claude 5.x, “mythos-scale”은 확인되지 않은 제품 로드맵이다
+
+공식 계약 발표에 모델명이 없다면 삭제해야 합니다. 인프라 계약에서 모델 세대를 추론하는 것은 전략적 분석이지 사실이 아닙니다.
+
+### 5) `Nscale $14.6B valuation`과 1.35GW 수치는 직접 출처 필요
+
+거래가치, 기업가치, 프로젝트 가치가 혼동되기 쉽습니다. 특히 비상장사의 valuation은 가장 최근 자금조달 라운드나 인수 제안가를 명시해야 합니다.
+
+## 전력 환산
+
+460MW를 345,000가구로 환산하면 가구당 약 1.33kW의 평균부하를 전제로 합니다. 범위상 불가능한 계산은 아니지만 다음을 명시해야 합니다.
+
+- 발전 용량인지 IT load인지
+- PUE를 포함한 facility load인지
+- 미국 평균 가구 전력소비량의 기준 연도
+
+“전력 소비가 정확히 345,000가구와 같다”기보다는 “약 35만 가구의 평균 전력수요에 상당”이 안전합니다.
+
+---
+
+# 3. Z.ai GLM-5.3-Flash
+
+## 시간 검증
+
+`Event Date: 2026-08-27`만 있고 시각이 없습니다. 엄격한 24시간 기준은 8월 27일 00:52 UTC 이후이므로 날짜만으로는 통과 여부를 판단할 수 없습니다.
+
+다음 중 하나가 필요합니다.
+
+- Z.ai 공식 블로그 게시 시각
+- Hugging Face 최초 공개 커밋 시각
+- 모델 저장소의 `createdAt`
+- OpenRouter 공개 시각
+
+따라서 `event_within_24h_window: true`는 현재 증거만으로 **미입증**입니다.
+
+## 출처·수치 검증 문제
+
+### 1) Hugging Face 저장소만으로 모든 주장을 뒷받침할 수 없다
+
+다음은 서로 다른 출처가 필요합니다.
+
+- 320B/18B, 계층 수, expert 수: `config.json` 또는 기술보고서
+- MIT 라이선스: 저장소 LICENSE 및 metadata
+- Ox Alpha 동일성: Z.ai 공식 발표
+- OpenRouter 성능: OpenRouter 페이지
+- API 가격: 실제 API 제공자 가격표
+- 30T 학습 토큰: 모델 카드 또는 기술보고서
+- 3배 compute/4배 KV 절감: 측정 조건이 포함된 벤치마크
+
+현재 Primary URL은 모델 저장소 하나뿐이므로 “Ox Alpha의 정체”, 학습 토큰, API 가격, 성능 배수를 모두 검증하기 어렵습니다.
+
+### 2) 성능 수치가 측정값인지 구조적 추정인지 구분되지 않았다
+
+45개 층 중 34개가 KV cache를 사용하지 않는 선형 attention이고 11개만 KV cache를 유지한다면, 단순 계층 수 기준 감소율은 약:
+
+- 기존 대비 잔존 비율: 11/45 ≈ 24.4%
+- 단순 감소 배수: 45/11 ≈ 4.09배
+
+그러나 실제 메모리에는 다음이 포함됩니다.
+
+- 선형 attention recurrent state
+- sparse attention의 인덱스/메타데이터
+- activation workspace
+- MoE communication buffer
+- 비전·비디오 토큰
+- tensor-parallel 복제 비용
+
+따라서 “4x KV-cache compression”은 구조적 근사치일 수는 있어도 전체 GPU 메모리가 4배 줄어든다는 의미로 쓰면 안 됩니다.
+
+### 3) Transformer 비교 설명이 기술적으로 부정확하다
+
+> “full quadratic attention matrices to be computed for every token”
+
+자가회귀 추론에서 KV cache를 사용하면 과거 토큰 전체의 K/V를 매 단계 다시 계산하지 않습니다. 프리필은 일반적으로 이차 복잡도의 영향을 받지만, 디코딩 단계의 attention 연산은 문맥 길이에 대해 대체로 선형 증가합니다.
+
+다음처럼 고치는 편이 정확합니다.
+
+> “Full softmax attention incurs quadratic prefill cost and KV-cache growth linear in context length during autoregressive serving.”
+
+### 4) GLM-4-Plus의 130B 및 멀티모달 표기는 근거가 약하다
+
+`GLM-4-Plus`와 `GLM-4V-Plus`는 구분해야 합니다. GLM-4-Plus의 정확한 파라미터 수가 공식 공개되지 않았다면 “Dense ~130B”를 사실처럼 적을 수 없습니다.
+
+### 5) GLM-6 로드맵은 공식 출처가 없으면 삭제해야 한다
+
+다음 내용은 매우 구체적이지만 출처가 없습니다.
+
+- 2027
+- Fully Disaggregated MoE
+- >2M tokens
+- Full Agentic Real-Time Autonomy
+
+공식 로드맵이 아니라 편집자의 전망이면 표에서 분리해 **Analyst Scenario**로 표시해야 합니다.
+
+### 6) “4-GPU로 서빙 가능”은 GPU 종류 없이는 무의미하다
+
+328GB 가중치에는 런타임 오버헤드와 KV/recurrent state가 포함되지 않습니다.
+
+- 4×80GB = 320GB이므로 가중치만으로도 부족
+- 4×96GB는 매우 빠듯함
+- 4×192GB라면 가능할 수 있음
+
+따라서 “4x or 8x high-memory GPUs” 대신 GPU 메모리와 양자화·병렬화 조건을 제시해야 합니다.
+
+---
+
+# 4. Hot Chips 2026 메모리 발표
+
+## 시간 검증
+
+Category 6 예외가 올바르게 적용되었습니다.
+
+- 이벤트: 2026-08-24~25
+- 기준: 2026-08-28 09:52 KST
+- 경과: 약 3~4일
+- 허용 한도: 7일
+
+따라서 **시간상 적합**하며 stale로 지적할 사유가 없습니다.
+
+## 명백한 기술 용어 오류
+
+### 1) HBM4는 `2,048 pins`보다 `2,048-bit interface/I/O`가 정확하다
+
+HBM 규격의 대표 수치는 데이터 인터페이스 폭입니다.
+
+- HBM3/HBM3E: 1,024-bit
+- HBM4: 2,048-bit
+
+이를 물리적 패키지 핀 수와 동일시하면 안 됩니다. 실제 micro-bump 또는 전체 연결 수에는 데이터 외에도 명령·주소·전원·접지 등이 포함됩니다.
+
+다음 표현을 모두 수정해야 합니다.
+
+- `2,048 pins` → `2,048-bit data interface`
+- `1,024-pin HBM3e` → `1,024-bit HBM3E interface`
+- Background Stat도 `2,048-bit I/O width`로 변경
+
+### 2) 48GB는 16-Hi 자체의 고정 용량이 아니다
+
+48GB는 예를 들어 24Gb DRAM die 16개를 쌓았을 때의 용량입니다. 16-Hi라는 적층 수만으로 48GB가 자동 결정되지는 않습니다.
+
+따라서:
+
+> “up to 16-high stacks, with 48GB in the disclosed 24Gb-die configuration”
+
+처럼 die density 조건을 붙여야 합니다.
+
+### 3) PIM 성능 배수를 범용 성능처럼 쓰면 안 된다
+
+`3.01x inference speedup`, `8x effective bandwidth`는 반드시 다음 조건을 밝혀야 합니다.
+
+- 모델 또는 kernel
 - batch size
-- KV 또는 sparse-index 메모리
-- 실제 GPU 수
+- baseline SoC/GPU
+- precision
+- sequence length
+- 전력 제한
+- 실측인지 시뮬레이션인지
 
-### 처리량 수치의 단위 문제
+특정 데모 결과를 “LPDDR5X-PIM이 일반적으로 3.01배 빠르다”고 일반화하면 부정확합니다.
 
-> 16,000 tokens/sec per GPU  
-> 200 tokens/sec per concurrent user
+### 4) HPB의 35% 수치도 열 측정 기준이 필요하다
 
-두 수치는 동시 사용자 수, batch size, 입력·출력 길이, quantization 및 speculative decoding 조건이 없으면 비교 불가능합니다. 특히 GB300 NVL72 전체 시스템 결과를 “per GPU”로 환산했다면 선형 환산인지 실측인지 밝혀야 합니다.
+다음 표현은 서로 다른 지표일 수 있습니다.
 
-### 상태 분류 오류
+- hotspot temperature 35% 감소
+- peak junction temperature 35% 감소
+- thermal resistance 35% 감소
+- hotspot area 35% 감소
 
-`Open-Weight Silicon Preview`는 부적절합니다. 이는 실리콘 공개가 아니라 소프트웨어 모델·가중치 공개입니다.
+원 발표 슬라이드의 정확한 지표와 단위를 그대로 옮겨야 합니다. 온도를 섭씨 기준으로 “35% 감소”라고 표현하는 것도 물리적으로 오해를 부르기 쉽습니다.
 
-권장:
+### 5) HBM3E base die를 단순히 “passive”라고 부르는 것은 과도하다
 
-```text
-Official API Release & Open-Weight Model Preview
-```
+HBM3E base die에도 인터페이스·테스트·제어 관련 회로가 존재할 수 있습니다. HBM4에서의 변화는 일반적으로 더 고급인 logic/active base die와 파운드리 선택·커스터마이징 확대입니다.
 
----
+표에서는 다음처럼 표현하는 편이 좋습니다.
 
-## 항목 4 — AMD MI455X 및 Helios
+> “conventional memory-interface base die”  
+> 대비  
+> “advanced/custom logic base die”
 
-### 판정: **Category 6 시간 요건은 충족하지만 핵심 사양에 오류**
+### 6) Intel EMIB-T “qualification 완료”는 공식 확인이 필요하다
 
-### 가장 중요한 오류: 메모리 대역폭
+“협업 중”, “호환 로드맵 제시”, “qualification 완료”는 서로 다른 단계입니다. Intel Foundry와 SK hynix 양측 자료가 없다면:
 
-AMD가 MI400/MI455X에 대해 공개해 온 대표 수치는 대체로 다음 계열입니다.
+> “being evaluated for integration”
 
-- **432GB HBM4**
-- 약 **19.6 TB/s per GPU**
-- 72 GPU Helios에서 약 **1.4 PB/s aggregate memory bandwidth**
-- 약 **31TB aggregate HBM**
-- 약 **2.9 EFLOPS FP4**
+정도로 낮춰 써야 합니다.
 
-초안은 이를 다음처럼 적었습니다.
+## URL 품질
 
-- 23.3 TB/s per GPU
-- 1.7 PB/s per rack
+Primary URL이 Tom’s Hardware의 2차 보도인데 Source를 “Hot Chips Technical Proceedings”라고 적었습니다. 기술 수치의 최종 근거는 다음 중 하나여야 합니다.
 
-산술적으로 23.3 × 72 = 1,677.6 TB/s이므로 초안의 두 값은 서로 일관되지만, **출발점인 23.3 TB/s가 공식 MI455X 사양과 불일치**합니다. 공식 수치 19.6 TB/s를 적용하면:
+- Hot Chips 공식 프로그램/슬라이드
+- Samsung 발표 PDF
+- SK hynix 발표 PDF
+- 발표자 논문 또는 공식 보도자료
 
-\[
-19.6 \times 72 = 1{,}411.2\ \text{TB/s}
-\]
-
-즉 약 **1.41 PB/s**입니다.
-
-따라서 본문, Technical Deep Dive, 비교표, Background Stats의 다음 숫자를 모두 고쳐야 합니다.
-
-| 초안 | 수정 권고 |
-|---|---|
-| 23.3 TB/s/GPU | 공식 자료의 약 19.6 TB/s/GPU로 확인 |
-| 1.7 PB/s/rack | 약 1.4 PB/s/rack |
-| MI355X 대비 3배 이상 | 동일 정밀도·동일 단위로 재계산 |
-
-### 공정·패키징 단정
-
-다음 세부 사양은 공식 Hot Chips 슬라이드가 직접 뒷받침하지 않으면 확정적으로 쓰면 안 됩니다.
-
-- N2 compute dies
-- N3P cache/I/O chiplets
-- compute dies의 copper-to-copper 3D hybrid bonding
-- CoWoS-L 세부 연결 방식
-
-AMD가 “2nm/3nm 기반”을 공개한 것과 각 die의 기능을 N2·N3P에 정확히 할당한 것은 다른 수준의 주장입니다. 슬라이드 번호 또는 proceedings 페이지를 붙여야 합니다.
-
-### Helios 구성 수량 누락
-
-“72 MI455X + Venice CPUs + Vulcano 800 NICs”만으로는 랙 토폴로지를 재현할 수 없습니다. 다음 수량을 공식 구성표와 맞춰야 합니다.
-
-- CPU 개수
-- GPU tray 수와 tray당 GPU 수
-- NIC/DPU 개수
-- scale-up switch 수
-- scale-out fabric 구성
-
-### `EPYC Venice (96-core)` 재검증
-
-Venice를 단순히 “96-core”로 고정하는 것은 부정확할 가능성이 큽니다. Venice 제품군 전체의 최대 코어 수와 Helios에 탑재되는 특정 SKU의 코어 수는 구분해야 합니다. Hot Chips 발표가 특정 96코어 SKU를 명시한 경우에만 비교표에 유지하십시오.
-
-### SI/PI 설명의 과도한 추론
-
-다음은 발표된 제품 사실이 아니라 작성자의 엔지니어링 추론입니다.
-
-- all-reduce burst가 hybrid-bonded die에서 특정 전압 droop를 유발
-- IFoE 때문에 특정 저손실 PCB와 trace-length matching이 필수
-- 다음 리비전에서 CPO로 전환
-
-합리적인 분석일 수는 있지만 출처가 없으면 “AMD가 공개한 implementation rules”처럼 쓰면 안 됩니다. 특히 CPO 전환은 로드맵 근거가 필요합니다.
-
-권장 표현:
-
-> “Potential implementation implications include tighter PDN, SI and thermal design constraints; these are analyst inferences rather than disclosed Helios design rules.”
-
-### Hot Chips 날짜
-
-행사 전체 기간, 튜토리얼 기간 및 해당 AMD 세션 날짜를 구분해야 합니다. `August 25–26`이라고 쓰면서 메타데이터는 `August 25`로 한 것은 불완전합니다. 세션 프로그램의 정확한 날짜·현지 시각을 기입하십시오.
+Tom’s Hardware는 보조 출처로 두는 것이 적절합니다.
 
 ---
 
-# 3. 요약부의 과장 표현
+# 요약·캘린더 추가 문제
 
-다음 표현은 증거 수준보다 강합니다.
+## 요약부에서 반복되는 오류
 
-### “establishes”, “prove”, “validate”
+다음 문구는 본문 수정과 함께 고쳐야 합니다.
 
-- Google 발표가 음성 인터페이스 전체의 진화를 “확립”
-- Qwen 모델 하나가 비용 89% 절감을 “증명”
-- AMD 발표가 메모리 월 해결책을 “검증”
+- “empirically documented at scale”  
+  → 독립 보고서와 사건 범위가 확인된 뒤 사용
+- “directly lock down multi-gigawatt utility power”  
+  → 해당 거래는 460MW이므로 단일 계약을 multi-gigawatt로 표현하면 과장
+- “proved hybrid linear-sparse attention”  
+  → 한 모델 공개는 효율 가능성을 입증할 수 있지만 업계 표준을 “증명”하지는 않음
+- “2,048-pin HBM4”  
+  → `2,048-bit HBM4 interface`
 
-벤치마크 조건과 독립 재현이 없다면 다음처럼 낮추는 것이 적절합니다.
+## NVIDIA 배당금
 
-- `suggests`
-- `demonstrates under reported test conditions`
-- `illustrates one approach`
-- `company-claimed`
+> “$0.25 per share”
 
-특히 Qwen의 `1/9 training cost`는 비용인지 FLOPs인지 GPU-hours인지 구분해야 합니다. “compute expenditure”는 금전 비용과 계산량을 혼동합니다.
+이는 반드시 NVIDIA IR의 Q2 FY2027 실적발표 자료와 대조해야 합니다. NVIDIA의 최근 분할 조정 기준 분기 배당금과 비교하면 $0.25는 매우 큰 변화이므로, 공식 선언문 없이 적으면 안 됩니다. 특히 주식분할 전·후 금액을 혼동했을 가능성이 있습니다.
+
+다음 세 항목을 직접 링크해야 합니다.
+
+- declared dividend per share
+- record date
+- payment date
+
+## Apple, Meta, VMware 일정
+
+제품 출시일과 행사 일정에도 직접 URL이 없습니다.
+
+- Apple “M5 Max/M5 Ultra Mac Studio” 출시일
+- Meta @Scale 10월 28일
+- VMware Explore 장소·기간
+
+공식 이벤트 페이지나 기업 뉴스룸 링크를 붙이지 못하면 “예정” 목록에서 제거하거나 “미확정/보도 기준”으로 표시해야 합니다.
 
 ---
 
-# 4. 향후 일정 검증
+## 권고 수정 우선순위
 
-각 항목에 공식 이벤트 또는 제품 발표 URL이 필요합니다.
+1. **1번:** OpenAI·METR·Redwood 직접 링크를 각각 제시하고, `GPT-5.6 Sol`, `Astra`, CrowdStrike, CoT 위조, 15~30% 비용 추정은 원문 확인 전 삭제.
+2. **2번:** `Vera Rubin NVL72`를 수정하고 `SpaceX Colossus` 비교행 삭제. 8월 27일의 실제 신규 계약 확인 시각을 제시하지 못하면 24시간 슬롯에서 제외.
+3. **3번:** Hugging Face `config.json`, LICENSE, 최초 커밋 시각을 인용. GLM-4-Plus 파라미터와 GLM-6 로드맵 삭제 또는 전망으로 분리.
+4. **4번:** 모든 `pins`를 `bit interface/I/O width`로 교정하고, 3.01배·8배·35%·70%·230%에 벤치마크 조건을 붙임.
+5. **전체:** 사건 발생일, 발표일, 기사 게시일, 기사 업데이트일을 별도 필드로 분리.
 
-| 일정 | 판정 |
-|---|---|
-| VMware Explore 2026, 8/31–9/3 | 행사 공식 페이지로 장소·날짜 확인 필요 |
-| Gartner Gold Coast, 9/14–16 | 공식 Gartner 이벤트 페이지 필요 |
-| Mac Studio M5 Max/Ultra, 9/22 판매 | Apple Newsroom 및 제품 주문 페이지 필요 |
-| NVIDIA 10/1 배당, $0.25 | **금액 오류 가능성이 매우 높음. 실적 발표문 기준으로 수정 필수** |
-| 512GB Mac Studio, 10월 말 | Apple 주문 페이지의 배송 예정일과 “공식 출시일”을 구분해야 함 |
-
-배송 예상일은 지역과 주문 시점에 따라 달라질 수 있으므로 “commercial shipping commences”로 확정하면 안 됩니다.
-
----
-
-# 최종 수정 우선순위
-
-1. **항목 3 삭제 후 공식 Qwen 저장소·기술 보고서 기준으로 재작성**
-2. **항목 4의 23.3 TB/s와 1.7 PB/s를 공식 사양으로 교체**
-3. **항목 2에서 NVIDIA 실적과 AWS 200만 GPU 계약을 분리**
-4. **NVIDIA 주당 $0.25 배당 수정**
-5. **항목 1에 모델 카드·API 문서·Artificial Analysis 직접 URL 추가**
-6. 항목 4의 `event_within_24h_window`를 false 또는 unknown으로 수정하되 Category 6의 7일 예외는 유지
-7. 모든 벤치마크에 데이터셋, 언어 평균 방식, 정밀도, 하드웨어 및 batch 조건 추가
-
-결론적으로 **시간 윈도우는 대체로 통과하지만, 핵심 제품·수치 검증에서는 항목 3과 4가 명백히 실패하고 항목 1과 2도 공식 1차 자료가 추가되기 전에는 확정 보도로 사용할 수 없습니다.**
+최종적으로 **4번만 시간 슬롯 적합성이 확실하며**, 1번은 제시된 정확한 타임스탬프가 실제 페이지와 일치할 경우에만 통과합니다. 2번과 3번은 현재 초안의 날짜 정보만으로 엄격한 24시간 요건을 충족했다고 볼 수 없습니다.
