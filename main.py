@@ -97,10 +97,10 @@ def get_latest_gemini_model(client):
             latest = flash_models[0].replace("models/", "")
             print(f"Automatically selected Gemini Flash model: {latest}")
             return latest
-        return "gemini-3.5-flash"
+        return "gemini-2.5-flash"
     except Exception as e:
         print(f"Warning: Gemini model discovery failed, using fallback.")
-        return "gemini-3.5-flash"
+        return "gemini-2.5-flash"
 
 @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=2, min=15, max=60), retry_error_callback=return_none_on_error)
 def run_gpt_chat(client, model, messages, system=None):
@@ -458,7 +458,7 @@ def main():
         f.write(final_content)
 
     # ---------------------------------------------------------
-    # Phase 5: HTML Generation (GPT-5.6 Terra 적용)
+    # Phase 5: HTML Generation (Gemini 모델 적용)
     # ---------------------------------------------------------
     print("\n--- Phase 5: HTML Generation ---")
     p5_start = time.time()
@@ -491,27 +491,38 @@ def main():
         print("❌ Phase 5 failed: html_content.txt 프롬프트를 찾을 수 없습니다 (HTML_PROMPT_URL 또는 prompt/html_content.txt 확인 필요).")
         sys.exit(1)
 
-    if not o_client:
-        print("❌ Phase 5 failed: OpenAI client is required for GPT HTML generation. Please set OPENAI_API_KEY.")
-        sys.exit(1)
-
-    gpt_model_id = "gpt-5.6-terra"
-    print(f"Generating article content using model: {gpt_model_id}...")
+    print(f"Generating article content using Gemini model: {g_model}...")
 
     user_prompt = f"다음 데이터를 바탕으로 시스템 지시사항에 맞춰 4개 기사(<article>) 블록만 생성하십시오:\n\n{final_content}"
-    messages = [{"role": "user", "content": user_prompt}]
-
-    articles_content = run_gpt_chat(o_client, gpt_model_id, messages, system=html_prompt_content)
-
-    if not articles_content:
-        print("❌ Phase 5 failed after retries. Exiting.")
-        sys.exit(1)
-
-    try:
-        validate_articles_content(articles_content)
-    except ValueError as e:
-        print(f"❌ Phase 5 validation failed: {e}")
-        sys.exit(1)
+    
+    articles_content = None
+    max_retries = 5
+    for attempt in range(max_retries):
+        try:
+            response = g_client.models.generate_content(
+                model=g_model,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=html_prompt_content,
+                    temperature=0.2
+                )
+            )
+            raw_text = response.text
+            if not raw_text:
+                raise ValueError("Gemini 응답이 비어 있습니다.")
+            
+            validate_articles_content(raw_text)
+            articles_content = raw_text
+            break
+        except Exception as e:
+            print(f"⚠️ Phase 5 attempt {attempt + 1} failed: {e}")
+            if attempt < max_retries - 1:
+                sleep_time = min(60, 15 * (2 ** attempt)) + random.uniform(1, 3)
+                print(f"   {sleep_time:.1f}초 후 재시도합니다...")
+                time.sleep(sleep_time)
+            else:
+                print("❌ Phase 5 failed after 5 attempts. Exiting.")
+                sys.exit(1)
 
     articles_content = _strip_markdown_fence(articles_content)
 
@@ -531,5 +542,4 @@ def main():
     print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
 
 if __name__ == "__main__":
-
     main()
