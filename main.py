@@ -17,6 +17,11 @@ sys.stdout.reconfigure(line_buffering=True)
 
 load_dotenv()
 
+ALLOWED_ICONS = {
+    "#icon-chip", "#icon-network", "#icon-deal", "#icon-security",
+    "#icon-regulation", "#icon-packaging", "#icon-robot", "#icon-datacenter", "#icon-research"
+}
+
 def clean_old_caches(cache_dir="trial"):
     if not os.path.exists(cache_dir):
         return
@@ -97,10 +102,10 @@ def get_latest_gemini_model(client):
             latest = flash_models[0].replace("models/", "")
             print(f"Automatically selected Gemini Flash model: {latest}")
             return latest
-        return "gemini-2.5-flash"
+        return "gemini-3.7-flash"
     except Exception as e:
         print(f"Warning: Gemini model discovery failed, using fallback.")
-        return "gemini-2.5-flash"
+        return "gemini-3.7-flash"
 
 @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=2, min=15, max=60), retry_error_callback=return_none_on_error)
 def run_gpt_chat(client, model, messages, system=None):
@@ -115,7 +120,6 @@ def run_gpt_chat(client, model, messages, system=None):
     )
     return response.choices[0].message.content
 
-
 def _strip_markdown_fence(text):
     """```html ... ``` 또는 ``` ... ``` 마크다운 래퍼를 제거."""
     if "```html" in text:
@@ -124,20 +128,38 @@ def _strip_markdown_fence(text):
         return text.split("```")[1].strip()
     return text
 
-
 def validate_articles_content(text):
-    """🛡️ Phase 5용 검증 함수.
-    - <article> 열고 닫는 태그가 4쌍 이상 있어야 함
-    - 문서 골격(DOCTYPE/head/style 등)이 실수로 포함되지 않았는지 확인
-    """
+    """🛡️ Phase 5 Gemini 정밀 검증기: 골격 태그, 기사 수, SVG 아이콘 화이트리스트, ECharts ID 정합성, 가짜 차트 검사"""
     stripped = _strip_markdown_fence(text)
+    
+    for forbidden in ("<!DOCTYPE", "<head", "<style", "<body", "```"):
+        if forbidden in stripped:
+            raise ValueError(f"금지된 문서 골격/마크다운({forbidden})이 포함되었습니다.")
+
     open_count = stripped.count("<article")
     close_count = stripped.count("</article>")
     if open_count < 4 or close_count < 4:
-        raise ValueError(f"기사 블록이 불완전합니다 (open={open_count}, close={close_count}). 응답이 잘렸을 수 있습니다.")
-    for forbidden in ("<!DOCTYPE", "<head", "<style", "```"):
-        if forbidden in stripped:
-            raise ValueError(f"문서 골격/마크다운({forbidden})이 잘못 포함되었습니다.")
+        raise ValueError(f"기사 블록이 불완전합니다 (open={open_count}, close={close_count}).")
+
+    if "bento-grid-wrap" not in stripped:
+        raise ValueError("마무리 Bento Grid 섹션(bento-grid-wrap)이 누락되었습니다.")
+
+    used_icons = re.findall(r'href="(#[^"]+)"', stripped)
+    for icon in used_icons:
+        if icon not in ALLOWED_ICONS:
+            raise ValueError(f"허용되지 않은 SVG 아이콘 ID 사용: {icon}")
+
+    container_ids = set(re.findall(r'id="(chart-art\d+-[a-zA-Z0-9]+)"', stripped))
+    script_target_ids = set(re.findall(r"getElementById\(['\"](chart-art\d+-[a-zA-Z0-9]+)['\"]\)", stripped))
+    if script_target_ids and not script_target_ids.issubset(container_ids):
+        diff = script_target_ids - container_ids
+        raise ValueError(f"스크립트 대상 DOM ID가 HTML 컨테이너에 존재하지 않음: {diff}")
+
+    chart_data_matches = re.findall(r'data\s*:\s*\[([\d\s,\.]+)\]', stripped)
+    for data_str in chart_data_matches:
+        numbers = [float(n.strip()) for n in data_str.split(',') if n.strip()]
+        if len(numbers) > 1 and len(set(numbers)) == 1:
+            raise ValueError(f"모든 값이 동일한 무의미한 가짜 차트 데이터 감지: {numbers}")
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
 def run_grounded_research(client, model_id, system_rules, user_prompt, output_file="trial/1.txt"):
@@ -218,12 +240,9 @@ def main():
                         line = raw_line.strip()
                         if not line:
                             continue
-                        # 한 줄에 여러 항목이 마커로 붙어버린 경우를 대비한 안전장치(추가 분리)
                         parts = re.split(r'(?:(?<=\S)\s+|^)(?=\d{1,2}[.\)]\s|[-•]\s)', line)
                         parts = [p for p in parts if p.strip()] or [line]
                         for part in parts:
-                            # "-" 등 앞 마커만 제거하고 실제 내용만 남긴다.
-                            # 템플릿의 빈 "-" 줄은 마커 제거 후 내용이 없으므로 자동으로 무시된다.
                             content = re.sub(r'^(?:[-•]|\d{1,2}[.\)])\s*', '', part.strip()).strip()
                             if content:
                                 ref_lines.append(content)
@@ -458,7 +477,7 @@ def main():
         f.write(final_content)
 
     # ---------------------------------------------------------
-    # Phase 5: HTML Generation (Gemini 모델 적용)
+    # Phase 5: HTML Generation (Gemini 3.7 Flash + 방어 검증)
     # ---------------------------------------------------------
     print("\n--- Phase 5: HTML Generation ---")
     p5_start = time.time()
@@ -504,7 +523,7 @@ def main():
                 contents=user_prompt,
                 config=types.GenerateContentConfig(
                     system_instruction=html_prompt_content,
-                    temperature=0.2
+                    temperature=0.15
                 )
             )
             raw_text = response.text
@@ -515,7 +534,7 @@ def main():
             articles_content = raw_text
             break
         except Exception as e:
-            print(f"⚠️ Phase 5 attempt {attempt + 1} failed: {e}")
+            print(f"⚠️ Phase 5 attempt {attempt + 1} validation/API failed: {e}")
             if attempt < max_retries - 1:
                 sleep_time = min(60, 15 * (2 ** attempt)) + random.uniform(1, 3)
                 print(f"   {sleep_time:.1f}초 후 재시도합니다...")
