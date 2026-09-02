@@ -475,9 +475,8 @@ def main():
     os.makedirs("data", exist_ok=True)
     with open(f"data/{today_str}.txt", "w", encoding="utf-8") as f:
         f.write(final_content)
-
     # ---------------------------------------------------------
-    # Phase 5: HTML Generation (GPT-5.6 Terra)
+    # Phase 5: HTML Generation (Gemini 3.8 Flash)
     # ---------------------------------------------------------
     print("\n--- Phase 5: HTML Generation ---")
     p5_start = time.time()
@@ -510,17 +509,30 @@ def main():
         print("❌ Phase 5 failed: html_content.txt 프롬프트를 찾을 수 없습니다 (HTML_PROMPT_URL 또는 prompt/html_content.txt 확인 필요).")
         sys.exit(1)
 
-    if not o_client:
-        print("❌ Phase 5 failed: OpenAI client is required for GPT HTML generation. Please set OPENAI_API_KEY.")
-        sys.exit(1)
-
-    gpt_model_id = "gpt-5.6-terra"
-    print(f"Generating article content using model: {gpt_model_id}...")
+    gemini_model_id = "gemini-3.8-flash"
+    print(f"Generating article content using model: {gemini_model_id}...")
 
     user_prompt = f"다음 데이터를 바탕으로 시스템 지시사항에 맞춰 4개 기사(<article>) 블록만 생성하십시오:\n\n{final_content}"
-    messages = [{"role": "user", "content": user_prompt}]
-
-    articles_content = run_gpt_chat(o_client, gpt_model_id, messages, system=html_prompt_content)
+    
+    articles_content = None
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = g_client.models.generate_content(
+                model=gemini_model_id,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=html_prompt_content,
+                    temperature=0.3
+                )
+            )
+            articles_content = response.text
+            if articles_content:
+                break
+        except Exception as e:
+            print(f"⚠️ Phase 5 attempt {attempt + 1} failed: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(10)
 
     if not articles_content:
         print("❌ Phase 5 failed after retries. Exiting.")
