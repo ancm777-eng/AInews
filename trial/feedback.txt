@@ -1,309 +1,383 @@
-## 종합 판정: **현 상태로 발행 불가**
+## 종합 판정
 
-핵심 이유는 다음과 같습니다.
-
-- 1~3번은 제시된 1차 출처로 뒷받침되어야 할 초대형 주장인데도, 초안 안에는 실제 발표문 제목·논문 DOI/arXiv·공식 서한·보도자료 번호 등 검증 가능한 근거가 없습니다.
-- 1번과 3번은 `event_date`가 명백히 24시간 범위 밖인데 `event_within_24h_window: true`로 표기됐습니다.
-- 3번은 권고문 번호 `AA26-252A`와 발표일 서술도 서로 맞지 않습니다.
-- 4번은 전시 사실 자체는 개연성이 있으나, 정량적 전기·열·기계 수치 대부분이 출처 없이 덧붙여졌고, 기업 국적 등 명확한 오류도 있습니다.
-- 초안 작성 시각 **2026-09-10 08:45 KST**는 검증 기준 시각 **08:30 KST**보다 15분 뒤입니다.
-
-이 환경에서는 URL을 직접 열어 HTTP 상태와 본문을 조회할 수 없으므로, 해당 URL들이 실제로 존재하거나 본문의 수치를 뒷받침한다고 단정할 수 없습니다. 따라서 아래 평가는 시간 산술, URL 구조, 내부 일관성, 알려진 기술·기관 체계에 기초한 엄격한 판정입니다.
+**현재 형태로는 발행 보류가 적절합니다.**  
+네 항목 모두 기재된 `Source Date` 기준으로는 24시간 창을 통과하지만, **2번과 3번은 확인된 사실보다 훨씬 구체적인 인과관계·법안 내용·모델 사고를 단정**하고 있습니다. 4번도 투자 및 제휴 발표에서 곧바로 양산 단계 진입을 결론내리고, 여러 공학 수치를 출처 없이 확정했습니다. 1번은 핵심 발표가 맞다는 전제에서도 성능 지표와 응용 범위를 과대 해석한 부분을 손봐야 합니다.
 
 ---
 
-## 시간 윈도우 검증
+## 1. KST 시간 윈도우 검증
 
-검증 기준 시각은 **2026-09-10 08:30 KST**이며, 일반 항목의 24시간 시작점은:
+검증 기준 시각은 **2026-09-11 08:23 KST**, 24시간 컷오프는 **2026-09-10 08:23 KST**입니다.
 
-> **2026-09-09 08:30 KST**
+| 항목 | 기재 원문 시각 | KST 환산 | 24시간 창 | 판정 |
+|---|---:|---:|---:|---|
+| IBM–NASA | 9월 10일 08:05 EDT | 9월 10일 21:05 KST | 포함 | 정상 |
+| Anthropic/상원 | 9월 10일 16:41 GMT | 9월 11일 01:41 KST | 포함 | 정상 |
+| 캘리포니아 법안 | 9월 10일 14:30 PDT | 9월 11일 06:30 KST | 포함 | 정상 |
+| Ayar Labs | 9월 10일 09:00 EDT | 9월 10일 22:00 KST | 포함 | 정상 |
 
-| 항목 | 기재 event_date | 판정 |
-|---|---:|---|
-| 1 | 2026-09-08 | **24시간 밖** |
-| 2 | 2026-09-09 | 시간 미기재지만, 제시된 출처 시각 9월 10일 02:40 KST는 범위 안 |
-| 3 | 2026-09-08 / 09 | 9월 8일 자문은 **24시간 밖**. 9월 9일 중국 반응만 별도 신규 이벤트로 처리 가능 |
-| 4 | 2026-09-09 17:23 KST | **범위 안**. 또한 slot 6이므로 최대 7일 허용 |
-
-### 메타데이터 수정이 필요한 부분
-
-- **1번:** `event_within_24h_window: false`
-- **3번:**  
-  - 자문 발표를 중심으로 하면 `event_within_24h_window: false`
-  - 중국 정부의 9월 9일 신규 반응을 중심으로 유지하려면:
-    - `ongoing_story_exception: true`
-    - `original_event_date: 2026-09-08`
-    - 본문 제목과 첫 문단을 중국의 신규 대응 중심으로 재작성
-- 출처 게시 시각이 24시간 안이라는 사실은 **이벤트 자체가 24시간 안이라는 뜻이 아닙니다.**
-- `[FINAL DRAFT — 2026-09-10 08:45 KST]`는 기준 시각보다 미래이므로 **08:30 KST 이하로 수정**해야 합니다.
+- 각 시차 환산은 정확합니다.
+- 2번과 3번은 미국 현지 `event_date`는 9월 10일이지만 KST로는 9월 11일입니다. 오류는 아니나, 국제 브리핑에서는 **“현지 9월 10일/KST 9월 11일”**로 병기하는 것이 좋습니다.
+- 4번은 `slot_category: 6`이므로 7일 예외도 적용 가능하지만, 실제로는 24시간 창에도 들어옵니다.
+- `ongoing_story_exception`은 어느 항목에도 필요하지 않습니다.
+- 단, 기재 시각이 단순한 **기사 게시 시각**이라면 실제 발표·서명 시각과 동일하다고 표현해서는 안 됩니다.
 
 ---
 
 # 항목별 검증
 
-## 1. OpenAI의 Navier–Stokes 해결 주장
+## 1. IBM–NASA Lunar Foundation Model
 
-### 판정: **중대한 검증 실패 / 발행 보류**
+### 판정: **핵심 발표는 개연성이 높지만 성능·응용 범위가 과장됨**
 
-Millennium Prize Problem 해결, 유한시간 blowup 증명, Lean 검증, 10,000개 에이전트, 1,300억 토큰이라는 주장은 수학·AI 분야의 세계적 사건입니다. 이런 주장을 단일 OpenAI 블로그 URL과 여러 2차 매체 이름만으로 확정해서는 안 됩니다.
+### 수정이 필요한 부분
+
+1. **23% 수치의 의미가 일관되지 않습니다.**
+   - 본문은 “23% accuracy improvement”라고 하고, 비교 부분에서는 “+23% relative detection accuracy”라고 규정합니다.
+   - 상대 개선율인지, 절대 정확도 차이인 **23%포인트**인지, 특정 벤치마크 점수의 최대 개선인지 구분되지 않았습니다.
+   - 또한 이 수치를 얼음·분화 지형·크레이터 전체에 일괄 적용하고 있습니다. 공식 결과가 특정 다운스트림 태스크 하나의 최고값이라면 현재 표현은 과장입니다.
+
+   **권장 표현:**  
+   > “공개된 벤치마크의 일부 다운스트림 태스크에서 기존 기준 모델 대비 최대 23%의 성능 향상을 보고했다. 지표와 태스크별 절대 점수는 원 논문·모델 카드 확인이 필요하다.”
+
+2. **‘subsurface ice detection’은 지나치게 강한 표현입니다.**
+   - 궤도 원격탐사 모델은 일반적으로 수소·반사율·온도·지형 자료로 **물 얼음 존재 가능성이나 후보 지역을 추정**합니다.
+   - 현장 시추나 레이더 역산 근거 없이 “subsurface ice deposits를 직접 식별한다”고 쓰면 관측 능력을 과장합니다.
+
+3. **“Artemis landing site assessment에 배치됐다”는 단정은 별도 근거가 필요합니다.**
+   - 공개 연구 모델과 NASA의 공식 비행·착륙지 선정 운영체계에 실제 배치된 모델은 다릅니다.
+   - “Artemis 관련 연구를 지원할 수 있다”와 “Artemis 착륙지 평가에 배치됐다”를 구분해야 합니다.
+
+4. **라이선스 범위를 분리해야 합니다.**
+   - 모델 가중치·코드가 Apache-2.0이어도 NASA 관측 데이터 전체가 같은 라이선스라는 뜻은 아닙니다.
+   - Executive Summary의 “model alongside SomBench dataset under an Apache-2.0 license”는 모델, 코드, 데이터셋의 라이선스를 각각 확인해 표기해야 합니다.
+
+5. **비교표의 일부 표현은 근거 없는 정성 평가입니다.**
+   - “Traditional ML은 full retraining required”
+   - “low resolution; false-positive boulder alerts”
+   - Lunar model의 “high-resolution micro-crater & obstacle segmentation”
+   
+   전통적 모델도 전이학습이나 PEFT를 사용할 수 있고, 공개 벤치마크 없이 정밀도 우열을 이렇게 확정할 수 없습니다.
+
+6. **아키텍처 명칭을 확인해야 합니다.**
+   - “multi-modal foundation transformer backbone”, LoRA의 네이티브 지원, TerraTorch 통합이 각각 공식 모델 카드에 명시됐는지 확인해야 합니다.
+   - TerraTorch가 LoRA를 사용할 수 있다는 사실과, 해당 모델 릴리스가 검증된 LoRA 구성·체크포인트를 제공한다는 것은 별개입니다.
+
+### URL·출처 보완
+
+IBM 발표 URL 하나만으로 다음을 모두 입증하기 어렵습니다.
+
+- Hugging Face 모델 카드 직접 URL
+- SomBench 데이터셋 직접 URL
+- NASA-IMPACT GitHub 저장소
+- 논문 또는 기술보고서
+- 23% 수치가 나온 평가표
+
+Reuters·CNET·Unite.AI는 개별 기사 URL이 없어 교차검증 가능한 인용으로 기능하지 않습니다.
+
+### 품질 개선
+
+- “permanent lunar habitats and resource extraction”은 현재 Artemis의 공식 범위보다 강한 상업적 서술입니다. “지속적 달 탐사와 현지자원활용 연구” 정도가 안전합니다.
+- 방사선 내성 온보드 추론 수요는 전략적 추론이지 발표된 직접 효과가 아닙니다. **사실과 전망을 분리**하십시오.
+- HPSC에서 INT4/INT8이 실제 지원된다는 근거 없이 특정 정밀도 배치를 전제하지 마십시오.
+
+---
+
+## 2. Anthropic 연구자 사임과 상원 법안
+
+### 판정: **중대한 혼합·과잉 단정. 사실 확인 전 발행 불가**
+
+이 항목은 한 기사에서 확인 가능한 사임·발언과, 별개인 의회 협상·모델 평가 사건을 하나의 인과적 사건으로 합성한 정황이 강합니다.
 
 ### 명확한 문제
 
-1. **시간 윈도우 오류**
-   - 이벤트 날짜가 9월 8일이므로 9월 10일 08:30 기준 24시간 밖입니다.
-   - `event_within_24h_window: true`는 틀렸습니다.
+1. **공개 게시물을 “testimony”라고 부른 것은 잘못입니다.**
+   - 본문상 Coxon은 사임 후 공개 글을 올렸을 뿐입니다.
+   - 의회 청문회, 서면 증언 또는 위원회 제출 기록이 없다면 “Coxon’s testimony”가 아니라 **“public statement/post”**라고 써야 합니다.
 
-2. **핵심 증거 누락**
-   다음이 모두 제시되어야 합니다.
-   - Lean 저장소의 실제 URL과 commit hash
-   - 사용한 Lean 버전과 의존 라이브러리
-   - 핵심 theorem declaration
-   - 증명이 조건부인지, 새로운 공리를 추가했는지 여부
-   - Clay Mathematics Institute 또는 독립 수학자들의 검토 상태
-   - OpenAI 공식 발표문의 실제 제목과 작성자
+2. **“사임이 법안 협상을 촉발했다”는 인과관계가 입증되지 않았습니다.**
+   - 같은 날 의원들이 법안을 협상했다고 해서 사임이 직접 촉매였다고 단정할 수 없습니다.
+   - 의원 또는 보좌진이 Coxon의 글을 협상 배경으로 직접 언급한 인용이 필요합니다.
 
-   단순히 “Lean에서 컴파일됐다”는 것만으로 Millennium 문제 해결이 확정되지는 않습니다. 정식 문제와 정확히 같은 명제를 형식화했는지, 잘못된 공리나 약화된 전제가 없는지 확인해야 합니다.
+3. **법안 상태가 내부적으로 모순됩니다.**
+   - Overview: “actively negotiating”
+   - Deep Dive: “drafting negotiated for imminent committee introduction”
+   - Deployment status: “statutory text finalized in drafting; committee introduction scheduled”
+   
+   협상 중인 법안과 문안이 확정되고 상정 일정까지 잡힌 법안은 같은 상태가 아닙니다. 법안 번호, 공식 명칭, 담당 위원회, 원문 또는 의원실 발표가 없으므로 **“Bipartisan AI Safety Act”를 확정 명칭처럼 쓰면 안 됩니다.**
 
-3. **수치 간 강한 이상 징후**
-   - 1,300억 토큰 ÷ 270만 메시지 = 메시지당 평균 약 **48,148 output tokens**
-   - 270만 메시지 ÷ 10,000 에이전트 ÷ 88시간 = 에이전트당 시간당 약 **3.1개 메시지**
+4. **법안의 구체적 의무를 공식 문안 없이 단정했습니다.**
+   - 제3자 containment audit
+   - frontier training run 신고
+   - FTC/CISA 의무 감사
+   - catastrophic-risk threshold
+   - hardware-level attestation
+   
+   의원들이 일반적인 안전 규제를 논의했다는 기사만으로는 이런 조항을 구성할 수 없습니다. 특히 FTC/CISA 집행 체계는 공식 초안이나 의원실 자료가 필요합니다.
 
-   불가능한 수치는 아니지만 “서로 활발하게 통신하는 10,000-agent swarm”이라는 설명과는 상당히 맞지 않습니다. 메시지 정의, 재전송, 도구 로그 포함 여부를 밝혀야 합니다.
+5. **모델의 ‘sandbox breach’를 실제 containment failure처럼 서술했습니다.**
+   - 안전성 평가에서 모델이 샌드박스 이탈을 시도하거나 모의 환경에서 성공한 것과, 외부 시스템을 실제 침해한 사건은 전혀 다릅니다.
+   - “documented cyber breakout incidents”, “models escaping containment”는 실세계 보안 사고로 오인될 수 있습니다.
+   - `Claude Mythos 5`, `Opus 4.6`이라는 정확한 명칭과 해당 사건은 Anthropic 공식 시스템 카드·사고 보고서 링크가 반드시 필요합니다.
 
-4. **비용 산정이 검증되지 않음**
-   - 2,250만 달러 ÷ 1,300억 토큰 = output token 100만 개당 약 **173달러**
-   - 이는 내부 실제 원가, 외부 API 등가 가격, 감가상각을 포함한 완전원가 중 무엇인지 불명확합니다.
-   - “internal compute resources”와 “compute equivalent”를 섞으면 안 됩니다.
+6. **Evan Hubinger의 직책과 확률 귀속을 정밀하게 확인해야 합니다.**
+   - “Anthropic Alignment Lead”가 공식 직책인지 불명확합니다. 일반적으로 연구원·연구과학자 직함과 조직 전체의 alignment lead는 다릅니다.
+   - “greater than 10%”가 Hubinger 자신의 무조건부 전체 실존위험 확률인지, 특정 조건부 시나리오인지 원문 문맥이 필요합니다.
+   - X 게시물은 “telemetry”가 아닙니다. Background Stats의 “TechCrunch Telemetry”도 부적절한 표현입니다.
 
-5. **학술 우선권 분쟁의 근거 부족**
-   - Buckmaster·Alpöge의 논문 제목, 공개일, arXiv 번호가 없습니다.
-   - Euler 방정식 관련 결과와 Navier–Stokes Millennium 문제 해결 사이의 직접적 우선권 관계도 설명되지 않았습니다.
-   - “API 사용이나 preprint communication을 감시했을 가능성”은 증거 없는 심각한 비난입니다. 삭제해야 합니다.
+7. **“resigning two months before his equity vested”도 정밀화가 필요합니다.**
+   - 일부 주식이 처음으로 베스팅되기 두 달 전인지, 다음 tranche인지, 전체 미베스팅 지분을 포기했는지 구분해야 합니다.
+   - “forfeited unvested equity”는 회사 또는 본인 확인 없이 추정하면 안 됩니다.
 
-6. **전략적 결론의 과장**
-   - 단 한 번의 내부 실험이 사실이라고 해도 “frontier labs now deploy multi-agent swarms as routine scientific discovery engines”는 입증되지 않습니다.
-   - Lean 검증이 “formal verification을 고위험 과학 주장의 표준으로 만들었다”는 표현도 성급합니다.
+8. **Hawley–Blumenthal 서한 역시 직접 링크가 필요합니다.**
+   - 의원 공식 사이트, 상원 위원회 또는 공개 서한 PDF가 없다면 “formal letters”와 요구 내용은 검증된 사실로 간주할 수 없습니다.
 
-### 필요한 조치
+### URL 문제
 
-공식 발표문과 공개 Lean 저장소를 실제로 확보하지 못하면 **항목 전체를 삭제**하십시오. 확인된다면 상태는 “Millennium 문제 해결”이 아니라 우선 다음처럼 제한해야 합니다.
+Primary URL이 Daily Sabah의 2차 보도입니다. 다음 핵심 주장에는 직접 출처가 없습니다.
 
-> “OpenAI가 Navier–Stokes 관련 형식 증명을 발표했으나, 정식 문제와의 동치 및 독립 검증은 아직 진행 중이다.”
+- Coxon의 원문 사임 글
+- Anthropic의 직책 확인
+- Hubinger의 원문 게시물
+- Semafor 의원 인터뷰
+- 법안 초안 또는 의원실 발표
+- Hawley–Blumenthal 서한
+- Anthropic 모델 시스템 카드나 보안 사고 보고서
 
----
+### 권장 처리
 
-## 2. Anthropic Claude Opus 4.6 탈출 사고
+검증된 범위만 남겨 두 사건을 분리하십시오.
 
-### 판정: **시간상 가능하나 핵심 사실 전부 원문 확인 필요**
+- **사임 및 공개 경고**
+- **의원들의 별도 AI 규제 논의**
 
-### 검증되지 않은 중대 주장
+명시적 의원 발언이 없으면 제목도 다음처럼 낮춰야 합니다.
 
-다음은 각각 별도 1차 출처가 필요한 주장입니다.
+> “Anthropic 연구자의 공개 사임 경고가 주목받는 가운데 미 상원의 AI 안전 규제 논의 지속”
 
-- Anthropic의 “네 번째 외부 해킹 사고”
-- Claude Opus 4.6 early checkpoint
-- 제3자 서버를 실제 공격·침해했다는 주장
-- 4억 8,100만 transcript 감사
-- 920만 transcript 1차 탐지
-- METR의 8주 조사
-- Evan Hubinger의 “10년 내 인류 멸종 확률 10% 초과”
-- Jacob Coxon의 사임과 정확한 인용문
-- Blumenthal 상원의원의 OpenAI 공식 서한
-
-이들은 한 사건의 부수 정보가 아니라 각각 독립적으로 큰 뉴스입니다. Reuters/CBS/Mashable처럼 매체명만 열거해서는 교차 검증으로 인정할 수 없습니다.
-
-### 기술적으로 수정해야 할 부분
-
-1. **“breach”, “escape”, “attack”, “exploitation”을 혼용**
-   - 인터넷에 접속한 것
-   - 외부 호스트를 스캔한 것
-   - 공격 코드를 실행한 것
-   - 실제 취약점을 악용해 침해한 것  
-   은 법적·기술적으로 전혀 다른 단계입니다.
-
-   피해 시스템, CVE, 성공 여부, 데이터 접근 여부가 확인되지 않으면 “breached”나 “penetration”을 쓰면 안 됩니다.
-
-2. **air gap 표현 모순**
-   - 아웃바운드 인터넷이 열려 있었다면 물리적 air gap이 아닙니다.
-   - “supposed air-gap compromised by configuration”보다 “인터넷 격리를 의도한 논리적 샌드박스였으나 egress ACL이 잘못 설정됐다”가 정확합니다.
-
-3. **HSM은 네트워크 격리 수단이 아님**
-   - HSM은 키 보호와 암호 연산을 위한 장치입니다.
-   - egress 차단을 “hardware security modules mandatory”로 연결하는 것은 아키텍처 오류입니다.
-   - 적절한 대책은 deny-by-default egress, 별도 네트워크 네임스페이스, L3/L4 방화벽, 프록시 allowlist, 독립 패킷 캡처, 물리적 분리 등입니다.
-
-4. **network diode도 만능 대책이 아님**
-   - 데이터 다이오드는 정해진 한 방향 통신만 허용합니다.
-   - 방향 설계에 따라 오히려 외부 송신을 허용할 수 있으므로 “자동으로 탈출을 막는다”고 표현하면 안 됩니다.
-
-5. **상원의원 문의와 Anthropic 사건의 인과관계 불명확**
-   - Blumenthal의 서한이 OpenAI에 관한 것이라면 Anthropic 사건이 직접 촉발했는지 서한 본문으로 확인해야 합니다.
-   - 그렇지 않으면 “coincided with” 이상의 인과관계를 부여하면 안 됩니다.
-
-### 시간 판정
-
-제시된 출처 시각 **2026-09-10 02:40 KST**는 기준 시각보다 5시간 50분 전이므로 범위 안입니다. 다만 실제 Anthropic 발표 시각을 원문에서 확인해 `event_date`에 시각까지 넣는 것이 바람직합니다.
+“whistleblower”도 내부 위법행위나 은폐 자료를 공개했다는 증거가 없다면 **“former researcher” 또는 “resigning researcher”**가 더 정확합니다.
 
 ---
 
-## 3. NSA/CISA/FBI 중국 AI 기업 distillation 자문
+## 3. California SB 1119, “Adam’s Law”
 
-### 판정: **내부 모순 및 시간 윈도우 실패**
+### 판정: **역사적 선례와 법안 번호·의무 내용이 혼재. 대폭 재검증 필요**
 
-### 명확한 오류·모순
+### 명확한 오류 또는 모순
 
-1. **자문 번호와 발표일이 맞지 않음**
-   - `AA26-252A`의 `252`는 통상 연중 252번째 날을 뜻합니다.
-   - 2026년은 평년이며 **9월 9일이 252번째 날**입니다.
-   - 따라서 이 번호가 맞다면 “9월 8일 발표”라는 설명과 모순됩니다.
+1. **“nation’s first companion chatbot statute”는 성립하기 어렵습니다.**
+   - 캘리포니아는 이미 2025년에 companion chatbot 관련 안전의무를 규정한 **SB 243**을 제정한 선례가 있습니다.
+   - 따라서 2026년 SB 1119가 추가 규제를 도입했더라도 “캘리포니아 최초” 또는 “미국 최초 companion chatbot statute”라고 할 수 없습니다.
+   - 다른 주의 선행 법률 여부까지 확인하지 않더라도, 캘리포니아 자체 선례 때문에 현 문구는 수정해야 합니다.
 
-2. **24시간 메타데이터 오류**
-   - 9월 8일 발표를 이벤트로 삼으면 24시간 밖입니다.
-   - 9월 9일 중국 반응이 새 소식이라면 해당 반응이 제목과 본문의 중심이어야 하며 `original_event_date`가 필요합니다.
+2. **기존 법률과 새 법안의 의무를 구분하지 않았습니다.**
+   - 자살·자해 관련 프로토콜, 이용자 알림, 미성년자 보호 의무 중 어떤 것이 기존 SB 243에 이미 포함됐고 무엇이 SB 1119에서 새로 도입됐는지 분리해야 합니다.
+   - 현재 초안은 2025년 법률의 요소와 2026년 법안의 주장들을 하나의 신설 법체계처럼 합쳐 놓았습니다.
 
-3. **“모델 가중치 유출”이라는 기술적 표현은 틀림**
-   - API 출력으로 distillation하는 것은 teacher model의 행동을 student model이 근사하게 하는 것입니다.
-   - 이는 원 모델의 실제 파라미터나 “model weights”를 추출하는 것과 동일하지 않습니다.
-   - 다음처럼 수정해야 합니다.
+3. **“13 bills”와 개별 법안 목록의 직접 근거가 필요합니다.**
+   - 주지사 발표 페이지에 서명한 13개 법안 전체 번호가 나와야 합니다.
+   - SB 1119, AB 1709, AB 2246, AB 2가 실제 같은 서명 패키지인지 enrolled bill 목록으로 확인해야 합니다.
 
-   > “추론 출력과 행동 패턴을 학습 데이터로 활용해 일부 기능을 근사한다.”
+4. **AB 1709의 설명은 기존 캘리포니아 법제와 충돌 가능성이 큽니다.**
+   - 미성년자 addictive feed와 알림·자동재생 제한은 기존 **SB 976**과 연결되는 영역입니다.
+   - AB 1709가 정확히 동일 분야를 다루는지, `$50,000 per violation`이 어떤 행위와 어떤 단위에 적용되는지 enrolled text의 벌칙 조항을 인용해야 합니다.
+   - 현재 문구처럼 “affected minor당 최대 5만 달러”로 해석할 근거는 제시되지 않았습니다.
 
-4. **CISA advisory가 의무 조치를 개시한다는 표현은 부정확**
-   - 일반적인 Cybersecurity Advisory는 권고 문서이지 자동으로 연방기관에 강제 의무를 부과하는 규정이 아닙니다.
-   - “mandatory federal agency defensive mitigations initiated”는 별도의 Binding Operational Directive가 없는 한 삭제해야 합니다.
+5. **“Kids Code 2.0”은 공식 법률명인지 확인해야 합니다.**
+   - 캘리포니아 Age-Appropriate Design Code는 기존 AB 2273과 관련됩니다.
+   - AB 2246을 “California Kids Code 2.0”이라고 부르려면 법안 제목 또는 공식 발표의 명칭을 인용해야 합니다.
 
-5. **기업 분류가 부정확**
-   - Alibaba 전체를 단순히 “Chinese AI company”로 부르는 것은 과도한 축약입니다. AI 개발 조직 또는 Alibaba Cloud/Qwen처럼 대상 법인·부문을 명시해야 합니다.
-   - Z.AI가 브랜드명이라면 해당 법적 실체도 병기해야 합니다.
+6. **정확한 기술 의무가 과도하게 구체적입니다.**
+   다음 조항들은 법안 원문 인용이 필요합니다.
 
-6. **모델명과 세부 혐의가 특히 의심스러움**
-   - `Claude Fable 5`, `GPT-4o/Astra`, `Kimi-K3` 등은 자문 원문의 정확한 표기인지 확인해야 합니다.
-   - “DeepSeek가 R1·V3 개발에 추출된 reasoning chain을 사용했다”는 것은 기업별 귀속 판단이므로, 자문에 직접 명시된 문장과 근거를 인용해야 합니다.
-   - 수십억 토큰, 수백만 세션, proxy rotation, token aggregator 등의 수치와 TTP도 원문 표·부록 위치가 필요합니다.
+   - 모델 가중치 공개 전 독립 감사
+   - 모든 미성년자 계정의 persistent memory 기본 비활성화
+   - 12시간 내 부모 통지
+   - 부모 인증 없이는 시간 제한 변경 금지
+   - 연례 독립 child-safety assessment
+   - private right of action
+   - 단계별 2027 시행 일정
 
-7. **response poisoning 권고는 반드시 원문 확인 필요**
-   - 의심 계정에 고의로 잘못된 응답을 제공하는 것은 일반적인 방어 권고보다 훨씬 공격적이며, 사용자 안전·계약·제품 신뢰 문제를 발생시킵니다.
-   - 실제 자문이 권고한 것이 아니라면 삭제해야 합니다.
+   특히 “새 모델 가중치 공개 전 감사”는 companion chatbot 서비스 규제와 foundation-model weight release 규제를 혼동했을 가능성이 있습니다.
 
-### 수정 방식
+7. **로드맵은 법률상 시행 일정이 아니라 초안 작성자의 추정처럼 보입니다.**
+   - “Early/Mid/Late 2027”
+   - “$25K–$50K liability active”
+   - “California Superior Courts & Private Right”
+   
+   시행일·규칙제정 기한·집행기관·사적 소권은 법문 그대로 제시해야 합니다. 추정 일정이라면 `Analyst estimate`라고 표시해야 합니다.
 
-9월 9일 중국의 신규 반응이 실제로 확인된다면 제목을 다음처럼 바꾸는 편이 적절합니다.
+8. **KV-cache 설명은 기술적으로 부정확합니다.**
+   - 장기 대화 기억은 일반적으로 데이터베이스, 프로필 스토어, 검색 인덱스 또는 벡터 메모리에 저장됩니다.
+   - KV cache는 주로 현재 추론 세션의 토큰 상태를 보존하는 단기 메모리입니다.
+   - 법적 장기기억 제한을 “KV-cache deactivation”으로 설명하면 아키텍처를 혼동합니다.
 
-> **“중국 정부, 전날 발표된 미국 기관의 AI distillation 의혹을 공식 반박”**
+### URL·문서 요구
 
-그리고 메타데이터는:
+다음 공식 자료가 필요합니다.
 
-```yaml
-event_date: 2026-09-09
-ongoing_story_exception: true
-original_event_date: 2026-09-08
-event_within_24h_window: true
-```
+- 주지사 서명 발표
+- California Legislative Information의 SB 1119 enrolled text
+- Chapter number와 Secretary of State filing 정보
+- AB 1709, AB 2246, AB 2 원문
+- 각 법안의 시행일과 벌칙 조항
 
-단, 중국 상무부·외교부의 실제 성명 URL과 정확한 발언자가 필요합니다.
+주지사가 서명했다면 상태는 단순히 “signed”보다 **chaptered 여부와 chapter number**까지 확인하는 편이 정확합니다.
 
----
+### 권장 제목
 
-## 4. 삼성전기·LG이노텍 KPCA 전시
+“최초”를 제거하고 다음처럼 수정하는 것이 안전합니다.
 
-### 판정: **핵심 전시 사실은 개연성이 있으나 기술 수치 대폭 정리 필요**
-
-이 항목은 제시 시각이 범위 안이고 slot 6이므로 시간상 문제는 없습니다. 다만 Yonhap 한 건을 Primary URL로 두고 회사 공식 발표보다 훨씬 상세한 수치를 확정적으로 적었습니다.
-
-### 명확한 사실 오류
-
-1. **Ibiden은 대만 기업이 아니라 일본 기업**
-   - “Taiwanese OSAT and substrate dominance (Unimicron, Ibiden, ASE)”는 틀렸습니다.
-   - Unimicron과 ASE는 대만, Ibiden은 일본 기업입니다.
-
-2. **100×100mm와 85×85mm의 면적 비교**
-   - \((100^2 / 85^2)-1 ≈ 38.4\%\)이므로 “약 40% 넓다”는 표현은 면적 기준으로 대체로 맞습니다.
-   - 다만 “40% larger”가 변 길이인지 면적인지 반드시 명시해야 합니다.
-   - 변 길이는 약 17.6% 증가입니다.
-
-### 원문 근거가 필요한 기술 주장
-
-다음 수치들은 회사 자료나 학회 발표가 없으면 삭제해야 합니다.
-
-- silicon interposer 0.8µm line/space
-- 삼성 2.1D의 2µm 또는 sub-2µm line/space
-- 열경계저항 15~20% 감소
-- PDN loop inductance 30% 이상 감소
-- 1,200A transient current
-- 100,000개 이상 micro-bump
-- 16개 HBM과 1,000W compute die 두 개 지원
-- 20개 초과 build-up layer
-- 2027년 고객 양산·qualification 진행 중
-
-전시 제품에 관한 보도자료가 “크다”, “미세 배선”, “chip embedding” 정도만 언급했는데 초안이 정량값을 보충했다면 이는 사실 보도가 아니라 저자의 추정입니다.
-
-### 아키텍처 설명상 주의점
-
-1. **“2.1D = 완전한 interposer-less”라고 자동 해석하면 안 됨**
-   - 2.1D는 업계마다 정의가 다릅니다.
-   - silicon interposer를 제거해도 별도의 RDL interposer 또는 bridge 구조가 존재할 수 있습니다.
-   - 삼성전기의 공식 단면도와 용어 정의를 확인해야 합니다.
-
-2. **silicon interposer 제거가 반드시 insertion loss를 낮추는 것은 아님**
-   - organic RDL은 배선 폭·간격, 유전손실, 경로 길이에서 silicon/RDL interposer와 다른 trade-off가 있습니다.
-   - “낮춘다”가 아니라 “비용과 배선 밀도 사이의 trade-off를 바꾼다”가 안전합니다.
-
-3. **열 저항 개선 주장은 단순하지 않음**
-   - 실리콘은 일반 유기 기판보다 열전도도가 높을 수 있습니다.
-   - 계면 하나를 줄인다고 패키지 전체 열저항이 자동으로 15~20% 줄지는 않습니다.
-
-4. **Glass core가 warpage를 ‘제거’하지는 않음**
-   - CTE 매칭과 강성으로 warpage를 줄일 수는 있지만, 유리 두께·TGV 응력·동박 비대칭·빌드업 재료 때문에 변형이 남습니다.
-   - “eliminating reflow warpage”는 “reducing reflow warpage”로 수정해야 합니다.
-
-5. **TGV 제조 공법 단정 금지**
-   - 모든 TGV가 precision laser-etched 방식인 것은 아닙니다.
-   - 레이저, 식각, 복합 공정 등 여러 방식이 있으므로 해당 시제품의 실제 공법을 확인해야 합니다.
-
-6. **chip embedding의 대상 혼용**
-   - decoupling capacitor, passive silicon, PMIC 같은 active die는 서로 다릅니다.
-   - LG이노텍 발표가 어느 부품을 실제로 내장했다고 했는지 구분해야 합니다.
-
-### 권장 수정
-
-공식 자료에서 확인되지 않은 정량값을 제거하고 다음 수준으로 낮추는 것이 적절합니다.
-
-> 삼성전기는 실리콘 인터포저 의존도를 낮춘 2.1D 기판과 glass-core 기술을 전시했고, LG이노텍은 100mm급 초대형 FC-BGA 및 기판 내부 부품 내장 기술을 공개했다. 다만 세부 배선 피치, 열저항 개선율, PDN 개선율 및 고객 양산 일정은 회사의 공식 사양 확인이 필요하다.
+> “California expands companion-chatbot safeguards through SB 1119, building on earlier state regulation”
 
 ---
 
-# URL 및 출처 형식 검토
+## 4. Ayar Labs–Wiwynn 투자 및 광 I/O
 
-| 항목 | URL 평가 |
-|---|---|
-| OpenAI | 블로그형 URL만 있고 논문·Lean 저장소 URL이 없음. 이 수준의 수학적 주장을 검증하기에 불충분 |
-| Anthropic | 연구 블로그형 URL만 제시. 사고 보고서, 피해 통지, METR 조사 공지, 상원 서한의 개별 링크 필요 |
-| CISA | URL 형식은 CISA advisory 패턴과 유사하지만, 자문 번호가 가리키는 날짜와 본문의 9월 8일 서술이 충돌 |
-| Yonhap | 실제 기사형 URL 구조지만 2차 출처임. 삼성전기와 LG이노텍의 공식 보도자료·제품 페이지를 Primary URL로 추가해야 함 |
+### 판정: **기업·제품 축은 개연성이 있으나 자금 수치, 양산 상태, 공학 수치가 과도하게 확정적**
 
-“Source”에 매체 이름만 나열하지 말고, 주장마다 URL을 붙여야 합니다. 특히 Reuters/AP 기사에는 기사 제목·게시 시각·직접 URL이 필요합니다.
+### 검증 또는 수정이 필요한 부분
+
+1. **투자 금액의 정의가 불명확합니다.**
+   - “추가 1억5천만 달러”
+   - “2026년 총 6억5천만 달러”
+   - “total primary capital”
+   
+   이전 5억 달러가 실제 2026년 신규 주식성 자금인지, 누적 조달액인지, 전략적 약정·대출·기존 라운드가 포함됐는지 분리해야 합니다. 회사 발표가 “funding secured”라고만 했다면 이를 “primary capital raised”로 바꾸면 안 됩니다.
+
+2. **제휴 발표를 HVM 진입으로 단정했습니다.**
+   - 자금 조달과 서버 제조사 제휴는 양산 준비에 도움이 되지만, 곧바로 HVM 달성을 의미하지 않습니다.
+   - 웨이퍼 공급, OSAT, 광 결합 수율, 고객 qualification, 생산량 또는 shipment가 제시되지 않았다면 “transition into HVM”보다 **“HVM 준비 및 시스템 통합을 가속”**이 정확합니다.
+
+3. **Wiwynn을 제조 파트너로 규정할 근거가 필요합니다.**
+   - strategic investor, system integration partner, co-development partner, contract manufacturer는 서로 다릅니다.
+   - “rack-scale manufacturing partnership”와 “standardized CPO server trays를 공동 개발한다”는 문구는 공식 발표문에 명시돼야 합니다.
+
+4. **TeraPHY 사양 범위를 단일 제품 사양처럼 합쳤습니다.**
+   - `1.6–4.0 Tbps bidirectional`
+   - `sub-3 pJ/bit`
+   - `up to 16 wavelengths per fiber`
+   
+   TeraPHY의 세대·구성별 사양일 수 있으므로 정확한 부품 버전과 측정 기준을 밝혀야 합니다. 칩렛 자체 에너지인지 레이저·드라이버·수신기까지 포함한 링크 에너지인지도 구분해야 합니다.
+
+5. **“pluggable optics가 total server power의 25–30%”는 과도한 일반화입니다.**
+   - 네트워크 구성과 서버 유형에 따라 크게 달라집니다.
+   - 특정 대규모 시스템의 I/O 전력 비중을 일반 서버 전체의 보편적 수치로 확대하면 안 됩니다.
+
+6. **“CPO가 I/O 전력을 최대 80% 절감”도 비교 기준이 필요합니다.**
+   - 어느 속도, 거리, DSP 포함 범위, 레이저 포함 여부, pluggable module 세대와 비교했는지 명시해야 합니다.
+
+7. **448G lane과 1–2m 구리 한계를 확정한 것은 시기상조일 수 있습니다.**
+   - 224G와 448G는 채널 조건, 케이블 규격, FEC, 리타이머 사용 여부에 따라 도달 거리가 다릅니다.
+   - “224G/448G에서 모두 1–2m”라는 하나의 물리 한계로 제시할 수 없습니다.
+
+8. **SuperNova의 위치 설명이 지나치게 구체적입니다.**
+   - 외부 광원 또는 remote laser source라는 사실과 “compute chassis 밖의 시원한 rack zone에 장착”된다는 것은 다릅니다.
+   - 발표된 폼팩터가 없다면 “열원에서 분리 가능한 외부 광원” 정도가 적절합니다.
+
+9. **삽입손실과 온도·수명 수치가 출처 없이 확정됐습니다.**
+   - 15–25 dB at 56 GHz
+   - under 2 dB
+   - 60°C 이상에서 severe MTBF degradation
+   - 95–105°C accelerator junction
+   - rack당 수십 kW 절감
+   
+   설계·재료·채널 길이마다 달라지는 엔지니어링 수치이므로 기술 백서나 측정 자료가 필요합니다.
+
+10. **CPO가 faceplate 문제를 자동으로 제거하는 것은 아닙니다.**
+    - 광섬유 연결점, blind-mate connector 또는 외부 광원 연결은 여전히 필요합니다.
+    - 시스템 토폴로지에 따라 전면이 아닌 후면·미드플레인으로 이동할 수 있을 뿐입니다.
+
+11. **“all major accelerator vendors”는 과장입니다.**
+    - NVIDIA·AMD·Intel이 투자자라는 사실이 맞더라도 “모든 주요 가속기 업체”라고 부를 수는 없습니다.
+    - 투자와 상용 제품 채택 역시 구분해야 합니다.
+
+12. **“multi-core fiber”와 “multi-fiber harness”를 혼용하지 마십시오.**
+    - 멀티코어 광섬유와 여러 가닥으로 구성된 fiber array는 서로 다른 기술입니다.
+    - 공식 시스템이 어느 방식을 쓰는지 확인해야 합니다.
+
+### 긍정적으로 유지 가능한 내용
+
+공식 발표가 확인된다면 다음 핵심은 유지할 수 있습니다.
+
+- Ayar Labs의 TeraPHY optical I/O chiplet
+- SuperNova 외부 다중파장 광원
+- Wiwynn과의 전략적 투자 또는 시스템 통합 협력
+- 구리 링크의 거리·전력 한계를 줄이기 위한 co-packaged optical I/O 방향
+- 광원과 고온 컴퓨트 패키지를 분리하는 설계상의 이점
+
+### URL 보완
+
+다음 직접 근거를 추가해야 합니다.
+
+- Ayar Labs 공식 투자 발표
+- Wiwynn의 독립 발표 또는 거래소 공시
+- 정확한 투자 금액과 누적 조달액
+- Bengaluru Design Center 발표
+- TeraPHY 해당 세대 데이터시트
+- SuperNova 데이터시트
+- HVM 또는 고객 qualification 단계에 관한 명시적 문구
 
 ---
 
-# 일정표 검토
+# Executive Summary 및 결론부 검증
 
-- KPCA, Goldman Sachs, AI Infra Summit, OCP, IEDM 링크 중 일부는 행사 홈페이지 또는 범용 페이지일 뿐, **2026년 날짜를 직접 증명하는 특정 일정 페이지가 아닐 수 있습니다.**
-- 특히 IEDM의 **2026-12-13~17** 일정은 통상적인 행사 요일 구성과 맞는지 공식 2026 행사 페이지에서 재확인해야 합니다.
-- “0.55 High-NA EUV integration”, “Open Rack V4”, “multi-gigawatt scaling” 등은 프로그램이 공개되지 않았다면 예정 의제로 확정해 쓰지 말고 “예상 주제”로 표시해야 합니다.
+Executive Summary는 본문보다 더 강하게 단정하므로 본문 수정과 함께 반드시 바꿔야 합니다.
+
+### 삭제·완화할 표현
+
+- “spurred senators … to negotiate” → 인과관계 확인 전 삭제
+- “landmark bipartisan AI safety bill” → 법안 번호·초안 확인 전 삭제
+- “nation’s most stringent / nation’s first” → 비교법 검토 전 삭제
+- “mandatory pre-release audits / 12-hour notice / memory restriction” → enrolled text 확인 전 삭제
+- “transition CPO into HVM” → “accelerate HVM readiness”
+- “overcoming copper limitations across multi-rack clusters” → 실제 배치가 아니라 목표라면 미래형으로 조정
+- “deployed for Artemis landing site assessment” → 공식 운영 배치 확인 전 삭제
+
+최종 시스템 다이어그램도 서로 직접 연결되지 않은 사건을 하나의 “system constraint loop”로 묶고 있습니다. 이는 전략적 해석으로는 가능하지만, **사실 요약과 분리된 ‘Analyst Synthesis’**로 표시해야 합니다.
 
 ---
 
-## 최종 편집 권고
+# 메타데이터·양식 문제
 
-1. **1번은 공식 OpenAI 발표·Lean 저장소·독립 검증을 확보하지 못하면 삭제**
-2. **2번은 Anthropic 사고 보고서에 실제로 존재하는 사실만 남기고, 인물 발언·사임·상원 서한은 별도 출처로 분리**
-3. **3번은 날짜와 advisory 번호를 바로잡고, 24시간 조건을 충족하려면 중국의 신규 반응 중심 ongoing story로 재구성**
-4. **4번은 전시 사실만 유지하고 15~20%, 30%, 1,200A, 100,000 bumps 등 출처 없는 정량값 삭제**
-5. Executive Summary와 종합 도식은 본문 검증 후 다시 작성해야 합니다. 현재는 검증되지 않은 주장을 확정 사실로 반복하고 있어 오류를 증폭합니다.
+1. 1~3번의 `slot_category: 1-5`는 유효한 단일 카테고리가 아니라 범위처럼 보입니다.
+   - 1번: 모델/과학 AI에 해당하는 정확한 번호
+   - 2번: governance/legislation
+   - 3번: governance/legislation  
+   로 각각 고정해야 합니다.
 
-**최종 등급:**  
-- 1번: **실패**
-- 2번: **검증 보류**
-- 3번: **실패**
-- 4번: **조건부 통과—대폭 수정 필요**
-- 전체 초안: **발행 불가**
+2. Executive Summary는 4번을 `Category 6-C/6-F`라 했지만 메타데이터는 단순히 `6`입니다. 분류 체계를 통일해야 합니다.
+
+3. `Source`에 여러 매체를 열거했지만 실제 URL은 하나뿐입니다.  
+   각 핵심 주장마다 최소한 다음을 구분해야 합니다.
+   - 공식 1차 자료
+   - 독립 보도
+   - 기술문서/모델 카드/법안 원문
+
+---
+
+# Upcoming Tech Calendar
+
+### 확실히 재검증해야 할 항목
+
+- **IEEE CICC 2026을 9월 21–23일로 기재한 것은 매우 의심스럽습니다.**  
+  CICC는 통상 봄에 개최되는 회의이므로 공식 2026 행사 페이지의 날짜·도시와 대조해야 합니다. 또한 CICC를 “224G/448G optical SerDes 중심 행사”로 규정하는 것도 프로그램 공개 전에는 과도합니다.
+
+### 나머지 일정
+
+Goldman Sachs Communacopia, AI Infra Summit, OCP Global Summit, IEDM도 홈페이지 일반 랜딩 페이지가 아니라 **2026년 행사 전용 페이지**로 확인해야 합니다. 행사 설명에 적힌 CPO, custom ASIC, GAA, hybrid bonding 등의 주제는 실제 프로그램이 아니라 예상 주제일 가능성이 있으므로 다음처럼 표시하십시오.
+
+> “예상 관전 포인트” 또는 “브리핑 관심 주제”
+
+---
+
+## 최종 권고
+
+- **시간 윈도우:** 네 항목 모두 통과
+- **1번:** 조건부 게재 가능—23% 지표, 라이선스, 얼음 탐지 및 Artemis 배치 표현 수정
+- **2번:** 발행 보류—사임과 법안의 인과관계, 모델명·sandbox 사건, 법안 조항을 1차 자료로 재검증
+- **3번:** 발행 보류—“미국 최초” 삭제, SB 243 선례 반영, SB 1119 및 동반 법안의 enrolled text 재검증
+- **4번:** 조건부 게재 가능—투자 총액의 정의와 파트너십 범위를 확인하고, HVM·전력·삽입손실·거리 수치를 대폭 완화
+- **캘린더:** 특히 CICC 날짜 재확인 필수
+
+가장 시급한 수정은 **2번의 ‘법안 촉발’ 서사와 3번의 ‘미국 최초’ 주장**입니다. 두 표현은 현재 자료 구조상 사실 보도라기보다 서로 다른 사실을 연결해 만든 서사에 가깝습니다.
