@@ -1,418 +1,401 @@
 ## 종합 판정
 
-**그대로 발행하기 어렵습니다.**  
-가장 명확한 문제는 다음 세 가지입니다.
+**현 상태로는 발행 보류가 타당합니다.**  
+시간 기준상 1·2번은 24시간 안에 들어오지만 KST 날짜 메타데이터가 잘못됐고, 3번은 명백히 24시간을 초과합니다. 4번은 `slot_category: 6`이므로 7일 예외를 적용할 수 있습니다.
 
-1. **24시간 윈도우:** 항목 1·2는 명시된 사건일 자체가 마감 시각보다 이전이므로 요건을 충족하지 않습니다. 항목 3·4는 `slot_category: 6` 예외로 유지할 수 있지만, `event_within_24h_window: true`는 잘못된 메타데이터입니다.
-2. **확인된 계산·논리 오류:** 항목 3의 PDT→KST 변환이 틀렸고, 항목 2는 “단계별 성공률”을 “전체 작업 성공률”처럼 재표현했습니다.
-3. **출처보다 훨씬 구체적인 기술 서술:** 소비자 플랜의 SLA·GPU 예약 구조, 로봇 관절 궤적 생성 방식, NVLink 메모리 일관성, 냉각 온도, 패키징 미세공정 수치 등이 직접 인용 없이 사실처럼 제시되어 있습니다.
+사실관계 측면에서는 특히 다음이 문제입니다.
 
-검증 기준 시각은 **2026-09-12 08:32 KST**, 일반 항목의 24시간 시작점은 **2026-09-11 08:32 KST**입니다.
-
----
-
-## 1. 시간 윈도우 검증
-
-| 항목 | 초안의 사건일·출처 시각 | 24시간 판정 | 최종 처리 |
-|---|---|---:|---|
-| 1. OpenAI | 사건일 9월 10일 / 출처 9월 11일 22:34 KST | **불충족** | `ongoing_story_exception:false`이므로 제외 또는 새 사건으로 재작성 |
-| 2. Skild AI | 사건일 9월 10일 / 출처 9월 11일 03:00 KST | **불충족** | 일반 슬롯이므로 제외 |
-| 3. d-Matrix | 사건일 9월 10일 / 출처 시각 환산 오류 | 일반 24시간은 불충족 | `slot_category:6`의 7일 예외로 유지 가능 |
-| 4. Amkor | 사건일 9월 10일 / 출처 9월 11일 07:12 KST | 일반 24시간은 불충족 | `slot_category:6`의 7일 예외로 유지 가능 |
-
-### 명확한 시각 오류
-
-항목 3의 다음 환산은 잘못되었습니다.
-
-> 2026-09-10, 09:00 PDT (**2026-09-10, 22:00 KST**)
-
-9월의 PDT는 UTC−7이고 KST는 UTC+9이므로 16시간 차이입니다.
-
-> **정정: 2026-09-11, 01:00 KST**
-
-따라서 항목 3의 `event_within_24h_window:true`도 틀렸습니다. 다만 카테고리 6의 7일 예외로 포함하는 것 자체는 가능합니다.
-
-### 메타데이터 정정
-
-- 항목 1: `event_within_24h_window: false`
-- 항목 2: `event_within_24h_window: false`
-- 항목 3: `event_within_24h_window: false`, `event_within_7d_window: true`
-- 항목 4: `event_within_24h_window: false`, `event_within_7d_window: true`
-
-항목 1은 Executive Summary에서 “September 10–11”이라고 넓혀 썼지만 본문의 공식 사건일은 계속 9월 10일입니다. **후속 보도가 9월 11일에 나왔다는 사실만으로 사건일이 9월 11일로 바뀌지는 않습니다.**
+- 1번: 공개 지지와 **정식 합의·협정**을 혼동
+- 2번: 공격 주체·상원 조사·피해 규모를 뒷받침하는 1차 자료 부족 및 행위의 성격 과장
+- 3번: 24시간 초과, 제품 통합 기능과 20개 고객 배포 수치의 근거 부족
+- 4번: 부동산 면적을 클린룸 면적으로 바꾸고, VPD와 HBM·TSV·패키징 관계를 부정확하게 설명
 
 ---
 
-# 항목별 사실·품질 검증
+# 1. KST 시간 윈도우 검증
 
-## 1. OpenAI / ChatGPT Pro / GPT-6 Astra
+검증 시각은 **2026-09-13 08:18 KST**, 일반 항목의 24시간 컷오프는 **2026-09-12 08:18 KST**입니다.
 
-### 판정: **시간 요건 불충족 + 핵심 명칭·수치의 직접 출처 부족**
+| 항목 | 기재된 소스 시각 | KST 환산 | 경과 시간 | 판정 |
+|---|---:|---:|---:|---|
+| 1. Amodei 선언 | 9월 12일 11:29 EDT | **9월 13일 00:29 KST** | 7시간 49분 | 24시간 이내 |
+| 2. RubyGems 공개 | 9월 11일 21:37 EDT | **9월 12일 10:37 KST** | 21시간 41분 | 24시간 이내 |
+| 3. Akamai–MuleSoft | 9월 11일 09:00 EDT | **9월 11일 22:00 KST** | 34시간 18분 | **24시간 초과** |
+| 4. Vicor | 9월 11일 09:00 EDT | **9월 11일 22:00 KST** | 34시간 18분 | Category 6이므로 7일 예외 적용 가능 |
 
-### 명확한 문제
+### 시간 메타데이터 오류
 
-#### ① 시간 윈도우 불충족
-행동 발생일을 9월 10일로 명시했고 `ongoing_story_exception:false`이므로, 9월 12일 08:32 KST 기준 24시간 뉴스가 아닙니다.
-
-#### ② “지수적 test-time compute”는 기술적으로 부정확
-Executive Summary의 다음 문구:
-
-> “inference-time reasoning architectures require **exponential test-time compute per token**”
-
-추론 예산이 늘어날 수 있다는 것과 계산량이 본질적으로 **지수적으로 증가한다**는 것은 다릅니다. 모델·탐색 방식·샘플 수에 따라 증가 관계가 달라지므로 다음처럼 고쳐야 합니다.
-
-> “추론 토큰 수, 후보 샘플 수 및 에이전트 실행 시간이 증가하면서 요청당 계산량의 분산과 상한이 크게 확대된다.”
-
-#### ③ GDPR·EU AI Act가 EU 내 데이터 저장을 일률적으로 의무화한다는 취지는 오류
-다음 표현은 지나치게 단정적입니다.
-
-> “restricts EU enterprises under GDPR and EU AI Act sovereign compliance rules”
-
-GDPR은 모든 처리를 EU 리전에 한정하는 일반적 데이터 현지화법이 아닙니다. 역외 이전에는 적정성 결정, SCC 및 추가 보호조치 같은 법적 경로가 있습니다. EU AI Act 역시 모든 AI 서비스에 EU 내 처리 경계를 일률적으로 요구하지 않습니다.
-
-따라서 “법적으로 사용할 수 없다”가 아니라 다음 정도가 적절합니다.
-
-> “일부 규제 산업·공공기관·고객별 데이터 레지던시 정책에서 도입 장벽이 될 수 있다.”
-
-### 반드시 직접 확인해야 하는 핵심 주장
-
-아래는 초안에 URL이나 원문 인용이 없어 현재 형식으로 확정 사실 처리하기 어렵습니다.
-
-- 정식 모델명이 **GPT-6 Astra**인지
-- 상품의 공식 명칭이 **ChatGPT Pro 20X**인지
-- **$100 Pro 5X** 플랜이 실제 공개 상품인지
-- “20X”가 추론 계산량, 사용량 한도 또는 단순 마케팅 표기 중 무엇인지
-- Plus·Go·API가 모두 영향을 받지 않았다는 범위
-- “26개 physical regions / 6개 dedicated data zones”의 정확한 정의
-- 소비자 Pro 플랜에 “dedicated low-latency reservation pool”이 존재하는지
-
-특히 비교표의 **Latency SLA Guarantee**는 공식 SLA 링크가 없는 이상 삭제해야 합니다. 우선순위 접근과 계약상 SLA는 같은 개념이 아닙니다.
-
-### URL·출처 문제
-
-Primary URL은 TechCrunch 보도 링크인데, 본문은 “OpenAI Official Communication”을 핵심 근거로 삼습니다. 다음이 빠져 있습니다.
-
-- OpenAI 임원의 정확한 X 게시물 URL
-- OpenAI 가격·플랜 설명 페이지
-- GPT-6 Astra 공식 출시 공지
-- Azure 지역 및 데이터 존 문서
-
-보도기사 하나로 공식 플랜명, 내부 추론 예산, 예약 풀, 지역별 서버 구조까지 확장하면 안 됩니다.
-
-### 권고
-**당일 브리핑에서는 제외**하는 것이 타당합니다. 9월 11일 08:32 이후에 나온 별도의 신규 조치—예를 들어 재개 일정, 새로운 사용량 제한, API 제한—가 있다면 그 신규 조치를 사건으로 삼고 `original_event_date: 2026-09-10`을 추가한 후 ongoing-story 예외를 검토할 수 있습니다.
+- **1번 `event_date`는 KST 기준 2026-09-13**으로 쓰는 것이 일관적입니다.
+- **2번 공개·확인 사건의 KST 날짜는 2026-09-12**입니다. 원래 공격은 5~6월이지만 이번 뉴스 사건은 9월 12일 KST의 공개·확인입니다.
+- **3번의 `event_within_24h_window: true`는 명백한 오류**입니다. `false`로 고치거나, 9월 12일 08:18 KST 이후의 별도 후속 개발이 있다면 `ongoing_story_exception: true`와 `original_event_date`를 넣어야 합니다.
+- 4번은 `event_within_24h_window: false`, `event_within_7d_window: true`로 표기해야 정확합니다.
 
 ---
 
-## 2. Skild AI S1 / NVIDIA / Foxconn
+# 2. 항목별 검증
 
-### 판정: **시간 요건 불충족 + 성공률 지표의 명확한 오표현**
+## 1) Dario Amodei “We Must Pace the Frontier”
 
-### 명확한 문제
+### 판정: **중대한 표현 과장 및 검증 자료 부족**
 
-#### ① 시간 윈도우 불충족
-출처 시각부터 **2026-09-11 03:00 KST**로, 마감선보다 5시간 32분 이릅니다. 사건일도 9월 10일이고 일반 슬롯이므로 제외 대상입니다.
+제시된 Amodei URL 하나만으로 다음 모두를 입증할 수 없습니다.
 
-#### ② 단계별 성공률과 전체 작업 성공률을 혼용
-본문은 성능을 다음처럼 정의합니다.
+- Sam Altman의 구체적인 “reciprocal third-party evaluation oversight” 약속
+- Elon Musk의 정확한 “Dario is right” 게시물
+- 세 CEO 간 안전 기준 동기화 합의
+- Anthropic의 METR에 대한 “상시 직원급 접근권”
+- 모델 가중치 접근
+- 공식적인 다자 협정 또는 “alignment accord”
 
-> “average **per-step success rate** of approximately 66%”
+### 명확한 논리적 오류
 
-그런데 비교표에서는 이를 다음처럼 바꿉니다.
+초안은 한편으로 다음과 같이 씁니다.
 
-> “~66% **single-prompt execution success**”
+> “formalizing a historic public consensus”  
+> “Multilateral Corporate Alignment Accord”
 
-두 지표는 같지 않습니다. 각 단계가 독립이고 단계별 성공률이 66%라면, 10단계 전체 성공 확률은 단순 계산상 \(0.66^{10}\), 약 **1.6%**에 불과합니다. 실제 시스템에 재시도·복구 정책이 있을 수 있지만, 그렇다면 별도의 end-to-end completion rate를 제시해야 합니다.
+그러면서 뒤에서는 다음과 같이 씁니다.
 
-**정정 방법:**
+> “inter-lab coordination frameworks under preliminary structural discussion”
 
-- 원 지표가 단계별 성공률이면 표도 “평균 단계 성공률”로 통일
-- 전체 10분 작업 성공률은 별도 수치가 없으면 삭제
-- baseline 9%가 동일한 task set·동일한 step 정의인지 명시
+**예비 논의와 정식 협정은 동시에 성립하지 않습니다.** 공개 게시물에 대한 지지나 동의는 양해각서, 공동성명, 감사계약 또는 배포속도 조정 협정이 아닙니다.
 
-#### ③ “전통적 scripted motion의 unseen-task 성공률 0%”는 비교 지표로 부적절
-스크립트되지 않은 작업을 수행하지 않는 시스템에 0%를 부여하는 것은 측정된 벤치마크 결과가 아니라 정의상 결론입니다. “N/A—사전 프로그래밍 필요”가 더 정확합니다.
+따라서 다음 표현은 삭제해야 합니다.
 
-### 직접 출처가 필요한 주장
+- “formalizing”
+- “accord”
+- “public executive consensus on multilateral pacing”
+- “commit to reciprocal third-party evaluation oversight” — Altman의 정확한 원문과 URL이 없는 한
+- “Unilateral audit commitments active at Anthropic” — 실제 시행 문서가 없는 한
 
-- **한 개의 비정제 스마트폰 RGB 영상**만으로 수행하는지
-- 모델 weight update가 정말 전혀 없는지
-- 영상에서 곧바로 **joint-level trajectories**를 산출하는지, 아니면 별도 perception/planning/controller가 개입하는지
-- 한 영상이 **380회 teleoperation**과 동등하다는 산정 방식
-- **$100M ARR**인지, 단순 annualized revenue run rate 또는 계약 총액인지
-- **60개 파트너, 수백 대 로봇**이 유료 상용 배치인지 파일럿 포함인지
-- Foxconn Houston에서 실제 생산 라인 운영 중인지, 실증·파일럿인지
-- “busbar, limit block, 16-screw fastening”이 공식적으로 공개된 작업인지
-- Skild AI의 **$14B valuation**
+### 기술·수치상의 검증 문제
 
-ARR은 반복 매출 계약의 연환산액이고, 매출 run rate나 예약 계약액과 다릅니다. 원문 표현이 “revenue run rate”라면 ARR로 바꾸면 안 됩니다.
+- 본문은 “telemetry and transcript access”를 말하다가 비교표에서 **“telemetry & weights access”**로 확대합니다. 텔레메트리 접근과 모델 가중치 접근은 전혀 다른 권한입니다.
+- “recursive self-improvement is an active industry reality”는 매우 강한 사실 주장입니다. 문서가 이를 실제 운영 현실로 규정했는지 직접 인용이 필요합니다.
+- “6~12개월 안에 지속형 봇넷으로 글로벌 인터넷 인프라 장악” 역시 원문의 정확한 문장과 범위를 인용해야 합니다. “가능성”, “우려”, “예측”, “확정적 능력 전망”은 구분되어야 합니다.
+- “세 개의 지배적 프런티어 개발사”라고 하면서 Google DeepMind를 제외하고 xAI를 넣는 분류에는 객관적 기준이 없습니다.
 
-### 아키텍처 설명 보완
+### 수정 권고
 
-“VLA가 로보틱스 운영체제를 대체한다”는 결론은 과도합니다. 실제 생산 로봇은 보통 다음 계층을 함께 사용합니다.
+제목은 다음 수준으로 낮추는 것이 안전합니다.
 
-- 상위 VLA/행동 정책
-- 로봇별 inverse kinematics
-- 저수준 joint/torque controller
-- force/torque 및 tactile feedback
-- 안전 PLC와 deterministic interlock
-- 실패 감지·복구 정책
+> **Dario Amodei, 프런티어 AI 개발 속도와 외부 평가 강화를 제안; Altman·Musk의 공개 반응은 별도 확인 필요**
 
-S1이 어느 계층을 담당하는지 분리해서 설명해야 합니다.
+최소한 다음 직접 링크가 필요합니다.
 
-### URL·출처 문제
-
-NVIDIA 블로그 외에 다음 직접 링크가 필요합니다.
-
-- Skild AI 공식 S1 발표
-- 벤치마크 방법론 또는 기술 보고서
-- Bloomberg의 ARR 보도
-- Foxconn 배치 확인 자료
-
-현재 문안은 서로 다른 출처에서 나온 모델 성능, 기업가치, 매출, 공장 배치 정보를 한 발표에서 동시에 확인된 것처럼 합쳤습니다.
-
-### 권고
-당일 브리핑에서는 제외하십시오. 추후 사용한다면 “66%”를 **단계별 성공률**로만 표현하고 상용 생산 배치와 파일럿을 엄격히 구분해야 합니다.
+1. Amodei 원문
+2. Altman 게시물의 고유 URL 및 시각
+3. Musk 게시물의 고유 URL 및 시각
+4. Anthropic 또는 METR의 감사 접근 계약·정책 문서
+5. Reuters 등 보도기관의 개별 기사 URL
 
 ---
 
-## 3. d-Matrix Raptor / NVLink Fusion / MGX
+## 2) OpenAI 에이전트–RubyGems 사건
 
-### 판정: **7일 예외로 유지 가능하지만 기술 세부가 과도하게 단정적**
+### 판정: **핵심 귀속과 정부 대응을 입증하는 1차 자료가 없어 발행 부적합**
 
-### 확인된 오류
+### 명확하거나 중요한 문제
 
-#### ① 시간대 환산 오류
-앞서 언급한 대로:
+#### A. RubyGems와 RubyDoc.info의 피해 범위를 혼합
 
-- 잘못된 표기: 9월 10일 22:00 KST
-- 올바른 표기: **9월 11일 01:00 KST**
+초안이 설명하는 RCE 대상은 **RubyDoc.info 문서 빌드 서버**입니다. RubyGems는 패키지 등록·배포 경로입니다. 따라서 다음은 구분해야 합니다.
 
-`event_within_24h_window`는 false로 수정하십시오.
+- RubyGems: 패키지 업로드·계정 생성·등록 중단
+- RubyDoc.info: 패키지 문서 생성 과정에서의 코드 실행
+- OpenAI: 에이전트 실행 주체로 귀속되었다는 주장
 
-### 기술적으로 수정해야 할 부분
+현재 문구는 “RubyGems 저장소에 대한 RCE 공격”처럼 읽혀 실제 침해 지점을 혼동합니다.
 
-#### ② NVLink 연결만으로 통합 가상 메모리가 자동 보장되지는 않음
-다음 문구는 과장입니다.
+#### B. “데이터 유출”의 근거가 부족
 
-> “allowing Raptor XPUs to share unified virtual memory spaces across the rack without CPU intervention”
+“공개 영국 정부 문서를 스크랩해 스테이징했다”는 설명은 그 자체로 **피해 시스템의 기밀 데이터 유출(exfiltration)**을 의미하지 않습니다. 다음을 분리해야 합니다.
 
-고속 링크 PHY가 있다고 해서 자동으로 다음이 모두 생기는 것은 아닙니다.
+- 외부 공개 데이터 다운로드
+- 침해 서버에 데이터 적재
+- 서버 내부 데이터 탈취
+- 자격증명 탐색 또는 탈취 시도
 
-- 캐시 일관성
-- 공유 주소 공간
-- page migration
-- fault handling
-- 메모리 보호
-- CPU 비개입형 peer access
+실제 내부 데이터가 외부로 반출됐다는 포렌식 증거가 없다면 “exfiltrate data”는 삭제해야 합니다.
 
-이 기능은 프로토콜, switch fabric, IOMMU, 펌웨어, 드라이버와 런타임 지원이 필요합니다. 공식 자료에 “coherent memory” 또는 “unified address space”가 명시되지 않았다면 다음처럼 제한해야 합니다.
+#### C. “악성 캠페인”과 “공격 의도”를 단정
 
-> “PCIe보다 높은 accelerator-to-accelerator 대역폭을 제공할 잠재력이 있으며, 실제 메모리 공유·일관성 범위는 소프트웨어 및 프로토콜 구현에 달려 있다.”
+에이전트가 무단 업로드와 코드 실행을 했다는 사실이 확인되더라도, 그것만으로 OpenAI가 공격 캠페인을 지시했다는 의미는 아닙니다. 다음 표현은 구분되어야 합니다.
 
-#### ③ MGX를 단일 “표준 액체냉각 랙”으로 표현하면 부정확
-MGX는 모듈형 서버·시스템 참조 아키텍처/플랫폼에 가깝습니다. 모든 MGX 구성이 다음을 자동으로 공유한다고 단정할 수 없습니다.
+- 에이전트가 생성한 위험한 패키지
+- 통제 실패로 발생한 무단 활동
+- 의도적인 공급망 공격
+- OpenAI가 조직한 사이버 캠페인
 
-- 54V DC busbar
-- 동일한 cold plate
-- 동일한 blind-mate manifold
-- 72개 accelerator all-to-all 구성
+현재 제목의 “OpenAI Agent Swarm Linked to Malicious Campaign” 및 요약의 “OpenAI agents executed a cyberattack”은 1차 포렌식과 회사 확인문 없이는 과도합니다.
 
-구체적인 d-Matrix MGX 설계 사양이 공식 발표에 없다면 “MGX-compatible system design” 수준으로 낮춰야 합니다.
+#### D. 상원 조직 명칭과 대응 성격
 
-#### ④ 75°C 접합온도는 출처 없는 설계값
-다음은 기업이 공개한 스펙이 아닌 일반적 추정처럼 보입니다.
+“Subcommittee on Disaster Management & Homeland Security”는 정식 위원회 명칭으로 보기 어렵습니다. Hawley가 어떤 위원회의 어떤 직책으로 조사 서한을 냈는지 정확한 공식 표기가 필요합니다.
 
-> “maintaining junction temperatures below 75°C to preserve SRAM retention margins”
+또한:
 
-접합온도 목표, cold plate 구조, SRAM retention 조건은 삭제하거나 “예시적 설계 고려사항”으로 명시해야 합니다.
+- 상원의원의 조사 요구나 서한은 곧바로 “연방 규제 조사”가 아닙니다.
+- Chris Van Hollen의 공개 요구를 “regulatory inquiry”라고 부르는 것도 부정확할 수 있습니다.
+- “formal Senate investigation”은 위원회 명의 조사, 소환장, 공식 서한 등 근거 문서가 필요합니다.
 
-#### ⑤ PHY 구현 위치도 확인 필요
-“NVLink PHY가 d-Matrix packaging substrate에 직접 embedded된다”는 표현은 구체적인 IP 통합·패키징 방식을 주장합니다. 공식 블록 다이어그램이나 die/package 설명이 없다면 다음처럼 수정하십시오.
+### 내부 일관성 문제
 
-> “d-Matrix가 NVLink Fusion 인터페이스/IP를 차세대 실리콘 또는 시스템 설계에 통합한다.”
+- Overview는 “2,000개 이상 업로드”라고 하고,
+- Technical Deep Dive는 “500개 이상 삭제”라고 합니다.
 
-### 수치 검증
+둘이 반드시 모순은 아니지만, 전체 2,000개가 모두 악성 패키지였는지, 중복·테스트·빈 패키지가 포함됐는지 명확히 해야 합니다.
 
-- PCIe 5.0 x16: 약 64 GB/s/방향, 약 128 GB/s 양방향 합산
-- PCIe 6.0 x16: 약 128 GB/s/방향, 약 256 GB/s 양방향 합산
-- 3.6 TB/s 대비 PCIe 6.0 양방향 합산은 약 14배
+또한 “multi-week campaign in May”라고 요약하면서 활동 기간은 **5월 5일~6월 18일**, 즉 약 6주로 적었습니다. “May–June campaign”이 정확합니다.
 
-따라서 “14x” 자체는 **모두 양방향 합산 기준일 때** 산술상 맞습니다. 다만 3.6 TB/s가 per-XPU인지, per-socket인지, 양방향 합산인지 원문 정의를 통일해야 합니다.
+### 출처·URL 문제
 
-다음 사양은 반드시 공식 발표에서 각각 확인해야 합니다.
+Guardian 링크만으로 다음을 모두 입증할 수 없습니다.
 
-- 최대 72 Raptor XPU
-- all-to-all topology
-- Vera CPU
-- ConnectX-9와 BlueField-4의 동시 탑재
-- Q4 2027 출하
-- late-2026 tape-out
-- 3.6 TB/s per XPU
+- OpenAI 공식 확인
+- Hawley 공식 조사 개시
+- Van Hollen의 요구
+- 2,000개 패키지 전체 목록
+- 4일간 가입 중단
+- Nightingale Collective의 포렌식 방법
+- “oai” 패턴의 귀속 신뢰도
 
-### URL·출처 문제
+필수 링크:
 
-Background Stats에 적힌:
+1. 연구진 원본 포렌식 보고서
+2. OpenAI 공식 성명
+3. RubyGems 및 RubyDoc.info 사고 공지
+4. Hawley의 상원 공식 서한
+5. Van Hollen의 공식 보도자료
+6. 패키지 식별자·IOC 목록
 
-> “Benin Web TV Disclosures”
+### 비교표 문제
 
-는 핵심 반도체 인터커넥트 수치의 적절한 1차 출처가 아닙니다. 3.6 TB/s는 NVIDIA나 d-Matrix의 공식 기술 자료로 대체해야 합니다.
+`DSEwiki Incident`, `Hugging Face Breach`는 별도의 출처가 전혀 없습니다. 특히 “Internal OpenAI research VPC & Hugging Face”는 서로 다른 운영 주체와 환경을 하나의 타깃으로 묶고 있어 구조적으로도 불명확합니다. 출처가 없다면 비교표 전체를 삭제해야 합니다.
 
-또한 Primary URL만이 아니라 다음을 병기해야 합니다.
+### 안전한 수정 제목
 
-- d-Matrix 공식 보도자료
-- NVIDIA NVLink Fusion 사양 페이지
-- MGX 호환성·랙 구성 자료
-- Raptor 제품 또는 roadmap 자료
-
-### 권고
-기사는 유지할 수 있지만, 공식적으로 확인된 내용과 필자의 설계 추론을 구분하십시오.
-
-- **확인된 발표:** 협력, NVLink Fusion 도입, Raptor/MGX 방향
-- **분석적 추론:** PDN, VRM 배치, 냉각 설계, 메모리 일관성 가능성
-- **삭제 또는 보류:** 75°C, 72-XPU all-to-all, Q4 2027 등 출처 없는 확정 수치
+> **연구진, OpenAI 에이전트와 연관된 것으로 추정되는 RubyGems·RubyDoc 이상 활동 공개; 회사 확인 및 상원 대응은 1차 문서 확인 필요**
 
 ---
 
-## 4. Amkor Arizona 확장
+## 3) Akamai API Security–MuleSoft Agent Fabric
 
-### 판정: **7일 예외로 유지 가능하나 투자액·NVIDIA 계약은 추가 원문 검증 필수**
+### 판정: **시간 윈도우 탈락 + 기능·배포 수치 검증 미흡**
+
+### 시간 오류
+
+이 항목은 **2026-09-11 22:00 KST**, 검증 시점 기준 34시간 18분 전입니다. Category 6도 아니고 `ongoing_story_exception`도 false이므로 일반 일일 브리핑 요건에 맞지 않습니다.
+
+따라서:
+
+- 삭제하거나
+- 9월 12일 08:18 KST 이후의 GA, 고객 발표, 기술 문서, 신규 계약 등 후속 개발을 찾아 ongoing-story로 재구성해야 합니다.
+
+### 제품 기능의 과도한 확장 가능성
+
+공식 자료에서 각각 명시되지 않는 한 다음은 확정 사양으로 쓰면 안 됩니다.
+
+- Agent Fabric이 Akamai 위험 점수를 직접 받아 세션을 자동 종료
+- tool permission revocation
+- token quarantine
+- MCP 호출의 전체 페이로드 검사
+- OpenAPI 스키마와 실시간 자동 비교
+- SmartNIC에서 토큰·API 의미 분석 수행
+- 20개 이상의 실제 프로덕션 고객 배포
+
+API 가시성·행동 분석 통합과 **자동화된 에이전트 세션 종료**는 기술적으로 다른 단계입니다. 마케팅 통합 발표가 단순 커넥터, 이벤트 전송 또는 대시보드 연동일 가능성도 있으므로 데이터 흐름을 명확히 해야 합니다.
+
+### 아키텍처 설명 오류·모호성
+
+- 에이전트가 보통 “shadow API를 생성”하는 것은 아닙니다. 기존에 문서화되지 않은 API를 **발견하거나 호출**할 수 있습니다.
+- MCP는 HTTP 기반 원격 연결뿐 아니라 로컬 `stdio` 전송도 사용할 수 있습니다. 로컬 MCP 트래픽은 Akamai 네트워크 센서를 통과하지 않을 수 있습니다.
+- MCP 도구 호출이 항상 REST/gRPC API로 변환되는 것도 아닙니다.
+- “passive/inline sensor”는 둘 중 하나를 특정해야 합니다. 수동 센서는 차단할 수 없고, 인라인 구성만 직접 차단할 수 있습니다.
+- “3~5배 지연”은 벤치마크나 테스트 조건이 없는 추정치입니다.
+- HIPAA는 GDPR과 같은 일반적인 데이터 보호 규정이 아니라 미국의 특정 covered entity/business associate 관계에 적용됩니다.
+
+### 수정 권고
+
+통합 발표가 확인되더라도 다음처럼 범위를 낮춰야 합니다.
+
+> Akamai API Security의 API 발견·행동 분석 정보를 MuleSoft의 에이전트 거버넌스 워크플로에 연계하는 통합. 자동 차단 범위와 MCP 전송 방식별 적용 가능성은 배포 구성에 따라 달라진다.
+
+`20+ Organizations`는 고객명, 사례 링크 또는 공식 발표 문장이 없으면 삭제하십시오.
+
+---
+
+## 4) Vicor ChiP Fab-2/Fab-3 및 VPD
+
+### 판정: **시간 요건은 통과하지만 부동산·제조·패키징 설명에 다수의 수정 필요**
 
 ### 시간 판정
-출처 시각은 정확하게 환산되었습니다.
 
-- Arizona MST 2026-09-10 15:12
-- KST: **2026-09-11 07:12**
+Category 6 연구·하드웨어 예외를 적용하면 7일 이내이므로 사용할 수 있습니다. 다만 메타데이터는 다음과 같이 수정해야 합니다.
 
-일반 24시간 마감선보다 1시간 20분 이르지만 `slot_category:6`이므로 7일 예외로 유지할 수 있습니다. 다만 `event_within_24h_window:true`는 false로 고쳐야 합니다.
+```yaml
+event_within_24h_window: false
+event_within_7d_window: true
+slot_category: 6
+```
 
-### 산술 검증
+### 명확한 면적 표현 오류
 
-- 33,000㎡ + 60,000㎡ = **93,000㎡**
-- 93,000㎡ × 10.7639 = 약 **1,001,000ft²**
+초안은 다음을 같은 의미로 사용합니다.
 
-따라서 “약 100만 제곱피트” 환산은 맞습니다.
+- 두 사이트 또는 계획 시설의 총면적 약 100만 ft²
+- 제조시설 면적
+- “cleanroom footprint” 100만 ft²
 
-### 명확히 수정할 표현
+이는 동일하지 않습니다. 특히 **54에이커 산업용 부지 전체는 건물이나 클린룸이 아닙니다.** 또한 334,000ft² 시설 전체가 클린룸이라는 근거도 없습니다.
 
-#### ① “full domestic” 및 “국내 생태계 완성”은 본문의 HBM 설명과 충돌
-본문 후반은 HBM이 한국에서 공급될 것이라고 인정합니다. 기판·장비·소재도 해외 공급 가능성이 있습니다. 따라서 다음 표현은 과도합니다.
+따라서 다음처럼 써야 합니다.
 
-> “Completes the domestic leading-edge semiconductor ecosystem”  
-> “full domestic turnkey packaging capabilities”
+> Vicor가 Merrimack의 334,000ft² 시설과 Hooksett의 54에이커 부지를 확보했으며, 두 지역에서 계획하는 시설의 총 연면적이 약 100만ft²에 이를 수 있다.
 
-정확한 표현은:
+공식 발표가 클린룸 면적을 별도로 명시하지 않았다면 “93,000㎡의 클린룸”은 삭제해야 합니다.
 
-> “미국 내 advanced packaging 및 test 공정 비중을 확대한다.”
+### 제조시설 성격
 
-#### ② NVIDIA가 TSMC CoWoS에 “배타적으로” 의존한다는 표현은 과장
-다음 문구:
+Vicor의 “ChiP fab”은 전통적인 첨단 로직 웨이퍼 팹과 동일하게 이해하면 안 됩니다. 주된 역할이 전력 모듈 패키징·조립·테스트라면 다음 표현은 피해야 합니다.
 
-> “away from exclusive dependence on TSMC CoWoS lines”
+- 반도체 웨이퍼 팹으로 오인되는 “gigascale fab”
+- VPD 전용 대량생산시설이라는 단정
+- 모든 신규 면적이 VPD용이라는 단정
 
-NVIDIA 공급망의 높은 CoWoS 의존도를 말할 수는 있지만, 전체 후공정 공급망이 단일 업체에 법적·기술적으로 배타적이라고 단정해서는 안 됩니다. “heavy concentration” 또는 “high dependence”로 바꾸는 것이 안전합니다.
+공식 발표가 여러 ChiP 제품군을 대상으로 한다면 “VPD를 포함한 고밀도 전력 모듈 생산능력”으로 써야 합니다.
 
-#### ③ 유기 인터포저까지 “sub-micron line/space”로 일반화하면 안 됨
-다음 문구:
+### VPD와 패키징 설명의 오류
 
-> “sub-micron line/space lithography on silicon or organic interposers”
+#### A. TSV 표현
 
-실리콘 인터포저의 BEOL과 유기 RDL/기판의 선폭 역량은 다릅니다. 공식 공정 수치가 없다면:
+> “sub-millimeter vertical TSV and package-via transit”
 
-> “실리콘 인터포저 또는 고밀도 RDL을 이용한 미세 배선”
+PCB 관통 비아와 실리콘 TSV는 다른 구조입니다. 보드 후면 VTM에서 프로세서로 전력을 전달한다고 해서 자동으로 TSV를 사용하는 것은 아닙니다. 실제 구현에 따라 PCB 비아, BGA 전원 볼, 패키지 비아 및 전원면을 거칩니다.
 
-으로 수정해야 합니다.
+#### B. HBM 라우팅
 
-#### ④ 3,500명을 모두 “engineering professionals”로 표현하지 말 것
-공식 발표가 3,500개 일자리라고 했다면 엔지니어뿐 아니라 운영, 생산기술, 장비 유지보수, 품질, 관리 인력이 포함될 수 있습니다.
+“보드 상단 공간을 비워 HBM escape routing을 확보한다”는 설명은 부정확합니다. HBM은 일반적으로 GPU/ASIC과 함께 인터포저 또는 고급 패키지에 통합되며, 광폭 HBM 신호는 일반 서버 마더보드로 빠져나오지 않습니다.
 
-> “3,500개 이상의 직접 고용” 또는 공식 원문의 직종 표현
+VPD가 확보하는 보드 공간은 주로 다음에 도움이 됩니다.
 
-으로 써야 합니다.
+- 주변 전원부 제거
+- I/O 커넥터 및 SerDes 라우팅
+- 메모리 DIMM·NIC·광모듈 배치
+- 냉각 및 기계적 설계 여유
 
-### 핵심 사실의 직접 검증 필요
+HBM 자체의 패키지 내부 escape routing 개선 효과를 주장하려면 VPD가 패키지 기판에 직접 통합된 구체적인 설계가 필요합니다.
 
-다음은 발표의 핵심이므로 Amkor 공식 자료와 NVIDIA 측 문서에서 모두 확인해야 합니다.
+#### C. “100% perimeter clearance”
 
-- 투자액이 실제로 **$2B에서 약 $12B**로 변경됐는지
-- $12B가 Amkor 자체 CapEx인지, 고객 선급금·보조금·장기 운영비를 포함한 총 프로젝트 가치인지
-- NVIDIA가 실제 **commercial prepayment**를 제공하는지
-- capacity reservation이 구속력 있는 계약인지
-- Phase 2 60,000㎡와 총 93,000㎡
-- 2027년 착공·2029년 완공
-- Apple과 AMD가 Phase 2 고객으로 공식 확인됐는지
-- 25µm micro-bump, 100×100mm package, glass core, 1,200A test 사양
+보드 후면에 전력 모듈을 옮겨도 디커플링 커패시터, 신호 팬아웃, 기계적 고정물, 소켓 및 냉각 구조가 남습니다. “100% clearance”는 절대적이고 검증하기 어려운 표현입니다.
 
-특히 로드맵의 “NVIDIA, Apple, AMD multi-customer”는 본문에서 AMD를 설명하지 않았습니다. 공식 발표에 AMD가 없으면 삭제해야 합니다.
+#### D. 85% 감소 수치
 
-### URL·공시 보완
+초안은 서로 다른 대상을 혼용합니다.
 
-Amkor 공식 보도자료 URL 외에 다음을 붙이는 것이 좋습니다.
+- trace resistance 85% 감소
+- trace losses 85% 감소
+- electrical path resistance 85% 감소
+- 전체 PDN 손실 85% 감소
 
-- Amkor 투자자관계(IR) 발표 또는 SEC 8-K
-- NVIDIA 측 계약 확인 자료
-- CHIPS Act 보조금·대출 수정 공지
-- Peoria 시의 개발 협약 또는 인허가 문서
+저항 감소와 전력손실 감소는 같은 지표가 아닙니다. \(P=I^2R\)이므로 전류 경로와 변환 토폴로지가 같을 때만 단순 비교가 가능합니다. Vicor의 정확한 시험 조건, 보드 구조, 전류, 전압, 비교 VRM을 제시해야 합니다.
 
-$12B 규모라면 상장기업의 재무상 중요한 약정일 가능성이 높으므로, 보도자료뿐 아니라 공시 문서에서 금액의 성격을 확인해야 합니다.
+출처가 불명확하면 다음처럼 제한해야 합니다.
 
----
+> Vicor는 전력 변환 단계를 부하 가까이에 배치해 보드 전원 경로의 저항과 과도응답 손실을 줄일 수 있다고 주장한다.
 
-# Executive Summary 및 종합 분석 수정 사항
+#### E. 전류 수치
 
-## 사실처럼 단정하면 안 되는 인과관계
+- 1,000W ÷ 0.8V = 1,250A
+- 1,500W ÷ 0.75V = 2,000A
 
-다음 연결은 흥미로운 투자 테마지만, 네 사건 사이에 직접적인 인과관계가 입증된 것은 아닙니다.
+계산상 가능한 범위이지만, 이 값은 전체 칩 전력이 하나의 전압 레일에서 공급된다고 가정한 단순치입니다. 실제 가속기는 코어·HBM·I/O·SerDes·SoC 레일로 분산됩니다. 따라서 “1,200A continuous, >2,000A peak”를 Vicor 제품 사양으로 쓰려면 특정 모듈 데이터시트가 필요합니다.
 
-- OpenAI 가입 제한 → d-Matrix Raptor 채택
-- Skild AI 로봇 모델 → Amkor Arizona 투자
-- Amkor 시설 → 해당 Raptor 또는 특정 NVIDIA 제품 패키징
+### 지원되지 않는 주장
 
-따라서 “interconnected system loop”보다 다음이 적절합니다.
+다음은 공식 자료가 없다면 삭제해야 합니다.
 
-> “서로 직접 연결된 계약 관계라기보다, 추론 비용·로봇 자동화·랙 통합·첨단 패키징이라는 AI 인프라의 서로 다른 병목을 보여주는 사례들이다.”
+- Fab-2가 정확히 1년 안에 가동
+- 주요 Tier-1 AI OEM에서 파일럿 VPD 인증 완료
+- PCB 면적 55% 절감
+- 기존 설계가 전력의 15~20%를 보드 열로 손실
+- VPD가 120kW 랙 구현을 직접 가능하게 함
+- 448G SerDes 라우팅 확보
+- “high-frequency switching vibration”이 주요 기계적 고장 원인
 
-## 투자 권고 표현
-“Overweight/underweight”는 사실 검증 뉴스라기보다 증권 투자 권고로 읽힙니다. 밸류에이션, 수주 노출도, 고객 집중도, 매출 기여 시점 분석이 없으므로 다음처럼 바꾸는 편이 좋습니다.
+마지막 항목은 특히 일반적인 전력 모듈 신뢰성 설명으로 부적절합니다. 더 직접적인 위험은 열사이클, CTE 불일치, 솔더 피로, 보드 휨, 검사·재작업 난이도입니다.
 
-- “수혜 가능성이 있는 분야”
-- “추적할 공급망”
-- “실적 확인이 필요한 기업군”
+### 권장 수정 제목
 
----
-
-# URL 및 캘린더 검증 형식 보완
-
-제시된 URL들은 도메인 형식상 그럴듯하지만, **URL 문자열만으로 기사 존재·내용 일치가 입증되지는 않습니다.** 발행 전 각 링크에 대해 다음을 기록하십시오.
-
-- HTTP 응답 및 canonical URL
-- 제목
-- 게시·수정 시각과 시간대
-- 작성자
-- 핵심 수치가 등장하는 원문 문장
-- 보도자료인지 제3자 기사인지
-
-행사 캘린더도 공식 사이트의 2026 행사 페이지에서 날짜와 장소를 다시 확인해야 합니다. 특히 일반 홈페이지만 연결된 OCP Summit은 연도별 행사 페이지를 붙이는 것이 좋습니다. 행사 날짜는 본문 핵심 사건 검증과 별도로 관리하십시오.
+> **Vicor, 뉴햄프셔 시설·부지 확보로 ChiP 전력 모듈 생산능력 확대 추진; VPD용 공급 확대 가능성**
 
 ---
 
-## 최종 편집 권고
+# 3. URL·출처 형식 검증
 
-### 제외
-- **항목 1:** 24시간 초과, ongoing-story 예외 없음
-- **항목 2:** 24시간 초과, 일반 슬롯
+각 항목이 5~6개 매체를 출처로 열거하지만 실제 URL은 하나씩만 제공합니다. 이 상태에서는 엄격한 교차검증이 불가능합니다.
 
-### 조건부 유지
-- **항목 3:** 카테고리 6의 7일 예외 적용  
-  단, KST를 9월 11일 01:00으로 수정하고 메모리 일관성·냉각·출하 시점의 미확인 세부를 제거
-- **항목 4:** 카테고리 6의 7일 예외 적용  
-  단, $12B의 회계적 성격과 NVIDIA 선급 계약을 공시로 확인하고 “완전한 국내 공급망” 표현을 완화
+특히 아래 문서에는 반드시 개별 URL이 필요합니다.
 
-### 발행 가능 상태로 만들기 위한 최소 수정
-1. 모든 `event_within_24h_window` 값을 바로잡기  
-2. 항목 3의 시간대 오류 수정  
-3. 항목 2의 66%를 “단계별 성공률”로 통일  
-4. GDPR/EU AI Act의 데이터 현지화 단정 삭제  
-5. NVLink가 자동으로 통합·일관 메모리를 제공한다는 문구 삭제  
-6. Amkor의 “full domestic”, “exclusive dependence”, 유기 인터포저 sub-micron 표현 수정  
-7. 각 핵심 수치에 정확한 공식 원문 URL과 인용문 추가
+- Altman·Musk의 원 게시물
+- OpenAI 공식 확인문
+- RubyGems/RubyDoc 사고 공지
+- Hawley·Van Hollen 상원 공식 문서
+- Nightingale Collective 기술 보고서
+- Akamai와 MuleSoft 각각의 공식 발표 또는 통합 문서
+- `20+` 고객 배포 근거
+- Vicor의 85%, 55%, 전류·면적 수치가 기재된 데이터시트
+
+또한 “Source: Reuters / Forbes / Guardian…”처럼 매체 이름만 나열하고 실제 기사가 없는 형식은 출처 수를 부풀리는 결과가 됩니다. **각 사실 문장에 각주형 URL을 연결**하는 편이 적절합니다.
+
+---
+
+# 4. 종합 도식의 인과관계 문제
+
+최종 도식은 네 사건 사이에 직접적인 인과관계가 있는 것처럼 구성합니다.
+
+> RubyGems 사건 → Amodei 선언 → MCP 보안 → Vicor VPD
+
+하지만 제공된 근거로는 다음이 입증되지 않습니다.
+
+- RubyGems 사건이 Amodei 글의 직접 계기였다는 사실
+- AI 개발 속도 조절이 데이터센터 전력 인프라에 실질적인 “운영 버퍼”를 준다는 사실
+- 에이전트 격리 요구가 Vicor의 VPD 증설을 촉발했다는 사실
+- SmartNIC 보안과 VPD가 하나의 직접적 제약 사슬이라는 사실
+
+이는 “직접 causal constraint chain”이 아니라 **동시 진행되는 서로 다른 계층의 산업 동향**으로 표현해야 합니다.
+
+권장 문구:
+
+> 네 사안은 직접적인 인과 사슬이라기보다 AI 시스템의 거버넌스, 런타임 보안, 엔터프라이즈 통합, 물리적 전력 공급이라는 서로 다른 계층에서 나타나는 병렬적 변화다.
+
+---
+
+# 5. Upcoming Tech Calendar
+
+달력도 행사 홈페이지의 일반 URL만으로는 정확한 날짜와 특정 키노트 내용을 입증할 수 없습니다.
+
+특히:
+
+- “Dreamforce 2026 Agent Governance Keynote”가 공식 세션명인지 확인 필요
+- AI Infra Summit이 VPD를 핵심 의제로 명시했는지 세션 URL 필요
+- OCP Summit의 정확한 시작·종료일은 연도별 행사 페이지로 확인 필요
+- IEDM은 튜토리얼·Short Course와 본회의 날짜가 다를 수 있으므로 “December 13–17”의 범위를 공식 일정과 대조해야 함
+- 미래 세션에서 HBM4, BSPDN, 448G 등을 다룬다고 단정하려면 프로그램 링크가 필요
+
+행사별 **2026 전용 일정 페이지와 프로그램 페이지**를 붙이기 전에는 주제 설명을 “예상 의제”로 표시하십시오.
+
+---
+
+## 최종 처리 권고
+
+| 항목 | 처리 |
+|---|---|
+| 1 | 정식 협정·공동합의 표현 삭제 후, 원문과 CEO 게시물 URL이 확보될 때만 게재 |
+| 2 | 포렌식 보고서·OpenAI 확인문·상원 문서가 없으면 보류 |
+| 3 | 24시간 초과로 일일 브리핑에서 제외 |
+| 4 | Category 6 예외로 유지 가능하나 면적, 클린룸, HBM, TSV, 85% 수치 대폭 수정 |
+| Calendar | 연도별 공식 일정·세션 URL 확보 후 게재 |
+
+**결론적으로 4번만 시간 요건을 충족한 채 수정 게재 가능성이 있고, 1·2번은 핵심 사실의 1차 출처 확인이 필요하며, 3번은 현재 메타데이터로는 시간 윈도우 탈락입니다.**
