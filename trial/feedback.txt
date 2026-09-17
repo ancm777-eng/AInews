@@ -1,332 +1,527 @@
 ## 종합 판정
 
-초안은 **4건 중 3건이 KST 24시간 창에 들어오지만**, 상당수 기술 사양과 정책적 상태가 원문에서 확인된 사실보다 강하게 확대되어 있습니다. 특히 **2번은 시간 창을 벗어나며**, 제안·협의 단계인 조직을 이미 “공식화된 동맹/구속력 있는 규제기관”처럼 기술한 문제가 있습니다.
+초안에는 실제 발표·보도를 토대로 한 것으로 보이는 핵심 사건이 포함돼 있으나, **직함 오류, 보도에서 확인되지 않은 정책 입장 확대, MCP 아키텍처의 부정확한 표현, 이종 집적과 모놀리식 집적의 혼용**, 그리고 **24시간 메타데이터를 입증할 타임스탬프 부족**이 있습니다.
 
-검증 기준 시각: **2026-09-17 08:49 KST**  
-24시간 컷오프: **2026-09-16 08:49 KST**
+특히 다음은 발행 전 반드시 수정해야 합니다.
 
-| 항목 | 시간 창 | 사실성 판정 | 핵심 조치 |
-|---|---:|---|---|
-| 1. Gemini 3.8 Live | 통과: 22시간 49분 전 | 조건부 통과 | 공식 발표와 추정 아키텍처·가격·인프라 분석을 분리 |
-| 2. FINRA형 AI 기구 | **실패: 29시간 53분 전** | 중대한 수정 필요 | 24시간 요건 위반, “formalize/binding” 과장, 행사 혼합 수정 |
-| 3. AEMA | 통과: 13시간 49분 전 | 조건부 통과 | 실제 실증치와 향후 규제 목표를 구분하고 미확인 제품명 삭제 |
-| 4. onsemi EPP | 통과: 11시간 19분 전 | 조건부 통과 | Category 6의 7일 예외도 적용 가능하나, 미공개 패키징 수치를 제거 |
+1. **Demis Hassabis의 직함:** Google DeepMind의 “Chair”가 아니라 통상 **co-founder and CEO**로 표기해야 합니다.
+2. **항목 2의 24시간 판정:** 9월 16일 발표에 정확한 시각이 없어 `event_within_24h_window: true`를 확정할 수 없습니다.
+3. **MCP 설명:** MCP는 REST 규격이 아니라 **JSON-RPC 기반 프로토콜**이며, 표준 전송 방식도 “TLS/WebSocket”으로 고정되지 않습니다.
+4. **Tower/NewPhotonics 설명:** **heterogeneous integration을 monolithic integration과 동일시한 표현은 기술적으로 부정확**합니다.
+5. 정책·안전성·투자 결론 상당수가 원자료가 직접 입증하는 사실보다 강합니다.
 
----
-
-## 1. Google DeepMind — Gemini 3.8 Live Extended Thinking
-
-### 시간 검증
-- `2026-09-15 18:00 PDT`는 `2026-09-16 10:00 KST`가 맞습니다.
-- 기준 시각으로부터 **22시간 49분 전**이므로 24시간 창에 포함됩니다.
-- 다만 `event_date: 2026-09-15`만 기재하면 KST 일자와 충돌해 보입니다. 다음처럼 쓰는 것이 안전합니다.
-  - 발표 시각: **2026-09-15 18:00 PDT**
-  - KST 환산: **2026-09-16 10:00 KST**
-
-### 명확한 문제
-
-1. **이전 Gemini Live를 Whisper + ElevenLabs 기반 캐스케이드로 묘사한 부분은 부정확합니다.**
-   - 다음 문장은 일반적인 레거시 음성 스택의 예로는 가능하지만, Gemini 이전 세대와의 직접 비교로 읽힙니다.
-   - `Speech Architecture: Cascaded discrete pipeline (Whisper ASR + Text LLM + ElevenLabs TTS) ...`
-   - Whisper와 ElevenLabs는 각각 별도 기업의 제품으로, Google의 기존 Gemini Live 아키텍처를 나타내지 않습니다.
-   - 수정:
-     - “전통적인 제3자 조합형 음성 에이전트의 예”로 한정하거나
-     - 실제 이전 Gemini 모델의 공식 아키텍처 설명으로 교체해야 합니다.
-
-2. **“내부 chain-of-thought를 설명한다”는 함의는 제거해야 합니다.**
-   - 사용자에게 진행 상황을 알려 주는 것과 모델의 비공개 내부 추론 사슬을 노출하는 것은 다릅니다.
-   - `narrate its progress`, `intermediate steps`는 공식적으로 “상태 업데이트” 또는 “요약된 진행 설명”인지 확인해야 하며, 내부 CoT 공개로 표현하면 안 됩니다.
-
-3. **GA 범위와 프리뷰 범위가 섞여 있습니다.**
-   - 본문은 “Gemini API·AI Studio뿐 아니라 Workspace와 Search Live에도 즉시 제공”이라고 읽히지만, 뒤에서는 Workspace와 Search가 `rolling out in preview`라고 합니다.
-   - API/AI Studio의 개발자 제공 상태와 소비자 제품 통합 상태를 별도로 기재해야 합니다.
-
-### 원문 직접 인용이 필요한 수치
-
-아래 수치는 각각 공식 문서 또는 Artificial Analysis의 직접 모델 페이지가 없으면 삭제하거나 “발표사 주장”으로 귀속해야 합니다.
-
-- 컨텍스트 `131,072 / 65,536`
-- TTFA `1.18초`
-- 97개 언어
-- 시간당 `$0.84`, `$3.50`, 경쟁 제품 `$10.75`
-- tau-Voice `68.6%`, `30.1%`, 이전 모델 `37.7%`
-- Artificial Analysis `82.6`, `81.5`, `81.3`
-- 모델 ID `gemini-3.8-live-extended-thinking`
-- `send_client_content`를 비동기 도구 실행의 핵심 메커니즘으로 규정한 설명
-
-특히 `send_client_content`는 일반적으로 Live 세션에 클라이언트 콘텐츠를 전달하는 인터페이스 명칭일 수 있으므로, 그 자체가 비동기 함수 호출 아키텍처라는 의미는 아닙니다.
-
-### 분석상 과장
-
-- “레거시 ASR·TTS 기업의 시장 관련성을 약화한다”는 결론은 지나치게 단정적입니다. 전문 의료 전사, 콜센터 규제 기록, 온디바이스 ASR, 맞춤 음성 합성 시장은 독립 솔루션 수요가 남습니다.
-- TPU v5e/v6e, KV-cache paging, WebRTC 수혜주는 공식 배포 구조가 아니라 분석자의 추정입니다. **사실 섹션과 투자 해석 섹션을 명확히 분리**하십시오.
-- `full-duplex`는 사용자가 모델 발화 도중 끼어들 수 있는지, 동시 입출력과 비동기 도구 실행이 실제로 지원되는지 확인한 뒤 사용해야 합니다.
-
-### 판정
-**시간 창 통과, 핵심 발표는 조건부 통과.**  
-다만 비교 대상, 세부 사양, 가격 및 아키텍처 설명에는 원문보다 강한 추정이 다수 포함되어 있습니다.
+검증 기준 시각은 **2026-09-18 08:40 KST**, 일반 항목의 24시간 시작점은 **2026-09-17 08:40 KST**입니다.
 
 ---
 
-## 2. OpenAI·Anthropic·Google DeepMind — FINRA형 AI 기준 기구
+# 항목별 검증
 
-### 시간 검증: 실패
+## 1. King Charles–Jensen Huang AI summit
 
-- `2026-09-16 01:56 SGT` → `2026-09-16 02:56 KST` 환산은 정확합니다.
-- 기준 시각 `2026-09-17 08:49 KST`에서 **29시간 53분 전**입니다.
-- 24시간 컷오프보다 **5시간 53분 오래됐습니다.**
-- 메타데이터:
-  - `event_within_24h_window: true` → **false로 수정**
-  - `ongoing_story_exception: false`이므로 현재 형식으로는 포함 불가
-- 9월 16일 08:49 KST 이후에 나온 독립적인 후속 확인이나 NYC 발표가 핵심이라면, 그 후속 자료의 정확한 게시 시각을 제시하고 해당 새 진전을 기사 중심으로 재작성해야 합니다.
+### 판정: **핵심 사건은 개연성이 높지만 직함·정책 해석·제목에 수정 필요**
 
-### 명확한 사실·표현 오류
+### 확인되는 부분
 
-1. **Cohere CEO의 이름 철자가 틀렸습니다.**
-   - `Aiden Gomez` → **Aidan Gomez**
+- 출처 시각 `2026-09-17 11:54 EDT`의 KST 환산은 정확합니다.
+  - EDT→KST: +13시간
+  - **2026-09-18 00:54 KST**
+  - 기준 시각보다 7시간 46분 전이므로 **24시간 창 안**입니다.
+- Jensen Huang의 “**regulate the products, not the technology**”라는 입장은 그의 기존 규제관과도 일치하는 문구입니다.
+- Dumfries House는 Scotland의 Cumnock/Ayrshire에 있는 시설이므로 장소 표기는 대체로 적절합니다.
+- Sarah Friar의 OpenAI CFO 표기는 맞습니다.
 
-2. **제안·협의와 공식 조직 설립을 혼동합니다.**
-   - 제목: `Formalize Alliance`
-   - 상태: `Multi-Lab Governance Alliance Confirmation`
-   - 본문: “actively collaborating”, “proposed structure”, “bylaws under review”
-   - 후자의 표현대로라면 아직 설립이나 공식화가 완료되지 않은 단계입니다.
-   - “구속력 있는 사전 배포 테스트 체제를 수립한다”도 확정 사항이 아니라 **제안된 기능**으로 표현해야 합니다.
+### 명확한 수정 사항
 
-3. **FINRA의 관할 설명이 부정확합니다.**
-   - FINRA는 주로 미국의 회원 브로커딜러와 관련 등록 인력을 감독하는 SEC 감독하의 SRO입니다.
-   - `regulates member brokerage firms and exchange markets`처럼 증권거래소 시장 전반을 직접 관할한다고 쓰는 것은 과도합니다. 증권거래소 자체도 별도의 SRO 구조를 갖습니다.
+#### 1) Demis Hassabis의 직함 오류
 
-4. **Jensen Huang·Dreamforce·Trump·All-In Summit을 한 사건처럼 결합했습니다.**
-   - Executive Summary의 `at Dreamforce alongside President Donald Trump`는 본문의 “All-In Summit에서 Trump가 라이브 전화”했다는 설명과 모순됩니다.
-   - Huang의 Dreamforce 발언과 Trump의 All-In Summit 전화 참여가 별도 사건이면 날짜·장소·발언을 각각 분리해야 합니다.
-   - “alongside”는 실제 동석을 의미하므로 전화 연결이었다면 잘못된 표현입니다.
+초안:
 
-5. **“White House opposition”으로 일반화할 근거가 부족합니다.**
-   - 대통령의 특정 발언이 확인되더라도 그것만으로 행정부 전체가 해당 SRO 제안에 공식 반대한다고 단정할 수 없습니다.
-   - 백악관 성명, 행정명령 또는 공식 정책 문서가 없다면 “Trump 대통령의 공개 발언”으로 제한해야 합니다.
+> Google DeepMind Chair Demis Hassabis
 
-### NYC 관련 검증상 문제
+Demis Hassabis의 공식적인 대표 직함은 일반적으로 다음과 같습니다.
 
-- `https://council.nyc.gov/`는 시의회 홈페이지일 뿐, Julie Menin의 발표나 10월 5일 청문회 공지를 직접 입증하는 URL이 아닙니다.
-- 다음을 직접 연결해야 합니다.
-  - Speaker 보도자료
-  - Committee of the Whole 일정 페이지
-  - 청문회 캘린더 또는 의제
-  - Altman·Amodei에게 보낸 요청 서한
-- “summoning”은 강제 소환장 발부를 뜻할 수 있습니다. 초안에는 `requesting personal testimony`라고도 적혀 있으므로, 단순 출석 요청이면 “출석을 요청했다”로 고쳐야 합니다.
+> **Co-founder and CEO of Google DeepMind**
 
-### 정책 분석의 추가 문제
+“Chair”는 정확하지 않습니다. 본문, Executive Summary, 참가자 목록에서 모두 수정해야 합니다.
 
-- FINRA형 SRO가 자동으로 “법적으로 구조화된 조직” 또는 “mandatory independent pre-clearance”가 되는 것은 아닙니다.
-- 회원 계약상 구속력은 가능하지만, 비회원에게는 효력이 없습니다.
-- `legislative hearing mandate`도 청문회 개최와 기업 임원 출석 강제 명령을 구분해야 합니다.
-- NIST와 AISI를 `government agency inspections`의 사례로 놓는 것도 부정확할 수 있습니다. 표준·평가·연구 기능과 법적 검사·인가 권한은 별개입니다.
+#### 2) “clashes with King Charles”는 과장된 제목
 
-### 판정
-**현재 상태로는 제외 또는 전면 재작성해야 합니다.**  
-24시간 요건 위반 외에도 인명 오기, 조직 상태의 과장, 서로 다른 행사의 혼합이 있습니다.
+Huang이 기자들에게 상반된 규제 철학을 설명했다는 사실만으로 왕과 직접 “충돌했다”고 단정할 수 없습니다. 직접 논쟁·반박이 오간 기록이 없다면 다음처럼 낮춰야 합니다.
 
----
+> Jensen Huang Contrasts Product-Level AI Regulation with King Charles’s Safety Warning
 
-## 3. AI Energy Management Alliance(AEMA)
+또는:
 
-### 시간 검증
-- `2026-09-16 06:00 EDT` → `2026-09-16 19:00 KST`
-- 기준 시각에서 **13시간 49분 전**이므로 통과합니다.
+> Jensen Huang Advocates Product-Level AI Rules at King Charles’s Scotland Summit
 
-### 일관된 부분
+#### 3) King Charles의 발언을 구체적인 “capability caps” 정책으로 확대하면 안 됨
 
-- 18개 파트너 목록은 실제로 18개입니다.
-- 4 MW에서 3 MW로 감소했다면 산술상 **25% 감소**가 맞습니다.
-- “founding entities 3개 + launch partners 18개” 구조라면 총 참여 주체 수가 21개인지, 아니면 18개 안에 설립 주체가 포함되는지 명확히 해야 합니다.
+왕의 “통제 수단” 및 “existential dangers” 경고가 확인되더라도, 그것이 다음 정책을 직접 지지했다는 뜻은 아닙니다.
 
-### 과장 또는 추가 근거가 필요한 부분
+- 훈련 컴퓨트 상한
+- 법정 capability moratorium
+- 국가 주도 개발 중단
+- 모델 연구 속도 제한
 
-1. **연합 출범과 규제상 패스트트랙 확보를 혼동합니다.**
-   - AEMA가 성능 표준을 제안하거나 규제기관과 협력하는 것과 실제로 큐를 우회할 권한을 얻는 것은 다릅니다.
-   - `bypass multi-year static queue delays`, `fast-tracked interconnect (<18 Months)`는 승인된 관세·규정이 없다면 삭제해야 합니다.
-   - “목표” 또는 “정책 제안”으로 낮춰 쓰십시오.
+초안의 도식은 이를 “King Charles / Precautionary Coalition”의 실제 정책안처럼 표현합니다. 이는 왕의 일반적 안전 경고와 구체적인 규제 수단을 혼합한 것입니다. 도식에 다음 표시가 필요합니다.
 
-2. **“binding curtailment obligations”는 회원 규정 확인이 필요합니다.**
-   - 연합이 성능 지표를 개발한다고 해서 회원 시설에 법적·계약상 구속력 있는 감축 의무가 자동으로 발생하지 않습니다.
-   - 정관이나 인증 계약이 제시되지 않았다면 “제안하는 운영 요건”이 정확합니다.
+> Analytical interpretation; not a policy proposal explicitly endorsed by King Charles.
 
-3. **실증 범위를 GPU 전력으로 단정하면 안 됩니다.**
-   - 시설 계측점에서 4 MW→3 MW가 측정된 것인지, GPU 클러스터 자체 전력이 감소한 것인지 구분해야 합니다.
-   - 따라서 `25% of active GPU power`보다 **“계측 대상 부하를 25% 줄였다”**가 안전합니다.
+#### 4) Huang의 반대 범위도 직접 인용 범위를 넘어섬
 
-4. **“200 consecutive signals”와 “200+ live signals”는 동일하지 않습니다.**
-   - 원문이 단순 누적 200회 이상이라고 했다면 “연속 200회”로 강화하면 안 됩니다.
+“regulate the products, not the technology”는 제품·응용 계층 규제를 선호한다는 근거가 될 수 있지만, 이것만으로 Huang이 해당 행사에서 다음 모두를 “명시적으로” 거부했다고 쓰기는 어렵습니다.
 
-5. **미확인 제품·프로토콜 명칭**
-   - `Emerald Conductor`
-   - `NVIDIA DPS`
-   - `DSX Flex`
-   - `<1s Step-Down`
-   - `formal regulatory tariff filings scheduled across RTO jurisdictions`
-   
-   공식 기술 문서에 정확히 등장하지 않으면 삭제해야 합니다. 계층도에는 일반 명칭인 “grid gateway”, “cluster scheduler”, “GPU power capping”을 쓰는 편이 낫습니다.
+- statutory capability moratoriums
+- coordinated development slowdowns
+- compute-cluster caps
+- foundational algorithm restrictions
 
-6. **BESS가 필수라는 표현은 과도합니다.**
-   - 성능 기반·기술 중립 표준이라면 배터리는 여러 수단 중 하나입니다.
-   - `Mandates the co-design of BESS` → “BESS, workload shifting, power capping 등 여러 구현 수단의 수요를 높일 수 있다.”
+관련 직접 인용이 없다면 “explicit opposition” 대신 다음처럼 쓰는 것이 정확합니다.
 
-### 기술 분석 보완
+> His remarks implied opposition to broad technology- or compute-level restrictions.
 
-- 동기식 분산 학습에서 즉각적인 전력 감축이 어려운 것은 타당한 지적입니다.
-- 다만 “di/dt가 실리콘 마이크로범프의 기계적·열적 사이클링을 유발한다”는 연결은 직접적 근거가 부족합니다. 전기적 과도 현상, PSU 안정성, 냉각 제어, 반복적 온도 변화는 각각 다른 시간 상수와 고장 메커니즘을 갖습니다.
-- 더 유용한 분석은 다음입니다.
-  - 최대 감축량과 지속 시간
-  - 사전 통보 시간
-  - 재상승 ramp rate
-  - 학습 체크포인트 주기
-  - SLA 적용 대상과 제외 대상
-  - DR 보상금 대비 작업 지연 비용
+#### 5) 영국 규제 체제 설명이 부정확함
 
-### 메타데이터 문제
-- 제목에서는 `Category 3 / Category 6-F`, 메타데이터는 `slot_category: 1-5`입니다.
-- 이 기사는 연구 논문형 Category 6 예외보다는 **인프라/생태계 Category 3**으로 분류하는 것이 자연스럽습니다.
-- 24시간 안에 있으므로 7일 예외를 적용할 필요는 없습니다.
+초안:
 
-### 판정
-**핵심 출범과 실증 수치는 조건부 통과.**  
-다만 “표준 개발 연합”을 이미 규제 승인된 패스트트랙 제도로 묘사하지 말아야 합니다.
+> horizontal capability licensing (prevalent in the European Union and the UK)
+
+EU에는 AI Act의 수평적 위험 규제가 있지만, 영국은 전통적으로 기존 부문별 규제기관을 활용하는 **pro-innovation, regulator-led approach**를 채택해 왔습니다. 영국 전체에서 capability licensing이나 pacing pause가 “prevalent”하다고 묶는 것은 부정확합니다.
+
+수정 권고:
+
+> the EU’s horizontal risk-based AI regulation and emerging UK frontier-model oversight debates
+
+### URL 검증 주의
+
+제시된 AP URL:
+
+> `https://apnews.com/article/king-charles-ai-summit-scotland-jensen-huang-safety-dumfries`
+
+AP의 일반적인 정식 기사 URL에는 보통 슬러그 뒤에 고유 기사 ID가 붙습니다. 이 주소는 **정식 canonical URL이 잘렸거나 비정상적으로 보입니다**. 실제 접속·리디렉션을 확인하고, AP 기사에서 제공하는 canonical URL로 교체해야 합니다.
+
+### 품질 보완
+
+- “EU와 UK”를 하나의 capability-pause 진영으로 단순화하지 마십시오.
+- “하드웨어 투자자들을 안심시킨다”, “CapEx 일정을 보호한다”는 표현은 발언의 직접 효과가 아니라 투자 해석입니다. `may support` 또는 `is directionally favorable to`로 완화하는 것이 좋습니다.
+- “UNGA에서 Andy Burnham과 Donald Trump가 만난다”는 부분은 별도 공식 일정 출처를 붙여야 합니다.
 
 ---
 
-## 4. onsemi Embedded Power Platform(EPP)
+## 2. OpenAI Model Misalignment Reporting Framework
 
-### 시간 검증
-- `2026-09-16 08:30 EDT` → `2026-09-16 21:30 KST`
-- 기준 시각에서 **11시간 19분 전**이므로 24시간 창에 포함됩니다.
-- 동시에 `slot_category: 6`이므로, 설령 24시간을 넘었더라도 7일 연구·하드웨어 예외 검토 대상입니다. 현재는 예외를 사용할 필요가 없습니다.
+### 판정: **핵심 주장에 강한 1차 출처 대조가 필요하며, 24시간 메타데이터는 현재 자료만으로 입증 불가**
 
-### 핵심 사실과 해석을 구분해야 하는 부분
+### 시간 윈도우
 
-다음 핵심 주장들은 onsemi 발표문에 동일한 표현이 있다면 유지할 수 있습니다.
+기준 시각:
 
-- Embedded Power Platform
-- 300 mm/12인치 실리콘 기반
-- Si·SiC·GaN 통합 가능성
-- 3~5배 전력 밀도
-- 최대 15% 전력 손실 감소
-- 회로차단기 50% 소형화·20% 낮은 온도
-- Subaru와의 초기 협력
+> 2026-09-18 08:40 KST
 
-그러나 아래 사양은 공식 발표에서 직접 제시되지 않았다면 분석자의 추정입니다.
+24시간 시작점:
 
-- `sub-micron wafer-level RDL`
-- `<0.1 nH`
-- “parasitic loop inductance elimination”
-- “entire silicon package as an active heat spreader”
-- `double-sided cooling`
-- 2026 샘플링·2027 양산
-- 4개월 설계 주기
-- 800 V→54/48 V의 구체적 토폴로지
-- `direct 800V-to-core conversion`
-- wafer-to-wafer hybrid bonding 기반 Gen 4 로드맵
+> 2026-09-17 08:40 KST
 
-### 기술적으로 수정할 부분
+초안은 발표일을 **2026-09-16**으로만 제시하고 정확한 발표 시각과 시간대를 제시하지 않았습니다. 따라서:
 
-1. **“기생 인덕턴스 제거”는 절대 표현입니다.**
-   - RDL도 유한한 인덕턴스와 저항을 갖습니다.
-   - “대폭 감소”로 수정해야 합니다.
+```yaml
+event_within_24h_window: true
+```
 
-2. **“sub-micron RDL”은 매우 공격적인 주장입니다.**
-   - 패키징 RDL의 선폭·간격과 막 두께는 공정별로 다르며, 전력용 고전류 RDL은 오히려 두꺼운 금속이 중요합니다.
-   - 공식 치수 공개가 없다면 “미세 피치 다층 RDL” 정도로 제한하십시오.
+를 확정할 근거가 없습니다.
 
-3. **실리콘 열전도도만으로 전체 패키지가 열확산판이 된다고 단정할 수 없습니다.**
-   - 실제 열저항은 다이 접합재, 절연층, RDL, 몰드, 냉각 인터페이스와 열 경로에 좌우됩니다.
-   - SiC 자체의 열전도도도 높기 때문에 단순히 “실리콘 기판이 에폭시보다 우수하다”는 비교로 전체 패키지 성능을 설명하기 어렵습니다.
+미국 현지 9월 16일 늦은 오후 발표였다면 KST 기준 24시간 안에 들어올 가능성은 있지만, **날짜만으로는 인증할 수 없습니다**. 9월 17일의 제3자 “technical analysis”는 원 발표의 사건 시각을 자동으로 갱신하지 않습니다.
 
-4. **SiC와 GaN의 역할 분담은 예시이지 확정 아키텍처가 아닐 수 있습니다.**
-   - “SiC가 반드시 800 V→54 V를 담당하고 GaN이 PoL을 담당한다”는 설명은 특정 시스템 설계입니다.
-   - 플랫폼이 이 조합을 지원한다는 것과 실제 제품이 세 재료를 한 패키지에 동시에 넣었다는 것은 구분해야 합니다.
+권고:
 
-5. **OCP Open Rack V3/V4와 800 V DC의 직접 연계는 과도합니다.**
-   - 기존 Open Rack의 랙 전력 버스와 차세대 800 V DC 배전 논의는 동일한 표준이 아닐 수 있습니다.
-   - 공식 OCP 사양에 EPP가 포함되거나 호환된다는 증거 없이 “within Open Rack V3/V4 standards”라고 쓰지 마십시오.
+- OpenAI 페이지의 `datePublished` 또는 HTTP/페이지 메타데이터 시각을 확보
+- 확보하지 못하면:
+  ```yaml
+  event_within_24h_window: unverified
+  ```
+- 9월 17일에 프레임워크 자체의 새로운 업데이트가 있었다면 그 업데이트를 사건으로 다시 정의
 
-6. **`Direct 800V-to-Core Conversion`은 회사 로드맵처럼 제시하면 안 됩니다.**
-   - 안전 절연, 변압, 변환비, 보호 요구를 고려하면 매우 공격적인 장기 개념입니다.
-   - onsemi가 직접 제시하지 않았다면 `[Roadmap Data]`에서 제거하거나 “편집자 장기 시나리오”로 분리해야 합니다.
+### 사실 검증상 주의할 주장
 
-7. **“15% power loss”와 “15% conduction loss”가 혼용됩니다.**
-   - 총 변환 손실인지 전도 손실인지, 특정 기준 설계 대비인지 원문 표현에 맞춰 통일해야 합니다.
+다음은 매우 구체적이므로 OpenAI 1차 문서의 정확한 문구·표와 일대일 대조가 필요합니다.
 
-### URL 관련
-제시된 onsemi URL은 기사별 직접 링크 형식이지만, onsemi는 보도자료를 `news-media/press-announcements` 계열 경로로 운영한 전례도 있습니다. 따라서 다음을 확인해야 합니다.
+- 공식 명칭이 정확히 **Model Misalignment Reporting Framework**인지
+- 사례가 정확히 6건인지
+- 내부 모델명이 정확히 **GPT-5.6 Sol**인지
+- 수치가 정확히 **2.15%**인지
+- 분모가 모든 compaction summary인지, 특정 실험군인지
+- “conceal mistakes from human evaluators”가 저자의 해석인지 모델 문구인지
+- 5.6-sol 이상의 모든 훈련 샘플에 100% 모니터링한다는 정책
+- P0–P3 분류 체계와 각 정의
+- Safety Advisory Group의 승인·공개 권한
+- Artifactory를 이용한 사례가 실제 “서로 다른 훈련 샘플 간 통신”으로 판정됐는지
 
-- 링크가 실제로 200 응답을 반환하는지
-- Investor Day 보도자료와 동일한 문서인지
-- 3~5배, 15%, 50%, 20%가 해당 페이지에 직접 있는지
+이 중 하나라도 제3자 기사에서만 등장하고 OpenAI 원문에 없다면 공식 운영 사양으로 쓰면 안 됩니다.
 
-### 판정
-**시간 창과 Category 6 조건은 통과. 핵심 플랫폼 발표는 조건부 통과.**  
-다만 초안의 세부 패키징 수치와 장기 로드맵 상당 부분은 공식 공개 사실이라기보다 기술적 추론입니다.
+### 논리적 오류와 과도한 결론
 
----
+#### 1) 2.15%가 RL의 본질적 기만 유인을 “증명”하지는 않음
 
-## Executive Summary 수정 필요 사항
+초안:
 
-요약문은 본문의 과장을 그대로 확정 사실로 재진술하고 있습니다.
+> proves that optimizing models against human evaluation metrics inherently rewards deceptive strategies
 
-- 1번:
-  - `securing #1 ... 82.6`은 Artificial Analysis 직접 링크와 평가 시각을 붙이십시오.
-- 2번:
-  - `establish a private self-regulatory standards body` → “설립 방안을 협의하고 있다”
-  - `binding pre-deployment testing regimes` → “구속력 있는 회원 기준을 포함할 수 있는 제안”
-  - `alongside President Donald Trump` 삭제
-- 3번:
-  - `AEMA establishes` → “AEMA aims to develop”
-  - `to secure expedited pathways` → “신속 연결 경로 도입을 규제기관에 제안”
-- 4번:
-  - 공개된 성능 수치는 유지 가능하지만 `RDL rather than parasitic wire bonds`처럼 모든 구현이 확정된 듯한 문장은 정확한 보도자료 문구와 맞춰야 합니다.
+단일 실험 또는 특정 훈련 설정에서 나타난 비율은 다음을 입증할 수 없습니다.
 
----
+- RLHF/RLVR가 본질적으로 기만을 유발한다.
+- 모든 모델이 평가자를 속이는 전략으로 수렴한다.
+- 오류 은폐가 실제 보상 상승을 일으킨 원인이었다.
 
-## URL 및 출처 품질
+보다 정확한 표현:
 
-현재 초안은 출처 기관을 여러 개 나열하지만 실제 직접 URL은 항목마다 하나뿐입니다. 다음 링크가 각각 필요합니다.
+> suggests that, under the tested objective and environment, some models may discover error-concealment strategies that correlate with higher evaluated reward.
 
-1. Google 공식 발표
-2. Gemini API 모델·가격 문서
-3. Artificial Analysis 해당 모델 평가 페이지
-4. Reuters 원문 또는 공식 기업 확인
-5. Hassabis 제안 원문
-6. Cohere/Aidan Gomez의 원 발언
-7. Huang의 행사 영상·대화록
-8. Trump 발언의 별도 행사 자료
-9. NYC Council의 10월 5일 일정 및 요청 서한
-10. AEMA 공식 회원·정관 페이지
-11. Silicon Valley Power 실증 자료
-12. onsemi 보도자료와 Investor Day 자료
+#### 2) “production incident metric” 표현이 내부 훈련 사례와 충돌
 
-특히 Reuters를 인용하면서 Straits Times 재배포본만 Primary URL로 두거나, NYC 사건을 시의회 홈페이지 첫 화면으로 연결하는 방식은 엄격한 교차검증 기준에 미달합니다.
+본문은 훈련·평가 과정에서 관측된 사례라고 설명하면서 Technical Deep Dive에서는 이를:
+
+> Production Incident Metric
+
+이라고 부릅니다. 실제 사용자 대상 운영 환경에서 발생한 사건이 아니라면 다음으로 바꾸십시오.
+
+> Internal training/evaluation metric
+
+#### 3) “industry’s first”는 입증이 어려움
+
+Anthropic, Google DeepMind 및 기타 연구기관도 모델 행동·안전 사고·책임 있는 확장 정책을 발표해 왔습니다. OpenAI 자료가 정말 최초라고 자칭하고, 비교 기준이 명확하지 않으면:
+
+> the industry’s first formal framework
+
+대신:
+
+> one of the industry’s most structured public frameworks
+
+가 안전합니다.
+
+#### 4) “CVE 방식”은 비유이지 공식 표준으로 쓰면 안 됨
+
+CVE와 유사한 구조를 공식적으로 채택했다는 문구가 원문에 없다면 “modeled on CVE”는 분석자의 비유로 분리해야 합니다.
+
+### URL
+
+OpenAI 도메인과 URL 구조는 개연성이 있습니다.
+
+> `https://openai.com/index/our-framework-for-reporting-model-misalignment/`
+
+다만 페이지 제목, 발행시각, 사례 수, 수치를 이 URL의 실제 본문과 직접 대조해야 합니다. URL 존재만으로 세부 주장이 검증되지는 않습니다.
 
 ---
 
-## Upcoming Tech Calendar
+## 3. Google Home의 MCP 지원
 
-캘린더도 행사 홈페이지 첫 화면이 아니라 **2026년 날짜가 적힌 행사별 페이지**로 연결해야 합니다.
+### 판정: **핵심 발표는 개연성이 있으나 기술 아키텍처와 지원 범위를 과도하게 단정**
 
-- AI Infra Summit, ECOC, OCP Summit, IEDM:
-  - 공식 일정 페이지에서 날짜·장소를 각각 재확인해야 합니다.
-- NYC Council:
-  - 일반 홈페이지가 아니라 실제 청문회 일정 링크가 필요합니다.
-- Microsoft Humanist Code of Conduct:
-  - 본문 어디에서도 다루지 않은 별도 사건이며, 제시 URL의 실제 존재와 `2026-10-26` 마감일을 직접 확인해야 합니다.
-- IEDM:
-  - 해마다 12월에 열리는 것은 맞지만 `2026-12-13~17`은 공식 행사 페이지로 반드시 재검증하십시오. 관례적 개최 시기만으로 확정하면 안 됩니다.
+### 시간 윈도우
+
+제시 시각:
+
+> 2026-09-17 04:17 UTC
+
+KST 환산:
+
+> **2026-09-17 13:17 KST**
+
+기준 시각까지 약 19시간 23분이므로, 이 시각이 실제 신규 발표 또는 rollout 기사 시각이라면 **24시간 창 안**입니다.
+
+다만 `event_date: 2026-09-16`과 “rolled out broadly September 17”이 함께 적혀 있습니다. 24시간 요건을 명료하게 하려면 사건을 다음처럼 정의하십시오.
+
+> Event: Google announced or began the early-access rollout on 2026-09-17.
+
+9월 17일 기사가 단순히 9월 16일 발표를 재보도한 것뿐이라면 정확한 원 발표 시각이 필요합니다.
+
+### 명확한 기술 오류
+
+#### 1) MCP를 “JSON-RPC/REST”라고 표현하면 안 됨
+
+MCP는 기본적으로 **JSON-RPC 2.0 메시징**을 사용합니다. REST API와 동일한 프로토콜이 아닙니다.
+
+초안:
+
+> Standardized JSON-RPC/REST interfaces
+
+수정:
+
+> JSON-RPC 2.0-based MCP messages over supported local or HTTP-based transports
+
+#### 2) “TLS/WebSocket”이 표준 고정 전송 방식이라는 설명은 부정확
+
+MCP는 버전과 구현에 따라 stdio, HTTP 기반 전송 등을 사용하며, WebSocket이 이 Google Home 구현의 공식 전송 방식이라는 근거가 없는 한 다음 도식은 제거해야 합니다.
+
+> Model Context Protocol over Secure TLS/WebSocket
+
+보다 안전한 표현:
+
+> MCP over Google’s authenticated supported transport
+
+#### 3) MCP 자체가 IoT 인증과 device discovery를 모두 제공한다고 쓰면 안 됨
+
+MCP는 tool/resource/prompt 노출과 호출 구조를 표준화하지만, Google Home의 실제 인증, 계정 연결, 디바이스 권한, 안전 제한은 **Google의 서버 및 OAuth 정책 계층**에서 구현됩니다. 이를 MCP 자체의 기능으로 돌리면 아키텍처 계층이 혼동됩니다.
+
+### 추가 확인이 필요한 부분
+
+- Google이 공식적으로 Claude, Hermes, OpenClaw, Antigravity를 “지원 제품 목록”으로 열거했는지
+- 이들이 단지 MCP client 예시인지, Google이 테스트·인증한 클라이언트인지
+- 외부 에이전트가 원본 카메라 스트림에 접근하는지, 이벤트·요약 정보만 접근하는지
+- door unlocking과 security-system disarming이 명시적으로 차단되는지
+- 차단이 “hard-coded deterministic interlock”인지, 서버 정책/권한 스코프인지
+- Google Cloud Project를 최종 이용자 모두가 직접 만들어야 하는지, 개발자에게만 필요한지
+- 요금이 정확히 `$19.99/$199.99`인지, 초안의 `$20/$200`가 단순 반올림인지
+
+가격이 공식적으로 `$19.99/month, $199.99/year`라면 본문에서는 공식 가격을 그대로 쓰고, 차트에서만 반올림해야 합니다.
+
+### 과장된 주장
+
+#### 1) “최초의 주요 소비자 IoT 생태계”는 증명하기 어려움
+
+Home Assistant와 여러 IoT·Matter 연동 프로젝트가 이미 MCP 서버 또는 에이전트 인터페이스를 제공했을 수 있습니다. “major consumer ecosystem”의 정의도 모호합니다.
+
+수정 권고:
+
+> one of the first large consumer smart-home platforms to expose MCP-based agent access
+
+#### 2) “undisputed open industry standard”는 과도함
+
+MCP 채택이 확대됐더라도 A2A, vendor-specific tool APIs, OpenAPI 기반 도구 호출 등이 병존합니다.
+
+수정:
+
+> a leading open protocol for agent-to-tool integration
+
+#### 3) “broad rollout”과 “early access”의 긴장
+
+전체 소비자 출시가 아니라 특정 구독자 대상 early access라면 “rolled out broadly”보다:
+
+> began rolling out to eligible U.S. early-access subscribers
+
+가 정확합니다.
+
+### URL
+
+PCMag URL 구조는 정상적인 편입니다.
+
+> `https://www.pcmag.com/news/google-home-now-lets-ai-agents-control-your-smart-home-devices`
+
+다만 Google 공식 개발자 문서 또는 공식 블로그를 Primary URL로 두고 PCMag는 보조 출처로 내리는 것이 바람직합니다. 제품의 권한 범위와 안전 제한은 2차 기사보다 API 문서가 우선입니다.
 
 ---
 
-## 최종 편집 권고
+## 4. Tower Semiconductor–NewPhotonics PIC 출하
 
-1. **2번은 현재 판에서 제외**하거나 9월 16일 08:49 KST 이후의 진짜 후속 개발을 중심으로 재작성합니다.
-2. 1·3·4번은 핵심 발표와 편집자 추론을 별도 블록으로 분리합니다.
-3. 회사가 공개하지 않은 수치에는 “추정”, “가능성”, “편집자 분석” 라벨을 붙입니다.
-4. `slot_category: 1-5`처럼 범위형 메타데이터를 쓰지 말고 각 항목에 단일 분류값을 지정합니다.
-5. 모든 벤치마크에는 평가 페이지, 평가일, 모델 버전, 경쟁 모델 비교 시점을 붙입니다.
-6. 제목에서 `Formalize`, `binding`, `fast-track`, `elimination` 같은 완료·절대 표현을 줄이고 실제 진행 상태를 반영합니다.
+### 판정: **발표와 제품 대역폭은 개연성이 높지만, 공정·집적 방식 설명에 중대한 용어 오류와 미입증 수치가 있음**
+
+### 시간 윈도우
+
+제시 시각:
+
+> 2026-09-17 06:00 EDT
+
+KST 환산:
+
+> **2026-09-17 19:00 KST**
+
+기준 시각까지 13시간 40분이므로 **24시간 창 안**입니다.
+
+또한 `slot_category: 6`이므로 최대 7일 예외 대상이며, 어느 기준으로도 시간상 문제는 없습니다.
+
+### URL
+
+GlobeNewswire URL은 일반적인 URL 형식과 보도자료 제목·ID 형식에 부합합니다.
+
+> `https://www.globenewswire.com/news-release/2026/09/17/3151834/0/en/...`
+
+네 항목 중 URL 형식상 가장 신뢰도가 높습니다. 그래도 Tower와 NewPhotonics 공식 IR/뉴스룸의 동일 보도자료 링크를 병기하는 것이 좋습니다.
+
+### 명확한 기술 오류
+
+#### 1) “monolithic heterogeneous integration”은 용어상 모순
+
+초안은 다음 표현을 반복합니다.
+
+> monolithic heterogeneous integration of Indium Phosphide directly onto silicon  
+> Monolithic InP-on-Silicon Heterogeneous Integration
+
+서로 다른 재료계를 bonding·transfer 등의 방식으로 결합하면 일반적으로 **heterogeneous integration**입니다. 실리콘 웨이퍼 위에 최종적으로 단일 PIC가 형성됐다는 의미에서 “single-die”라고 할 수는 있어도, 이를 전통적 의미의 “monolithic integration”이라고 부르면 부정확합니다.
+
+권장 표현:
+
+> wafer-level heterogeneous integration of InP gain materials/devices with silicon photonics
+
+또는 공식 자료가 허용하면:
+
+> a single integrated PIC produced through heterogeneous InP-on-silicon integration
+
+#### 2) “InP epitaxial layers bonded before waveguide patterning”은 공정 문서 없이 단정 불가
+
+보도자료의 “laser-integrated” 또는 “heterogeneously integrated”라는 표현만으로 다음 세부 공정 순서를 추론할 수 없습니다.
+
+- InP epitaxy의 직접 wafer bonding
+- silicon waveguide patterning 이전에 bonding
+- lithographic self-alignment
+- micro-packaging 단계 완전 제거
+
+Tower의 process design kit, 논문 또는 공정 설명에 이 순서가 명시되지 않았다면 삭제해야 합니다.
+
+#### 3) “single monolithic die에 DFB·SOA·modulator·photodetector 모두 집적” 확인 필요
+
+“laser-integrated PIC”가 반드시 다음 모든 소자를 하나의 동일 die에 포함한다는 뜻은 아닙니다.
+
+- DFB laser
+- SOA
+- modulator
+- photodetector
+
+송신·수신 기능이 별도 die 또는 chipset으로 구성될 수도 있습니다. NPG102의 block diagram이나 데이터시트를 인용해야 합니다.
+
+### 출처가 필요한 구체 수치
+
+다음 값은 보도자료나 데이터시트에 명시되지 않았다면 삭제해야 합니다.
+
+- 외부 레이저 결합 손실 `2–3 dB`
+- on-chip coupling `sub-1 dB`
+- 광엔진 소비전력 `3–4 pJ/bit`
+- electrical trace `sub-2 inches`
+- chassis/laser 환경 `>85°C`
+- heater 소비전력 “several mW per lane”
+
+수치 자체가 물리적으로 불가능하다는 뜻은 아니지만, 제품 공식 사양처럼 제시하기에는 근거가 부족합니다.
+
+### 제품·로드맵 표현상의 문제
+
+#### 1) NPG102가 PIC인지 완성 optical engine인지 구분 필요
+
+보도자료 제목이 “optical engine PICs”라고 하더라도 PIC와 완성 광엔진 모듈은 동일하지 않습니다. 다음을 구분해야 합니다.
+
+- PIC die
+- PIC chipset
+- packaged optical engine
+- CPX-compatible module
+- 완성 transceiver
+
+“serviceable”이 PIC 자체의 속성이 아니라 socketed module/system architecture의 속성일 수 있습니다.
+
+#### 2) 6.4T 제품 일정 불일치
+
+본문:
+
+> NPC505 ... scheduled for volume shipment in the first half of 2027
+
+후반부:
+
+> 6.4T NPC505 sampling planned for 1H 2027
+
+“volume shipment”과 “sampling”은 전혀 다른 단계입니다. 원자료에 따라 하나로 통일해야 합니다.
+
+#### 3) 200G/lane 표기는 electrical과 optical lane을 구분해야 함
+
+“200 Gbps per lane PAM4”가 다음 중 무엇인지 명확히 해야 합니다.
+
+- 200 Gb/s electrical lane
+- 200 Gb/s optical wavelength/lane
+- 양쪽 모두 200 Gb/s
+
+200G/lane을 단순히 “PAM4 modulation”이라고만 쓰면 전기 SerDes와 광 변조를 혼동할 수 있습니다.
+
+#### 4) “레이저 고장 시 GPU/HBM 전체를 폐기”는 과장
+
+CPO 모듈에서 광엔진·레이저 고장이 수리 비용과 서비스 복잡성을 높일 수는 있지만, 모든 CPO 설계에서 GPU와 HBM을 반드시 폐기해야 하는 것은 아닙니다. 외부 레이저 소스, 교체 가능한 광엔진, known-good-die 전략 등 여러 구현이 있습니다.
+
+수정:
+
+> may force replacement of a costly package or board-level assembly, depending on the CPO architecture and service model.
+
+### 품질 보완
+
+- “heaterless Niox MRM”의 재료명과 상표 표기를 공식 자료와 대조하십시오. `Niox`, `NiOx`, 제품명/회사 고유 명칭을 혼용하면 안 됩니다.
+- “zero-loss monitoring”이 마케팅 용어라면 따옴표와 출처가 필요합니다.
+- CPO, NPO, LPO, LRO, FRO, XPO를 한 제품의 모두 지원 형식으로 묶지 말고 실제 제품별 지원 범위를 표로 분리하는 편이 정확합니다.
+
+---
+
+# 요약·전망 부분 검증
+
+## 반드시 완화해야 할 문구
+
+### “What changed today”
+
+항목 2는 사건일이 9월 16일이며 정확한 시각이 없으므로, 현재 상태에서는 “today” 묶음에 확정적으로 포함시키기 어렵습니다.
+
+### “Google forced to open”
+
+> forcing Google to open its smart home ecosystem
+
+“강요했다”는 인과관계는 입증되지 않았습니다.
+
+수정:
+
+> contributing to Google’s decision to expose parts of its smart-home ecosystem through an open agent protocol
+
+### “proves concealment incentive”
+
+context-compaction 사례는 중요한 경고 신호지만 보상 설계가 본질적으로 기만을 유발한다는 증명은 아닙니다.
+
+### “rapid adoption of socket-pluggable NPO”
+
+한 업체의 상용 출하 발표만으로 산업 전체의 “rapid adoption”을 입증할 수 없습니다. 고객사, 출하량, 설계 채택, field deployment 자료가 필요합니다.
+
+---
+
+# Upcoming Tech Calendar
+
+## ECOC 2026
+
+- `https://www.ecoc2026.org/`는 적절한 공식 행사 도메인으로 보입니다.
+- 날짜·장소는 공식 행사 페이지에서 재확인하면 됩니다.
+- 특정 업체의 “live demonstrations”는 전시자 발표 링크를 별도로 달아야 합니다.
+
+## UN General Assembly / US–UK bilateral
+
+`https://www.un.org/en/ga/`는 UN 총회 일반 페이지일 뿐 다음을 입증하지 않습니다.
+
+- Andy Burnham–Donald Trump 양자회담
+- AI safety accords가 의제라는 점
+- semiconductor trade가 의제라는 점
+- 첫 대면 회담이라는 점
+
+이 일정은 영국 총리실, 백악관 또는 UN 공식 일정 링크가 없으면 삭제하거나 “potential/expected”로 낮춰야 합니다.
+
+## OCP Global Summit
+
+공식 OCP 링크를 사용한 점은 적절하지만 날짜와 CPX MSA 세션은 행사 공식 일정표에서 각각 확인해야 합니다. “evaluating”보다는 “expected to feature”가 안전합니다.
+
+## SEMICON West
+
+행사 날짜와 장소는 공식 페이지 대조가 필요합니다. 특정 장비업체 전시 여부까지 쓰려면 참가업체 목록을 인용해야 합니다.
+
+## IEDM 2026
+
+제시된 `December 13–17`은 튜토리얼·워크숍을 포함한 전체 행사인지, 본회의만의 날짜인지 확인해야 합니다. IEDM은 사전 튜토리얼과 본회의 날짜가 구분되는 경우가 많으므로 공식 `Important Dates` 페이지를 사용하십시오.
+
+---
+
+# 권고 수정 우선순위
+
+### 발행 전 필수
+
+1. `Google DeepMind Chair` → `Google DeepMind co-founder and CEO`
+2. 항목 2의 `event_within_24h_window: true` → 정확한 타임스탬프 확보 전 `unverified`
+3. `JSON-RPC/REST`, `TLS/WebSocket` MCP 설명 수정
+4. `monolithic heterogeneous integration` → `wafer-level heterogeneous integration`
+5. AP canonical URL 재확인
+6. NPC505의 “sampling”과 “volume shipment” 일정 통일
+7. UNGA 양자회담에 공식 일정 출처 추가
+
+### 분석 표현 완화
+
+- clashes → contrasts / advocates
+- first / undisputed → one of the first / leading
+- proves → suggests / indicates
+- forces → contributes to / supports
+- explicit opposition → implied opposition
+- rapid adoption → potential adoption / emerging interest
+
+현재 상태에서는 **항목 1·3·4는 수정 후 게재 가능**, **항목 2는 OpenAI 원문과 정확한 발행시각 및 수치 정의를 재검증하기 전 보류**하는 것이 가장 안전합니다.
