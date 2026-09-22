@@ -1,443 +1,472 @@
 ## 종합 판정
 
-초안은 **시간 윈도우는 대체로 충족**하지만, 사실성 측면에서는 여러 항목에서 **출처가 확인해 주는 발표 내용과 작성자가 추가한 기술적 추론·수치·사업 상태가 혼합**되어 있습니다.
+**현 상태로는 발행 불가**입니다. 네 항목 모두 핵심 주장에 대한 1차 출처 추적성이 부족하며, 특히 1·3·4번은 제품·수치·인용문이 서로 모순되거나 공식적으로 확인되는 제품 체계·기능과 충돌합니다. 2번은 Category 6이므로 날짜 자체는 허용 범위지만, 사양과 시스템 규모를 뒷받침하는 공식 자료가 필요합니다.
 
-- **시간 적합:** 4개 본문 항목 모두 제시된 발행 시각 기준으로 24시간 범위 안에 들어갑니다.
-- **사실성:**  
-  - 1번: 핵심 제품 설명은 가능성이 있으나 벤치마크·채택률·통합 범위와 비교 계산에 검증 문제가 큼  
-  - 2번: OpenAI 정책문서, 6건의 사례, Anthropic 협약을 하나의 공식 발표처럼 결합한 것이 문제  
-  - 3번: 발표의 핵심 방향은 타당할 수 있으나 BSPDN·DTC·CPO 손실·양산 상태 등 상당수가 출처 없는 확장  
-  - 4번: 산업단지 착공 사실과 TSMC 전용 CoWoS 검증라인 주장을 구분해야 하며, 생산능력 단위에 명백한 불일치가 있음
-- **캘린더:** 미·중 정상회의 항목은 특정 기사 URL도 없고 행사 명칭도 부정확해 삭제가 필요합니다. IEDM 날짜도 재확인이 필요합니다.
+KST 기준 최근 24시간은 다음과 같습니다.
 
----
-
-# 1. KST 시간 윈도우 검증
-
-검증 기준 시각은 **2026-09-22 09:16 KST**, 24시간 하한은 **2026-09-21 09:16 KST**입니다.
-
-| 항목 | 제시된 출처 시각(KST) | 24시간 판정 | 비고 |
-|---|---:|---|---|
-| TypeSafe AI / Jev | 9월 21일 23:15 | 충족 | 하한 이후 14시간  - 1분 |
-| OpenAI 정책문서 | 9월 22일 03:00 | 충족 | 하한 이후 |
-| Marvell/ECOC | 9월 21일 15:00 | 충족 | CEST→KST 환산도 정확 |
-| Baipu 산업단지 | 9월 21일 11:24 | 충족 | Taiwan CST→KST +1시간 환산 정확 |
-
-### 시간 메타데이터 보완점
-
-- 네 항목 모두 `event_date`가 날짜만 기록되어 있습니다. 엄격한 24시간 검증을 위해서는 `event_timestamp_kst`도 별도로 저장해야 합니다.
-- 3번과 4번은 `slot_category: 6`이므로 7일 예외 적용 대상이 될 수 있지만, 이번에는 제시된 발행 시각만으로도 24시간 범위에 들어옵니다.
-- 1번의 실제 제품 출시일은 9월 15일이고 9월 21일 사건은 “채택 급증/후속 분석”입니다. 따라서 `event_date`를 9월 21일로 유지하려면 **그날 새로 공개된 채택 통계의 원출처와 발표 시각**이 필요합니다. 단순 재소개 기사라면 24시간짜리 신규 사건으로 보기 어렵습니다.
+- **검증 기준 시각:** 2026-09-23 08:48 KST
+- **24시간 컷오프:** 2026-09-22 08:48 KST
+- 날짜가 `2026-09-22`로만 적혀 있고 발표 시각·시간대가 없으면 `event_within_24h_window: true`를 확정할 수 없습니다.
+- 2번은 `slot_category: 6`이므로 **7일 예외가 적용되며 시간상 낡은 항목으로 처리하면 안 됩니다.**
+- 1번은 `ongoing_story_exception: true`이지만, 기사의 실질적 중심이 새 보안 패치보다 9월 8일 출시와 9월 21일 주가 상승에 있어 예외 요건을 충분히 충족하지 못합니다.
 
 ---
 
-# 2. 항목별 검증
+## 항목별 판정
 
-## 1) TypeSafe AI Jev
-
-### 판정: **부분 수정 필요 — 핵심 제품보다 성능·채택 주장과 기술 표현의 검증이 부족**
-
-### 확인 가능한 논리·수치 오류
-
-#### ① 본문 자체의 지연시간 비교로는 “약 194배”가 나오지 않음
-
-초안은 다음 두 범위를 비교합니다.
-
-- 기존 LLM: 1,500~4,000ms
-- Jev: 70~500ms
-
-가장 유리한 극단값을 사용해도:
-
-- `4,000 ÷ 70 ≈ 57.1배`
-
-따라서 초안의 문장:
-
-> “1,500 ms – 4,000 ms to 70 ms – 500 ms (up to ~194x reduction)”
-
-은 **같은 표의 숫자만으로는 수학적으로 성립하지 않습니다**. 193.6배가 별도의 특정 벤치마크에서 나온 값이라면, 그 벤치마크의 기준 모델·작업·배치 크기·토큰 수를 따로 제시해야 합니다.
-
-또한 “193.6x faster”는 “193.6x reduction”과 같은 표현이 아닙니다. 후자는 통상 감소율 표현에 적절하지 않습니다.
-
-#### ② “결정론적”과 “확률적·보정된 분포”의 구분이 불명확
-
-Jev를 다음과 같이 동시에 표현합니다.
-
-- “deterministic, machine-native decision engine”
-- “typed, probabilistic decisions”
-- “calibrated probabilities and confidence intervals”
-
-동일 입력에 동일 결과를 내는 **결정론적 실행 방식**과 확률분포를 출력하는 **확률적 예측 내용**은 공존할 수 있습니다. 그러나 현재 문장은 모델의 판단 자체가 확정적이라는 인상을 줍니다. 다음처럼 고치는 편이 정확합니다.
-
-> “스키마 제약을 받는 확률적 분류 결과를 단일 비자동회귀 추론으로 반환한다.”
-
-#### ③ “수학적으로 보장된 type-safety”는 모델 속성으로 단정하면 안 됨
-
-타입 안정성은 일반적으로 다음 중 하나가 강제해야 합니다.
-
-- API 서버의 스키마 검증
-- SDK의 타입 시스템
-- 디코더의 제약
-- 런타임 validation
-
-모델이 확률분포를 반환한다는 사실만으로 “mathematically guaranteed type-safety”가 자동으로 성립하지 않습니다. **모델 출력 형식과 SDK/런타임 보장을 분리**해야 합니다.
-
-#### ④ `Boolean / Noul`은 오탈자 또는 잘못된 제품 용어
-
-`Noul`은 일반적인 타입 명칭이 아닙니다. 공식 문서에서 실제로 사용한 고유 용어가 아니라면 `Null`, `Boolean`, 또는 해당 공식 타입명으로 수정해야 합니다.
-
-### 출처·URL 문제
-
-- 제시된 Tom’s Hardware URL은 형식상 개별 기사 URL이지만 **2차 출처**입니다.
-- 다음 핵심 주장은 Tom’s Hardware 기사 하나로 처리해서는 안 됩니다.
-  - 13% 채택률
-  - “paid enterprise teams”인지 “paid teams”인지
-  - Vercel 역사상 가장 빠른 채택
-  - $40M 시드 투자
-  - Cloudflare Workers AI 및 LangChain 실제 지원
-  - 193.6배/444.6배 벤치마크
-- “Source” 목록에는 Vercel·Cloudflare·Forbes·ZDNet Korea가 있으나 직접 URL이 없습니다. 따라서 엄격한 URL 검증 기준을 충족하지 못합니다.
-
-특히 초안은 `paid developer teams`, `paid enterprise teams`, `paying enterprise developer teams`를 혼용합니다. **모집단이 서로 다르므로 원문 표현으로 통일**해야 합니다.
-
-### 기술적 보완
-
-- “single parallel forward pass”는 **출력 생성이 비자동회귀**라는 뜻으로 제한해야 합니다. Transformer 내부의 레이어 계산 전체가 한 단계이거나 모든 계산이 완전히 동시적이라는 의미는 아닙니다.
-- KV 캐시 부담을 줄일 가능성은 있지만, 실제 절감량은 입력 길이·배치·백엔드 구조에 따라 달라집니다. “dramatically increasing batch concurrency”는 실측치 없이 단정하기 어렵습니다.
-- “zero output token fees”와 “output tokens are unmetered”도 구분해야 합니다. 텍스트 출력 토큰 자체가 존재하지 않는 API라면 “무료 출력 토큰”보다 **출력 토큰 과금 항목 없음**이 정확합니다.
-
-### 권장 판정문
-
-> Jev의 비자동회귀형 스키마 제한 의사결정 모델이라는 핵심 설명은 유지할 수 있으나, 193.6배 속도, 444.6배 비용, 13% 채택률 및 플랫폼 통합 범위는 각각 직접 출처가 필요하다. 본문에 제시된 지연시간 범위만으로는 193.6배 속도 향상이 계산되지 않는다.
-
----
-
-## 2) OpenAI 정책·오정렬 사례·Anthropic 협약
-
-### 판정: **서로 다른 세 개의 보도를 하나의 OpenAI 공식 발표처럼 결합함**
-
-### 핵심 문제
-
-이 항목에는 사실상 세 사건이 섞여 있습니다.
-
-1. OpenAI의 정책문서 발표
-2. 여섯 건의 모델 행동/오정렬 사례 공개
-3. OpenAI–Anthropic 상호 스트레스 테스트 협상 보도
-
-제시된 OpenAI 공식 URL이 1번을 뒷받침한다고 해도, 반드시 2번과 3번까지 같은 페이지가 뒷받침하는 것은 아닙니다. 특히 3번은 초안 자체가 **The Information의 취재 보도**라고 밝히고 있습니다.
-
-따라서 다음 표현은 부정확합니다.
-
-> “OpenAI concurrently disclosed … Alongside these disclosures…”
-
-실제 발표 주체와 출처가 다르다면 다음처럼 분리해야 합니다.
-
-> “같은 날 OpenAI는 정책문서를 발표했다. 별도의 OpenAI 자료에서는 최근 모델 행동 사례가 공개됐으며, The Information은 OpenAI와 Anthropic이 상호 평가 협약을 논의 중이라고 보도했다.”
-
-### 명확한 과장
-
-#### ① “prohibited”는 인용문의 의미보다 강함
-
-초안에 인용된 표현은:
-
-> “should not be pursued unless and until it can be done safely”
-
-이지만 Technical Deep Dive는 이를:
-
-> “autonomous RSI prohibited”
-
-라고 요약합니다.
-
-“추진해서는 안 된다”는 정책적 입장과 공식적·법적 “금지”는 다릅니다. 다음으로 수정해야 합니다.
-
-> “OpenAI는 안전성을 입증하기 전 완전자율 RSI를 추진해서는 안 된다는 입장을 제시했다.”
-
-#### ② 협약의 법적 구속력·협상 단계가 일관되지 않음
-
-본문에는 다음 표현이 혼재합니다.
-
-- “nearing a legally binding agreement”
-- “actively negotiating”
-- “in final negotiation”
-- “confirmed”
-- “disclosures confirmed”
-
-단순 협상 보도라면 “confirmed” 또는 “final negotiation”으로 격상해서는 안 됩니다. 당사자 공식 확인이 없다면:
-
-> “법적 구속력을 갖는 방안을 포함한 상호 평가 협약을 논의 중이라고 보도됐다.”
-
-정도로 제한해야 합니다.
-
-#### ③ 글로벌 표준 제안과 양자 협약을 같은 정책의 구성요소로 표시
-
-도식과 비교표는 “legally binding cross-lab pact”를 OpenAI 글로벌 표준안의 한 축처럼 배치합니다. 그러나 초안 설명상 이는 별도의 취재 보도입니다. **정책문서와 기업 간 협상을 분리**해야 합니다.
-
-### 출처·명칭 검증 필요
-
-- `GPT-5.6 Sole`은 매우 구체적인 내부 모델명입니다. 공식 문서의 철자와 명칭을 직접 확인해야 합니다. 내부 평가용 별칭인지, 공개 제품명인지도 구분해야 합니다.
-- “최근 6개월간 여섯 건”이라는 기간과 건수는 직접 원문 인용이 필요합니다.
-- “scraped exposed GitHub API keys”와 “retrieved leaked API keys”는 다른 행동일 수 있습니다. 검색·발견·실제 사용·무단 API 호출을 각각 구분해야 합니다.
-- “Authored under strategic priorities established by Sam Altman and Jakub Pachocki”는 제시된 출처만으로 입증되지 않는 조직적 추론입니다.
-- `Dark Reading`, `Bloomberg`, `The Information`, `CNBC`는 출처 목록에만 있고 개별 URL이 없어 URL 검증 요건을 충족하지 못합니다.
-
-### 분석 보완
-
-- “양자 협약이 Sherman Act Section 1 위반 위험을 높인다”는 부분은 가능한 리스크 분석이지만, 안전성 평가 협력 자체가 곧 경쟁 제한 합의라는 의미는 아닙니다. 가격·시장배제·공동 기준의 강제 여부가 있어야 하므로 **조건부 시나리오**로 표현해야 합니다.
-- 정책문서가 사전 허가제를 반대한다는 이유만으로 “hyperscale compute expansion trajectories를 보존한다”고 단정하는 것은 전략적 해석입니다. 사실과 분석을 분리해야 합니다.
-
-### 권장 구성
-
-이 항목은 최소한 다음 세 소제목으로 나누는 것이 좋습니다.
-
-- 공식 정책문서에서 확인된 내용
-- 공식 사례 보고서에서 확인된 6건
-- 언론이 보도한 OpenAI–Anthropic 협상
-
----
-
-## 3) Marvell 2nm 광인터커넥트/ECOC
-
-### 판정: **발표 핵심과 작성자의 미확인 시스템 설계 추론이 혼합됨**
-
-### 기술적으로 타당한 부분
-
-- 400Gbps PAM4는 이상적인 raw signaling 기준으로 약 200GBaud가 필요합니다.
-- 200GBaud의 기본 Nyquist 주파수는 약 100GHz입니다.
-- 8개 400G 레인을 합치면 3.2Tbps가 됩니다.
-- CPO가 ASIC과 광 엔진 사이의 고속 전기 경로를 줄이는 방향이라는 설명도 타당합니다.
-- CEST 08:00 → KST 15:00 환산은 맞습니다.
-
-### 명확하게 수정해야 할 부분
-
-#### ① 2nm와 BSPDN을 자동으로 연결하면 안 됨
-
-초안은 다음을 Marvell 구현 사실처럼 단정합니다.
-
-> “Marvell utilizes backside power delivery network (BSPDN) topologies…”
-
-2nm GAA 공정이라고 해서 자동으로 backside power delivery를 사용하는 것은 아닙니다. 특히 **TSMC N2와 backside power를 적용하는 후속 공정은 구분**되어야 합니다. Marvell 발표가 BSPDN을 명시하지 않았다면 삭제해야 합니다.
-
-동일하게:
-
-> “high-density deep-trench capacitors integrated into the DSP interposer”
-
-도 구체적인 제품 구현 사실이므로 직접 근거가 없으면 삭제해야 합니다.
-
-#### ② “Lossless Scale-Out Switch Fabric”은 물리적으로 부정확
-
-모든 실제 광링크에는 삽입손실·결합손실·전송손실이 존재합니다. 도식의 `Lossless`는 다음처럼 바꿔야 합니다.
-
-> “Lower-loss scale-out optical fabric”
-
-#### ③ 30% 수치의 적용 범위가 흔들림
-
-초안은 30%를 다음처럼 서로 다르게 사용합니다.
-
-- physical interconnect power dissipation
-- power consumption per bit
-- system power reduction
-- 3nm 대비 DSP 전력
-
-이들은 같은 지표가 아닙니다. 원 발표가 공정 기반 칩 전력 비교라면 **시스템 전체 또는 물리 인터커넥트 전체의 30% 절감**으로 확대하면 안 됩니다.
-
-#### ④ 40% 밀도 개선도 측정 대상 명시 필요
-
-“silicon compute density”, “mixed-signal silicon functional density”가 혼용됩니다. 광 DSP는 순수 compute density와 혼합신호 회로 밀도가 같지 않습니다. 원문이 공정 플랫폼의 논리 밀도 수치라면 실제 DSP 제품의 면적 효율로 바로 치환할 수 없습니다.
-
-### 발표 상태 과장 가능성
-
-다음 표현은 각각 직접 근거가 필요합니다.
-
-- “Fully functional 2nm demonstration silicon”
-- “customer sampling planned for 1H 2027”
-- “Libra Generation commercial ramping”
-- 3.2T가 OSFP와 QSFP-DD 양쪽에 구현됨
-- CPO 전기 경로가 15mm 미만
-- 채널 손실 75% 이상 절감
-- 전기 trace loss `< -3dB`
-- 기존 모듈 소비전력 25~40W
-- Megtron 6에서 `-4dB/inch` 초과
-- Tier-1 고객의 초기 design win 확보
-
-Business Wire 보도자료가 단순 “showcase/demo 예정”이라고 표현했다면, “operating live”, “functional reference system”, “commercial silicon”은 별도 의미입니다.
-
-### 제품 로드맵 검증
-
-`Nova`, `Libra`, `Next-Gen 2nm PAM4`, `Coherent-Lite`가 서로 다른 제품·세대·공정인지 공식 제품표와 대조해야 합니다. 현재 표는:
-
-- 제품명
-- 공정 세대
-- 신호 속도
-- 상용화 상태
-
-가 한꺼번에 결합돼 있어 오기 위험이 큽니다. 특히 “Libra 2nm commercial ramping”은 ECOC에서 업계 최초 2nm 데모를 발표했다는 서술과 긴장 관계가 있습니다. 이미 상용 램프 중인 2nm 제품과 업계 최초 데모 제품이 무엇이 다른지 설명해야 합니다.
-
-### URL 평가
-
-Business Wire URL은 특정 보도자료를 지칭하는 형태여서 출처 형식은 적절합니다. 다만 기사 제목이 “to Showcase”라면 다음을 구분해야 합니다.
-
-- 행사에서 공개할 계획
-- 실제 현장 시연 완료
-- 고객 샘플링
-- 양산
-
-초안은 이 네 단계를 상당 부분 혼용합니다.
-
----
-
-## 4) Baipu 산업단지/TSMC CoWoS 검증 허브
-
-### 판정: **산업단지 착공 사실과 TSMC 전용 검증라인에 대한 상세 주장을 분리 검증해야 함**
-
-### 가장 명백한 수치·단위 문제
-
-초안은 CoWoS 수요를:
-
-- 2027년 연간 810,000 units
-
-로 제시하면서 비교표에서는 Chiayi AP7을:
-
-- `260k+ wpm`
-
-으로 표기합니다.
-
-`wpm`이 wafers per month라면 연간 312만 장입니다.
-
-- `260,000 × 12 = 3,120,000장/년`
-
-이는 동일 문서의 810,000장/년 수요 맥락과 단위 규모가 크게 어긋납니다. 260k가 연간 생산능력인지, 월간인지, 패키지 수인지, 300mm wafer equivalent인지 확인해야 합니다. **현재 표의 `260k+ wpm`은 삭제 또는 단위 수정이 필요합니다.**
-
-360,000에서 810,000으로 증가는 수학적으로 정확히 125%입니다.
-
-- `(810,000 - 360,000) ÷ 360,000 = 1.25`
-
-그러나 이 수치가 wafer/year인지 package/year인지 반드시 명시해야 합니다.
-
-### 출처로 직접 입증해야 할 주장
-
-Taipei Times URL이 산업단지 착공과 면적·경제효과를 뒷받침하더라도, 다음은 별도의 TSMC 또는 정부 원문이 필요합니다.
-
-- 공식 명칭이 `"Baipu Plan"`인지
-- TSMC가 두 개의 전용 시설을 직접 건설하는지
-- 하나가 기술검증랩이고 하나가 인재센터인지
-- 상업 생산이 전혀 없는 전용 CoWoS 라인인지
-- KLA·Camtek·Nova가 입주 또는 참여를 확정했는지
-- 장비 검증 기간이 25~50% 단축되는지
-- 2029년 4분기 가동인지
-- TSMC가 단지의 공식 “anchor developer”인지
-
-현재는 “산업단지에 반도체 공급망 기업을 유치한다”는 일반적 계획과 “TSMC가 직접 운영하는 CoWoS 공동 검증 생산라인”을 같은 사실처럼 확장했을 가능성이 있습니다.
-
-### 기업 분류 수정
-
-Executive Summary는 KLA·Camtek·Nova를 포함해:
-
-> “inspection, metrology, and etching toolmakers”
-
-라고 부릅니다.
-
-Camtek과 Nova는 기본적으로 검사·계측 업체이지 대표적인 식각 장비업체가 아닙니다. KLA는 계측·공정제어가 중심이며 인수 사업을 통해 일부 공정장비 범위가 있지만, 세 회사를 통칭해 “etching toolmakers”로 부르는 것은 부정확합니다.
-
-다음처럼 수정하는 것이 안전합니다.
-
-> “inspection, metrology and process-control equipment suppliers, such as KLA, Camtek and Nova”
-
-식각 장비를 언급하려면 실제 참여가 확인된 식각 장비사를 별도로 제시해야 합니다.
-
-### 기술적 추론 과장
-
-다음 내용은 Baipu 착공 발표에서 확인되는 시설 사양이라기보다 일반적인 첨단 패키징 기술 설명입니다.
-
-- 10,000개 이상의 micro-bump
-- 25µm 이하 pitch를 Baipu에서 직접 검증
-- Camtek·Nova의 X-ray 장비 투입
-- LAB 및 underfill 공동 개발
-- 인터포저 내 DTC 통합
-- 고종횡비 식각 및 박막 증착 공동 개발
-- AP7 및 Arizona AP9으로 결과 이전
-
-이 내용을 유지하려면 “발표된 시설 기능”이 아니라 **가능한 적용 분야**로 명확히 표시해야 합니다.
-
-### 명칭·위치
-
-`Ciaotou`는 과거 로마자 표기이고 현재는 일반적으로 `Qiaotou`가 사용됩니다. 문서 내 표기를 하나로 통일하는 편이 좋습니다. “northern Ciaotou/Gangshan district”도 행정구역이 혼합되어 있으므로 실제 부지 주소를 기준으로 표기해야 합니다.
-
-### URL 평가
-
-Taipei Times URL은 개별 기사 형식이지만, 직접 출처로 열거한 다음 URL이 누락됐습니다.
-
-- Kaohsiung City Government 보도자료
-- TSMC 공식 발표
-- Reuters 개별 기사
-- 장비업체 참여 발표
-
-이들 직접 링크가 없으면 상세 운영모델과 파트너 명단까지 검증했다고 보기 어렵습니다.
-
----
-
-# 3. Executive Summary 수정 필요 사항
-
-현재 Executive Summary는 상세 본문에서조차 확정되지 않은 사항을 모두 확정 사실로 압축합니다.
-
-### 수정해야 할 표현
-
-- **Jev:** “13% of paid developer teams” → 모집단을 원문 그대로 표기
-- **OpenAI:** “disclosures confirmed” → 공식 문서와 언론 보도를 분리
-- **Marvell:** “slashing physical interconnect power by 30%” → 원 발표의 정확한 전력 기준으로 제한
-- **Baipu:** “TSMC will construct” 및 “invites KLA, Camtek, Nova” → 공식 확정 여부에 따라 “planned/reported” 사용
-- “CoWoS demand surges 125%” → 기준 연도와 단위 명시
-
----
-
-# 4. Upcoming Tech Calendar 검증
-
-## ECOC 2026
-
-- 행사명·장소·9월 20~24일 일정은 문맥상 일관됩니다.
-- 다만 Marvell 부스 번호 `#2040`과 Coherent의 플랫폼명은 행사 exhibitor directory 직접 링크가 필요합니다.
-
-## 미·중 “Bilateral Strategic & Economic Summit”
-
-### 판정: **삭제 권고**
-
-- Reuters 홈페이지 `https://www.reuters.com/`는 특정 행사를 입증하는 출처가 아닙니다.
-- “U.S.–China Strategic and Economic Dialogue”는 역사적으로 특정 제도와 연결된 명칭이며, 대통령 간 정상회담의 일반 명칭으로 사용하면 부정확할 수 있습니다.
-- 9월 22~24일 워싱턴에서 Trump–Xi 정상회의가 열린다는 주장은 매우 중대한 일정이므로 백악관·중국 외교부·Reuters 개별 기사 중 최소 하나의 직접 URL이 필요합니다.
-
-특정 기사와 공식 일정이 없으면 캘린더에서 제거해야 합니다.
-
-## OCP Global Summit 2026
-
-- OCP 공식 URL은 출처 유형상 적절합니다.
-- 다만 10월 13~15일, 장소, 800V DC·CPO socket이 공식 의제로 확정됐는지 세션 페이지를 직접 연결해야 합니다.
-
-## NVIDIA GTC Europe/Berlin
-
-- NVIDIA GTC 일반 URL만으로는 Berlin·CityCube·10월 20~22일을 모두 입증하기 어렵습니다.
-- 해당 지역 행사의 직접 등록 페이지 또는 NVIDIA 공식 보도자료 URL로 교체해야 합니다.
-
-## IEDM 2026
-
-### 판정: **날짜 재검증 필요**
-
-- IEDM은 통상 12월 초에 개최되는 경우가 많아 초안의 **12월 13~17일**은 공식 일정과 직접 대조해야 합니다.
-- 일반 홈페이지가 아니라 2026년 행사 페이지 또는 IEEE conference listing을 인용해야 합니다.
-- 공식 일정이 확인되지 않으면 날짜를 확정형으로 싣지 않는 것이 안전합니다.
-
----
-
-# 최종 등급
-
-| 항목 | 시간 | 사실성 | 권장 조치 |
+| 항목 | 사실 판정 | 시간 판정 | 권고 |
 |---|---|---|---|
-| 1. Jev | 통과 | 부분 검증 | 속도 계산 수정, Vercel·가격·통합 직접 링크 추가 |
-| 2. OpenAI | 통과 | 혼합 출처 문제 | 정책문서·6건 사례·Anthropic 협상을 분리 |
-| 3. Marvell | 통과 | 핵심 발표 외 기술 확장 과다 | BSPDN/DTC/손실·양산 상태 삭제 또는 직접 근거 추가 |
-| 4. Baipu | 통과 | 핵심 운영모델 미확인, 단위 오류 | 260k wpm 수정, TSMC·정부 직접 출처 추가 |
-| Tech Calendar | 해당 없음 | 일부 심각한 미검증 | 미·중 정상회의 삭제, IEDM·GTC 직접 일정 재확인 |
+| 1. Meta Muse | **중대한 오류 및 내부 모순** | **24시간 예외 적용 부적절** | 전면 재검증 |
+| 2. Alibaba V900 | **핵심 사양 미입증·아키텍처 과장** | **Category 6의 7일 범위에는 적합** | 공식 자료 확보 전 보류 |
+| 3. GPT-6 Sol/Luna | **핵심 제품·가격·기능 확인 불가** | 정확한 게시 시각 필요 | 삭제 또는 공식 발표 기준 재작성 |
+| 4. Trump “SI” 지시 | **인용·행정명령·회담 일정 미입증** | 연설 시각이 뉴욕 주간이면 24시간 내 가능 | UN·백악관 원문 확인 전 삭제 |
 
-**발행 전 필수 수정 우선순위:**  
-1. 미·중 정상회의 캘린더 항목 삭제  
-2. Baipu의 `260k+ wpm` 단위 수정  
-3. Jev의 “~194배” 지연시간 비교 수정  
-4. Marvell의 BSPDN·DTC 및 “lossless” 표현 삭제  
-5. OpenAI 공식 발표와 Anthropic 협상 보도를 분리하십시오.
+---
+
+# 1. Meta Muse
+
+## 판정: 중대한 수정 필요
+
+### 1) 다운로드 수치가 초안 내부에서 충돌합니다
+
+서로 다른 수치가 같은 비교 기준으로 제시됩니다.
+
+- Executive Summary: Muse **2.8 million**, ChatGPT **1.3 million**
+- Overview 첫 부분: Muse **2.8 million**
+- 이어지는 문장: Muse **1.8 million**, ChatGPT **1.3 million**
+
+따라서 Muse의 “첫 12일 비교 다운로드”가 **1.8백만인지 2.8백만인지 확정되지 않습니다.** 단순 오타라 하더라도 헤드라인과 Background Stats 전체를 좌우하므로 반드시 수정해야 합니다.
+
+또한 다음 두 지표도 구분해야 합니다.
+
+- 미국·캐나다 전체 다운로드
+- 미국 iPhone App Store 무료 앱 순위
+
+다운로드 범위와 순위 범위가 다르므로 “미국·캐나다 2.8백만 다운로드로 미국 App Store 1위를 차지했다”는 직접 인과 표현은 피해야 합니다.
+
+### 2) Stripe Link와 가상카드 기능을 혼동했습니다
+
+초안은 Stripe Link가 다음 기능을 제공한다고 단정합니다.
+
+> “dynamic, single-use virtual card numbers”
+
+그러나 **Stripe Link는 기본적으로 결제정보 저장 및 빠른 체크아웃 제품**입니다. 일회용 또는 동적 가상카드 발급은 통상 **Stripe Issuing 또는 별도 카드 발급 파트너 기능**에 해당합니다. 공식적인 Muse–Stripe 발표가 가상카드 발급 구조까지 명시하지 않았다면 다음과 같이 고쳐야 합니다.
+
+- 확인된 기능: “Stripe Link를 이용한 결제 승인·체크아웃”
+- 별도 확인이 필요한 기능: “일회용 가상카드 번호 생성”
+- Stripe Issuing을 사용한다면 발급 주체, 카드 네트워크, 책임 분담을 명시
+
+현재 서술은 서로 다른 Stripe 제품을 합친 것으로 보입니다.
+
+### 3) Muse의 도메인과 제품 소유권 확인이 필요합니다
+
+본문은 Web endpoint를 `muse.ai`로 기재하지만, Primary URL은 Meta Newsroom입니다. `muse.ai`가 실제 Meta 소유 서비스 도메인인지 다음 자료로 확인해야 합니다.
+
+- Meta 공식 제품 페이지의 직접 링크
+- 도메인 등록 및 인증서 주체
+- App Store/Google Play의 개발자 명칭
+- Meta 개인정보처리방침에서 해당 도메인 언급 여부
+
+“Meta Newsroom에 출시 글이 있다”는 것만으로 `muse.ai`가 Meta 서비스라고 결론 내릴 수 없습니다.
+
+### 4) 보안 취약점 설명도 증거 수준이 부족합니다
+
+`endo_voyager_dictation_endpoint`라는 preference key, 토큰 탈취 경로, David Singleton의 패치 배포를 주장하지만 다음 핵심 자료가 없습니다.
+
+- Patrick Wardle 원문 분석 URL
+- 취약 버전과 수정 버전
+- CVE 또는 Meta 보안 권고
+- 공격에 필요한 로컬 권한
+- 실제로 탈취되는 토큰 종류
+- 패치 배포 시간과 시간대
+
+특히 “local malware가 preference를 변경할 수 있다”면 이는 원격 zero-day와 구분해야 합니다. 이미 로컬 코드 실행 권한을 가진 공격자가 필요한 취약점을 단순히 “zero-day”라고 부르는 것은 공격 심각도를 과장할 수 있습니다.
+
+### 5) 주가 이벤트는 24시간 밖입니다
+
+미국 주식시장의 **2026년 9월 21일 종가**는 대략 다음 시각입니다.
+
+- 뉴욕 9월 21일 16:00
+- KST 9월 22일 05:00 전후
+
+이는 기준 시각인 9월 23일 08:48 KST에서 약 **27시간 48분 전**이므로 24시간 범위 밖입니다.
+
+`ongoing_story_exception: true`와 `original_event_date: 2026-09-08`은 형식상 들어 있으나, 기사 제목과 분량의 중심은 다음입니다.
+
+- 9월 8일 출시
+- 12일간 다운로드
+- 9월 21일 주가 상승
+- 장기적인 인프라 수요
+
+9월 22일 보안 패치는 부차적 요소입니다. 따라서 ongoing-story 예외를 사용하려면 제목과 리드를 새 보안 패치 중심으로 바꾸고, 주가·출시 내용은 배경으로 축소해야 합니다.
+
+### 6) 시장가치 계산은 산식을 제시해야 합니다
+
+11.3% 상승과 1,920억 달러 증가는 대략 양립할 수 있지만, 정확한 산식이 필요합니다.
+
+- 기준: 전일 종가 기준 시가총액인지
+- 주식 수: 기본 주식 수인지 희석 주식 수인지
+- 장중 고가가 아닌 종가 기준인지
+
+“주가 상승이 Muse 하나 때문에 발생했다”는 표현도 과도합니다. 실적 전망, 광고 시장, 매크로 변수, 애널리스트 리포트 등 동시 요인을 분리해야 합니다.
+
+### 7) 비교표에 사실과 다른 일반화가 있습니다
+
+다음 문장은 보편적으로 성립하지 않습니다.
+
+- 전통적 챗봇은 background persistence가 “None”
+- ChatGPT/Claude는 payment handling이 “None”
+- 대화형 챗봇은 브라우저 탭이 닫히면 반드시 종료
+- 소비자 챗봇은 로컬 OS 상태를 변경할 수 없음
+
+예약 작업, 비동기 리서치, 커넥터, 브라우저·컴퓨터 사용 기능이 이미 존재할 수 있으므로 비교 대상을 특정 제품·버전·날짜로 제한해야 합니다.
+
+### 수정 권고
+
+제목을 다음처럼 축소하는 것이 안전합니다.
+
+> **Meta Muse macOS 클라이언트 보안 패치—로컬 엔드포인트 변경 취약성의 영향과 에이전트 권한 모델**
+
+그리고 다운로드·주가·구독료·1Password·Stripe 가상카드 등의 수치는 각각 직접 출처를 붙여야 합니다.
+
+---
+
+# 2. Alibaba Zhenwu V900 및 Panjiu
+
+## 판정: 날짜는 허용되지만 사양과 규모는 공식 확인 전 보류
+
+### 시간 판정
+
+이 항목은 `slot_category: 6`이므로 event date가 9월 22일이면 **7일 범위에 들어갑니다.** 정확한 발표 시각이 없어 24시간 여부를 단정할 수는 없지만, 이 항목을 시간상 부적격으로 처리해서는 안 됩니다.
+
+### 1) Primary URL의 원문성이 확인되지 않습니다
+
+제시된 URL:
+
+`https://www.alibabacloud.com/blog/apsara-conference-2026-zhenwu-v900-infrastructure`
+
+이 링크만으로는 다음을 확인할 수 없습니다.
+
+- Alibaba Cloud 공식 보도자료인지
+- 행사 요약 블로그인지
+- T-Head 데이터시트인지
+- 제3자 작성 콘텐츠인지
+
+216GB, 1,200GB/s, FP4, 50만 장, 20GW, Q1 2027 등은 각각 별도의 핵심 주장입니다. 행사 블로그 하나가 아니라 다음 자료가 필요합니다.
+
+- T-Head 제품 페이지 또는 데이터시트
+- Apsara 기조연설 영상과 타임스탬프
+- Alibaba 투자자 공시
+- 시스템 토폴로지 문서
+- Reuters 원문 URL과 인용 대상
+
+### 2) “500,000-card supernode”와 “cluster”가 혼용됩니다
+
+초안은 다음 표현을 번갈아 씁니다.
+
+- Panjiu supernode
+- unified supernode fabric
+- unified cluster fabric
+- 500,000 accelerators within a unified cluster
+
+**Supernode 내부 scale-up 연결 규모**와 여러 supernode를 묶는 **scale-out cluster 규모**는 다릅니다. 50만 가속기가 단일 coherency/scale-up domain인지, 아니면 다단계 네트워크로 연결된 최대 클러스터 규모인지 구분해야 합니다.
+
+50만 장은 일반적으로 다음과 같은 계층이 필요합니다.
+
+1. 패키지 또는 보드 내 연결
+2. 서버/트레이 내 scale-up
+3. 랙 내 fabric
+4. 랙 간 scale-out
+5. 데이터홀 또는 캠퍼스 간 네트워크
+
+현재 도식은 단일 ICN Switch가 50만 장까지 직접 연결하는 것처럼 오해하게 합니다.
+
+### 3) 1,200GB/s의 정의가 불분명합니다
+
+다음을 명확히 해야 합니다.
+
+- 단방향인지 양방향 합산인지
+- 칩당 aggregate인지 링크당인지
+- 메모리 대역폭인지 accelerator-to-accelerator fabric인지
+- 유효 payload인지 raw signaling rate인지
+- GB/s인지 Gb/s인지
+
+본문은 “bidirectional inter-chip bandwidth”라고 하지만 도식에서는 단순히 `1.2 TB/s`로 표시해 방향과 집계 기준이 사라집니다.
+
+### 4) 216GB만으로 2.5D/HBM 구조를 단정할 수 없습니다
+
+초안은 다음을 사실처럼 설명합니다.
+
+> 216 GB requires advanced 2.5D interposer packaging bridging logic chiplets with high-density memory stacks.
+
+216GB라는 용량만으로는 다음을 확정할 수 없습니다.
+
+- HBM 세대
+- 스택 개수
+- 인터포저 사용 여부
+- 2.5D, 3D 또는 보드 배치 여부
+- 메모리 버스 폭
+
+공식 패키지 단면이나 HBM 사양이 없다면 “가능성이 높다” 정도로 낮춰야 합니다.
+
+### 5) 전력 무결성 설명의 공식이 부정확하게 사용됐습니다
+
+`V = L × di/dt`는 기생 인덕턴스에 의해 발생하는 전압 항을 나타냅니다. 전체적인 전압 droop는 다음 요소를 함께 고려해야 합니다.
+
+- 저항성 손실 `I·R`
+- 인덕턴스 항 `L·di/dt`
+- 커패시터 방전
+- VRM 제어루프 응답
+- 패키지·보드 임피던스
+
+따라서 이를 “voltage droop를 지배하는 공식”처럼 단독 제시하는 것은 과도한 단순화입니다.
+
+### 6) 20GW와 5조~10조 파라미터를 제품 발표와 직접 연결하면 안 됩니다
+
+20GW가 다음 중 무엇인지 명시해야 합니다.
+
+- IT load
+- 시설 전체 전력
+- 계약된 전력
+- 건설 계획
+- 실제 가동 용량
+
+또 “5조~10조 파라미터”는 dense parameter인지 MoE 총 파라미터인지, 활성 파라미터가 얼마인지가 더 중요합니다. 파라미터 수만으로 훈련 규모나 V900 수요를 계산할 수 없습니다.
+
+### 7) Critical View의 “sub-nanosecond synchronization”은 삭제해야 합니다
+
+50만 장 분산훈련에서 필요한 것은 전역 sub-nanosecond clock synchronization이 아니라 주로 다음입니다.
+
+- collective latency와 bandwidth
+- topology-aware scheduling
+- congestion control
+- fault isolation
+- checkpoint/restart
+- straggler 관리
+- gradient synchronization 효율
+
+“50만 장을 위해 sub-nanosecond synchronization이 필요하다”는 결론은 기술적으로 부정확합니다.
+
+---
+
+# 3. OpenAI GPT-6 Sol/Luna
+
+## 판정: 핵심 제품 발표가 확인되기 전까지 삭제 권고
+
+### 1) 제품 계보 전체가 단일 공식 출처로 입증되어야 합니다
+
+다음 명칭들이 모두 등장하지만, 각각의 공식 모델 카드·API 문서 링크가 없습니다.
+
+- GPT-6 Astra
+- GPT-6 Sol
+- GPT-6 Luna
+- GPT-5.6 Sol
+- GPT-5.6 Luna
+
+제시된 OpenAI 블로그 URL만으로는 부족합니다. 최소한 다음이 필요합니다.
+
+- OpenAI 모델 문서
+- API pricing 페이지
+- 모델 ID가 표시된 API reference
+- model card/system card
+- ChatGPT release notes
+
+특히 `gpt-6-sol`, `gpt-6-luna`가 실제 호출 가능한 model identifier인지 확인해야 합니다.
+
+### 2) “Claude Fable” 비교는 출처가 없습니다
+
+Anthropic 비교 모델로 `Claude Fable`을 제시하지만 버전, 모델 카드, 출시일, 벤치마크가 없습니다. 공식 제품이 확인되지 않으면 삭제해야 합니다. 경쟁 모델과의 능력 비교는 다음 조건이 같아야 합니다.
+
+- 동일 프롬프트
+- 동일 도구 권한
+- 동일 추론 예산
+- 동일 평가 세트
+- 동일 샘플 수
+
+“comparable to Claude Fable”은 현재 검증 가능한 기술적 진술이 아닙니다.
+
+### 3) 배포 주체가 혼재합니다
+
+“OpenAI가 GitHub Copilot에 출시했다”는 표현은 부정확할 수 있습니다. GitHub Copilot의 모델 제공 여부와 플랜 구성은 GitHub/Microsoft가 발표해야 하므로 다음을 분리해야 합니다.
+
+- OpenAI API 제공
+- ChatGPT/Codex 제공
+- GitHub Copilot에서 선택 가능
+- Copilot 플랜별 이용 가능 여부
+
+`Pro+, Max, Enterprise` 역시 GitHub의 정확한 플랜 명칭과 대조해야 합니다.
+
+### 4) 캐시 관련 수치가 하나의 실험처럼 합쳐졌습니다
+
+다음 수치는 서로 다른 측정 항목입니다.
+
+- cache hit rate: 84% → 90% 이상
+- cache writes: 약 66% 감소
+- active inference cost: 36% 감소
+- cached token price: 90% 할인
+
+캐시 적중률 상승만으로 비용이 자동으로 36% 절감되지는 않습니다. 비용 절감에는 다음이 필요합니다.
+
+- 입력/출력 토큰 비중
+- cached/uncached 입력 비중
+- 캐시 write 가격
+- cache TTL
+- 모델 전환 여부
+- 테스트 기간과 트래픽 규모
+
+따라서 Manus, Strawberry Browser, Wordsmith 각각의 사례를 분리하고, 36%가 누구의 어떤 기간에 대한 측정값인지 밝혀야 합니다.
+
+### 5) prompt caching의 구현을 단정했습니다
+
+초안은 캐시 적중 시 다음과 같이 설명합니다.
+
+> read pre-computed attention keys from host memory or SSD tiers
+
+이는 공급자의 내부 구현이 공개되지 않았다면 단정할 수 없습니다. 캐시가 다음 중 어디에 저장되는지는 별개의 문제입니다.
+
+- GPU HBM
+- 동일 노드의 CPU DRAM
+- 원격 메모리
+- 분산 KV cache
+- SSD 계층
+
+“행렬 재계산을 줄일 수 있다”는 설명은 가능하지만, host memory/SSD 사용까지 공식 아키텍처처럼 쓰면 안 됩니다.
+
+### 6) 시간 메타데이터도 불충분합니다
+
+미국에서 9월 22일 주간에 발표됐다면 KST로 9월 22일 밤~23일 새벽이므로 24시간 범위에 들어갈 가능성이 높습니다. 그러나 현재는 게시 시각과 시간대가 없어 `event_within_24h_window: true`를 엄격하게 확정할 수 없습니다.
+
+---
+
+# 4. Trump의 “Super Intelligence” 지시
+
+## 판정: 공식 기록 확인 전 삭제
+
+### 1) 연설 발언과 법적 행정지시를 혼동했습니다
+
+대통령이 연설에서 용어 변경 의사를 밝혔다고 해도, 그것만으로 모든 연방기관에 법적으로 적용되는 문서 명칭 변경이 성립하는 것은 아닙니다. 다음 중 하나가 필요합니다.
+
+- 서명된 Executive Order
+- Presidential Memorandum
+- OMB memorandum
+- 백악관 공식 fact sheet
+- Federal Register 문서
+- 기관별 시행 지침
+
+초안도 마지막에는 “formal inter-agency guidance expected”라고 적었습니다. 이는 아직 정식 행정지침이 없다는 뜻이므로, 앞부분의 “officially replace”와 “mandates all agencies”는 단정적이고 내부적으로도 충돌합니다.
+
+보다 정확한 표현은 다음과 같습니다.
+
+> “트럼프 대통령이 UN 연설에서 연방정부의 용어 변경을 추진하겠다고 말했다. 다만 실제 시행 범위는 후속 행정문서 확인이 필요하다.”
+
+### 2) 직접 인용문은 UN transcript와 대조해야 합니다
+
+긴 직접 인용문에는 다음이 필요합니다.
+
+- UN 공식 영상
+- UN 회의록 또는 백악관 transcript
+- 발언 시작 시각
+- Reuters 원문
+- 인용문 전후 문맥
+
+현재 Reuters URL만으로는 “super intelligence” 변경 발언과 “globalist scheme” 발언이 동일한 2026년 연설에서 나온 것인지 확인할 수 없습니다. 과거 연설이나 다른 정책 발언을 2026년 이벤트에 합성했을 가능성도 배제할 수 없습니다.
+
+### 3) “safety pause treaties”는 인용문보다 강한 해석입니다
+
+인용된 문구는 국제적 통제 체계를 거부한다는 뜻일 수 있으나, 그것이 곧 특정한 다음 사항 전부의 공식 거부를 뜻하지는 않습니다.
+
+- safety pause treaty
+- compute cap
+- licensing regime
+- capability moratorium
+- 국제 검증 체계 전반
+
+원문에 구체적 조약이나 정책수단이 언급되지 않았다면 “multilateral safety pause treaties를 공식 거부했다”는 문장은 분석적 확대입니다.
+
+### 4) 연설 하나로 규제 위험이 제거됐다고 볼 수 없습니다
+
+다음 결론은 과도합니다.
+
+- “Eliminates the near-term risk of federal statutory pauses”
+- “zero ex-ante compute development caps”
+- “federal moratorium risks eliminated”
+
+대통령의 정책 방향과 의회 입법, 법원 판단, 독립기관 규제는 별개입니다. “감소시킨다” 또는 “행정부의 반대 입장을 분명히 한다”가 적절합니다.
+
+### 5) 트럼프–시진핑 정상회담은 별도 검증이 필요합니다
+
+“24시간 후 워싱턴 국빈 방문”은 매우 중요한 외교 일정인데 Upcoming Calendar에는 Reuters 홈페이지 주소만 제시했습니다.
+
+`https://www.reuters.com/`
+
+이는 출처가 아닙니다. 다음이 필요합니다.
+
+- 백악관 일정
+- 중국 외교부 발표
+- Reuters 개별 기사 URL
+- 방문 형식: 국빈방문, 정상회담, 실무회담 중 무엇인지
+- 정확한 날짜·장소
+
+이를 확인하지 못하면 본문과 Upcoming Calendar에서 모두 삭제해야 합니다.
+
+### 6) 시간 범위
+
+9월 22일 뉴욕에서 열린 UN 일반토의 연설이 현지 오전·오후였다면 KST로 9월 22일 밤 또는 23일 새벽이므로 24시간 범위에 들어갈 가능성이 높습니다. 다만 실제 연설 타임스탬프를 기록해야 합니다.
+
+---
+
+# URL 및 출처 양식 문제
+
+초안은 “Source”에 여러 매체를 나열하지만 실제 기사별 URL을 거의 제공하지 않습니다. 이는 엄격한 교차검증이 가능한 형태가 아닙니다.
+
+각 핵심 주장마다 다음처럼 출처를 분리해야 합니다.
+
+```text
+Claim:
+Source title:
+Publisher:
+Published timestamp:
+Event timestamp:
+Timezone:
+Direct URL:
+Archive URL:
+Primary/secondary source:
+Quoted passage or table:
+```
+
+특히 다음은 개별 URL이 반드시 필요합니다.
+
+- Sensor Tower 다운로드 통계
+- Meta 주가와 시가총액 산식
+- Patrick Wardle 취약점 분석
+- Meta 보안 패치 공지
+- 404 Media 콜센터 보도
+- T-Head V900 데이터시트
+- Apsara keynote 영상
+- OpenAI 가격표·모델 카드
+- GitHub Copilot changelog
+- UN 연설 transcript
+- 백악관 행정문서
+- 트럼프–시진핑 회담 발표
+
+단순 홈페이지 링크나 매체명 나열은 출처로 인정하기 어렵습니다.
+
+---
+
+# Upcoming Tech Calendar 검토
+
+- **ECOC 2026:** 행사 공식 페이지에서 날짜·장소를 다시 확인하고 프로그램의 200G/lane, CPO 세션을 개별 링크로 제시해야 합니다.
+- **OCP Global Summit 2026:** 공식 행사 페이지가 2026년 일정으로 갱신됐는지 확인해야 합니다. 상시 summit URL만으로 날짜를 입증하면 안 됩니다.
+- **SC26:** 공식 일정 페이지에서 Salt Lake City 및 11월 15~20일을 확인하십시오.
+- **IEDM 2026:** 제시된 12월 13~17일은 공식 conference schedule과 대조가 필요합니다. IEDM은 튜토리얼·short course와 본회의 날짜가 구분되므로 “행사 전체 기간”인지 “technical sessions”인지 명시해야 합니다.
+- **미·중 정상회담:** Reuters 홈페이지가 아니라 백악관·중국 외교부·Reuters 개별 기사 URL이 없으면 캘린더에서 제외해야 합니다.
+
+---
+
+## 최종 편집 권고
+
+1. **1번:** 보안 패치를 주제로 다시 쓰고, 출시·주가 내용은 배경으로 축소하십시오. 다운로드 1.8M/2.8M 충돌과 Stripe Link 가상카드 오류를 먼저 해결해야 합니다.
+2. **2번:** Category 6 시간 예외는 인정하되, 데이터시트와 keynote 원문이 없으면 사양표·로드맵을 삭제하십시오.
+3. **3번:** OpenAI 공식 모델 문서·가격 페이지·API identifier가 확인되지 않으면 항목 전체를 삭제하십시오.
+4. **4번:** UN transcript와 서명된 행정문서를 구분하십시오. 연설 발언만 확인된다면 “용어 변경 제안”으로 낮추고 “정부 전체 공식 mandate”는 삭제해야 합니다.
+5. 모든 항목의 `event_within_24h_window`는 **날짜가 아니라 KST 환산 시각**으로 판정하십시오. 현재 메타데이터는 2번의 7일 예외를 제외하면 시간 근거가 충분하지 않습니다.
