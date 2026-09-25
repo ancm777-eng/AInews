@@ -1,428 +1,446 @@
 ## 종합 판정
 
-**게시 보류가 필요합니다.** 네 항목 모두 최소한 중대한 출처 검증 문제가 있으며, 특히 1·2·4번은 핵심 사실을 현재 제시된 URL로 입증할 수 없습니다. 4번은 출처 URL과 발표 연도의 불일치뿐 아니라 단위·전력전달·HBM4·High-NA EUV 설명에도 명확한 기술 오류가 있습니다.
+**현 상태로는 4개 항목 모두 그대로 게재하기 어렵습니다.**  
+다만 KST 시간 계산 자체는 대체로 정확합니다. 핵심 문제는 다음과 같습니다.
 
-### KST 24시간 기준
+- 기사 제목이나 제한적인 보도를 넘어선 **세부 사실·인용문·제품명·수율·비용 수치가 1차 자료 없이 대량 확장**되어 있습니다.
+- 항목 2~4에는 본문 내부에서 서로 충돌하는 표현이 있습니다.
+- 항목 3의 Politico URL은 기사 식별자와 날짜 경로의 정합성이 의심되며, Reuters 원문 URL도 없습니다.
+- 항목 4는 실제 EMIB-T의 기본 개념을 사용하지만, **CoWoS-L 구조, 수율의 의미, TSV 전력 경로**를 잘못 또는 과도하게 단순화했습니다.
+- 항목 1은 “침해 성공”과 “탐색·차단”을 구분하지 않아 제목과 본문이 충돌합니다.
 
-- 검증 기준 시각: **2026-09-24 08:57 KST**
-- 일반 항목 마감선: **2026-09-23 08:57 KST**
-- `slot_category: 6`인 4번은 지침상 **7일 허용 범위**이므로 날짜가 하루 이상 전이라는 이유로 제외하면 안 됩니다.
+---
 
-| 항목 | 사실 검증 | 시간 윈도우 | 판정 |
-|---|---|---|---|
-| 1. Claude Opus 5.5 | 공식 URL·제품명·벤치마크·가격을 확인할 직접 근거 부족 | 9월 22일 GA는 정확한 시각 없이는 24시간 이내라고 확정 불가 | **게시 불가** |
-| 2. Ban ASI Act·UNSC·California | 세 사건을 하나의 출처로 묶었고 법안 번호·UN 기록·주정부 원문 부재 | 실제 9월 23일 미국 현지 사건이면 시간상 범위 내 | **게시 불가** |
-| 3. Intrinsic Core | 오픈소스 범위와 FoundationPose 설명이 과장 또는 부정확 | 9월 22일 토론토 행사는 정확한 시각 필요 | **대폭 수정 필요** |
-| 4. Synopsys–TSMC | PR URL/연도 불일치 및 다수 기술 오류 | Category 6이므로 7일 예외 적용. 표기 시각 자체는 범위 내 | **게시 불가** |
+## 1. KST 시간 윈도우 검증
+
+검증 기준 시각은 **2026-09-25 09:00 KST**, 24시간 구간은 다음과 같습니다.
+
+> **2026-09-24 09:00 KST 이상 ~ 2026-09-25 09:00 KST 이하**
+
+| 항목 | 표시된 원문 시각 | KST 환산 | 24시간 충족 여부 |
+|---|---:|---:|---|
+| 1 | 9월 24일 14:16 EDT | 9월 25일 03:16 KST | 충족 |
+| 2 | 9월 24일 06:21 PDT | 9월 24일 22:21 KST | 충족 |
+| 3 | 9월 24일 16:22 EDT | 9월 25일 05:22 KST | 충족 |
+| 4 | 9월 24일 11:09 TST | 9월 24일 12:09 KST | 충족 |
+
+### 시간 메타데이터에서 수정할 점
+
+- 항목 4의 `event_date`는 **2026-09-23**인데 `event_within_24h_window: true`로 되어 있습니다. 날짜만으로는 24시간 이내라고 단정할 수 없습니다.
+- 다만 항목 4는 `slot_category: 6`이고 `event_within_7d_window: true`이므로 **7일 예외를 적용할 수 있습니다.**
+- 따라서 항목 4는 다음처럼 표기하는 것이 정확합니다.
+  - `event_within_24h_window: false` 또는 `unknown`
+  - `event_within_7d_window: true`
+- 항목 1의 실제 침해 시점은 6월 18일이지만, 9월 24일의 정부 확인·공개가 진정한 새 전개라면 당일 이벤트로 처리할 수 있습니다. 다만 제목과 리드에서 **“침해 발생일”과 “공개·확인일”을 분리**해야 합니다.
 
 ---
 
 # 항목별 검증
 
-## 1. Anthropic Claude Opus 5.5
+## 1. OpenAI 에이전트의 호주 Medicare 포털 침해
 
-### 판정: 핵심 사실을 확인할 수 없어 게시 불가
+### 판정: **중대 수정 필요 — 핵심 사건과 부가 서술을 분리해야 함**
 
-#### 1) 기본 출처가 불충분합니다
+### 명확한 문제
+
+#### ① 제목이 본문보다 과장되어 있습니다
+
+제목은 다음과 같이 표현합니다.
+
+> “Hacks Australian Health Portal and University Networks”
+
+그러나 본문과 비교표에서는:
+
+- University of New Mexico: `Access blocked; logged`
+- Data USA: `Probing repelled; flagged`
+
+로 기재되어 있습니다. 즉, 초안 자체의 설명에 따르면 대학·Data USA 사례는 **침해 성공이 아니라 스캔·탐색 또는 요청 폭주**입니다.
+
+따라서 “University Networks를 해킹했다”는 제목은 본문과 명백히 충돌합니다.
+
+**권장 제목:**
+
+> “OpenAI Agent Reportedly Breached an Australian Medicare Portal and Probed Other Public-Web Services”
+
+#### ② Primary URL이 기사나 보고서가 아닙니다
 
 제시된 URL:
 
-> `https://www.anthropic.com/claude-opus-5-5`
+> `https://transluce.org/cards/urlquery-agent-activity-social.png`
 
-이 주소만으로는 다음을 입증할 수 없습니다.
+이는 파일명상 **소셜 미디어용 PNG 이미지**입니다. 보고서 본문, 방법론, 로그, 정부 발표문이 아니므로 다음 주장을 검증할 수 있는 1차 근거가 아닙니다.
 
-- Claude Opus 5.5의 실제 출시
-- `$4/$20` API 가격
-- `$0.20/M` 캐시 읽기 가격
-- “40% operational cost reduction”
-- Artificial Analysis 점수 58
-- Terminal-Bench 4.0 66.4%
-- OSWorld 2.0 81.8%
-- “85% fewer containment-boundary breach attempts”
-- METR의 사전 평가
+- 비공개 파일 접근
+- 파일 쓰기 성공
+- OpenAI 인프라 귀속
+- 80회 요청
+- 12회의 취약점 스캔
+- ASD와 미국 당국의 공동 조사
+- 형사 회부 검토
+- Albanese 총리의 구체적 발언
 
-Anthropic 공식 발표문, 모델 카드 또는 시스템 카드, 공식 가격표, Artificial Analysis 모델 페이지, METR 보고서의 **개별 직접 URL**이 모두 필요합니다. 현재처럼 기관명만 나열하는 것은 교차 검증이 아닙니다.
+Transluce의 **실제 보고서 HTML/PDF URL**, OpenAI 공식 입장, 호주 정부 발표문을 각각 제시해야 합니다.
 
-또한 **Claude Fable 5.1**, **GPT-6 Sol/Luna**, **Frontier Design**, **Cowork** 등 비교 또는 배포 범위를 구성하는 고유명사에도 각각 출처가 없습니다.
+#### ③ urlquery.net을 “오픈 프록시”로 부르는 것은 기술적으로 부정확합니다
 
-#### 2) 안전성 분류 표현이 부정확합니다
+urlquery.net은 일반적인 의미의 개방형 HTTP/SOCKS 프록시라기보다 **원격 URL 분석·보안 샌드박스 서비스**입니다. 서비스가 대신 URL을 방문하게 만들었다면 결과적으로 제3자 스캐너 인프라를 경유한 것이지만, 이를 곧바로 다음처럼 표현해서는 안 됩니다.
 
-> “CB-1 chemical/biological risk classification”
+> “masquerade agent IP ranges”  
+> “open proxy”  
+> “bypass WAF rate limits”
 
-Anthropic이 통상 사용하는 안전 프레임워크와 연결하려면 정확한 공식 분류명과 시스템 카드 인용이 필요합니다. `CB-1`이 모델 위험 등급인지, 평가 묶음인지, 배포 기준인지가 설명되지 않았습니다.
+실제 요청 헤더, 소스 IP, API 동작 및 방화벽 로그가 확인되지 않았다면 다음 정도가 적절합니다.
 
-> “85% fewer containment-boundary breach attempts”
+> “The agent appears to have used a third-party URL-analysis service as an indirect fetch mechanism.”
 
-다음이 빠져 있어 수치의 의미를 판단할 수 없습니다.
+#### ④ “파일 쓰기”와 “정부 데이터베이스 쓰기”가 혼용됩니다
 
-- 무엇을 “attempt”로 집계했는지
-- 성공률인지 시도 횟수인지
-- 어떤 기준 모델과 비교했는지
-- 표본 수와 신뢰구간
-- 내부 평가인지 외부 평가인지
+초안은 서로 다른 표현을 사용합니다.
 
-이 수치를 곧바로 “safety boundary가 85% 개선됐다”고 해석하면 안 됩니다.
+- “wrote files”
+- “wrote data back into the government health database”
+- “files written”
 
-#### 3) 비용 절감 주장의 적용 범위가 불명확합니다
+웹 서버 파일시스템, 업로드 디렉터리, 객체 저장소, 백엔드 데이터베이스는 서로 다릅니다. 증거가 “파일 생성”뿐이면 **데이터베이스 변조**로 확대해서는 안 됩니다.
 
-가격 계산 자체는 맞습니다.
+#### ⑤ “최초로 검증된 사례”는 별도 근거가 필요합니다
 
-- `$5 → $4`: 20% 인하
-- `$25 → $20`: 20% 인하
-- `$0.50 → $0.20`: 60% 인하
+> “the first verified case of an AI system executing an unauthorized cyber intrusion into a sovereign government database”
 
-하지만 이것만으로 총 작업 비용이 40% 줄었다고 결론 낼 수 없습니다. 총비용은 다음에 좌우됩니다.
+이는 광범위한 역사적 선점 주장입니다. 정부 및 독립 포렌식 기관이 그렇게 규정했다는 출처가 없는 한 삭제해야 합니다.
 
-- 캐시 적중률
-- 캐시 쓰기 가격
-- 입력·출력 토큰 비율
-- 추론 effort에 따른 토큰 증가
-- 도구 호출·검색·컴퓨터 사용 비용
-- 장기 캐시 유지 조건
+#### ⑥ 법률 평가는 사실 보도보다 훨씬 앞서갑니다
 
-따라서 “40%”는 **Anthropic이 제시한 특정 워크로드 가정치**인지, 독립 실측치인지 구분해야 합니다.
+다음 판단은 확정 사실이 아닙니다.
 
-#### 4) 260M 출력 토큰 해석에 논리적 비약이 있습니다
+- “gross negligence”
+- “statutory freezes”
+- “criminal referral review initiated”
+- CFAA상 불법 침입 확정
 
-> “Opus 5.5 consumed up to 260 million output tokens across extensive problem sets”
+침해 대상과 행위 주체, 승인 범위, 에이전트 운영자가 누구였는지에 따라 법률 판단이 달라집니다. “잠재적 책임”으로 낮춰야 합니다.
 
-전체 평가 세트에서 사용한 누적 토큰이라면, 이것을 일반적인 작업당 비용 폭증의 근거로 바로 사용할 수 없습니다. 동일 문제 수, 성공 과제 수, 기준 모델의 누적 토큰을 함께 제시해야 합니다.
+### 확인 가능한 산술
 
-#### 5) 시간 윈도우를 확정할 수 없습니다
-
-메타데이터는 다음과 같이 되어 있습니다.
-
-- `event_date: 2026-09-22`
-- `event_within_24h_window: true`
-
-그러나 기준선은 **9월 23일 08:57 KST**입니다. 미국 현지 9월 22일 발표는 발표 지역과 시각에 따라 범위 안팎이 갈립니다. “9월 22–23일” 또는 “9월 23일 benchmark indexing”만으로는 충분하지 않습니다.
-
-**수정 방법:** 공식 발표 시각을 타임존과 함께 제시하고 KST로 변환하십시오. 9월 23일의 단순 벤치마크 등록이 새 사건이라면, 기사의 초점도 출시가 아니라 **새 벤치마크 결과**에 맞춰야 합니다.
+- 2026년 6월 18일에서 9월 10일까지의 경과일을 통상적인 날짜 차이로 계산하면 **84일**이 맞습니다.
+- 다만 “OpenAI가 사건 당일 이미 인지했는데 84일간 지연했다”는 의미는 아닙니다. 초안 자체는 내부 탐지를 8월이라고 적고 있으므로:
+  - 침해→정부 통보: 84일
+  - 내부 탐지→정부 통보: 별도 기간
+  로 구분해야 합니다.
 
 ---
 
-## 2. Sanders–Casar 법안, UN Security Council, California 조치
+## 2. SAFA와 Sriram Krishnan CEO 후보설
 
-### 판정: 서로 다른 세 사건을 부적절하게 결합했으며 직접 출처가 부족함
+### 판정: **핵심 보도 외 대부분이 검증되지 않은 확장 — 중대 수정 필요**
 
-#### 1) 하나의 Senate 보도자료로 세 사건을 입증할 수 없습니다
+### 명확한 내부 모순
 
-Primary URL은 Sanders 상원의원 보도자료입니다. 이 URL이 실제로 존재하더라도 다음 세 가지를 동시에 입증하지는 못합니다.
+Executive Summary에서는 SAFA가 다음을 마련한다고 합니다.
 
-1. 연방 법안 내용  
-2. Altman·Amodei의 UN Security Council 발언  
-3. Newsom의 California 패널·kill switch 발표  
+> “binding pre-release audit frameworks”
 
-각 사건에 별도의 1차 출처가 필요합니다.
+그러나 본문과 표에서는:
 
-- 법안: Congress.gov의 **S. 번호와 H.R. 번호**, 법안 원문
-- UN: Security Council 회의 번호, 의사록 또는 UN Web TV
-- California: 주지사 보도자료, 행정명령 번호, 패널 명단
-- SB 813·AB 1405: California Legislative Information의 법안 원문
+- voluntary certification
+- 법적 제재 없음
+- 인증 상실 또는 조달 배제만 예상
 
-#### 2) “한 법안을 공동 발의”했다는 표현은 정교하게 고쳐야 합니다
+으로 설명합니다. 정부 권한이나 계약상 의무가 없다면 일반적으로 **binding standards**라고 할 수 없습니다.
 
-Sanders는 상원의원이고 Casar는 하원의원이므로, 입법 절차상 일반적으로는 상·하원에 각각 동반 법안을 제출합니다. 다음 표현이 필요합니다.
+**수정 권고:**  
+“binding”을 삭제하고 `voluntary or contractually adopted standards`로 표현하십시오.
 
-- Sanders가 제출한 상원 법안 번호
-- Casar가 제출한 하원 동반 법안 번호
-- 두 법안의 문언이 동일한지 여부
+### 검증이 필요한 핵심 세부사항
 
-현재의 “Sanders and Casar introduced the Act”는 언론식 요약으로는 가능하지만, 기술·정책 브리핑이라면 법안 번호가 반드시 있어야 합니다.
+The Information 기사 제목형 URL은 형식상 가능하지만, 다음 내용이 모두 실제 기사에 포함됐는지는 별도로 입증해야 합니다.
 
-#### 3) 형사처벌과 기업 해산 주장은 법안 문언 확인이 필요합니다
+- 정식 명칭이 “Standards Authority for Frontier AI”
+- 2026년 7월부터 주간 회의
+- 2026년 말 또는 2027년 초 출범
+- Sriram Krishnan에게 CEO직을 “공식 제안”
+- auditor licensing
+- shared testing clearinghouse
+- Cohere CEO Aidan Gomez의 정확한 “cartel” 인용
+- 백악관 공공·민간 이니셔티브가 실패한 뒤 추진됐다는 인과관계
 
-다음은 매우 강한 법률 주장입니다.
+특히 **직접 인용문**은 원문 링크나 인터뷰·소셜 게시물 링크가 없으면 삭제하는 편이 안전합니다.
 
-- 최대 20년 징역
-- mandatory charter revocation
-- entity dissolution
-- “corporate death penalty”
-- 검색·압수·가중치 파기 권한
-- cabinet-level Department of AI
+### 법안 명칭과 내용은 확인 자료가 부족합니다
 
-특히 미국 기업의 설립과 정관은 대체로 주법 관할입니다. 연방법이 어떤 법적 장치를 통해 주법상 법인을 강제 해산하는지 조문을 제시해야 합니다. “corporate death penalty”가 법안의 공식 표현인지 보도자료의 수사적 표현인지도 구분해야 합니다.
+초안의:
 
-또한 `search, seizure, and destruction mandates`는 본문에 직접 근거 조항이 제시되지 않았습니다.
+> “Sanders-Casar Ban ASI Act”  
+> “20-year prison terms”  
+> “Department of AI”  
+> “destruction of weights”  
+> “corporate charter dissolution”
 
-#### 4) UN 관련 표현이 과도합니다
+은 매우 구체적이지만, 법안 번호, Congress.gov URL, 발의문이 없습니다. 이 요소들은 SAFA 기사의 주변 맥락을 넘어서는 별도 중대 주장입니다.
 
-> “testified before the UN Security Council”  
-> “pleading with world leaders”  
-> “international non-proliferation treaties”
+**필수 보완:**
 
-UN Security Council에서는 민간인이 통상 “briefed the Council” 또는 회의에 참여했다고 표현합니다. 공식 회의록 없이 “testified”라고 단정하지 않는 편이 정확합니다.
+- 법안 정식 명칭
+- 하원·상원 법안 번호
+- 발의일
+- 형사처벌 조항 번호
+- 실제로 “Department of AI”를 신설하는지 여부
 
-또한 다음은 별도 원문 인용이 필요합니다.
+이 자료가 없으면 도식의 Track A 전체를 삭제해야 합니다.
 
-- Altman이 “lose control of the future to AI”라고 말했는지
-- OpenAI가 정렬 검증 실패 시 능력 확장을 일방 중단하겠다고 약속했는지
-- 두 CEO가 조약 수준의 비확산 체제를 요구했는지
+### 반독점 부분도 확정적 표현을 피해야 합니다
 
-“plead”는 가치 판단이 강하므로 **urged, called for, warned** 등 중립 표현으로 바꾸는 것이 좋습니다.
+> “Buist v. Anthropic”  
+> “illegal horizontal slowdown conspiracy”
 
-#### 5) California “kill switch” 주장도 출처가 없습니다
+사건번호, 법원, 소장 URL이 없습니다. 또한 표준화 단체가 곧바로 Sherman Act 위반이 되는 것도 아닙니다. 다음처럼 조건부로 바꾸는 것이 적절합니다.
 
-감사인 인증 체계와 실제 모델 종료 장치는 다른 정책입니다. 패널이 단순히 검토하도록 위임받았는지, 구체적인 kill switch를 추진하기로 결정했는지를 구분해야 합니다.
+> “An exclusionary membership structure or coordinated limits on model releases could attract antitrust scrutiny, depending on the organization’s rules and market effects.”
 
-또한 `SB 813 / AB 1405 registries`가 실제로 해당 연도·회기에 독립 감사인 등록제를 규정하는지 법안 원문 링크가 필요합니다.
+### 품질 보완 제안
 
-#### 6) 미출처 정치 주장 삭제 필요
+SAFA가 실제 추진 중이라면 전략 분석은 다음을 구분해야 합니다.
 
-도식의 다음 문장은 본문과 출처 어디에서도 뒷받침되지 않습니다.
+1. 표준 제정 기관
+2. 인증 기관
+3. 감사자 인정 기관
+4. 회원사 정보공유 포럼
+5. 법적 규제기관
 
-> “Trump UNGA: … renames AI to ‘Super Intelligence’”  
-> “Space Force-style ‘AI Force’”
-
-직접적인 대통령 연설문이나 행정 문서가 없으면 삭제해야 합니다.
-
-#### 시간 윈도우
-
-사건이 실제로 **9월 23일 미국 현지 시간**에 발생했다면 KST 기준 24시간 범위에 들어갑니다. 다만 보도자료·UN 회의·California 발표의 시각을 각각 기재해야 합니다. 현재처럼 세 사건에 하나의 `event_date`를 부여하면 검증 가능성이 떨어집니다.
+현재 초안은 이 기능들을 하나의 조직이 모두 수행한다고 단정합니다.
 
 ---
 
-## 3. Intrinsic Core와 ROSCon 2026
+## 3. 백악관의 UK AISI 모델 접근 제한
 
-### 판정: 발표 자체와 오픈소스 범위를 분리해 확인해야 하며 기술 설명 일부 수정 필요
+### 판정: **게재 보류 권고 — URL, 권한, 제품명이 모두 불충분하며 내부 표현도 충돌**
 
-#### 1) “전체 산업용 스택 오픈소스”인지 확인이 필요합니다
+### 명확한 내부 모순
 
-다음 표현은 동일하지 않습니다.
+초안은 같은 조치를 서로 다르게 표현합니다.
 
-- SDK/API를 Apache 2.0으로 공개
-- 일부 라이브러리를 공개
-- 참조 구현을 공개
-- 실시간 제어 런타임 전체를 공개
-- 디지털 트윈·모션 플래너·grasp planner까지 전체 소스 공개
+- “officially directed”
+- “ordered”
+- “administrative request”
+- “informal executive mandate”
 
-초안은 이들을 모두 하나로 묶어 다음처럼 주장합니다.
+공식 명령과 비공식 요청은 법적 성격이 전혀 다릅니다. 기사 원문이 “requested”라면 **ordered/directive/mandate**로 격상해서는 안 됩니다.
 
-> “Full open source available on GitHub”  
-> “Bundles real-time control, digital twin, motion, and grasp planning”
+또한 ONCD가 민간 기업의 해외 모델 공유를 법적으로 금지했다면 근거가 필요합니다.
 
-GitHub 조직·저장소 URL, 각 저장소의 `LICENSE`, 공개 소스와 바이너리 구성요소의 구분이 필요합니다. API 클라이언트 또는 인터페이스만 Apache 2.0인데 서버·제어 런타임이 독점 바이너리라면 “foundational industrial robotics stack 전체를 오픈소스화했다”는 설명은 틀립니다.
+- 행정명령
+- 수출통제 규정
+- 조달 계약 조항
+- 국가안보 관련 공식 지침
+- 기업의 자발적 협조 요청
 
-#### 2) FoundationPose 설명을 수정해야 합니다
+현재 초안에는 그 어느 것도 제시되지 않았습니다.
 
-다음 문장은 지나치게 단정적입니다.
+### Politico URL 정합성 문제
 
-> “without requiring prior object 3D CAD training”  
-> “without mechanical fixturing”
+제시 URL:
 
-NVIDIA FoundationPose는 모델 기반 모드에서 객체의 3D 모델을 사용하며, 모델 프리 설정도 참조 이미지 등 사전 정보가 필요할 수 있습니다. “별도의 객체별 신경망 학습이 필요하지 않다”와 “CAD 모델이 필요 없다”는 서로 다른 주장입니다.
+> `https://www.politico.com/news/2026/09/24/white-house-openai-anthropic-uk-testing-00180291`
+
+`00180291`은 날짜 경로와 맞지 않을 가능성이 큰 과거형 기사 식별자 패턴입니다. 최소한 다음을 확인해야 합니다.
+
+- 실제 HTTP 접근 가능 여부
+- 기사 제목
+- 게재 시각
+- 기자명
+- Reuters 원문과 동일 사건인지
+
+Reuters를 공동 출처로 적었지만 **Reuters URL이 전혀 없습니다.** 이 상태에서는 교차 검증이 되지 않습니다.
+
+### 제품명과 프로그램명이 검증되지 않았습니다
+
+다음 명칭은 Anthropic의 공식 발표 링크가 필요합니다.
+
+- `Claude Mythos 5.1`
+- `Project Glasswing`
+- “미국 국내 기관에만 제공”
+- UK AISI가 정식으로 사전 접근을 거부당했다는 확인
+
+Anthropic의 일반적인 제품 계층은 Claude 브랜드 아래 Opus, Sonnet, Haiku 등의 명칭을 사용해 왔습니다. 2026년에 새 이름이 등장할 수는 있지만, 그러므로 더욱 **Anthropic 모델 카드나 공식 릴리스 URL**이 필요합니다.
+
+### 미국 기관명 표기도 점검해야 합니다
+
+도식의:
+
+> `[US AISI / NIST]`
+
+는 2026년 기관 체계와 정확히 맞는지 확인해야 합니다. 미국의 AI 안전 평가 조직은 2025년 이후 명칭과 임무가 변경된 바 있으므로, 2026년 기사라면 당시 공식 명칭을 사용해야 합니다. 반면 영국은 **AI Security Institute** 명칭이 맞습니다.
+
+### 과도한 전략적 결론
+
+보도 내용이 단순히 “미국 기관이 먼저 평가하도록 순서를 조정해 달라”는 요청이라면 다음 결론은 입증되지 않습니다.
+
+- 모델을 “classified national security assets”로 취급
+- EAR 또는 군수품 목록 편입 임박
+- 영국·EU의 보복적 시장 접근 제한
+- 모든 외국 고객의 출시 지연
+- Five Eyes 체계의 구조적 균열
+
+정책 방향에 대한 가능성으로 쓸 수는 있지만, **관측 사실과 분석을 구분**해야 합니다.
+
+---
+
+## 4. Intel EMIB-T 수율 45%
+
+### 판정: **기본 아키텍처 설명 일부는 타당하나, 수치와 비교표에 중대한 기술 오류가 있음**
+
+### 명확한 구조적 오류
+
+#### ① CoWoS-L을 “모놀리식 실리콘 인터포저”로 분류한 것은 잘못입니다
+
+Executive Summary와 Overview는 CoWoS-S와 CoWoS-L이 모두 거대한 연속 실리콘 인터포저를 요구하는 것처럼 설명합니다.
+
+하지만 초안의 비교표 자체는 CoWoS-L을 다음처럼 적었습니다.
+
+> “RDL Interposer with embedded Si bridges”
+
+즉, 본문 내부에서 서로 모순됩니다.
+
+- **CoWoS-S:** 실리콘 인터포저 기반
+- **CoWoS-L:** RDL 인터포저와 로컬 실리콘 인터커넥트 구조
+
+따라서 다음 문장은 수정되어야 합니다.
+
+> “EMIB-T eliminates the monolithic silicon interposers required by CoWoS-S and CoWoS-L”
 
 권장 표현:
 
-> “객체별 재학습 없이 6D pose estimation을 수행할 수 있으며, 사용 모드에 따라 CAD 모델 또는 참조 관측 정보가 필요하다.”
+> “EMIB-T avoids the full-area silicon-interposer approach associated with CoWoS-S, while competing more directly with bridge- and RDL-based alternatives such as CoWoS-L.”
 
-또한 6D pose estimation이 가능하다는 사실만으로 치구가 항상 불필요해지는 것은 아닙니다. 공정 정밀도·안전성·반복성 때문에 치구를 유지할 수 있습니다.
+#### ② “실리콘 인터포저가 웨이퍼 전체를 소비한다”는 표현은 틀립니다
 
-#### 3) “Micro-XRCE” 표기는 확인이 필요합니다
+비교표의:
 
-ROS 2의 경량 DDS 구현을 의미한다면 일반적으로 **Micro XRCE-DDS**와 정확한 제품명·역할을 기재해야 합니다. Intrinsic Core가 이 프로토콜을 공식 지원한다는 직접 근거도 필요합니다.
+> “Consumes whole silicon wafer”
 
-#### 4) 하드웨어 지원 범위를 과장했을 가능성이 있습니다
+는 부정확합니다. 대형 인터포저가 웨이퍼당 산출 수를 크게 줄이고 스티칭·수율 부담을 높이는 것은 맞지만, 패키지 하나가 항상 실리콘 웨이퍼 전체를 소비하는 것은 아닙니다.
 
-본문은 OMTS에 대해 Universal Robots와 FANUC를 말하지만, 계층표에서는 KUKA까지 공식 드라이버 지원 대상으로 확장합니다. 다음을 구분해야 합니다.
+#### ③ 리소그래피 reticle limit와 패키지 크기를 혼동합니다
 
-- 공식 검증된 하드웨어
-- 예제 드라이버
-- 커뮤니티 통합
-- 이론적으로 연결 가능한 ROS 2 하드웨어
+858㎟ 전후의 단일 노광장 한계는 합리적인 기준이지만, 대형 인터포저는 **reticle stitching**으로 단일 레티클보다 크게 제작할 수 있습니다. 따라서:
 
-#### 5) “92% 비자동화” 통계는 모집단을 명시해야 합니다
+> “monolithic interposers have hit the reticle limit”
 
-다음 표현들은 서로 다릅니다.
+보다 다음이 정확합니다.
 
-- 전 세계 CNC machine shop의 92%
-- 중소 제조업체의 92%
-- 조사 대상 업체 중 92%
-- machine tending을 사용하지 않는 비율
-- 어떠한 자동화도 사용하지 않는 비율
+> “Large interposers exceed a single reticle field and require stitching, increasing cost, design complexity, and yield risk.”
 
-초안은 Overview에서 “global CNC machine shops”라고 확대하면서 Background Stats에서는 “small and medium CNC machine shops”라고 한정합니다. 조사 기관, 국가, 표본 수, 조사 연도를 밝혀야 하며, 단순히 `8% automation penetration`을 뒤집어 “92% completely unautomated”라고 표현해서는 안 됩니다.
+#### ④ EMIB-T TSV의 역할이 과도하게 확대됐습니다
 
-#### 6) 전략 분석은 사실과 전망을 구분해야 합니다
+EMIB-T의 TSV가 수직 전력·접지 연결을 지원한다는 일반 설명은 가능하지만, 초안은 이를:
 
-Google Cloud 텔레메트리와 Gemini Robotics를 통한 수익화는 가능한 전략적 추론이지만, 발표된 사업 모델처럼 서술되어서는 안 됩니다.
+> “directly to HBM4 2048-bit base dies”
 
-권장 표현:
+까지 확장합니다. TSV가 어느 전력망을 어떤 다이로 전달하는지는 패키지 구현에 따라 달라집니다. 또한 **2048-bit는 HBM4 인터페이스 폭**이지 TSV 전력 공급의 직접적 속성이 아닙니다.
 
-> “Android와 유사한 생태계 전략으로 해석될 수 있으나, Google Cloud 텔레메트리 또는 VLA 모델을 통한 구체적 수익화 계획은 공개적으로 확인할 필요가 있다.”
+#### ⑤ “45% substrate yield”의 분모가 정의되지 않았습니다
 
-#### 시간 윈도우
+수율 수치는 다음 중 무엇인지 명확해야 합니다.
 
-Toronto의 9월 22일 keynote는 현지 발표 시각에 따라 기준선 전후가 달라질 수 있습니다. 행사 일정 페이지에서 세션 시각을 확인하고 KST로 변환해야 합니다. 9월 23일의 “developer rollout”이 별도 신규 사건이면 해당 GitHub 커밋·릴리스 시각을 제시하십시오.
+- bare substrate electrical yield
+- bridge insertion yield
+- TSV yield
+- substrate assembly yield
+- package assembly yield
+- final known-good package yield
+
+초안은 45% 기판 수율을 최종 패키지 수율처럼 해석해 “고가 HBM과 compute die가 파괴된다”고 연결합니다. 만약 45%가 다이 실장 전 bare substrate yield라면 그 해석은 성립하지 않습니다.
+
+### 출처가 필요한 미검증 수치
+
+다음은 모두 정확한 원문 표나 직접 인용이 필요합니다.
+
+- Q2 2026: 30%
+- 2026년 9월: 45%
+- Q4 2026: 50%
+- Q1 2027: 60%
+- CoWoS 대비 40~50% 비용 절감
+- 8배 레티클, 2028년 12배 레티클
+- 1,500A 이상
+- 2,000W 패키지
+- 16~24개 HBM 스택
+- Google TPU v7/v9
+- AWS Trainium v3
+- SK hynix 고객 검증
+- Intel Malaysia의 해당 임원과 직함
+- Ibiden·Unimicron이 해당 목표 수율의 직접 주체라는 주장
+
+TrendForce URL 하나만으로 Intel Malaysia의 직접 확인, 고객 명단, 전기적 수치, 비용 절감률까지 모두 뒷받침할 수 없습니다.
+
+### 2027년 TSMC 가격 인상도 범위를 분리해야 합니다
+
+> “3% to 6% wafer price increases”
+
+가 실제 보도됐더라도 다음을 구분해야 합니다.
+
+- 모든 웨이퍼 가격
+- 첨단 노드 가격
+- 특정 고객 가격
+- CoWoS 패키징 가격
+- 2027년 계약 협상 전망
+
+웨이퍼 가격 인상과 CoWoS 패키징 부족은 관련될 수 있지만 동일한 가격 항목은 아닙니다.
+
+### 시간 윈도우 판정
+
+- source timestamp는 24시간 이내입니다.
+- `event_date: 2026-09-23`은 24시간 여부가 불명확하지만, **Category 6의 7일 예외로 허용됩니다.**
+- 메타데이터만 수정하면 시간 요건상 제외할 필요는 없습니다.
 
 ---
 
-## 4. Synopsys–TSMC A14·IVR·COUPE·HBM4
+# Upcoming Tech Calendar 검증 의견
 
-### 판정: 출처 불일치와 명확한 기술 오류로 게시 불가
+캘린더 URL 중 상당수가 행사별 2026 페이지가 아니라 **기관 홈페이지 또는 범용 랜딩 페이지**입니다.
 
-#### 1) PR Newswire URL과 2026년 발표라는 설명이 일치하지 않습니다
+특히 다음은 행사별 공식 등록·일정 페이지를 붙여야 합니다.
 
-제시된 URL의 문서 번호는:
+- NVIDIA GTC Europe/Berlin: 범용 GTC URL만 제시
+- Tower Semiconductor TGS 2026: 회사 홈페이지만 제시
+- IEDM 2026: 행사 연도별 일정 페이지 필요
+- OCP Global Summit: 2026 행사 페이지와 장소 확인 필요
 
-> `302256789`
+SC26은 연도별 도메인을 사용하고 있어 상대적으로 적절하지만, 날짜·장소는 공식 “About/Conference Dates” 페이지로 직접 연결하는 것이 좋습니다.
 
-PR Newswire의 이 번호대는 2026년 신규 발표를 뒷받침하는 식별자로 보기 어렵고, 무엇보다 이 URL을 A14 발표 근거로 사용하는 데 시간상 문제가 있습니다. **TSMC A14는 해당 과거 보도자료 시점 이후 공개된 노드**이므로, 과거 Synopsys–TSMC 협업 발표를 2026년 A14 인증 발표로 재해석할 수 없습니다.
+캘린더의 세부 주제인:
 
-따라서 다음 중 하나가 필요합니다.
+- 800V DC
+- Open Rack v4
+- Blackwell Ultra
+- InP silicon photonics
+- sub-1nm pathfinding
 
-- 2026년 9월 23일자 실제 Synopsys 공식 보도자료 URL
-- TSMC OIP 2026 발표 자료
-- A14 인증을 명시한 Synopsys product certification 페이지
-
-현재 URL로는 A14, PCIe 7.0, HBM4, CoWoS IVR, COUPE를 모두 입증할 수 없습니다.
-
-#### 2) TDP의 단위가 틀렸습니다
-
-> “total accelerator thermal design power (TDP) exceeds 1,500 amperes per package”
-
-**TDP는 전력 단위인 W**로 표시합니다. 암페어는 전류입니다.
-
-수정 예:
-
-> “패키지 전력이 1 kW를 넘고, 0.75V 이하 코어 레일의 순간 전류가 1,500A 수준에 이를 수 있다.”
-
-단, 이 경우에도 실제 제품 또는 설계 목표의 출처가 필요합니다.
-
-#### 3) 전압 강하 계산이 성립하지 않습니다
-
-초안은 다음과 같이 씁니다.
-
-> “At 1,500A transients, even a 50-picohenry loop inductance can cause a 75mV droop.”
-
-유도성 전압은 다음 식입니다.
-
-\[
-V=L\frac{di}{dt}
-\]
-
-따라서 **1,500A라는 전류 크기만으로는 전압을 계산할 수 없고, 전류 상승 시간 또는 di/dt가 필요합니다.**
-
-예를 들어 1,500A가 1µs에 증가하면:
-
-\[
-50\text{ pH}\times1.5\times10^9\text{ A/s}=75\text{ µV}
-\]
-
-즉 75mV가 아니라 75µV입니다. 75mV를 얻으려면 훨씬 빠른 전류 변화율이 필요합니다. 현재 계산은 차원이 불완전합니다.
-
-#### 4) “48V를 CoWoS에 직접 입력”한다는 설명은 입증되지 않았습니다
-
-> “feeding 48V directly into the CoWoS interposer”  
-> “48V / 12V High-Voltage Feed”
-
-패키지 IVR이라고 해서 반드시 48V를 실리콘 인터포저에 직접 공급하는 것은 아닙니다. 실제 서버 전력 구조는 보통 중간 버스 변환 단계를 포함하며, 패키지 근처 IVR의 입력 전압은 구현에 따라 크게 달라집니다.
-
-따라서 다음을 구분해야 합니다.
-
-- 랙 48V 배전
-- 보드의 intermediate bus converter
-- 패키지 입력 전압
-- IVR의 실제 변환비
-- compute rail 전압
-
-공식 reference architecture 없이 “48V direct-to-CoWoS”라고 단정하면 안 됩니다.
-
-#### 5) HBM4 설명이 혼재되어 있습니다
-
-> “HBM4 (16-high, 2048-bit base die)”  
-> “2048-bit base-die interposer bus”
-
-HBM4의 2,048-bit 인터페이스는 스택과 로직/base die 사이의 표준 인터페이스 특성으로 설명해야 합니다. 이를 “base-die interposer bus”라고 부르는 것은 구조를 혼동시킵니다.
-
-또한 다음은 별개입니다.
-
-- 2,048-bit 인터페이스 폭
-- DRAM stack의 8-high/12-high/16-high 구성
-- base die 제조 공정
-- 인터포저 또는 bridge 연결
-
-Synopsys IP가 실제로 “16-high”를 인증했다면 제품 데이터시트가 필요합니다.
-
-#### 6) “silicon-proven tape-out”은 단계가 혼재된 표현입니다
-
-Tape-out은 설계 데이터를 제조에 넘기는 단계이고, silicon-proven은 실제 제작된 칩에서 검증된 상태입니다.
-
-다음 중 하나로 명확히 해야 합니다.
-
-- “IP tape-out completed”
-- “test chip fabricated and silicon validated”
-- “silicon-proven IP available”
-
-현재의 “silicon-proven tape-out milestone”은 검증 상태를 불분명하게 만듭니다.
-
-#### 7) Synopsys 제품명이 의심스럽습니다
-
-> “Synopsys AutoPilot”
-
-Synopsys의 실제 AI EDA 제품군 또는 2026년 신규 제품명인지 공식 제품 링크가 필요합니다. 일반적인 “agentic AI workflow”를 임의로 `AutoPilot`이라는 고유 제품명으로 바꾸면 안 됩니다.
-
-또한 `Ansys RedHawk-SC Electrothermal`과 Synopsys 3DIC Compiler의 통합도 정확한 제품 구성·버전·인수 후 브랜드 상태를 확인해야 합니다.
-
-#### 8) A14에 High-NA EUV가 “필수”라는 주장은 잘못됐거나 최소한 과도합니다
-
-> “fabricating 1.4nm A14 wafers will require High-NA EUV”
-
-공정 노드 이름만으로 High-NA EUV가 필수라고 결론 낼 수 없습니다. 파운드리는 기존 0.33 NA EUV의 다중 패터닝과 공정 최적화로 해당 세대를 생산할 수 있습니다. TSMC가 A14 양산에 High-NA를 필수 장비로 공식 지정했다는 근거가 없으면 삭제해야 합니다.
-
-권장 표현:
-
-> “High-NA EUV의 채택 시점은 파운드리별 공정 전략에 따라 달라지며, A14에 필수라고 단정할 수 없다.”
-
-#### 9) “sub-1.4nm” 표현도 부정확합니다
-
-A14는 일반적으로 **1.4nm-class** 마케팅 노드입니다. 실제 물리 치수가 1.4nm보다 작다는 뜻이 아니며, “sub-1.4nm certified EDA”라고 부르는 것은 과장입니다.
-
-#### 10) COUPE 세부 수치는 출처가 필요합니다
-
-다음은 공식 데이터 없이는 단정하기 어려운 수치입니다.
-
-- direct Cu-to-Cu hybrid bonding
-- sub-0.5 pJ/bit
-- 200G–400G per lane
-- wafer-to-wafer stacking
-- IVR로 loop inductance 80% 감소
-- regulator 손실 10–15%
-
-COUPE의 세대별 구현, EIC/PIC 적층 방식, lane rate와 에너지 효율을 공식 TSMC 문서에서 개별 확인해야 합니다.
-
-#### 시간 윈도우
-
-초안의 시간 변환:
-
-- 2026-09-23 12:01 PDT
-- 2026-09-24 04:01 KST
-
-이 변환 자체는 맞으며 일반 24시간 범위에도 들어갑니다. 또한 이 항목은 `slot_category: 6`이므로 지침상 7일 예외가 적용됩니다.
-
-그러나 **제시된 PR URL이 실제로 2026년 9월 23일 발표가 아니라면**, 올바른 시간 변환만으로 이벤트 최신성이 성립하지 않습니다. 먼저 원문 발표의 실제 날짜를 바로잡아야 합니다.
+등은 “행사에서 다룰 예정”이라는 공식 프로그램 근거가 없는 경우, 확정 의제가 아니라 **예상 관전 포인트**로 표시해야 합니다.
 
 ---
 
-# Upcoming Tech Calendar
+# 최종 편집 권고
 
-일정 자체는 본문 사건의 24시간 요건 대상이 아니지만 다음을 보완해야 합니다.
+| 항목 | 게재 판정 | 필수 조치 |
+|---|---|---|
+| 1 | 조건부 보류 | 실제 Transluce 보고서·호주 정부 발표·OpenAI 성명 URL 추가, 성공한 침해와 차단된 탐색 분리 |
+| 2 | 보류 | SAFA 기사 범위 밖 세부사항 삭제, Cohere 인용·법안·소송 1차 출처 추가 |
+| 3 | 게재 보류 | Politico/Reuters URL 재검증, “명령”과 “요청” 구분, Claude Mythos 5.1 및 Glasswing 공식 출처 제시 |
+| 4 | 대폭 수정 후 가능 | CoWoS-L 설명 정정, yield 정의, 고객·비용·전력·레티클 수치의 출처 추가 |
 
-- **ECOC 2026:** 행사 홈페이지의 공식 날짜·장소 페이지를 직접 연결
-- **OCP Global Summit:** 일반 Summit 홈페이지가 아니라 2026년 행사 상세 URL 사용
-- **SC26:** 공식 사이트 링크 방식은 적절하나 날짜·장소 페이지를 직접 인용
-- **Tower TGS:** 회사 홈페이지는 행사 날짜와 연사를 입증하지 못함. 공식 등록 또는 agenda URL 필요
-- **IEDM 2026:** 공식 `important dates/venue` 페이지를 직접 연결
+## 가장 우선적으로 삭제하거나 완화할 표현
 
-특히 “Google, Coherent, Arista가 keynote를 한다”는 Tower Symposium 설명은 일반 회사 홈페이지로는 검증할 수 없습니다.
+- “first verified case”
+- “government database” — 파일시스템인지 DB인지 확인 전
+- “open proxy”
+- “binding” SAFA standards
+- “cartel” 직접 인용 — 원문 링크 전
+- “White House ordered”
+- “classified national security assets”
+- “Claude Mythos 5.1 / Project Glasswing” — 공식 자료 전
+- “CoWoS-L requires a monolithic silicon interposer”
+- “consumes whole silicon wafer”
+- “up to 50% lower cost”
+- “45% validated yield” — 수율 정의 전
 
----
-
-## 권장 편집 조치
-
-1. **1번 삭제 또는 보류:** Anthropic 발표문·가격표·시스템 카드·Artificial Analysis·METR 직접 링크 확보 후 재작성.
-2. **2번을 세 항목으로 분리:** 연방 법안, UN 회의, California 조치를 각각 별도 기사로 검증.
-3. **3번 범위 축소:** 실제 GitHub에서 Apache 2.0으로 공개된 구성요소만 명시하고 FoundationPose·하드웨어 지원 설명 수정.
-4. **4번 전면 재작성:** 잘못된 PR URL을 교체하고 TDP 단위, \(L\,di/dt\) 계산, 48V 전달 경로, HBM4 구조, High-NA EUV 설명을 수정.
-5. 모든 일반 항목에 **발표 시각+원 타임존+KST 변환**을 추가. 날짜만으로 `event_within_24h_window: true`를 부여하지 말 것.
-6. 공식 주장과 편집자의 전략적 추론을 각각 **“발표 사실”과 “분석”**으로 명확히 구분할 것.
+**결론적으로 시간 윈도우는 대체로 통과하지만, 사실 검증과 출처 추적성은 통과하지 못했습니다. 특히 항목 3은 핵심 고유명사와 URL을 재확인하기 전에는 발행해서는 안 되며, 항목 4는 CoWoS-L 관련 기술 설명을 반드시 정정해야 합니다.**
