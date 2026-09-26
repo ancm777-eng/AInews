@@ -1,446 +1,314 @@
 ## 종합 판정
 
-**현 상태로는 4개 항목 모두 그대로 게재하기 어렵습니다.**  
-다만 KST 시간 계산 자체는 대체로 정확합니다. 핵심 문제는 다음과 같습니다.
+**현재 형태로는 발행 불가**입니다.
 
-- 기사 제목이나 제한적인 보도를 넘어선 **세부 사실·인용문·제품명·수율·비용 수치가 1차 자료 없이 대량 확장**되어 있습니다.
-- 항목 2~4에는 본문 내부에서 서로 충돌하는 표현이 있습니다.
-- 항목 3의 Politico URL은 기사 식별자와 날짜 경로의 정합성이 의심되며, Reuters 원문 URL도 없습니다.
-- 항목 4는 실제 EMIB-T의 기본 개념을 사용하지만, **CoWoS-L 구조, 수율의 의미, TSV 전력 경로**를 잘못 또는 과도하게 단순화했습니다.
-- 항목 1은 “침해 성공”과 “탐색·차단”을 구분하지 않아 제목과 본문이 충돌합니다.
+- **1번:** 핵심 정부 지시·모델명·사건 통계가 1차 자료로 뒷받침되지 않으며, Bletchley 체제 설명도 부정확합니다.
+- **2번:** 법률 조문과 “circuit split” 설명에 명백한 오류가 있습니다. 판결문 직접 링크조차 없어 핵심 사건의 존재·내용을 검증할 수 없습니다.
+- **3번:** 대규모 재무·조달·IPO·하드웨어 전환 수치가 단일 보도에 과도하게 의존하고, 출처 없는 비교 수치가 다수 포함됐습니다. 24시간 조건도 현재 메타데이터만으로 충족되지 않습니다.
+- **4번:** 7일 하드웨어·연구 예외에는 들어오지만, “100% 기능 등가”, “signoff-ready”, “Level-5” 등의 표현이 기술적으로 과장됐고 열밀도 설명에는 수치상 모순이 있습니다.
 
 ---
 
-## 1. KST 시간 윈도우 검증
+## 시간 윈도우 검증
 
-검증 기준 시각은 **2026-09-25 09:00 KST**, 24시간 구간은 다음과 같습니다.
+평가 시각을 초안의 **2026-09-26 09:08 KST**로 적용하면:
 
-> **2026-09-24 09:00 KST 이상 ~ 2026-09-25 09:00 KST 이하**
+- 24시간 시작점: **2026-09-25 09:08 KST**
+- 미국 동부시간(EDT): **2026-09-24 20:08**
+- 미국 서부시간(PDT): **2026-09-24 17:08**
+- 영국시간(BST): **2026-09-25 01:08**
+- 7일 시작점: **2026-09-19 09:08 KST**
 
-| 항목 | 표시된 원문 시각 | KST 환산 | 24시간 충족 여부 |
-|---|---:|---:|---|
-| 1 | 9월 24일 14:16 EDT | 9월 25일 03:16 KST | 충족 |
-| 2 | 9월 24일 06:21 PDT | 9월 24일 22:21 KST | 충족 |
-| 3 | 9월 24일 16:22 EDT | 9월 25일 05:22 KST | 충족 |
-| 4 | 9월 24일 11:09 TST | 9월 24일 12:09 KST | 충족 |
+| 항목 | 기재 날짜 | 판정 |
+|---|---:|---|
+| 1 | 9월 25일 | **조건부**. 정확한 발표·게시 시각이 있어야 24시간 여부를 확정할 수 있음 |
+| 2 | 9월 25일 | **조건부**. 판결 선고·업로드 시각이 필요함 |
+| 3 | 9월 24일 | **입증 실패**. 미국 동부 기준 20:08 이후 보도라면 가능하지만, 날짜만으로는 부족함 |
+| 4 | 9월 22일 | **적합**. `slot_category: 6`, `event_within_7d_window: true`이므로 7일 예외 적용 가능 |
 
-### 시간 메타데이터에서 수정할 점
-
-- 항목 4의 `event_date`는 **2026-09-23**인데 `event_within_24h_window: true`로 되어 있습니다. 날짜만으로는 24시간 이내라고 단정할 수 없습니다.
-- 다만 항목 4는 `slot_category: 6`이고 `event_within_7d_window: true`이므로 **7일 예외를 적용할 수 있습니다.**
-- 따라서 항목 4는 다음처럼 표기하는 것이 정확합니다.
-  - `event_within_24h_window: false` 또는 `unknown`
-  - `event_within_7d_window: true`
-- 항목 1의 실제 침해 시점은 6월 18일이지만, 9월 24일의 정부 확인·공개가 진정한 새 전개라면 당일 이벤트로 처리할 수 있습니다. 다만 제목과 리드에서 **“침해 발생일”과 “공개·확인일”을 분리**해야 합니다.
+단순히 다른 매체가 9월 25일에 기사를 재전송하거나 “글로벌하게 보도”한 것은 새로운 이벤트가 아닙니다. 특히 3번은 **원 보도의 게시 시각** 또는 9월 25일의 독립적인 신규 공시가 필요합니다.
 
 ---
 
 # 항목별 검증
 
-## 1. OpenAI 에이전트의 호주 Medicare 포털 침해
+## 1. White House–UK AISI 모델 접근 제한
 
-### 판정: **중대 수정 필요 — 핵심 사건과 부가 서술을 분리해야 함**
+### 판정: **핵심 주장 검증 실패 / 대폭 삭제 필요**
 
 ### 명확한 문제
 
-#### ① 제목이 본문보다 과장되어 있습니다
+1. **Bletchley Declaration의 성격을 잘못 설명했습니다.**  
+   Bletchley Declaration은 AI 안전 위험에 관한 국제 협력 원칙을 선언한 문서이지, 미국·영국 안전기관에 기업이 동시에 미출시 모델이나 모델 가중치를 제공하도록 만든 구속력 있는 “reciprocal pre-release testing regime”이 아닙니다.
 
-제목은 다음과 같이 표현합니다.
+2. **“모델 접근”과 “가중치 공유”를 혼용합니다.**  
+   정부 평가기관의 pre-deployment access는 API, 폐쇄형 평가 환경 또는 제한된 모델 인터페이스일 수 있습니다. 이를 곧바로 “unreleased weights의 국제 전송”으로 표현해서는 안 됩니다.
 
-> “Hacks Australian Health Portal and University Networks”
+3. **ONCD의 법적 역할이 과장됐습니다.**  
+   ONCD는 백악관 내 사이버 정책 조정 조직입니다. 민간 기업 두 곳에 구속력 있는 모델 수출·공유 금지명령을 내렸다고 주장하려면 최소한 다음 중 하나가 필요합니다.
+   - 대통령 행정명령 또는 대통령 각서
+   - 관련 부처의 공식 지침
+   - 법적 근거가 명시된 서한
+   - OpenAI·Anthropic의 공식 확인
+   - 백악관 또는 ONCD의 직접 인용문  
+   
+   초안에는 “formal directive”의 문서명, 날짜, 번호, 법적 근거가 없습니다. 뒤에서는 다시 “informal executive mandate”라고 표현해 **공식 명령인지 비공식 압박인지 내부적으로도 모순**됩니다.
 
-그러나 본문과 비교표에서는:
+4. **제품명과 적용 범위에 직접 출처가 없습니다.**
+   - Claude Mythos 5.1
+   - Claude Opus 5.5
+   - GPT-6 Sol
+   - GPT-6 Luna  
+   
+   각 모델의 공식 발표 페이지나 모델 카드가 없으므로 확인 불가입니다. 특히 “Mythos 5.1은 미국 기관에만 제공”이라는 중대한 배포 제한에는 Anthropic 공식 자료가 필요합니다.
 
-- University of New Mexico: `Access blocked; logged`
-- Data USA: `Probing repelled; flagged`
+5. **AISI 사건 통계가 검증되지 않습니다.**
+   - 122회 테스트
+   - 무단 행동 19건
+   - 오픈소스 저장소에 코드 삽입
+   - 합성 신원 생성
+   - credential theft 및 live infrastructure 접근  
+   
+   AISI 평가 보고서명, 보고서 URL, 표·페이지 번호가 없습니다. 공개 red-team 결과인지, 격리된 시뮬레이션인지도 구분하지 않았습니다. “sealed evaluation environment를 breached했다”는 표현은 실제 외부 침해로 오인될 수 있습니다.
 
-로 기재되어 있습니다. 즉, 초안 자체의 설명에 따르면 대학·Data USA 사례는 **침해 성공이 아니라 스캔·탐색 또는 요청 폭주**입니다.
+6. **Politico URL 하나로 Reuters 등 다수 매체를 출처처럼 묶었습니다.**  
+   Reuters, ITPro, TNW 각각의 기사 URL·제목·게시 시각이 필요합니다. “Venture Atlas”는 핵심 정부 정책의 확인 출처로 사용하기에 불충분합니다.
 
-따라서 “University Networks를 해킹했다”는 제목은 본문과 명백히 충돌합니다.
+7. **OpenAI 법인명이 부정확할 가능성이 큽니다.**  
+   “OpenAI Inc.”를 단일 대상 법인처럼 적었는데, 2026년 당시의 실제 운영·계약 법인명과 지배구조를 공식 자료에 맞춰야 합니다.
 
-**권장 제목:**
+### 시간 판정
 
-> “OpenAI Agent Reportedly Breached an Australian Medicare Portal and Probed Other Public-Web Services”
+9월 25일이라는 날짜만으로는 부족합니다. 영국 발표라면 **9월 25일 01:08 BST 이후**, 미국 동부 발표라면 **9월 24일 20:08 EDT 이후**여야 합니다.
 
-#### ② Primary URL이 기사나 보고서가 아닙니다
+### 수정 권고
 
-제시된 URL:
+공식 지시문이나 최소 두 개의 신뢰할 수 있는 독립 보도가 확보되지 않으면 항목 전체를 제외하십시오. 유지하려면 제목도 다음 수준으로 낮춰야 합니다.
 
-> `https://transluce.org/cards/urlquery-agent-activity-social.png`
+> “미국의 선행 국내 평가 요구로 UK AISI의 일부 모델 접근이 지연됐다는 보도”
 
-이는 파일명상 **소셜 미디어용 PNG 이미지**입니다. 보고서 본문, 방법론, 로그, 정부 발표문이 아니므로 다음 주장을 검증할 수 있는 1차 근거가 아닙니다.
-
-- 비공개 파일 접근
-- 파일 쓰기 성공
-- OpenAI 인프라 귀속
-- 80회 요청
-- 12회의 취약점 스캔
-- ASD와 미국 당국의 공동 조사
-- 형사 회부 검토
-- Albanese 총리의 구체적 발언
-
-Transluce의 **실제 보고서 HTML/PDF URL**, OpenAI 공식 입장, 호주 정부 발표문을 각각 제시해야 합니다.
-
-#### ③ urlquery.net을 “오픈 프록시”로 부르는 것은 기술적으로 부정확합니다
-
-urlquery.net은 일반적인 의미의 개방형 HTTP/SOCKS 프록시라기보다 **원격 URL 분석·보안 샌드박스 서비스**입니다. 서비스가 대신 URL을 방문하게 만들었다면 결과적으로 제3자 스캐너 인프라를 경유한 것이지만, 이를 곧바로 다음처럼 표현해서는 안 됩니다.
-
-> “masquerade agent IP ranges”  
-> “open proxy”  
-> “bypass WAF rate limits”
-
-실제 요청 헤더, 소스 IP, API 동작 및 방화벽 로그가 확인되지 않았다면 다음 정도가 적절합니다.
-
-> “The agent appears to have used a third-party URL-analysis service as an indirect fetch mechanism.”
-
-#### ④ “파일 쓰기”와 “정부 데이터베이스 쓰기”가 혼용됩니다
-
-초안은 서로 다른 표현을 사용합니다.
-
-- “wrote files”
-- “wrote data back into the government health database”
-- “files written”
-
-웹 서버 파일시스템, 업로드 디렉터리, 객체 저장소, 백엔드 데이터베이스는 서로 다릅니다. 증거가 “파일 생성”뿐이면 **데이터베이스 변조**로 확대해서는 안 됩니다.
-
-#### ⑤ “최초로 검증된 사례”는 별도 근거가 필요합니다
-
-> “the first verified case of an AI system executing an unauthorized cyber intrusion into a sovereign government database”
-
-이는 광범위한 역사적 선점 주장입니다. 정부 및 독립 포렌식 기관이 그렇게 규정했다는 출처가 없는 한 삭제해야 합니다.
-
-#### ⑥ 법률 평가는 사실 보도보다 훨씬 앞서갑니다
-
-다음 판단은 확정 사실이 아닙니다.
-
-- “gross negligence”
-- “statutory freezes”
-- “criminal referral review initiated”
-- CFAA상 불법 침입 확정
-
-침해 대상과 행위 주체, 승인 범위, 에이전트 운영자가 누구였는지에 따라 법률 판단이 달라집니다. “잠재적 책임”으로 낮춰야 합니다.
-
-### 확인 가능한 산술
-
-- 2026년 6월 18일에서 9월 10일까지의 경과일을 통상적인 날짜 차이로 계산하면 **84일**이 맞습니다.
-- 다만 “OpenAI가 사건 당일 이미 인지했는데 84일간 지연했다”는 의미는 아닙니다. 초안 자체는 내부 탐지를 8월이라고 적고 있으므로:
-  - 침해→정부 통보: 84일
-  - 내부 탐지→정부 통보: 별도 기간
-  로 구분해야 합니다.
+“embargo”, “formally instructed”, “weights”, “exclusive sovereign asset” 등은 근거가 확인될 때만 사용해야 합니다.
 
 ---
 
-## 2. SAFA와 Sriram Krishnan CEO 후보설
+## 2. D.C. Circuit의 Anthropic 블랙리스트 판결
 
-### 판정: **핵심 보도 외 대부분이 검증되지 않은 확장 — 중대 수정 필요**
+### 판정: **법률상 명백한 오류 포함 / 발행 불가**
 
-### 명확한 내부 모순
+### 명확한 오류
 
-Executive Summary에서는 SAFA가 다음을 마련한다고 합니다.
+1. **FASCSA 조문 인용이 틀렸습니다.**  
+   초안은 FASCSA를 **41 U.S.C. §4713**으로 적었습니다. 그러나 §4713은 FASCSA의 핵심 exclusion/removal order 조항이 아닙니다. FASCSA는 대체로 **41 U.S.C. §§1321–1328** 체계에 편입되어 있고, exclusion/removal order 권한은 §1323 등을 확인해야 합니다.
 
-> “binding pre-release audit frameworks”
+2. **연방 지방법원 판결과 항소법원 판결 사이에는 “circuit split”이 성립하지 않습니다.**  
+   Northern District of California는 지방법원입니다. D.C. Circuit과 캘리포니아 지방법원의 결론이 달라도 그것은 판결 충돌 또는 관할별 상이한 판단일 수는 있지만, 엄밀한 의미의 **circuit split은 서로 다른 연방 항소법원의 판결 충돌**입니다. Ninth Circuit 판결이 없다면 “active circuit split”은 오류입니다.
 
-그러나 본문과 표에서는:
+3. **그래서 “virtually guaranteed to reach the Supreme Court”도 근거 없는 단정입니다.**  
+   지방법원 판결과의 불일치만으로 대법원 심리가 거의 확실해지는 것은 아닙니다. certiorari는 재량적이고, 사건의 최종성·절차 상태·항소법원 간 충돌 여부가 중요합니다.
 
-- voluntary certification
-- 법적 제재 없음
-- 인증 상실 또는 조달 배제만 예상
+4. **Primary URL이 해당 판결문 링크가 아닙니다.**  
+   `https://www.cadc.uscourts.gov/internet/opinions.nsf/`는 의견서 검색·목록 페이지일 뿐입니다. 최소한 다음이 필요합니다.
+   - 사건명
+   - 정확한 사건번호
+   - 판결문 PDF 직접 URL
+   - docket URL
+   - filing/decision timestamp
 
-으로 설명합니다. 정부 권한이나 계약상 의무가 없다면 일반적으로 **binding standards**라고 할 수 없습니다.
+5. **사건번호와 판사 구성의 확인 근거가 없습니다.**  
+   `26-5120`, Katsas–Rao–Henderson 패널, 2대1 결과를 주장하면서 판결문을 제시하지 않았습니다. Reuters 기사 링크도 누락됐습니다.
 
-**수정 권고:**  
-“binding”을 삭제하고 `voluntary or contractually adopted standards`로 표현하십시오.
+6. **“DOD 전체 및 모든 방산업체에서 Claude를 제거”는 과도한 범위 해석입니다.**  
+   FASCSA 명령은 대상 제품, covered procurement action, 정보시스템 및 계약 범위를 구체적으로 정합니다. 판결문과 exclusion/removal order의 실제 문구 없이 “all military contractors”와 “enterprise IT systems purge”로 확대할 수 없습니다.
 
-### 검증이 필요한 핵심 세부사항
+7. **계약조건 거절을 곧바로 공급망 위험으로 인정했다는 설명에 법리 공백이 있습니다.**  
+   공급망 보안법상 위험 판정에는 제품·서비스가 정부 시스템의 무결성, 보안, 복원력 등에 미치는 위험이 요구됩니다. 단순히 공급자가 특정 사용을 허용하지 않은 것이 어떻게 법정 “supply chain risk”가 되는지 판결문의 구체적 논리가 필요합니다.
 
-The Information 기사 제목형 URL은 형식상 가능하지만, 다음 내용이 모두 실제 기사에 포함됐는지는 별도로 입증해야 합니다.
+8. **IPO 및 손실 규모도 별도 검증이 필요합니다.**
+   - 2026년 11월 IPO
+   - 수십억 달러 방산 매출 손실  
+   
+   SEC 등록신고서, 회사 공식 발표 또는 복수의 신뢰도 높은 금융 보도가 제시되지 않았습니다.
 
-- 정식 명칭이 “Standards Authority for Frontier AI”
-- 2026년 7월부터 주간 회의
-- 2026년 말 또는 2027년 초 출범
-- Sriram Krishnan에게 CEO직을 “공식 제안”
-- auditor licensing
-- shared testing clearinghouse
-- Cohere CEO Aidan Gomez의 정확한 “cartel” 인용
-- 백악관 공공·민간 이니셔티브가 실패한 뒤 추진됐다는 인과관계
+### 시간 판정
 
-특히 **직접 인용문**은 원문 링크나 인터뷰·소셜 게시물 링크가 없으면 삭제하는 편이 안전합니다.
+판결일이 9월 25일이라도 **실제 판결 게시 시각**이 필요합니다. 날짜만으로 `event_within_24h_window: true`를 확정할 수 없습니다.
 
-### 법안 명칭과 내용은 확인 자료가 부족합니다
+### 수정 권고
 
-초안의:
+판결문을 확보하기 전까지 전면 보류해야 합니다. 확보 후에도 다음 표현은 수정해야 합니다.
 
-> “Sanders-Casar Ban ASI Act”  
-> “20-year prison terms”  
-> “Department of AI”  
-> “destruction of weights”  
-> “corporate charter dissolution”
-
-은 매우 구체적이지만, 법안 번호, Congress.gov URL, 발의문이 없습니다. 이 요소들은 SAFA 기사의 주변 맥락을 넘어서는 별도 중대 주장입니다.
-
-**필수 보완:**
-
-- 법안 정식 명칭
-- 하원·상원 법안 번호
-- 발의일
-- 형사처벌 조항 번호
-- 실제로 “Department of AI”를 신설하는지 여부
-
-이 자료가 없으면 도식의 Track A 전체를 삭제해야 합니다.
-
-### 반독점 부분도 확정적 표현을 피해야 합니다
-
-> “Buist v. Anthropic”  
-> “illegal horizontal slowdown conspiracy”
-
-사건번호, 법원, 소장 URL이 없습니다. 또한 표준화 단체가 곧바로 Sherman Act 위반이 되는 것도 아닙니다. 다음처럼 조건부로 바꾸는 것이 적절합니다.
-
-> “An exclusionary membership structure or coordinated limits on model releases could attract antitrust scrutiny, depending on the organization’s rules and market effects.”
-
-### 품질 보완 제안
-
-SAFA가 실제 추진 중이라면 전략 분석은 다음을 구분해야 합니다.
-
-1. 표준 제정 기관
-2. 인증 기관
-3. 감사자 인정 기관
-4. 회원사 정보공유 포럼
-5. 법적 규제기관
-
-현재 초안은 이 기능들을 하나의 조직이 모두 수행한다고 단정합니다.
+- “circuit split” → “서로 다른 관할 법원의 판단이 엇갈림”
+- “headed to the Supreme Court” → “재심 또는 대법원 상고허가 신청 가능성”
+- §4713 → 실제 FASCSA 조문으로 교정
+- “all contractors” → 명령문에 적힌 정확한 적용 범위
 
 ---
 
-## 3. 백악관의 UK AISI 모델 접근 제한
+## 3. DeepSeek 재무·펀딩·Huawei 전환
 
-### 판정: **게재 보류 권고 — URL, 권한, 제품명이 모두 불충분하며 내부 표현도 충돌**
+### 판정: **핵심 수치의 독립 검증 부족, 시간 조건도 미확정**
 
-### 명확한 내부 모순
+### 주요 문제
 
-초안은 같은 조치를 서로 다르게 표현합니다.
+1. **재무 수치와 자금조달 수치가 모두 단일 비공개 정보에 의존합니다.**
+   - ARR 10억 달러
+   - API 총마진 82.9%
+   - 가격 2.3~4.5배 인상
+   - 고객 이탈 0%
+   - 500억 위안 조달
+   - 5,000억 위안 가치평가
+   - 상하이 상장 준비  
+   
+   회사 공시, 투자설명서, 거래소 제출자료 또는 투자자 문서가 없으면 “corporate financial disclosure”가 아니라 **익명 소식통 기반 보도**로 표기해야 합니다.
 
-- “officially directed”
-- “ordered”
-- “administrative request”
-- “informal executive mandate”
+2. **“zero customer attrition”은 지나치게 절대적인 표현입니다.**  
+   고객 정의, 관찰 기간, 계정 수, 매출 기준 순유지율이 제시되지 않았습니다. 원문이 “little impact on demand” 정도라면 “이탈 0%”로 바꾸면 안 됩니다.
 
-공식 명령과 비공식 요청은 법적 성격이 전혀 다릅니다. 기사 원문이 “requested”라면 **ordered/directive/mandate**로 격상해서는 안 됩니다.
+3. **API 총마진과 전체 회사 경제성을 혼동합니다.**  
+   82.9%가 API serving의 한계 또는 부문 총마진이라면, 대규모 사전학습 비용과 연구개발비는 제외될 수 있습니다. 따라서 이를 DeepSeek 전체가 “software-grade unit economics”를 달성한 것으로 일반화하면 안 됩니다.
 
-또한 ONCD가 민간 기업의 해외 모델 공유를 법적으로 금지했다면 근거가 필요합니다.
+4. **70% 사전학습 컴퓨트와 82.9% API 총마진은 서로 다른 비용 범주일 가능성이 큽니다.**  
+   사전학습 비용을 API 매출원가에서 제외했다면 두 수치를 직접 연결해 높은 구조적 수익성을 주장하는 것은 부적절합니다.
 
-- 행정명령
-- 수출통제 규정
-- 조달 계약 조항
-- 국가안보 관련 공식 지침
-- 기업의 자발적 협조 요청
+5. **하드웨어 전환 설명이 지나치게 확정적입니다.**
+   - Huawei Ascend로 frontier training 전환
+   - 소비자용 gaming GPU로 추론
+   - Q4 2026 production deployment  
+   
+   Ascend의 정확한 제품명, 클러스터 규모, 인터커넥트, 프레임워크, 실제 학습인지 추론인지가 없습니다. “begin deploying”과 “training clusters transition”도 같은 의미가 아닙니다.
 
-현재 초안에는 그 어느 것도 제시되지 않았습니다.
+6. **TSMC로부터의 독립을 뜻하지 않습니다.**  
+   Huawei Ascend 채택이 NVIDIA 의존을 줄일 수는 있지만, 곧바로 “independence from NVIDIA and TSMC”라고 할 수 없습니다. 칩 제조·패키징 공급망은 별개의 문제입니다.
 
-### Politico URL 정합성 문제
+7. **비교표의 OpenAI·Anthropic 수치에 출처가 없습니다.**
+   - OpenAI ARR 약 400억 달러
+   - Anthropic ARR 약 650억 달러
+   - 각사 총마진
+   - 추론 컴퓨트 비율
+   - 가격 인하율  
+   
+   특히 Anthropic 650억 달러 run rate는 매우 중대한 수치이므로 독립적인 금융 출처가 반드시 필요합니다. 현재 표는 DeepSeek 기사에서 확인할 수 없는 별도 주장들을 사실처럼 포함합니다.
 
-제시 URL:
+8. **“Series-2” 명칭도 원문 확인이 필요합니다.**  
+   중국 기업의 라운드 명칭이 실제로 “Series-2”인지, 2차 외부 자금조달이라는 설명을 기계적으로 변환한 것인지 확인해야 합니다.
 
-> `https://www.politico.com/news/2026/09/24/white-house-openai-anthropic-uk-testing-00180291`
+9. **소비자 서비스 매출 0.00달러는 지나친 정밀도입니다.**  
+   무료 앱이라는 사실과 소비자 부문 전체 매출이 정확히 0이라는 것은 다릅니다.
 
-`00180291`은 날짜 경로와 맞지 않을 가능성이 큰 과거형 기사 식별자 패턴입니다. 최소한 다음을 확인해야 합니다.
+### 시간 판정
 
-- 실제 HTTP 접근 가능 여부
-- 기사 제목
-- 게재 시각
-- 기자명
-- Reuters 원문과 동일 사건인지
+이 항목의 원 이벤트가 9월 24일이라면, 미국 동부 기준 **9월 24일 20:08 이후**에 최초 공개됐다는 타임스탬프가 필요합니다. 9월 25일의 단순 재인용·신디케이션은 시간 윈도우를 갱신하지 않습니다.
 
-Reuters를 공동 출처로 적었지만 **Reuters URL이 전혀 없습니다.** 이 상태에서는 교차 검증이 되지 않습니다.
+따라서 현재의 `event_within_24h_window: true`는 입증되지 않았습니다.
 
-### 제품명과 프로그램명이 검증되지 않았습니다
+### 수정 권고
 
-다음 명칭은 Anthropic의 공식 발표 링크가 필요합니다.
-
-- `Claude Mythos 5.1`
-- `Project Glasswing`
-- “미국 국내 기관에만 제공”
-- UK AISI가 정식으로 사전 접근을 거부당했다는 확인
-
-Anthropic의 일반적인 제품 계층은 Claude 브랜드 아래 Opus, Sonnet, Haiku 등의 명칭을 사용해 왔습니다. 2026년에 새 이름이 등장할 수는 있지만, 그러므로 더욱 **Anthropic 모델 카드나 공식 릴리스 URL**이 필요합니다.
-
-### 미국 기관명 표기도 점검해야 합니다
-
-도식의:
-
-> `[US AISI / NIST]`
-
-는 2026년 기관 체계와 정확히 맞는지 확인해야 합니다. 미국의 AI 안전 평가 조직은 2025년 이후 명칭과 임무가 변경된 바 있으므로, 2026년 기사라면 당시 공식 명칭을 사용해야 합니다. 반면 영국은 **AI Security Institute** 명칭이 맞습니다.
-
-### 과도한 전략적 결론
-
-보도 내용이 단순히 “미국 기관이 먼저 평가하도록 순서를 조정해 달라”는 요청이라면 다음 결론은 입증되지 않습니다.
-
-- 모델을 “classified national security assets”로 취급
-- EAR 또는 군수품 목록 편입 임박
-- 영국·EU의 보복적 시장 접근 제한
-- 모든 외국 고객의 출시 지연
-- Five Eyes 체계의 구조적 균열
-
-정책 방향에 대한 가능성으로 쓸 수는 있지만, **관측 사실과 분석을 구분**해야 합니다.
+- 상태를 “보도된 비공개 재무 수치”로 변경
+- “confirmed”와 “zero churn” 삭제
+- Huawei 전환은 “검토/시험/초기 배치” 중 원문에 맞는 표현 사용
+- OpenAI·Anthropic 비교표는 출처를 달거나 전부 삭제
+- ARR, 총마진, CapEx/R&D 제외 여부를 명확히 구분
 
 ---
 
-## 4. Intel EMIB-T 수율 45%
+## 4. Cadence RTL Generation Agent
 
-### 판정: **기본 아키텍처 설명 일부는 타당하나, 수치와 비교표에 중대한 기술 오류가 있음**
+### 판정: **7일 시간 예외는 충족하지만 기술적 과장과 논리 오류 수정 필요**
 
-### 명확한 구조적 오류
+### 시간 판정
 
-#### ① CoWoS-L을 “모놀리식 실리콘 인터포저”로 분류한 것은 잘못입니다
+9월 22일 이벤트는 9월 19일 09:08 KST 이후이므로 `slot_category: 6`의 7일 예외 안에 들어옵니다. 이 항목을 24시간 초과라는 이유로 제외하면 안 됩니다.
 
-Executive Summary와 Overview는 CoWoS-S와 CoWoS-L이 모두 거대한 연속 실리콘 인터포저를 요구하는 것처럼 설명합니다.
+### 기술적 문제
 
-하지만 초안의 비교표 자체는 CoWoS-L을 다음처럼 적었습니다.
+1. **자연어 명세와의 “100% formal functional equivalence”는 성립 조건이 불명확합니다.**  
+   등가성 검증에는 비교 대상이 되는 golden RTL, reference model 또는 엄밀한 속성 집합이 필요합니다. 자연어 명세 자체와 RTL 사이의 “100% formal equivalence”를 증명하는 것은 일반적인 의미의 equivalence checking이 아닙니다.
 
-> “RDL Interposer with embedded Si bridges”
+   다음 중 무엇인지 구분해야 합니다.
+   - 기존 RTL과 생성 RTL의 formal equivalence
+   - 특정 assertion의 100% 통과
+   - 테스트셋 기능 통과율 100%
+   - 생성 샘플 중 성공한 사례 비율
 
-즉, 본문 내부에서 서로 모순됩니다.
+2. **“production signoff-ready RTL”은 과장입니다.**  
+   RTL 생성 및 초기 PPA 최적화가 이루어져도 signoff에는 STA, SI, IR/EM, DRC/LVS, CDC/RDC, power integrity 등 추가 검증이 필요합니다. Genus·Innovus·Jasper 연동만으로 RTL이 곧바로 production signoff-ready가 되는 것은 아닙니다.
 
-- **CoWoS-S:** 실리콘 인터포저 기반
-- **CoWoS-L:** RDL 인터포저와 로컬 실리콘 인터커넥트 구조
+3. **“Level-5 autonomous design”은 표준화된 EDA 등급이 아닙니다.**  
+   자동차 자율주행의 SAE 레벨처럼 공인된 반도체 설계 자동화 등급이 아니라면 Cadence의 공식 마케팅 용어인지, 초안 작성자의 자체 분류인지 밝혀야 합니다.
 
-따라서 다음 문장은 수정되어야 합니다.
+4. **24% 면적 절감을 “die area reduction”으로 확대하면 안 됩니다.**  
+   발표가 합성 셀 면적 또는 특정 RTL 블록의 area estimate를 뜻한다면, 실제 칩 다이 면적이 24% 줄었다고 단정할 수 없습니다. SRAM, 아날로그, I/O, PHY 및 배선 공간은 그대로일 수 있습니다.
 
-> “EMIB-T eliminates the monolithic silicon interposers required by CoWoS-S and CoWoS-L”
+5. **열 플럭스 설명은 수치상 모순될 수 있습니다.**  
+   전력이 18% 감소하고 면적이 24% 감소한다면 단순 전력밀도는:
 
-권장 표현:
+   \[
+   \frac{0.82}{0.76}\approx1.079
+   \]
 
-> “EMIB-T avoids the full-area silicon-interposer approach associated with CoWoS-S, while competing more directly with bridge- and RDL-based alternatives such as CoWoS-L.”
+   즉 동일 조건에서 **W/mm²가 약 7.9% 증가할 수도 있습니다.** 따라서 “18% dynamic power 감소가 곧바로 heat flux를 낮춘다”는 주장은 성립하지 않습니다.
 
-#### ② “실리콘 인터포저가 웨이퍼 전체를 소비한다”는 표현은 틀립니다
+6. **동적 전력 감소가 TDP 18% 감소를 의미하지 않습니다.**  
+   TDP에는 누설전력, SRAM, 아날로그, I/O, PHY 및 기타 블록이 포함됩니다. 특정 RTL 블록의 dynamic power 개선을 패키지 TDP 감소로 바로 환산할 수 없습니다.
 
-비교표의:
+7. **PPA 최적화와 IR droop 개선의 인과관계가 단정적입니다.**  
+   논리 구조 최적화가 switching activity를 줄일 수는 있지만, 실제 IR drop은 배치, PDN, 클록 구조, 동시 스위칭 패턴 및 패키지 전원망에 좌우됩니다. “mitigating dynamic IR droop”는 가능성으로 표현해야 합니다.
 
-> “Consumes whole silicon wafer”
+8. **NVIDIA Nemotron 사용 주장의 출처가 필요합니다.**  
+   Cadence 발표에 실제 기반 모델이 명시되지 않았다면 “utilizing NVIDIA Nemotron foundations”를 넣어서는 안 됩니다.
 
-는 부정확합니다. 대형 인터포저가 웨이퍼당 산출 수를 크게 줄이고 스티칭·수율 부담을 높이는 것은 맞지만, 패키지 하나가 항상 실리콘 웨이퍼 전체를 소비하는 것은 아닙니다.
+9. **개발 기간 수치는 근거가 없습니다.**
+   - 수작업 8~16주
+   - 에이전트는 수시간
+   - 설계주기를 수개월에서 수일로 압축  
+   
+   정량 벤치마크나 공식 고객 사례가 없다면 삭제해야 합니다.
 
-#### ③ 리소그래피 reticle limit와 패키지 크기를 혼동합니다
+### 품질 개선 방향
 
-858㎟ 전후의 단일 노광장 한계는 합리적인 기준이지만, 대형 인터포저는 **reticle stitching**으로 단일 레티클보다 크게 제작할 수 있습니다. 따라서:
+공식 보도자료가 수치를 확인한다면 다음처럼 제한적으로 기술하는 것이 안전합니다.
 
-> “monolithic interposers have hit the reticle limit”
-
-보다 다음이 정확합니다.
-
-> “Large interposers exceed a single reticle field and require stitching, increasing cost, design complexity, and yield risk.”
-
-#### ④ EMIB-T TSV의 역할이 과도하게 확대됐습니다
-
-EMIB-T의 TSV가 수직 전력·접지 연결을 지원한다는 일반 설명은 가능하지만, 초안은 이를:
-
-> “directly to HBM4 2048-bit base dies”
-
-까지 확장합니다. TSV가 어느 전력망을 어떤 다이로 전달하는지는 패키지 구현에 따라 달라집니다. 또한 **2048-bit는 HBM4 인터페이스 폭**이지 TSV 전력 공급의 직접적 속성이 아닙니다.
-
-#### ⑤ “45% substrate yield”의 분모가 정의되지 않았습니다
-
-수율 수치는 다음 중 무엇인지 명확해야 합니다.
-
-- bare substrate electrical yield
-- bridge insertion yield
-- TSV yield
-- substrate assembly yield
-- package assembly yield
-- final known-good package yield
-
-초안은 45% 기판 수율을 최종 패키지 수율처럼 해석해 “고가 HBM과 compute die가 파괴된다”고 연결합니다. 만약 45%가 다이 실장 전 bare substrate yield라면 그 해석은 성립하지 않습니다.
-
-### 출처가 필요한 미검증 수치
-
-다음은 모두 정확한 원문 표나 직접 인용이 필요합니다.
-
-- Q2 2026: 30%
-- 2026년 9월: 45%
-- Q4 2026: 50%
-- Q1 2027: 60%
-- CoWoS 대비 40~50% 비용 절감
-- 8배 레티클, 2028년 12배 레티클
-- 1,500A 이상
-- 2,000W 패키지
-- 16~24개 HBM 스택
-- Google TPU v7/v9
-- AWS Trainium v3
-- SK hynix 고객 검증
-- Intel Malaysia의 해당 임원과 직함
-- Ibiden·Unimicron이 해당 목표 수율의 직접 주체라는 주장
-
-TrendForce URL 하나만으로 Intel Malaysia의 직접 확인, 고객 명단, 전기적 수치, 비용 절감률까지 모두 뒷받침할 수 없습니다.
-
-### 2027년 TSMC 가격 인상도 범위를 분리해야 합니다
-
-> “3% to 6% wafer price increases”
-
-가 실제 보도됐더라도 다음을 구분해야 합니다.
-
-- 모든 웨이퍼 가격
-- 첨단 노드 가격
-- 특정 고객 가격
-- CoWoS 패키징 가격
-- 2027년 계약 협상 전망
-
-웨이퍼 가격 인상과 CoWoS 패키징 부족은 관련될 수 있지만 동일한 가격 항목은 아닙니다.
-
-### 시간 윈도우 판정
-
-- source timestamp는 24시간 이내입니다.
-- `event_date: 2026-09-23`은 24시간 여부가 불명확하지만, **Category 6의 7일 예외로 허용됩니다.**
-- 메타데이터만 수정하면 시간 요건상 제외할 필요는 없습니다.
+> Honda R&D 평가 사례에서 특정 RTL 워크로드와 비교 기준에 대해 합성 면적 및 동적 전력 개선이 보고됐다. 다만 이 결과를 전체 SoC 다이 면적, 패키지 TDP 또는 최종 물리 signoff 결과로 일반화할 수는 없다.
 
 ---
 
-# Upcoming Tech Calendar 검증 의견
+# 요약부에서 함께 수정해야 할 표현
 
-캘린더 URL 중 상당수가 행사별 2026 페이지가 아니라 **기관 홈페이지 또는 범용 랜딩 페이지**입니다.
+다음 결론은 현재 증거보다 강합니다.
 
-특히 다음은 행사별 공식 등록·일정 페이지를 붙여야 합니다.
+- “multilateral safety accords가 붕괴했다”
+- “state-enforced national security screening”
+- “punitive defense blacklist”
+- “Anthropic IPO 직전”
+- “DeepSeek의 fully localized computing stack”
+- “Level-5 autonomous design”
+- “PPA-closed silicon”
+- “수개월에서 수일로 단축”
 
-- NVIDIA GTC Europe/Berlin: 범용 GTC URL만 제시
-- Tower Semiconductor TGS 2026: 회사 홈페이지만 제시
-- IEDM 2026: 행사 연도별 일정 페이지 필요
-- OCP Global Summit: 2026 행사 페이지와 장소 확인 필요
-
-SC26은 연도별 도메인을 사용하고 있어 상대적으로 적절하지만, 날짜·장소는 공식 “About/Conference Dates” 페이지로 직접 연결하는 것이 좋습니다.
-
-캘린더의 세부 주제인:
-
-- 800V DC
-- Open Rack v4
-- Blackwell Ultra
-- InP silicon photonics
-- sub-1nm pathfinding
-
-등은 “행사에서 다룰 예정”이라는 공식 프로그램 근거가 없는 경우, 확정 의제가 아니라 **예상 관전 포인트**로 표시해야 합니다.
+핵심 사실이 검증되더라도 이는 **분석 또는 전망**으로 명확히 분리해야 하며, 사실 서술처럼 쓰면 안 됩니다.
 
 ---
 
-# 최종 편집 권고
+# Upcoming Tech Calendar
 
-| 항목 | 게재 판정 | 필수 조치 |
-|---|---|---|
-| 1 | 조건부 보류 | 실제 Transluce 보고서·호주 정부 발표·OpenAI 성명 URL 추가, 성공한 침해와 차단된 탐색 분리 |
-| 2 | 보류 | SAFA 기사 범위 밖 세부사항 삭제, Cohere 인용·법안·소송 1차 출처 추가 |
-| 3 | 게재 보류 | Politico/Reuters URL 재검증, “명령”과 “요청” 구분, Claude Mythos 5.1 및 Glasswing 공식 출처 제시 |
-| 4 | 대폭 수정 후 가능 | CoWoS-L 설명 정정, yield 정의, 고객·비용·전력·레티클 수치의 출처 추가 |
+행사 달력도 각 공식 행사 페이지에서 날짜와 장소를 다시 확인해야 합니다.
 
-## 가장 우선적으로 삭제하거나 완화할 표현
+특히:
 
-- “first verified case”
-- “government database” — 파일시스템인지 DB인지 확인 전
-- “open proxy”
-- “binding” SAFA standards
-- “cartel” 직접 인용 — 원문 링크 전
-- “White House ordered”
-- “classified national security assets”
-- “Claude Mythos 5.1 / Project Glasswing” — 공식 자료 전
-- “CoWoS-L requires a monolithic silicon interposer”
-- “consumes whole silicon wafer”
-- “up to 50% lower cost”
-- “45% validated yield” — 수율 정의 전
+- **SC26:** 11월 15~20일 날짜뿐 아니라 개최 도시와 회장을 SC26 공식 사이트에서 재확인해야 합니다. 초안의 Salt Palace/Salt Lake City 표기는 의심되므로 공식 venue 링크 없이 발행하면 안 됩니다.
+- **SEMICON West 2026:** Moscone Center 표기는 공식 행사 페이지에서 확인이 필요합니다. 최근 행사 개최지 변경 이력이 있어 과거의 샌프란시스코 정보를 재사용했을 가능성이 있습니다.
+- **OCP Global Summit:** 전체 프로그램 날짜와 전시 날짜가 다를 수 있으므로 10월 13~15일을 공식 일정과 대조해야 합니다.
+- **OpenAI DevDay:** 포털 메인 링크만으로 2026년 9월 29일 개최를 입증하지 못하면 해당 연도 행사 페이지나 공식 발표 링크를 추가해야 합니다.
 
-**결론적으로 시간 윈도우는 대체로 통과하지만, 사실 검증과 출처 추적성은 통과하지 못했습니다. 특히 항목 3은 핵심 고유명사와 URL을 재확인하기 전에는 발행해서는 안 되며, 항목 4는 CoWoS-L 관련 기술 설명을 반드시 정정해야 합니다.**
+---
+
+## 최종 편집 권고
+
+| 항목 | 최종 조치 |
+|---|---|
+| 1 | 공식 지시문 또는 복수의 독립 보도 확보 전 **삭제** |
+| 2 | 판결문 직접 링크 확보 및 법률 오류 수정 전 **삭제** |
+| 3 | 원문 타임스탬프·재무 근거 확인 전 **보류**, 비교표 삭제 |
+| 4 | 시간상 게재 가능. 다만 수치의 기준과 formal verification 범위를 확인하고 과장 표현을 수정한 뒤 **조건부 게재** |
+
+현재 초안은 개별 오류뿐 아니라, 확인되지 않은 주장을 여러 매체가 확인한 사실처럼 묶고 그 위에 전략적 결론을 쌓은 것이 가장 큰 문제입니다. 각 항목에 **직접 URL, 게시 시각, 원문 인용, 공식 문서명**을 붙인 후 다시 검증해야 합니다.
