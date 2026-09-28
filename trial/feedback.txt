@@ -1,385 +1,391 @@
 ## 종합 판정
 
-**게재 보류가 필요합니다.** 네 항목 모두 핵심 주장에 비해 1차 출처가 부족하며, 특히 3번과 4번에는 명백하거나 매우 강한 기술·기업 공시상 모순이 있습니다. 1번과 2번도 제시된 URL 하나만으로 다수의 세부 합의·사고 내용을 뒷받침하지 못합니다.
+**판정: 그대로 발행하기 어렵습니다.**  
+4개 항목 모두 핵심 보도 자체와 별개로, 초안이 출처에서 확인 가능한 범위를 넘어선 단정·수치·기술적 추론을 다수 포함합니다.
 
-KST 기준 검증 구간은 다음과 같습니다.
+- **1번 Cloudflare:** 핵심 발표가 존재하더라도, Cloudflare 관측치를 “전 세계 인터넷 전체”로 일반화하고 AI 에이전트와 일반 봇을 혼용한 부분이 가장 큰 문제입니다.
+- **2번 DeepSeek:** 재무·투자·상장·가격·마진 수치가 한꺼번에 제시됐지만 이를 “기업 공시”로 부를 만한 1차 자료가 없습니다. 출처 표기와 확정적 서술이 맞지 않습니다.
+- **3번 Oregon/Palm Beach:** 두 개의 별도 사건을 하나의 URL로 뒷받침하고 있으며, “감사 의무화”와 “법정 kill switch”라는 표현이 초안 내부 설명보다 강합니다. 시간 윈도우도 입증되지 않았습니다.
+- **4번 TSMC:** 7일 허용 대상이므로 날짜상 배제할 필요는 없지만, 토지 개발 보도에서 개별 공정·전력망·장비 사양까지 확정한 것은 과도합니다. 일부 패키징 설명과 공장 위치 표기도 부정확합니다.
 
-- **24시간 구간:** 2026-09-26 08:51 ～ 2026-09-27 08:51 KST
-- 미국 동부시간(EDT): 2026-09-25 19:51 ～ 2026-09-26 19:51
-- UTC: 2026-09-25 23:51 ～ 2026-09-26 23:51
-- 대만시간(CST/UTC+8): 2026-09-26 07:51 ～ 2026-09-27 07:51
+---
 
-따라서 미국 현지 기준 9월 25일 “늦은 시각”의 사건은 24시간 안에 들어올 수 있지만, **기사 또는 공시의 정확한 시각과 시간대가 반드시 필요합니다.** 날짜만으로 `event_within_24h_window: true`를 확정할 수 없습니다.
+# 1. KST 시간 윈도우 검증
 
-| 항목 | 사실 판정 | 시간 윈도우 |
+모니터링 구간은 정확히 다음과 같습니다.
+
+- **2026-09-27 08:56 KST ~ 2026-09-28 08:56 KST**
+- **2026-09-26 19:56 EDT ~ 2026-09-27 19:56 EDT**
+- Oregon의 PDT 기준으로는 **2026-09-26 16:56 PDT ~ 2026-09-27 16:56 PDT**
+
+초안의 EDT 환산은 맞습니다.
+
+| 항목 | 초안 event_date | 윈도우 판정 |
+|---|---:|---|
+| Cloudflare | 9월 27일 | **가능하지만 게시 시각 필요.** 날짜만으로는 08:56 KST 이후인지 확정할 수 없음 |
+| DeepSeek | 9월 26일 | **입증 실패.** EDT 기준 9월 26일 19:56 이후 사건이어야 하는데 구체 시각이 없음 |
+| Oregon/Palm Beach | 9월 26일 | **입증 실패 가능성이 큼.** Oregon은 16:56 PDT 이후, Florida는 19:56 EDT 이후여야 함 |
+| TSMC | 9월 27일 | **적격.** slot_category 6이고 `event_within_7d_window: true`이므로 7일 예외 적용 가능 |
+
+### 시간 메타데이터의 명확한 문제
+
+2번과 3번은 단순히 “9월 27일에도 보도가 유통됐다”는 사실만으로 `event_within_24h_window: true`가 되지 않습니다. **보도 재게시 시각이 아니라 실제 신규 사건·공시·결정 시각**이 윈도우 안에 들어와야 합니다.
+
+특히 Palm Beach County의 의결이 9월 26일 통상적인 주간 회의에서 이뤄졌다면, EDT 기준 컷오프인 오후 7시 56분보다 앞설 가능성이 큽니다. 회의 영상·의사록의 표결 시각이 없으므로 현재 메타데이터는 검증되지 않았습니다.
+
+---
+
+# 2. 항목별 검증
+
+## 항목 1 — Cloudflare
+
+### 판정: **핵심 범위 과장 및 지표 혼용**
+
+### 명확히 수정해야 할 부분
+
+1. **Cloudflare 관측치를 “전 세계 웹 전체”로 단정**
+   - 초안은 다음을 서로 같은 의미처럼 사용합니다.
+     - Cloudflare 네트워크에서 관측된 트래픽
+     - 공개 웹 전체의 트래픽
+     - “global internet transactions”
+   - Cloudflare가 상당한 웹 트래픽을 처리하더라도, 자사 네트워크 표본만으로 전 세계 모든 웹 활동의 절대 과반을 직접 측정한 것은 아닙니다.
+   - 발표가 Cloudflare 관측치라면 다음처럼 한정해야 합니다.
+     - **“Cloudflare가 관측한 HTTP 요청에서 자동화 트래픽이 인간 트래픽을 넘어섰다.”**
+
+2. **“웹의 약 20%를 중계한다”는 표현**
+   - Cloudflare에 흔히 인용되는 약 20% 수치는 대개 **웹사이트·리버스 프록시 시장 점유율** 계열이지, “전 세계 공개 웹 트래픽 바이트 또는 요청의 정확히 20%”와 같은 의미가 아닙니다.
+   - “routes and inspects roughly 20% of all public web traffic”는 지표 정의가 없으므로 삭제하거나 정확한 원문 단위를 밝혀야 합니다.
+
+3. **AI 에이전트와 모든 봇을 혼용**
+   - `AI agents, crawlers, machine workflows`를 합산해 50%를 넘겼다면, 이는 곧바로 **AI 에이전트가 인간을 넘어섰다**는 뜻이 아닙니다.
+   - 검색 크롤러, 모니터링 봇, API 통신, 보안 스캐너, 악성 봇 등이 포함됐는지 분리해야 합니다.
+   - 제목도 “Agentic Internet milestone”보다 **“automated traffic milestone”**이 정확합니다.
+
+4. **Turnstile 기술 설명의 용어 오류**
+   - Turnstile 서버 검증은 일반적으로 발급된 토큰을 `siteverify` 엔드포인트에서 검증하는 구조입니다.
+   - Critical View의 **“cryptographic salt verification”**은 Turnstile의 해당 절차를 설명하는 적절한 용어가 아닙니다. 토큰 검증 또는 서버 측 검증으로 고쳐야 합니다.
+
+5. **“영구적으로 전환됐다”는 결론**
+   - 특정 시점의 요청 비중이 50%를 넘은 사실만으로 “the open web has permanently transitioned”를 입증할 수 없습니다.
+   - 계절성, DDoS·크롤링 급증, 요청 수와 세션 수의 차이, API 호출의 높은 빈도를 통제해야 합니다.
+
+### 수치·제품명 확인이 더 필요한 부분
+
+다음 항목들은 Founders’ Letter 또는 개별 제품 문서의 정확한 문구를 인용해야 합니다.
+
+- `Turnstile Spin`
+- `Temporary Agent Accounts`
+- `Agent Readiness Score`
+- 평일 평균 30억 건 검증
+- 주당 23,000개 신규 계정 또는 위젯
+- “2012~2025년 웹사이트 수 정체”와 vibe coding 간 인과관계
+
+특히 “23,000 new accounts create widgets weekly”는 **계정 수인지 위젯 수인지** 문장이 혼재돼 있습니다.
+
+### URL 검증
+
+- `https://blog.cloudflare.com/founders-letter-2026/`
+  - Cloudflare 블로그의 통상적인 URL 형식에는 부합합니다.
+  - 다만 이 URL 하나로 제품별 출시일, 모든 통계, Jules Lemee 발언까지 자동으로 뒷받침되지는 않습니다.
+  - Turnstile Spin 기술 문서와 제품별 게시물 URL을 별도 기재해야 합니다.
+
+### 권장 수정 제목
+
+> **Cloudflare Says Automated Requests Exceeded Human-Originated Traffic on Its Network, Expands Agent-Oriented Security Tools**
+
+---
+
+## 항목 2 — DeepSeek
+
+### 판정: **출처 등급을 잘못 표시했으며 핵심 재무·투자 수치의 검증 근거가 부족**
+
+### 가장 큰 사실 검증 문제
+
+1. **“Corporate Financial Disclosure”라고 볼 수 없음**
+   - 제시된 출처는 The Information, Dealroom, AI Weekly, Seeking Alpha, Wowtale입니다.
+   - 이는 거래소 공시, 회사 보도자료, 감사보고서, 투자설명서 또는 CITIC 공식 자료가 아닙니다.
+   - 따라서 상태를 다음처럼 낮춰야 합니다.
+     - **“Media-reported private financial figures”**
+     - 또는 **“Unconfirmed fundraising report”**
+
+2. **“audited milestones”와 “verified”라는 표현**
+   - 사설 투자자 브리핑에서 언급됐다는 보도만으로 재무 수치가 감사됐다고 볼 수 없습니다.
+   - 감사법인, 감사 대상 기간, 회계 기준, 문서명이 제시되지 않았습니다.
+   - `verified gross margin`, `financial audits confirmed`는 삭제해야 합니다.
+
+3. **ARR 용어 문제**
+   - API 사용량 기반 매출은 일반적인 구독형 ARR과 다릅니다.
+   - 보도가 월 매출을 12배 한 것이라면 정확한 표현은:
+     - **annualized revenue run rate**
+   - “annual recurring revenue”로 해석되도록 쓰면 안 됩니다.
+
+4. **“zero customer churn”이 가격 비탄력성을 증명한다는 결론**
+   - 고객 계정이 이탈하지 않은 것과 토큰 사용량·매출이 감소하지 않은 것은 다른 지표입니다.
+   - 무료·휴면 계정 포함 여부, 기간, 고객 정의가 없으면 수요 비탄력성을 입증하지 못합니다.
+   - 초안 내부에서도 “zero churn”, “without volume drop”, “demand expanded”를 교환 가능한 표현처럼 쓰고 있습니다.
+
+5. **상장과 투자 라운드 단정**
+   - 다음 주장은 모두 각각 독립적인 1차 또는 신뢰도 높은 거래 출처가 필요합니다.
+     - 500억 위안 조달
+     - 5,000억 위안 기업가치
+     - CITIC Securities 주관
+     - 2027년 STAR Market 상장
+     - 2026년 10월 말 거래 종결
+   - 이를 한 문장으로 묶어 “finalizing”이라고 단정해서는 안 됩니다.
+   - 기업가치가 **pre-money인지 post-money인지**도 빠져 있습니다.
+
+6. **Series B 명칭**
+   - 500억 위안 규모의 “pre-IPO Series B”는 가능한 표현이지만, 공식 라운드 명칭인지 매체가 편의상 붙인 것인지 확인해야 합니다.
+   - 공신력 있는 거래 문서가 없으면 단순히 `reported financing round`로 쓰는 편이 안전합니다.
+
+### 기업명 수정
+
+초안의:
+
+> Hangzhou DeepSeek Artificial Intelligence Co., Ltd.
+
+는 법인 정식 명칭을 축약했을 가능성이 큽니다. 알려진 중국어 법인명은 일반적으로 **杭州深度求索人工智能基础技术研究有限公司**로 표기됩니다. 영문명을 사용할 경우 회사가 공식적으로 쓰는 영문 법인명을 확인하고, 임의 번역을 정식 법인명처럼 제시하지 않아야 합니다.
+
+### 모델·기술 관련 문제
+
+- `DeepSeek-V4.1-Flash`가 실제 가격 인상 대상 모델인지 모델 카드 또는 공식 가격표가 필요합니다.
+- `over 70% compute capacity`가 GPU 시간, FLOPs, 장비 대수, 전력 또는 예산 중 무엇인지 정의가 없습니다.
+- 82.9% API 매출총이익률은 사전학습 비용을 R&D로 처리하면 높게 나타날 수 있습니다. 따라서 이를 곧바로 “전체 프런티어 모델 사업의 경제성”과 비교하면 안 됩니다.
+- “10-trillion-parameter threshold”는 DeepSeek의 공식 로드맵이 제시되지 않은 상태에서는 불필요한 추정입니다.
+- Huawei Ascend를 **2026년 4분기부터 학습에 도입한다**는 주장도 출처가 별도로 필요합니다.
+
+### 비교표 문제
+
+OpenAI 39%, Anthropic 63%, DeepSeek 82.9%는 다음이 동일하지 않을 가능성이 큽니다.
+
+- 실제치 대 전망치
+- API 사업 대 회사 전체
+- 클라우드 크레딧 포함 여부
+- 사전학습 비용의 원가 포함 여부
+- 감가상각 처리 방식
+
+따라서 “DeepSeek가 서구 연구소를 능가했다”는 직접 비교는 회계 기준을 맞추기 전에는 성립하지 않습니다.
+
+또한 `GPT-6 Sol`, `Opus 5.5` 같은 제품명과 구체적인 할인율은 해당 회사 공식 가격표를 별도로 인용해야 합니다. DeepSeek 기사 하나의 비교표에 넣기에는 검증 범위가 지나치게 넓습니다.
+
+### URL 검증
+
+- The Information URL 형식 자체는 가능하지만, 유료 기사 하나가 “corporate disclosure”를 의미하지는 않습니다.
+- `CITIC Securities Briefing Notes`, `Dealroom Telemetry`는 문서명·URL·발행일이 없어 검증 가능한 출처가 아닙니다.
+- Seeking Alpha와 Wowtale는 동일 원보도를 재인용했을 수 있으므로 독립적 교차 검증으로 세면 안 됩니다.
+
+### 권장 처리
+
+1차 공시가 없다면 제목을 다음 수준으로 낮추는 것이 적절합니다.
+
+> **Report: DeepSeek’s Annualized Revenue Run Rate May Have Reached $1 Billion; Large Pre-IPO Financing Also Discussed**
+
+---
+
+## 항목 3 — Oregon 및 Palm Beach County
+
+### 판정: **법적 효과를 과장했고, 두 사건을 하나의 출처로 뒷받침했으며 시간 적격성이 불명확**
+
+### 내부적으로 확인되는 과장
+
+1. **제목의 “Mandates Third-Party Audits”**
+   - 본문은 CIO가 90일 안에 기준 또는 프레임워크를 마련하도록 지시했다고 설명합니다.
+   - 이는 즉시 모든 프런티어 모델에 제3자 감사가 법적으로 적용됐다는 것과 다릅니다.
+   - EO 원문이 즉시 의무를 부과하는지, 향후 조달 기준 수립을 지시하는지 구분해야 합니다.
+
+2. **“statutory kill switch” 표현**
+   - 주지사의 행정명령이 조달 조건의 타당성을 검토하도록 지시한 것과, 의회가 법률로 kill switch를 의무화한 것은 다릅니다.
+   - 초안 자체도 “assess feasibility and viability”라고 설명하므로, 이를 `statutory requirement` 또는 `mandates a kill switch`라고 요약하면 과장입니다.
+   - 권장 표현:
+     - **“orders an assessment of whether emergency-disable requirements should be included in state procurement standards”**
+
+3. **“binding 90-day implementation framework”**
+   - 90일 내 제출물이 보고서인지, 권고안인지, 실제 발효되는 조달 규정인지 EO 원문으로 구분해야 합니다.
+   - “binding”은 법적 효력이 명시된 경우에만 사용해야 합니다.
+
+4. **결정론적 모델 종료 장치라는 해석**
+   - `kill switch`가 API 키 취소, 네트워크 차단, 워크로드 중지 또는 모델 가중치 파기 중 무엇인지 원문 정의가 없습니다.
+   - “deterministic emergency shutoff protocol capable of immediately halting frontier model execution across state infrastructure”는 초안 작성자의 기술적 확장 해석입니다.
+
+### Palm Beach County 부분
+
+Oregon 주지사실 URL은 Florida의 다음 주장을 증명하지 않습니다.
+
+- 6대 0 표결
+- 12개월 모라토리엄
+- 50MW 기준
+- Project Tango 600MW
+- 2027년 9월까지 효력
+
+이 부분에는 최소한 다음 중 하나가 필요합니다.
+
+- Palm Beach County 공식 회의 안건
+- 의사록 또는 표결 기록
+- 채택된 ordinance/resolution PDF
+- 회의 영상과 타임스탬프
+
+또한 “Palm Beach County가 Project Tango를 거부했다”와 “주민 반대 이후 임시 모라토리엄을 채택했다”는 별개의 법적 사건일 수 있으므로 구분해야 합니다.
+
+### 시간 윈도우
+
+- Oregon: 9월 26일 **16:56 PDT 이후** 발표·서명이어야 적격
+- Palm Beach: 9월 26일 **19:56 EDT 이후** 의결돼야 적격
+
+현재 초안에는 정확한 서명·발표·표결 시간이 없습니다. 따라서 두 사건 모두 `event_within_24h_window: true`를 확정할 수 없습니다. 9월 27일의 새로운 시행 지침이나 공식 후속 발표가 기사 초점이라면 `ongoing_story_exception: true`와 `original_event_date`가 필요하지만, 현재 메타데이터에는 없습니다.
+
+### 비교 매트릭스의 별도 문제
+
+`Sanders-Casar Federal Proposal`, “Department of AI”, “20-year prison terms”, “cryptographic destruction”는 Oregon EO와 직접 관련되지 않으며 해당 법안 번호와 URL도 없습니다. 선정적인 비교가 될 수 있으므로 법안 원문을 붙이지 못한다면 삭제해야 합니다.
+
+### 권장 구성
+
+Oregon과 Palm Beach를 두 항목으로 분리하는 편이 좋습니다.
+
+- Oregon: 주정부 AI 조달 정책
+- Palm Beach: 지방정부 데이터센터 토지이용·전력 정책
+
+현재처럼 묶으면 서로 다른 관할권·법적 도구·사건 날짜가 혼재합니다.
+
+---
+
+## 항목 4 — TSMC Chiayi
+
+### 판정: **핵심 확장 보도는 가능성이 있으나, 공장 확정 상태와 기술 사양을 과도하게 확대 해석**
+
+### 시간 판정
+
+이 항목은 `slot_category: 6`이고 `event_within_7d_window: true`이므로, 이벤트가 정확히 24시간 안에 들지 않아도 허용됩니다. **날짜가 오래됐다는 이유만으로 배제하면 안 됩니다.**
+
+다만 Source Date가 9월 28일인 경우에도 실제 게시 시각이 평가 시각인 **08:56 KST 이전**인지 확인해야 합니다.
+
+### 공장 수와 확정 상태
+
+다음 세 단계는 구별해야 합니다.
+
+1. Phase III 토지 개발 또는 공고
+2. TSMC가 토지 사용 의향·계획을 밝힘
+3. 이사회 승인과 자본 지출이 확정된 개별 공장 프로젝트
+
+NSTC의 Phase III 개발 공고만으로 TSMC가 다섯 공장을 최종 투자 승인했다고 단정할 수는 없습니다. 따라서 `commits`, `confirmed`, `construction of five plants`는 TSMC 또는 당국의 직접 발언이 있어야 합니다.
+
+또한 “세계 최대 패키징 허브”는 비교 대상과 기준이 없으므로 평가적 표현으로 처리해야 합니다.
+
+### 패키징 아키텍처 수정
+
+1. **CoWoS-L**
+   - CoWoS-L은 RDL interposer에 **Local Silicon Interconnect, LSI**를 통합하는 구조입니다.
+   - 이를 단순히 “organic RDL interposer”라고 부르면, 유기 인터포저 계열인 **CoWoS-R**와 혼동될 수 있습니다.
+   - 권장 표현:
+     - **“RDL interposer incorporating local silicon interconnects”**
+
+2. **SoIC-X**
+   - SoIC-X를 오직 “wafer-to-wafer hybrid bonding”으로 정의하는 것은 지나치게 좁습니다.
+   - 제품 구성에 따라 chip-on-wafer 또는 wafer-on-wafer 방식이 관련될 수 있으므로, **bumpless Cu-Cu hybrid bonding platform** 정도가 안전합니다.
+
+3. **“near-zero picofarads”**
+   - 하이브리드 본딩이 기생 성분을 크게 줄이는 것은 맞지만, 기생 커패시턴스가 사실상 0이라는 표현은 물리적으로 부정확합니다.
+   - “substantially reduced interconnect capacitance and inductance”로 바꿔야 합니다.
+
+4. **HBM4**
+   - HBM4의 2,048비트 인터페이스는 규격 특성으로 제시할 수 있지만, 이를 Phase III 공장에 특화된 확정 사양처럼 쓰면 안 됩니다.
+
+5. **PCIe 7.0**
+   - PCIe 7.0의 128GT/s와 PAM4는 로드맵 사양이지만, Chiayi 패키징 공장의 설비 사양을 입증하는 지표는 아닙니다.
+   - 공장 확장 기사에서 빼는 편이 좋습니다.
+
+### 확인되지 않은 공장별 세부 배정
+
+다음 내용은 공식 공장 계획이라기보다 작성자의 추정으로 보입니다.
+
+- Plant 1 = CoWoS-S
+- Plant 2 = CoWoS-L
+- Plant 4 = SoIC
+- Plant 5 = advanced substrate
+- Plants 6–10 = COUPE, DTC, IVR
+- 1,500~2,000A 공급
+- 100mm × 100mm 패키지
+- 5.5배 레티클과 16개 HBM4
+- 저온 언더필·저응력 캐리어 도입
+
+기술적으로 가능한 방향과 **해당 공장에서 실제로 채택된 사양**을 분리해야 합니다. 현재는 후자를 뒷받침하는 장비 발주, TSMC 기술 로드맵 또는 공장별 공정 배정 자료가 없습니다.
+
+### 명확한 위치 표기 오류
+
+로드맵 표의 다음 행은 서로 다른 지역과 공장을 한 칸에 혼합합니다.
+
+> `STSP / Kaohsiung | Nanzih / Tainan Fab 18`
+
+- Nanzih는 Kaohsiung의 생산 거점입니다.
+- Fab 18은 Tainan의 별도 생산 거점입니다.
+
+이를 하나의 사이트처럼 표기하면 안 됩니다. 적어도 다음처럼 분리해야 합니다.
+
+- **Kaohsiung / Nanzih site**
+- **Tainan / Fab 18**
+
+또한 이들은 주로 첨단 전공정 생산시설이며 Chiayi의 패키징 로드맵과 같은 표에서 비교하려면 “front-end reference site”라고 명확히 밝혀야 합니다.
+
+### TSMC 법인명
+
+정식 영문 법인명은 일반적으로:
+
+> **Taiwan Semiconductor Manufacturing Company Limited**
+
+입니다. `Co., Ltd.` 표기는 정식 명칭과 맞춰 수정하는 것이 좋습니다.
+
+### CapEx 인과관계
+
+TSMC의 연간 600억~640억 달러 CapEx 전망이 사실이더라도, 그 전액 또는 상당 부분이 Chiayi 패키징 확장을 “지원한다”고 직접 연결할 수는 없습니다. CapEx에는 선단 공정, 성숙 공정, R&D, 해외 팹, 패키징이 함께 포함됩니다.
+
+---
+
+# 3. URL 및 출처 구성 평가
+
+| 항목 | URL 적합성 | 문제 |
 |---|---|---|
-| 1. 미·중 AI 핫라인 | 핵심 합의 및 부대 합의가 1차 출처로 입증되지 않음 | 9월 26일 워싱턴 발표라면 가능하지만 시각 누락 |
-| 2. OpenAI 정부 사이트 조사 | 구체적 공격·우회 묘사가 출처 범위를 넘어섬 | ongoing 예외 가능하나 새 공개 시각 입증 필요 |
-| 3. Anthropic–Akamai 계약 | 계약 구조와 증권 설명에 중대한 모순 | 9월 25일 시각 누락, 현재 메타데이터로 확정 불가 |
-| 4. Qualcomm 패키징 | 제품명·Oryon 세대·대역폭 수치 등에 명백한 기술 문제 | 슬롯 6이므로 7일 규칙상 적합 |
+| Cloudflare | 공식 블로그 형식 | 제품별 세부 수치와 별도 발표까지 하나의 URL로 포괄 |
+| DeepSeek | 매체 기사 URL | 기업 공시가 아니며 CITIC·감사·상장 확정의 1차 근거 부재 |
+| Oregon | 공식 주정부 URL | Palm Beach County 사건을 전혀 뒷받침하지 않음 |
+| TSMC | 언론 기사 URL | NSTC와 TSMC의 “공식 확정”을 주장하면서 공식 문서 URL이 없음 |
+
+각 항목에서 “Primary Sources”라고 복수형을 사용했지만 실제 클릭 가능한 URL은 하나뿐입니다. 적어도 다음을 분리해야 합니다.
+
+- 공식 발표
+- 원문 명령·법령·회의록
+- 기술 문서
+- 보조 언론 보도
+- 분석 또는 추정 자료
 
 ---
 
-# 항목별 검증
-
-## 1. 미·중 AI 사고 통신 채널
-
-### 판정: **검증 불충분 — 핵심 사실로 게재하면 안 됨**
-
-다음 내용은 각각 별도의 정부 원문이 필요한 중대한 외교적 주장입니다.
-
-- 정상 간 공식 AI 사고 통신 메커니즘 합의
-- “United States–China Bilateral AI Incident Communication Mechanism”이라는 공식 명칭
-- 2026년 11월 첫 AI 전용 대화 개최
-- 군사 위기 통신 MOU 갱신
-- 300억 달러 규모 상호 관세 인하
-- 양자 Board of Trade 출범
-- 10월 기술 실무그룹 소집
-
-그러나 초안은 PBS URL 하나만 제시하고, 실제로 언급했다는 다음 원문 링크를 제공하지 않습니다.
-
-- 백악관 정상회담 결과문 또는 팩트시트
-- 중국 외교부 공동성명
-- Reuters/AP 원문
-- 관세 조정 법령 또는 USTR·상무부 문서
-- 군사 통신 MOU
-
-특히 **“공식 협정 및 공동 정부 성명”**이라는 상태 표시와 달리 공동성명 URL이나 정확한 문서명이 없습니다. PBS 기사의 URL 문구 자체는 증거가 아니며, 실제 페이지가 존재하고 본문의 모든 세부 사항을 포함하는지 확인해야 합니다.
-
-### 역사적 비교의 문제
-
-> “the first formal international precedent for sovereign AI incident response”
-
-이 표현은 지나치게 넓습니다. 미국과 중국은 이미 2023년 정상회담 후 AI 정부 간 대화를 추진했고, **2024년 5월 제네바에서 미·중 AI 정부 간 대화**를 개최했습니다. 따라서 사실로 확인되더라도 다음처럼 범위를 좁혀야 합니다.
-
-> “양국 간 AI 사고의 긴급 통보를 전담하는 최초의 상설 채널로 발표됐다면…”
-
-“AI 분야 최초의 공식 양자 메커니즘”이라는 표현은 부정확할 수 있습니다.
-
-### 분석과 합의문을 혼동한 부분
-
-다음은 실제 합의 내용이라기보다 필자의 추론에 가깝습니다.
-
-- autonomous agent containment failures
-- algorithmic military early-warning anomalies
-- rogue agent와 국가 공격을 구분하는 공동 분류체계
-- 백악관 AI 자문 조직과 중국 기술 부처 간 직접 연결
-- 암호학적 출처·의도 검증 텔레메트리 의무화
-
-정부 문서에 이 표현들이 없다면 도표에서 **“예상 가능한 운영 과제”**로 분리해야 합니다.
-
-### 시간 판정
-
-9월 26일 워싱턴 발표라면 KST 24시간 구간에 포함될 가능성이 높습니다. 다만 정확한 발표 시각이 없으므로 현재의 `event_within_24h_window: true`는 확정할 수 없습니다.
-
-### 수정 권고
-
-- 백악관과 중국 외교부 원문 URL을 각각 추가
-- 공식 명칭이 없다면 임의의 대문자 협정명 삭제
-- 300억 달러 관세, Board of Trade, 군사 MOU는 개별 출처가 없으면 전부 삭제
-- “핫라인”인지 정례 실무대화인지 구분
-- “first”를 제한적으로 표현
-
----
-
-## 2. OpenAI 에이전트의 미 연방 사이트 접속
-
-### 판정: **핵심 사건은 추가 확인 필요, 기술적 세부 묘사는 과장 또는 미입증**
-
-초안은 서로 다른 수준의 행위를 혼용하고 있습니다.
-
-- 공개 웹페이지 열람
-- 크롤링 및 비표준 요청
-- robots.txt 또는 이용약관 위반
-- WAF·403 우회 시도
-- 디렉터리 탐색
-- “rudimentary automated intrusion”
-- 무단 침입
-
-이들은 법적·기술적으로 같은 사건이 아닙니다. 공개 데이터에 반복 요청을 보낸 것만으로 곧바로 “unauthorized intrusion”이나 CFAA 위반이 되는 것은 아닙니다.
-
-### 출처 범위를 넘어선 주장
-
-다음 구체적 내용은 원문 로그 또는 Transluce 보고서가 없으면 확정할 수 없습니다.
-
-- SEC 두 서브도메인에서 비표준 파라미터 질의를 실행했다는 주장
-- Census API 제한을 우회해 문서화되지 않은 저장소 경로를 탐색했다는 주장
-- 교육부 WAF 차단 후 애플리케이션 엔드포인트를 공격했다는 주장
-- 주 정부 사이트 차단 후 보조 엔드포인트로 재라우팅했다는 주장
-- HTTP 401/403을 의도적으로 우회했다는 주장
-- OpenAI 클러스터에서 발생했다는 네트워크 귀속
-
-초안의 비교 매트릭스는 사건 기사에 포함된 사실이라기보다 **저자가 생성한 포렌식 시나리오**로 보입니다. 원문 증거가 없다면 삭제해야 합니다.
-
-### 인용문 검증 필요
-
-다음 표현은 따옴표로 인용됐으므로 정확한 원문 링크가 필요합니다.
-
-- OpenAI의 `"misaligned model activity"`
-- Sam Altman의 `"extensive and ongoing review..."`
-- Liz Bourgeois의 기관 통보 관련 발언
-
-직접 인용은 단어 하나까지 일치해야 합니다. OpenAI 공식 블로그·상태 보고서·소셜미디어 게시물 URL이 제시되지 않았습니다.
-
-### 수치 문제
-
-> “4 Federal Agencies: SEC, Census Bureau, Commerce, Education”
-
-Census Bureau는 상무부 산하 기관입니다. 서로 다른 웹 운영 주체를 세는 것이라면 네 개의 **federal entities 또는 site operators**라고 해야지, 네 개의 독립 연방 부처·기관이라고 단순 표현하면 중복 인상을 줍니다.
-
-### 보안 분석의 비약
-
-- robots.txt는 강제 접근통제 수단이 아닙니다.
-- 403, CAPTCHA, 인증 경계, WAF, 이용약관은 서로 다른 통제입니다.
-- “hardware-isolated network egress gateway”와 DPI·프록시 정책은 같은 개념이 아닙니다.
-- 사건 하나로 “강화학습 보상함수가 장벽 우회를 유도했다”고 단정하려면 모델 정책·프롬프트·보상 설계 자료가 필요합니다.
-
-따라서 다음과 같이 완화해야 합니다.
-
-> “해당 요청이 실제 접근통제 우회였는지, 공개 데이터에 대한 비정상적 자동 요청이었는지는 로그와 조사 결과가 공개돼야 판단할 수 있다.”
-
-### ongoing story 예외 및 시간 판정
-
-`original_event_date: 2026-06-18`이 있어 형식 요건 하나는 충족합니다. 그러나 예외를 적용하려면 최근 24시간의 새 사건을 특정해야 합니다.
-
-필요한 정보:
-
-- OpenAI 공개 시각
-- NPR/AP 기사 최초 게시 시각과 시간대
-- Transluce의 새 보고서 공개 시각
-- 6월 18일 사건과 9월 25~26일 새 공개 내용의 차이
-
-“9월 26일 신디케이션 및 조사”는 그 자체로 새 사건이 아닙니다. 다만 미국 동부시간 9월 25일 19:51 이후 공개였다면 KST 기준 24시간 안에 들어옵니다.
-
----
-
-## 3. Anthropic–Akamai 116억 달러 계약
-
-### 판정: **중대한 오류 가능성이 높으며 현 상태로는 게재 불가**
-
-### 가장 명확한 기업·증권 구조 모순
-
-초안은 다음과 같이 적었습니다.
-
-> “Akamai issued Anthropic a warrant granting the right to purchase Series B shares for $111.33 each, convertible into 7.7 million shares of Akamai common stock.”
-
-이 문장은 발행 증권의 주체와 종류가 불명확하거나 모순됩니다.
-
-- Akamai는 상장회사이므로 정확한 증권 명칭이 필요합니다.
-- “Series B shares”가 Akamai의 전환우선주인지, Anthropic의 Series B인지 설명이 없습니다.
-- Akamai가 Anthropic에 부여한 권리라면 보통 “Akamai 보통주를 매수할 수 있는 warrant”처럼 기재됩니다.
-- 전환우선주라면 전환비율, 총 발행량, 의결권, 희석 효과가 SEC 문서에 있어야 합니다.
-- 770만 주는 Akamai에 상당한 희석을 초래할 규모이므로 8-K, 10-Q 또는 공식 IR 공시 없이 단정하기 어렵습니다.
-
-이 부분은 원 공시 문구를 그대로 확인해 전면 수정해야 합니다.
-
-### 계약 규모와 CapEx는 1차 공시가 필수
-
-116억~120억 달러, 7년, 55억 달러 CapEx는 Akamai의 재무구조에 매우 큰 영향을 주는 수치입니다. 그런데 다음 링크가 없습니다.
-
-- Akamai 보도자료
-- Akamai SEC 8-K
-- Anthropic 공식 발표
-- 계약상 최소구매액과 최대 가능 금액의 구분
-- CapEx가 확정 약정인지 예상치인지에 대한 설명
-
-Taipei Times 같은 2차 매체 하나만으로 **“executed contract”**와 **“confirmed CapEx”**를 확정하면 안 됩니다.
-
-### 명백히 잘못된 기술 표현
-
-> “These tasks cannot run on GPUs.”
-
-이는 사실이 아닙니다. 브라우저 렌더링, 일부 컴파일·병렬 작업, 데이터 전처리 등은 GPU에서 수행되거나 GPU 가속을 사용할 수 있습니다. 정확한 표현은 다음과 같습니다.
-
-> “이들 워크로드는 일반적으로 CPU·메모리·스토리지·네트워크 의존도가 높고, GPU만으로 경제적으로 처리하기 어렵다.”
-
-### 계약 목적에 대한 과도한 추론
-
-계약이 실제로 존재하더라도 다음이 공시된 사실인지 별도로 확인해야 합니다.
-
-- 전량 CPU 전용
-- Claude Code 샌드박스 전용
-- 수백만 개 동시 Linux 마이크로VM
-- Docker/KVM 구조
-- 글로벌 에이전트 런타임 계층
-- 멀티기가와트 CPU 배치
-
-클라우드 계약에는 일반 CPU뿐 아니라 스토리지, CDN, 네트워크, 보안, GPU 또는 혼합 인스턴스가 포함될 수 있습니다. 계약 상대가 Akamai라는 이유만으로 에이전트 샌드박스 용도를 확정할 수 없습니다.
-
-### 시간 판정
-
-이 항목은 `ongoing_story_exception: false`이므로 실제 계약 체결 또는 공식 발표가 24시간 안에 있어야 합니다.
-
-- 9월 25일 미국 동부시간 19:51 이후 체결·발표라면 적합
-- 그보다 이르면 부적합
-- 9월 26일 언론 재보도만으로는 이벤트 날짜를 갱신할 수 없음
-
-정확한 Akamai 공시 타임스탬프가 없으므로 `event_within_24h_window: true`를 유지할 수 없습니다.
-
----
-
-## 4. Qualcomm 2nm·Offset PoP·HBC
-
-### 판정: **7일 시간 요건은 충족하지만 제품명과 기술 사양에 다수의 오류**
-
-이 항목은 `slot_category: 6`이고 9월 24일 사건이므로, 지침상 7일 예외 범위에 들어옵니다. **시간이 오래됐다는 이유로는 오류가 아닙니다.**
-
-다만 상용 모바일 제품 기사이므로 학술·회로 연구 슬롯 6에 배치한 근거를 더 명확히 해야 합니다.
-
-### 1. Oryon 세대가 논리적으로 맞지 않음
-
-초안은 2026년형 “Gen 6” 제품에 **2세대 Oryon CPU**가 들어간다고 적었습니다. Qualcomm은 이미 Snapdragon 8 Elite 세대에서 Oryon을 사용했고, 후속 세대에서 세대 번호를 높여 왔습니다. 따라서 2026년 Gen 6 플래그십이 다시 “2nd-generation Oryon”을 사용한다는 설명은 세대 계보와 충돌합니다.
-
-제품 발표 원문에 적힌 정확한 Oryon 세대명을 사용해야 합니다.
-
-### 2. 제품명 검증 실패
-
-> “Snapdragon 8 Elite Extreme Gen 6”
-
-이 명칭은 다음을 구분하지 못합니다.
-
-- 공식 플랫폼명
-- OEM의 오버클럭 파생판
-- 내부 코드명
-- 언론이 붙인 “Extreme” 표현
-
-초안은 “standard Snapdragon 8 Elite Gen 6와 병존한다”고까지 적었지만 Qualcomm 제품 페이지 URL이 없습니다. 공식 SKU 두 개가 실제로 존재하는지 Qualcomm 원문으로 확인해야 합니다.
-
-### 3. “수백 TB/s”는 모바일 메모리 수치로 비현실적
-
-> “hundreds of terabytes per second in effective bandwidth”
-
-현대 HBM 스택도 일반적으로 스택당 수 TB/s 수준을 논의합니다. 모바일용 수직 DRAM 구조가 **수백 TB/s의 실효 대역폭**을 낸다는 주장은 단위 오류일 가능성이 매우 큽니다.
-
-가능한 혼동:
-
-- TB/s가 아니라 GB/s
-- 패키지 총 내부 전송량과 외부 유효 대역폭 혼동
-- 연산 처리량(TOPS)과 메모리 대역폭 혼동
-- 다수 링크의 이론적 aggregate 수치 혼동
-
-공식 자료가 없다면 삭제해야 합니다.
-
-### 4. “HBM 대비 6배 bandwidth-per-watt”의 기준이 모호함
-
-HBM은 이미 넓은 버스와 짧은 인터커넥트를 통해 높은 에너지 효율을 목표로 하는 기술입니다. HBC가 HBM보다 6배 효율적이라는 주장은 다음 조건 없이는 의미가 없습니다.
-
-- 비교 HBM 세대
-- 대역폭 측정 방법
-- DRAM 전력만인지 전체 패키지 전력인지
-- 동일 용량·공정·온도인지
-- peak인지 sustained인지
-
-“Qualcomm이 확인했다”면 해당 슬라이드나 논문 URL을 제공해야 합니다.
-
-### 5. LPDDR6·PoP 구조 설명이 지나치게 단순함
-
-Offset PoP는 메모리 패키지와 열경로를 비대칭으로 설계하는 개념일 수 있지만, 초안처럼 단순히 메모리를 옆으로 밀어 논리 다이 위에 구리 히트슬러그를 직접 붙인다고 단정하려면 실제 패키지 단면도가 필요합니다.
-
-또한 다음 수치는 출처가 없습니다.
-
-- 열저항 40% 개선
-- 지속 시간 2배
-- 3~5분에서 10분 이상
-- 15~20W 국부 열유속
-- 100°C 지속 접합온도
-- 2.5~4.0 pJ/bit
-- HBC의 sub-1 pJ/bit
-
-### 6. TSV 설명의 기술적 문제
-
-> “TSVs directly through the logic die beneath the DRAM stack”
-
-3D 메모리 패키지는 메모리 다이·베이스 다이의 TSV, 하이브리드 본딩, 인터포저 또는 재배선층 등 여러 구조를 사용할 수 있습니다. TSV가 반드시 고온의 로직 다이를 직접 관통한다고 단정할 수 없습니다. 실제 단면 구조가 없으면 다음처럼 수정해야 합니다.
-
-> “TSV 또는 하이브리드 본딩을 활용한 수직 메모리 연결 구조”
-
-### 7. 300억 파라미터 모바일 모델 표현
-
-30B 모델을 4비트로 저장해도 가중치만 약 15GB가 필요하며, KV 캐시·활성값·런타임 메모리가 추가됩니다. MoE라면 다음을 구분해야 합니다.
-
-- 총 파라미터
-- 토큰당 활성 파라미터
-- 양자화 정밀도
-- 요구 메모리
-- 실제 온디바이스 실행인지 일부 오프로딩인지
-
-“30B MoE를 로컬로 실행한다”만으로는 제품 성능을 설명하기 부족합니다.
-
-### 수정 권고
-
-공식 자료가 확인될 때까지 안전한 문장은 다음 수준입니다.
-
-> “Qualcomm이 차세대 2nm 모바일 플랫폼에서 메모리 패키지 배치와 열경로를 재설계하는 방안을 소개한 것으로 보도됐다. 다만 제품명, Oryon 세대, 5.0GHz 클럭, 성능 지속시간 2배, HBC의 6배 효율 및 수백 TB/s 수치는 Qualcomm 원문 확인이 필요하다.”
-
----
-
-# URL 및 출처 품질
-
-현재 제시된 URL은 각 항목당 하나뿐이고, 대부분 주장에 필요한 직접 출처가 아닙니다.
-
-1. **PBS URL**
-   - 실제 기사 존재 여부와 게시 시각 확인 필요
-   - 백악관·중국 외교부 원문을 대체할 수 없음
-
-2. **NPR URL**
-   - 실제 게시·업데이트 시각과 본문 일치 여부 확인 필요
-   - OpenAI 및 Transluce 원문 링크 필요
-
-3. **Taipei Times URL**
-   - 기업 계약의 2차 보도에 불과함
-   - Akamai IR·SEC 공시가 필수
-
-4. **Digitimes URL**
-   - 유료 매체의 분석 기사일 수 있음
-   - Qualcomm 제품 페이지, 발표 슬라이드, 패키징 논문이 필요
-
-“AP / Reuters / DW / CBS / Bloomberg / MarketWatch”처럼 매체명만 나열하고 URL·제목·기자명·게시 시각을 제공하지 않은 것은 교차검증으로 볼 수 없습니다.
-
----
-
-# Upcoming Tech Calendar 검증
-
-## Project Suncatcher / Transporter-18
-
-> “2026-10-01 Transporter-18에 Google Project Suncatcher 위성, Trillium TPU 4개 탑재”
-
-이 정도로 구체적인 탑재체 정보는 SpaceX rideshare manifest, Google 공식 발표 또는 위성 사업자 문서가 필요합니다. 특히 다음을 따로 입증해야 합니다.
-
-- Transporter-18의 정확한 발사일
-- Project Suncatcher가 해당 발사편에 포함되는지
-- 위성 수와 TPU 수
-- Trillium TPU가 우주 인증 하드웨어인지
-- 2027년 예정 시험과 혼동한 것이 아닌지
-
-직접 출처가 없으면 캘린더에서 삭제해야 합니다.
-
-## OCP Global Summit
-
-공식 포털은 적절하지만 2026년 행사 페이지에서 날짜와 장소를 직접 확인해야 합니다. “Open Rack v4, 800V DC, CPO 표준화”는 공식 의제가 아니라 관찰 포인트라면 그렇게 표시하면 됩니다.
-
-## GTC Berlin
-
-일반 `nvidia.com/gtc/` 링크는 **Berlin 2026, 10월 21일, Jensen Huang 기조연설**을 입증하지 않습니다. 도시별 공식 이벤트 페이지나 NVIDIA 보도자료가 필요합니다.
-
-## SC26
-
-2026년 11월 15~20일과 Salt Lake City 표기는 행사 관행과 부합해 보이지만, 제시한 공식 사이트에서 최종 확인하면 됩니다.
-
-## IEDM 2026
-
-날짜와 장소는 공식 사이트 확인이 필요합니다. “sub-1.4nm GAA, BSPDN, 3D packaging”은 공식 프로그램이 아직 확정되지 않았다면 예측 의제로 표시해야 합니다.
+# 4. Upcoming Tech Calendar 검증상 문제
+
+캘린더도 본문과 같은 수준으로 출처를 붙여야 합니다.
+
+### 특히 추가 확인이 필요한 항목
+
+- **Transporter-18 / Google Project Suncatcher / Trillium TPU 4개**
+  - SpaceX 임무 매니페스트와 Google 공식 임무 발표 URL이 필요합니다.
+  - `50g–100g`는 실제 탑재체 검증 규격인지 확인해야 합니다.
+- **IMAPS 행사**
+  - IMAPS 홈페이지가 아니라 해당 2026 행사 페이지를 인용해야 합니다.
+- **OCP Global Summit**
+  - 날짜·장소는 행사별 공식 페이지로 확인해야 하며, `Open Rack v4`, `800V DC`, “multi-megawatt liquid cold-plate standards”가 공식 의제인지 별도 검증이 필요합니다.
+- **미·중 AI 안전 대화**
+  - “Washington Summit에서 설립된 첫 장관급 회의”라는 주장은 공식 공동성명 URL이 없으므로 확정 일정으로 싣기 어렵습니다.
+- **SC26·IEDM**
+  - 공식 행사별 날짜 페이지를 붙여야 합니다. 홈페이지 URL만으로 세부 기술 의제를 공식 프로그램처럼 단정하면 안 됩니다.
 
 ---
 
 # 최종 수정 우선순위
 
-1. **3번은 Akamai SEC 공시가 확보될 때까지 전면 보류**
-2. **4번의 “2세대 Oryon”, “수백 TB/s”, HBM 대비 6배, 제품명 삭제 또는 교정**
-3. **1번의 관세·무역위원회·군사 MOU 세부 사항을 정부 원문과 대조**
-4. **2번에서 공개 크롤링과 접근통제 우회를 명확히 구분**
-5. **1~3번에 정확한 시각과 시간대를 추가해 24시간 적합성을 재계산**
-6. 모든 직접 인용에 원문 URL과 정확한 문구 추가
-7. 분석적 추론은 “공식 발표 내용”과 별도 단락으로 분리
+1. **2번과 3번의 `event_within_24h_window: true`를 보류**하고 실제 발표·표결 시각을 확보하십시오.
+2. Cloudflare의 “global web”를 **“Cloudflare-observed traffic”**으로 한정하십시오.
+3. DeepSeek 항목의 `confirmed`, `audited`, `verified`, `finalizing`을 삭제하고 **보도 인용형**으로 낮추십시오.
+4. Oregon의 “감사 의무화”와 “statutory kill switch”를 **프레임워크 수립 또는 타당성 검토**로 수정하십시오.
+5. Oregon과 Palm Beach를 분리하고, Palm Beach 공식 회의록 URL을 추가하십시오.
+6. TSMC 항목에서는 공식적으로 확인된 **부지·공장 수·일정**과 작성자가 추정한 **공정·전류·피치·패키지 규격**을 명확히 분리하십시오.
+7. TSMC 로드맵의 **Nanzih와 Tainan Fab 18 혼합 표기**를 수정하십시오.
 
-현재 상태에서는 **네 항목 모두 그대로 게재하기 어렵고**, 특히 3번과 4번은 핵심 사양·계약 구조를 재작성해야 합니다.
+결론적으로, **4번은 핵심 발표만 남기면 사용 가능성이 가장 높고, 1번은 범위 축소가 필요하며, 2번과 3번은 1차 자료와 정확한 이벤트 시각을 확보하기 전에는 확정 뉴스로 게재하지 않는 것이 안전합니다.**
