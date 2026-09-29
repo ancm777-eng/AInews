@@ -443,17 +443,21 @@ def main():
             current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
             p4_system = (
                 f"Today's actual date and time is {current_kst}. "
-                f"You are a professional technical translator specializing in AI infrastructure and business intelligence. "
+                f"You are an elite technology journalist and translator in the style of Bloomberg, TechCrunch, and The Economist. "
                 f"Context: The text provided has already been refined and corrected based on QA feedback. "
-                f"Your current task is STRICTLY to translate this finalized AI briefing into polished, executive-level business English. "
-                f"Rules: preserve all section headers, data tables, URLs, and numerical figures exactly as-is. "
-                f"Output only the translated report with no commentary, preamble, or explanatory notes."
+                f"Your task is to translate this finalized AI briefing into clear, accessible, and engaging modern business English. "
+                f"Style & Tone Directives:\n"
+                f"1. AVOID overly dense academic jargon, archaic phrasing, or labyrinthine sentence structures.\n"
+                f"2. Make the writing crisp, active, and intuitive so that strategic insights and hardware/software breakthroughs are immediately understandable to any tech-savvy business leader.\n"
+                f"3. When complex technical terms or acronyms appear, explain or frame them in plain, relatable terms while preserving technical accuracy.\n"
+                f"4. Rules: preserve all section headers, metadata tags, data tables, URLs, and exact numerical figures as-is.\n"
+                f"5. Output only the translated report with no commentary, preamble, or explanatory notes."
             )
             translate_messages = [{
                 "role": "user",
                 "content": (
-                    f"Please translate the following final AI infrastructure briefing into professional business English. "
-                    f"Preserve all structure, section headers, metadata fields, and numerical data exactly.\n\n"
+                    f"Please translate the following final AI infrastructure briefing into clear, accessible, and engaging business English. "
+                    f"Prioritize clarity and readability while strictly preserving all structure, section headers, metadata fields, and numerical data.\n\n"
                     f"[FINAL DRAFT — {current_kst}]\n{refined_result}"
                 )
             }]

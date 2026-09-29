@@ -15,73 +15,112 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 
     <style>
-        /* Modern Tech Briefing: High-legibility typography, Slate design tokens, crisp cards */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
         :root {
-            --bg-main: #f8fafc;
+            /* 1. 사용자가 공유한 따뜻하고 화사한 4대 파스텔 키 컬러 */
+            --pastel-peach: #f6c4a6;
+            --pastel-peach-soft: #fef0e7;
+            --pastel-peach-text: #c45e2a;
+            --pastel-peach-border: #f8cdb4;
+
+            --pastel-yellow: #fed78a;
+            --pastel-yellow-soft: #fef8e7;
+            --pastel-yellow-text: #a16c14;
+            --pastel-yellow-border: #fde3a7;
+
+            --pastel-green: #b5d6a7;
+            --pastel-green-soft: #eef6ed;
+            --pastel-green-text: #417539;
+            --pastel-green-border: #cae8c2;
+
+            --pastel-blue: #a9c9e8;
+            --pastel-blue-soft: #edf5fc;
+            --pastel-blue-text: #316d9e;
+            --pastel-blue-border: #c8e0f7;
+
+            /* 2. 따뜻하고 부드러운 크림/웜화이트 배경 */
+            --bg-main: #fbfbfa;
             --bg-card: #ffffff;
-            --bg-surface: #f1f5f9;
-            --text-main: #0f172a;
-            --text-body: #334155;
-            --text-muted: #64748b;
-            --border-light: #e2e8f0;
-            --border-medium: #cbd5e1;
-            --border-dark: #334155;
-            --accent-blue: #2563eb;
-            --accent-blue-hover: #1d4ed8;
-            --accent-blue-soft: #eff6ff;
-            --accent-blue-border: #bfdbfe;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 14px;
-            --nav-height: 64px;
+            --bg-surface: #f4f4f2;
+            --bg-surface-subtle: #f8f8f6;
+            
+            /* 3. 눈이 편안한 딥 차콜 & 웜 슬레이트 텍스트 */
+            --text-main: #1f2937;
+            --text-body: #4b5563;
+            --text-muted: #6b7280;
+            --text-faint: #9ca3af;
+            
+            /* 4. 부드러운 파스텔 보더 */
+            --border-light: #e5e7eb;
+            --border-medium: #d1d5db;
+            
+            /* 5. 자연스러운 소프트 섀도우 */
+            --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.03);
+            --shadow-card: 0 2px 5px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(229, 231, 235, 0.85);
+            --shadow-card-hover: 0 12px 24px -6px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(209, 213, 219, 0.9);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --nav-height: 62px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-main);
             color: var(--text-body);
-            line-height: 1.68;
+            line-height: 1.74;
             font-size: 15px;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'tnum';
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        h1, h2, h3, h4, .headline-font {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: var(--text-main);
-            font-weight: 700;
-            letter-spacing: -0.02em;
+
+        /* 🌈 사용자가 제시한 4색 파스텔 스크롤 인디케이터 */
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3.5px;
+            background: linear-gradient(90deg, var(--pastel-peach) 0%, var(--pastel-yellow) 33%, var(--pastel-green) 66%, var(--pastel-blue) 100%);
+            z-index: 100;
+            width: 0%;
+            transition: width 0.1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* SVG Sizing Safety Guard (Prevents feedback/2.png giant symbol bug) */
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            color: var(--text-main);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
         svg {
             max-width: 100%;
             height: auto;
             vertical-align: middle;
         }
 
-        /* ===== Top Nav ===== */
+        /* ===== Top Nav (따뜻하고 단정한 글래스) ===== */
         .top-nav {
             position: sticky;
             top: 0;
             z-index: 50;
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border-light);
             height: var(--nav-height);
             display: flex;
             align-items: center;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         }
         .top-nav-inner {
             width: 100%;
-            max-width: 1120px;
+            max-width: 1140px;
             margin: 0 auto;
             padding: 0 2rem;
             display: flex;
@@ -89,79 +128,79 @@
             align-items: center;
         }
         .top-nav-brand {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 0.98rem;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.02rem;
             color: var(--text-main);
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.65rem;
         }
         .top-nav-brand-tag {
-            background: var(--accent-blue-soft);
-            color: var(--accent-blue);
-            border: 1px solid var(--accent-blue-border);
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
             font-size: 0.68rem;
             font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 4px;
-            letter-spacing: 0.04em;
+            padding: 2.5px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
         }
         .top-nav-brand span.brand-dot {
-            color: var(--accent-blue);
+            color: var(--pastel-peach-text);
         }
         .top-nav-meta {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             color: var(--text-muted);
-            background: var(--bg-surface);
-            border: 1px solid var(--border-light);
-            padding: 4px 10px;
-            border-radius: 20px;
+            background: var(--pastel-blue-soft);
+            border: 1px solid var(--pastel-blue-border);
+            padding: 3.5px 12px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
         }
         .top-nav-meta::before {
             content: '';
             display: inline-block;
-            width: 6px;
-            height: 6px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
-            background: #10b981;
+            background: var(--pastel-green-text);
         }
 
-        /* ===== Layout shell ===== */
+        /* ===== Layout Shell ===== */
         .layout-shell {
             display: flex;
-            max-width: 1120px;
+            max-width: 1140px;
             margin: 0 auto;
             align-items: flex-start;
         }
         .side-nav {
-            width: 240px;
+            width: 250px;
             flex-shrink: 0;
             position: sticky;
             top: var(--nav-height);
             height: calc(100vh - var(--nav-height));
             overflow-y: auto;
-            padding: 2.5rem 1.8rem 2rem 0;
+            padding: 2.6rem 1.8rem 2rem 0;
             display: block;
         }
         .side-nav-title {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: var(--text-muted);
+            color: var(--text-faint);
             margin-bottom: 0.4rem;
         }
         .side-nav-sub {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
+            font-size: 0.74rem;
             color: var(--text-muted);
             opacity: 0.85;
             margin-bottom: 1.4rem;
@@ -170,30 +209,30 @@
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 0.35rem;
+            gap: 0.4rem;
         }
         .side-nav-link {
             display: block;
             font-family: 'Inter', sans-serif;
-            font-size: 0.82rem;
-            font-weight: 500;
+            font-size: 0.83rem;
+            font-weight: 450;
             color: var(--text-muted);
             text-decoration: none;
-            padding: 0.45rem 0.6rem 0.45rem 0.85rem;
-            border-left: 2px solid var(--border-light);
+            padding: 0.48rem 0.7rem 0.48rem 0.9rem;
+            border-left: 2px solid transparent;
             line-height: 1.45;
-            border-radius: 0 6px 6px 0;
-            transition: all 0.15s ease;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .side-nav-link:hover {
             color: var(--text-main);
-            border-left-color: var(--text-muted);
+            border-left-color: var(--border-medium);
             background: rgba(0, 0, 0, 0.02);
         }
         .side-nav-link.active {
-            color: var(--accent-blue);
-            border-left-color: var(--accent-blue);
-            background: var(--accent-blue-soft);
+            color: var(--text-main);
+            border-left-color: var(--pastel-peach);
+            background: linear-gradient(90deg, var(--pastel-peach-soft) 0%, rgba(255, 255, 255, 0.1) 100%);
             font-weight: 600;
         }
         @media (max-width: 1023px) { .side-nav { display: none; } }
@@ -205,35 +244,35 @@
         }
 
         header.masthead {
-            padding: 3rem 0 2.2rem 0;
+            padding: 3.2rem 0 2.4rem 0;
             border-bottom: 1px solid var(--border-light);
-            margin-bottom: 2.5rem;
+            margin-bottom: 2.8rem;
         }
         .doc-category {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.76rem;
-            font-weight: 600;
-            color: var(--accent-blue);
-            background: var(--accent-blue-soft);
-            border: 1px solid var(--accent-blue-border);
-            padding: 3px 10px;
-            border-radius: 20px;
+            font-size: 0.73rem;
+            font-weight: 700;
+            color: var(--pastel-peach-text);
+            background: var(--pastel-peach-soft);
+            border: 1px solid var(--pastel-peach-border);
+            padding: 3px 11px;
+            border-radius: 16px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.9rem;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.95rem;
             display: inline-block;
         }
         h1 {
             font-size: 2.35rem;
-            font-weight: 700;
-            color: var(--text-main);
-            line-height: 1.25;
-            margin-bottom: 0.8rem;
+            font-weight: 800;
+            line-height: 1.24;
+            margin-bottom: 0.85rem;
             letter-spacing: -0.03em;
+            color: var(--text-main);
         }
         .meta-info {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             display: flex;
             align-items: center;
@@ -242,133 +281,425 @@
 
         main { max-width: 100%; }
 
-        /* ===== Article Cards ===== */
+        /* ===== Article Cards (단정하고 부드러운 매거진 카드) ===== */
         .paper-section {
             background: var(--bg-card);
             padding: 2.8rem;
-            margin-bottom: 2.5rem;
-            border: 1px solid var(--border-light);
+            margin-bottom: 2.8rem;
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
-            scroll-margin-top: calc(var(--nav-height) + 1.5rem);
-            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+            box-shadow: var(--shadow-card);
+            scroll-margin-top: calc(var(--nav-height) + 1.6rem);
+            transition: all 0.22s ease;
+            position: relative;
         }
         .paper-section:hover {
-            border-color: var(--border-medium);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-card-hover);
         }
         .paper-section h2 {
             font-size: 1.65rem;
-            font-weight: 700;
+            font-weight: 750;
             color: var(--text-main);
             margin-bottom: 1.8rem;
-            padding-bottom: 1.2rem;
+            padding-bottom: 1.25rem;
             border-bottom: 1px solid var(--border-light);
             line-height: 1.35;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.025em;
         }
 
         .section-title {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.82rem;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 0.79rem;
             font-weight: 700;
             color: var(--text-muted);
-            margin: 2.2rem 0 1.1rem 0;
+            margin: 2.2rem 0 1.15rem 0;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.55rem;
         }
+        /* 각 기사의 섹션 타이틀 포인트 바: 파스텔 피치/세이지 톤 */
         .section-title::before {
             content: '';
             display: inline-block;
             width: 4px;
             height: 14px;
-            background: var(--accent-blue);
+            background: var(--pastel-peach);
             border-radius: 2px;
         }
 
         p {
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.3rem;
             color: var(--text-body);
             text-align: left;
             font-size: 0.96rem;
+            line-height: 1.74;
         }
         p strong {
             color: var(--text-main);
             font-weight: 600;
         }
 
-        /* ===== Executive Summary Card (Abstract) - Modern, Clean, No Italics ===== */
+        /* ===== 🍑 Executive Summary: 따뜻한 살구/피치 파스텔 카드 ===== */
         .abstract-quote,
         .abstract-box {
             position: relative;
-            background: linear-gradient(180deg, #ffffff 0%, var(--bg-surface) 100%);
-            border: 1px solid var(--border-light);
-            border-left: 4px solid var(--accent-blue);
+            background: linear-gradient(135deg, var(--pastel-peach-soft) 0%, #fffcf9 100%);
+            border: 1px solid var(--pastel-peach-border);
+            border-left: 4px solid var(--pastel-peach);
             border-radius: var(--radius-md);
-            padding: 1.4rem 1.6rem;
-            margin: 0 0 2rem 0;
-            box-shadow: var(--shadow-sm);
+            padding: 1.45rem 1.75rem;
+            margin: 0 0 2.2rem 0;
+            box-shadow: 0 2px 4px rgba(246, 196, 166, 0.15);
         }
         .abstract-quote::before,
         .abstract-box::before {
             content: 'EXECUTIVE SUMMARY';
-            display: block;
+            display: inline-block;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 700;
             letter-spacing: 0.08em;
-            color: var(--accent-blue);
-            margin-bottom: 0.6rem;
-            text-transform: uppercase;
+            color: var(--pastel-peach-text);
+            background: #fff;
+            border: 1px solid var(--pastel-peach-border);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 0.8rem;
         }
         .abstract-quote p,
         .abstract-box p {
-            font-family: 'Inter', -apple-system, sans-serif;
-            font-style: normal; /* No italics: solves feedback/1.png */
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
             font-size: 0.96rem;
             font-weight: 400;
-            line-height: 1.68;
+            line-height: 1.72;
             color: var(--text-main);
             margin-bottom: 0;
             text-align: left;
         }
         .abstract-quote p strong,
         .abstract-box p strong {
-            color: #0f172a;
+            color: #111827;
             font-weight: 600;
+            background: rgba(246, 196, 166, 0.25);
+            padding: 1px 4px;
+            border-radius: 3px;
         }
 
         /* ===== Inline Callout Box ===== */
         .inline-callout {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-light);
-            border-left: 4px solid var(--accent-blue);
+            background: var(--pastel-blue-soft);
+            border: 1px solid var(--pastel-blue-border);
+            border-left: 4px solid var(--pastel-blue);
             border-radius: var(--radius-sm);
-            padding: 1.25rem 1.5rem;
-            margin: 1.8rem 0;
+            padding: 1.3rem 1.6rem;
+            margin: 1.9rem 0;
         }
-        .inline-callout-title {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.88rem;
-            font-weight: 600;
+        .inline-callout p {
+            font-size: 0.91rem;
+            color: var(--text-body);
+            line-height: 1.65;
+            margin-bottom: 0;
+        }
+
+        /* ===== 🎨 Stat Card: 4색 파스텔 순환 그리드 ===== */
+        .stat-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            margin: 2.2rem 0;
+        }
+        .stat-card {
+            flex: 1 1 200px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.45rem 1.6rem;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* 4색 파스텔 랭크 뱃지 순환 */
+        .stat-card:nth-child(4n+1) { border-top: 3px solid var(--pastel-peach); }
+        .stat-card:nth-child(4n+1) .stat-rank {
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
+        }
+        
+        .stat-card:nth-child(4n+2) { border-top: 3px solid var(--pastel-blue); }
+        .stat-card:nth-child(4n+2) .stat-rank {
+            background: var(--pastel-blue-soft);
+            color: var(--pastel-blue-text);
+            border: 1px solid var(--pastel-blue-border);
+        }
+
+        .stat-card:nth-child(4n+3) { border-top: 3px solid var(--pastel-green); }
+        .stat-card:nth-child(4n+3) .stat-rank {
+            background: var(--pastel-green-soft);
+            color: var(--pastel-green-text);
+            border: 1px solid var(--pastel-green-border);
+        }
+
+        .stat-card:nth-child(4n+4) { border-top: 3px solid var(--pastel-yellow); }
+        .stat-card:nth-child(4n+4) .stat-rank {
+            background: var(--pastel-yellow-soft);
+            color: var(--pastel-yellow-text);
+            border: 1px solid var(--pastel-yellow-border);
+        }
+
+        .stat-rank {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 2.5px 8px;
+            border-radius: 5px;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+        .stat-number {
+            font-family: 'JetBrains Mono', 'Plus Jakarta Sans', sans-serif;
+            font-size: 2.3rem;
+            font-weight: 700;
             color: var(--text-main);
+            line-height: 1.1;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.035em;
+        }
+        .stat-number .stat-unit {
+            font-size: 1.12rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-left: 3px;
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.48;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ===== 🎨 Infographic Block: 4색 파스텔 아이콘 매칭 ===== */
+        .infographic-block {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            align-items: stretch;
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            margin: 2.2rem 0;
+            padding: 1.45rem;
+        }
+        .infographic-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.15rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 1.3rem;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.2s ease;
+        }
+        .infographic-item:hover {
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.04);
+            transform: translateY(-1.5px);
+        }
+
+        /* 인포그래픽 아이콘 4색 파스텔 순환 */
+        .infographic-item:nth-child(4n+1) .infographic-icon,
+        .infographic-item:nth-child(4n+1) svg {
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
+        }
+        .infographic-item:nth-child(4n+2) .infographic-icon,
+        .infographic-item:nth-child(4n+2) svg {
+            background: var(--pastel-blue-soft);
+            color: var(--pastel-blue-text);
+            border: 1px solid var(--pastel-blue-border);
+        }
+        .infographic-item:nth-child(4n+3) .infographic-icon,
+        .infographic-item:nth-child(4n+3) svg {
+            background: var(--pastel-green-soft);
+            color: var(--pastel-green-text);
+            border: 1px solid var(--pastel-green-border);
+        }
+        .infographic-item:nth-child(4n+4) .infographic-icon,
+        .infographic-item:nth-child(4n+4) svg {
+            background: var(--pastel-yellow-soft);
+            color: var(--pastel-yellow-text);
+            border: 1px solid var(--pastel-yellow-border);
+        }
+
+        .infographic-icon,
+        .infographic-item svg,
+        .infographic-hero-icon {
+            width: 42px !important;
+            height: 42px !important;
+            min-width: 42px !important;
+            min-height: 42px !important;
+            padding: 9px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+        .infographic-item strong {
+            display: block;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.45rem;
+            line-height: 1.38;
+        }
+        .infographic-item p {
+            font-size: 0.87rem;
+            color: var(--text-muted);
+            line-height: 1.58;
+            margin-bottom: 0;
+            text-align: left;
+        }
+
+        /* ===== Charts (모던 클린 위젯 룩) ===== */
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.3rem;
+            margin: 2.3rem 0;
+        }
+        .chart-label {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.85rem;
+            text-align: left;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 0.4rem;
         }
-        .inline-callout p {
-            font-size: 0.9rem;
-            color: var(--text-body);
-            line-height: 1.6;
-            text-align: left;
-            margin-bottom: 0;
+        .chart-label::before {
+            content: '';
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--pastel-blue);
         }
-        .inline-callout p strong {
+        .chart-container {
+            width: 100%;
+            min-height: 340px;
+            margin: 2.3rem 0;
+            border: 1px solid var(--border-light);
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-subtle);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-top: 3px solid var(--pastel-blue);
+        }
+        .chart-container > div[id^="chart-"] {
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+        }
+
+        /* ===== 🎁 Bento Grid (Takeaways: 4색 파스텔 피날레) ===== */
+        .bento-grid-wrap {
+            margin: 3.4rem 0 2.2rem 0;
+            padding-top: 2.8rem;
+            border-top: 1px solid var(--border-light);
+        }
+        .bento-grid-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2.2rem;
+            letter-spacing: -0.025em;
             color: var(--text-main);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.35rem;
+        }
+        .bento-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.7rem;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.22s ease;
+        }
+        .bento-card:hover {
+            box-shadow: 0 10px 20px -4px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+        
+        /* 벤토 카드 4색 파스텔 테두리 & 아이콘 테마 */
+        .bento-card:nth-child(4n+1) { border-top: 3.5px solid var(--pastel-peach); }
+        .bento-card:nth-child(4n+1) .bento-card-icon {
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
+        }
+
+        .bento-card:nth-child(4n+2) { border-top: 3.5px solid var(--pastel-blue); }
+        .bento-card:nth-child(4n+2) .bento-card-icon {
+            background: var(--pastel-blue-soft);
+            color: var(--pastel-blue-text);
+            border: 1px solid var(--pastel-blue-border);
+        }
+
+        .bento-card:nth-child(4n+3) { border-top: 3.5px solid var(--pastel-green); }
+        .bento-card:nth-child(4n+3) .bento-card-icon {
+            background: var(--pastel-green-soft);
+            color: var(--pastel-green-text);
+            border: 1px solid var(--pastel-green-border);
+        }
+
+        .bento-card:nth-child(4n+4) { border-top: 3.5px solid var(--pastel-yellow); }
+        .bento-card:nth-child(4n+4) .bento-card-icon {
+            background: var(--pastel-yellow-soft);
+            color: var(--pastel-yellow-text);
+            border: 1px solid var(--pastel-yellow-border);
+        }
+
+        .bento-card-icon {
+            width: 40px !important;
+            height: 40px !important;
+            padding: 9px;
+            border-radius: 10px;
+            margin-bottom: 1.1rem;
+            display: inline-flex;
+            box-sizing: border-box;
+        }
+        .bento-card-title {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 1.02rem;
+            color: var(--text-main);
+            margin-bottom: 0.65rem;
+            line-height: 1.35;
+        }
+        .bento-card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 0;
         }
 
         /* ===== Modern Academic Table ===== */
@@ -378,7 +709,6 @@
             border: 1px solid var(--border-light);
             border-radius: var(--radius-md);
             background: var(--bg-card);
-            box-shadow: var(--shadow-sm);
         }
         .academic-table {
             width: 100%;
@@ -390,7 +720,7 @@
         }
         .academic-table th,
         .academic-table td {
-            padding: 12px 16px;
+            padding: 11px 15px;
             vertical-align: top;
             word-wrap: break-word;
             overflow-wrap: break-word;
@@ -398,7 +728,7 @@
         }
         .academic-table th {
             font-weight: 600;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-muted);
@@ -408,345 +738,20 @@
         .academic-table td {
             border-bottom: 1px solid var(--bg-surface);
             color: var(--text-body);
-            font-size: 0.88rem;
-        }
-        .academic-table td.num,
-        .academic-table td code {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.82rem;
         }
         .academic-table tr:last-child td {
             border-bottom: none;
         }
         .academic-table tr:hover td {
-            background: rgba(248, 250, 252, 0.8);
-        }
-
-        /* ===== Charts ===== */
-        .chart-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1.25rem;
-            margin: 2.2rem 0;
-        }
-        .chart-row .chart-container {
-            margin: 0;
-        }
-        .chart-label {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.84rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 0.8rem;
-            text-align: center;
-        }
-        .chart-container {
-            width: 100%;
-            min-height: 330px;
-            margin: 2.2rem 0;
-            border: 1px solid var(--border-light);
-            background: var(--bg-card);
-            padding: 1.4rem;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .chart-container > div[id^="chart-"] {
-            flex: 1;
-            min-height: 0;
-            width: 100%;
-        }
-
-        @media (max-width: 640px) {
-            .chart-row { grid-template-columns: 1fr; }
-        }
-
-        .code-term {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.82rem;
-            font-weight: 500;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-light);
-            color: var(--accent-blue);
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        /* ===== Concept Box ===== */
-        .concept-box {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            padding: 1.4rem 1.6rem;
-            margin: 1.6rem 0 2.2rem 0;
-        }
-        .concept-title,
-        .concept-box h4 {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.76rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--accent-blue);
-            margin-bottom: 1rem;
-        }
-        .concept-item {
-            margin-bottom: 0.8rem;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: var(--text-body);
-        }
-        .concept-item:last-child {
-            margin-bottom: 0;
-        }
-        .concept-item strong {
-            color: var(--text-main);
-            font-weight: 600;
-        }
-        .concept-box dl {
-            display: grid;
-            grid-template-columns: max-content 1fr;
-            column-gap: 1rem;
-            row-gap: 0.6rem;
-        }
-        .concept-box dt {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--text-main);
-        }
-        .concept-box dd {
-            font-size: 0.88rem;
-            color: var(--text-body);
-            margin: 0;
-        }
-
-        /* ===== Stat Card Grid ===== */
-        .stat-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.2rem;
-            margin: 2rem 0;
-        }
-        .stat-card {
-            flex: 1 1 200px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            padding: 1.4rem 1.6rem;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .stat-card:hover {
-            border-color: var(--border-medium);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
-        .stat-rank {
-            display: inline-block;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            color: var(--accent-blue);
-            background: var(--accent-blue-soft);
-            border: 1px solid var(--accent-blue-border);
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-bottom: 0.7rem;
-            text-transform: uppercase;
-        }
-        .stat-number {
-            font-family: 'Inter', sans-serif;
-            font-size: 2.3rem;
-            font-weight: 700;
-            color: var(--text-main);
-            line-height: 1.1;
-            margin-bottom: 0.4rem;
-            letter-spacing: -0.03em;
-        }
-        .stat-number .stat-unit {
-            font-size: 1.15rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-left: 3px;
-        }
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.45;
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* ===== Infographic Block (Solves feedback/2.png giant icon bug) ===== */
-        .infographic-block {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.25rem;
-            align-items: stretch;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            margin: 2rem 0;
-            padding: 1.4rem;
-        }
-        .infographic-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 1.1rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-sm);
-            padding: 1.25rem;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .infographic-item:hover {
-            border-color: var(--border-medium);
-            box-shadow: var(--shadow-md);
-            transform: translateY(-1px);
-        }
-        .infographic-icon,
-        .infographic-item svg,
-        .infographic-hero-icon {
-            width: 40px !important;
-            height: 40px !important;
-            min-width: 40px !important;
-            min-height: 40px !important;
-            max-width: 40px !important;
-            max-height: 40px !important;
-            padding: 9px;
-            border-radius: 10px;
-            background: var(--accent-blue-soft);
-            color: var(--accent-blue);
-            flex-shrink: 0;
-            box-sizing: border-box;
-        }
-        .infographic-item div {
-            flex: 1;
-            min-width: 0;
-        }
-        .infographic-item strong {
-            display: block;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 0.4rem;
-            line-height: 1.4;
-        }
-        .infographic-item p {
-            font-size: 0.86rem;
-            color: var(--text-muted);
-            line-height: 1.55;
-            margin-bottom: 0;
-            text-align: left;
-        }
-
-        .infographic-kicker {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--accent-blue);
-            margin-bottom: 0.8rem;
-            display: block;
-        }
-        .infographic-hero {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .infographic-hero-number {
-            font-family: 'Inter', sans-serif;
-            font-size: 2.6rem;
-            font-weight: 700;
-            color: var(--text-main);
-            line-height: 1.1;
-            letter-spacing: -0.03em;
-        }
-        .infographic-hero-number .stat-unit {
-            font-size: 1.25rem;
-            font-weight: 500;
-            color: var(--text-muted);
-        }
-        .infographic-hero-label {
-            font-size: 0.88rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* ===== Bento Grid (Key Takeaways) ===== */
-        .bento-grid-wrap {
-            margin: 3rem 0 2rem 0;
-            padding-top: 2.8rem;
-            border-top: 1px solid var(--border-light);
-        }
-        .bento-grid-title {
-            font-size: 1.45rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 2rem;
-            letter-spacing: -0.02em;
-            color: var(--text-main);
-        }
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.25rem;
-        }
-        .bento-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            padding: 1.6rem;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .bento-card:hover {
-            border-color: var(--border-medium);
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-        }
-        .bento-card-icon {
-            width: 38px !important;
-            height: 38px !important;
-            min-width: 38px !important;
-            max-width: 38px !important;
-            padding: 8px;
-            border-radius: 8px;
-            background: var(--accent-blue-soft);
-            color: var(--accent-blue);
-            margin-bottom: 1rem;
-            display: inline-flex;
-            box-sizing: border-box;
-        }
-        .bento-card-title {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 0.98rem;
-            color: var(--text-main);
-            margin-bottom: 0.6rem;
-            line-height: 1.35;
-        }
-        .bento-card p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.55;
-            text-align: left;
-            margin-bottom: 0;
+            background: rgba(0, 0, 0, 0.015);
         }
 
         /* ===== Site Footer ===== */
         .site-footer {
             border-top: 1px solid var(--border-light);
-            padding: 2.5rem 0 3.5rem 0;
+            padding: 2.6rem 0 3.6rem 0;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             color: var(--text-muted);
             display: flex;
             flex-wrap: wrap;
@@ -759,7 +764,7 @@
             transition: color 0.15s ease;
         }
         .site-footer a:hover {
-            color: var(--accent-blue);
+            color: var(--pastel-peach-text);
         }
 
         @media (max-width: 768px) {
@@ -768,9 +773,11 @@
             .content-wrap { padding: 0 1rem; }
             .infographic-block { grid-template-columns: 1fr; padding: 1.1rem; }
         }
+
     </style>
 </head>
 <body>
+    <div id="scroll-progress"></div>
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
         <defs>
             <symbol id="icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
@@ -873,5 +880,17 @@
             articles.forEach(function (art) { observer.observe(art); });
         })();
     </script>
+
+    <script>
+        // Real-time Scroll Progress Bar
+        window.addEventListener('scroll', function() {
+            var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var scrolled = (height > 0) ? (winScroll / height) * 100 : 0;
+            var bar = document.getElementById('scroll-progress');
+            if (bar) bar.style.width = scrolled + '%';
+        });
+    </script>
+
 </body>
 </html>
