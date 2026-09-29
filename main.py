@@ -45,8 +45,38 @@ def return_none_on_error(retry_state):
     print(f"\n❌ Action ultimately failed after {retry_state.attempt_number} attempts: {retry_state.outcome.exception()}")
     return None
 
+def extract_archive_summary(content, file_date_str):
+    summaries = []
+    article_blocks = re.split(r'\n(?=###\s+(?:\[?\d+\]?|\d+\.))', content)
+    for block in article_blocks:
+        lines = block.strip().split('\n')
+        if not lines:
+            continue
+        first_line = lines[0].strip()
+        if not re.match(r'^###\s+(?:\[?\d+\]?|\d+\.)', first_line):
+            continue
+        if "Executive Summary" in first_line:
+            continue
+            
+        title = re.sub(r'^###\s+(?:\[?\d+\]?\.?\s*)?', '', first_line).strip()
+        url_match = re.search(r'\*\*Primary URL:\*\*\s*(https?://[^\s\)]+)', block)
+        url = url_match.group(1).strip() if url_match else ""
+        
+        if url:
+            summaries.append(f"- [{file_date_str}] {title} (URL: {url})")
+        else:
+            summaries.append(f"- [{file_date_str}] {title}")
+    
+    if not summaries:
+        exec_matches = re.findall(r'^\d+\.\s+\*\*([^*]+)\*\*:\s*(.+)$', content, re.MULTILINE)
+        for topic, desc in exec_matches[:4]:
+            short_desc = (desc[:120] + '...') if len(desc) > 120 else desc
+            summaries.append(f"- [{file_date_str}] {topic}: {short_desc}")
+            
+    return summaries
+
 def get_recent_archives(days=7):
-    archive_data = ""
+    archive_lines = []
     archive_dir = "data"
     if not os.path.exists(archive_dir): return ""
     try:
@@ -56,15 +86,22 @@ def get_recent_archives(days=7):
         count = 0
         for filename in files:
             file_date_str = filename.replace(".txt", "")
-            file_date = datetime.datetime.strptime(file_date_str, "%Y-%m-%d")
+            try:
+                file_date = datetime.datetime.strptime(file_date_str, "%Y-%m-%d")
+            except ValueError:
+                continue
             if (today - file_date).days <= days:
                 file_path = os.path.join(archive_dir, filename)
                 with open(file_path, "r", encoding="utf-8") as f:
-                    archive_data += f"\n--- Report from {file_date_str} ---\n" + f.read() + "\n"
+                    content = f.read()
+                items = extract_archive_summary(content, file_date_str)
+                if items:
+                    archive_lines.extend(items)
                 count += 1
             if count >= days: break
-        if archive_data:
-            return f"\n[REPORTS FROM LAST {days} DAYS - DO NOT REPEAT UNLESS THERE IS NEW PROGRESS]\n{archive_data}\n"
+        if archive_lines:
+            index_text = "\n".join(archive_lines)
+            return f"\n[INDEX OF TOPICS COVERED IN LAST {days} DAYS - DO NOT REPEAT UNLESS THERE IS NEW PROGRESS]\n{index_text}\n"
         return ""
     except Exception as e:
         print(f"Warning: Could not read archives: {e}")
@@ -344,11 +381,11 @@ def main():
             
             feedback = run_gpt_chat(o_client, "gpt-6-sol", gpt_messages, system=p2_system)
             if not feedback:
-                print("❌ Phase 2 failed. Exiting.")
-                sys.exit(1)
-                
-            with open(p2_cache_file, "w", encoding="utf-8") as f: f.write(feedback)
-            print(f"✅ Phase 2 complete. Saved to {p2_cache_file} (Time: {time.time() - p2_start:.2f}s)")
+                print("⚠️ Phase 2 (GPT-6 Sol) 호출 실패: Graceful Fallback 발동. Phase 1 초안을 유지하고 후속 단계로 진행합니다.")
+                feedback = None
+            else:
+                with open(p2_cache_file, "w", encoding="utf-8") as f: f.write(feedback)
+                print(f"✅ Phase 2 complete. Saved to {p2_cache_file} (Time: {time.time() - p2_start:.2f}s)")
 
     # ---------------------------------------------------------
     # Phase 3: Gemini Refinement (품질 제안 흡수 피드백 루프)
@@ -367,29 +404,45 @@ def main():
             p3_start = time.time()
             current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
             
-            refine_prompt = (
-                f"현재 실제 KST 시간은 {current_kst}입니다.\n"
-                "위 피드백을 철저히 반영하여 [Initial Draft]를 다듬어 최종본을 작성하십시오.\n"
-                "1. 🚨 [조건 위반 및 사실 오류 수정] 피드백 내용 중 기사가 조건을 위반했거나 심각한 사실 오류가 있다면, 해당 항목을 전면 삭제(Drop)하십시오.\n"
-                "2. 💡 [품질 보완 제안 적극 반영] 피드백의 '품질 보완 제안(📌 보완 제안)' 파트에 명시된 개선 요청 사항들(누락된 하위 아키텍처 명시, 구체적인 파트너십 브랜드 보완, 교정 명칭 반영 등)을 본문에 완벽히 녹여내어 분석의 깊이를 극대화하십시오.\n"
-                "3. 삭제된 빈 슬롯 수만큼, 당신에게 부여된 'Google Search' 툴을 즉각 사용하여 완전히 새로운 AI 인프라/하드웨어 뉴스를 직접 발굴하여 대체 작성하십시오. "
-                "일반 슬롯(카테고리 1~5)은 최근 24시간 이내에 발생한 사건만 허용합니다. "
-                "단, 삭제된 항목이 카테고리 6(HW-Circuit-Research, 학술연구/미래 로드맵)이었다면, 대체 항목은 GLOBAL RULES에 명시된 대로 최근 7일 이내 발표/게시된 논문·컨퍼런스·기술 블로그를 기준으로 발굴하십시오. "
-                "또한 GLOBAL RULES의 [중대 사건 지속 전개 예외] 조건을 모두 만족하는 항목이라면, 최초 사건이 24시간을 초과했더라도 유지하거나 대체 항목으로 채택할 수 있습니다 (단, 하루 최대 1건, ongoing_story_exception: true 표기 필수). "
-                "최종 리포트는 무조건 4개의 항목으로 채워져야 합니다.\n"
-                "4. 피드백에서 지적되지 않은 정상 항목은 불필요한 재작성 없이 원문을 최대한 유지하십시오.\n"
-                "5. 인라인 수식 기호 절대 사용 금지. 벡터는 굵은 글씨, 변수는 일반 텍스트.\n"
-                "6. 기존 섹션 구조(Overview, Strategic Impact, Technical Deep Dive 등)를 정확히 유지하십시오."
-            )
+            # -----------------------------------------------------
+            # 스마트 분기: 기사 삭제/대체 지시 여부 감지
+            # -----------------------------------------------------
+            drop_keywords = ["전면 삭제", "drop", "대체 작성", "삭제하고", "대체하십시오", "조건 위반", "위반했거나"]
+            needs_search = any(kw.lower() in feedback.lower() for kw in drop_keywords)
+
+            if needs_search:
+                print("🔍 피드백에 기사 삭제/대체 지시가 감지되어 Google Search 툴을 가동합니다.")
+                tools = [types.Tool(google_search=types.GoogleSearch())]
+                refine_temp = 0.3
+                refine_prompt = (
+                    f"현재 실제 KST 시간은 {current_kst}입니다.\n"
+                    "위 피드백을 철저히 반영하여 [Initial Draft]를 다듬어 최종본을 작성하십시오.\n"
+                    "1. 🚨 [조건 위반 및 사실 오류 수정] 피드백 내용 중 기사가 조건을 위반했거나 심각한 사실 오류가 있다면, 해당 항목을 전면 삭제(Drop)하십시오.\n"
+                    "2. 💡 [품질 보완 제안 적극 반영] 피드백의 '품질 보완 제안(📌 보완 제안)' 파트에 명시된 개선 요청 사항들(누락된 하위 아키텍처 명시, 구체적인 파트너십 브랜드 보완, 교정 명칭 반영 등)을 본문에 완벽히 녹여내어 분석의 깊이를 극대화하십시오.\n"
+                    "3. 삭제된 빈 슬롯 수만큼, 당신에게 부여된 'Google Search' 툴을 즉각 사용하여 완전히 새로운 AI 인프라/하드웨어 뉴스를 직접 발굴하여 대체 작성하십시오. "
+                    "일반 슬롯(카테고리 1~5)은 최근 24시간 이내에 발생한 사건만 허용합니다. "
+                    "단, 삭제된 항목이 카테고리 6(HW-Circuit-Research, 학술연구/미래 로드맵)이었다면, 대체 항목은 GLOBAL RULES에 명시된 대로 최근 7일 이내 발표/게시된 논문·컨퍼런스·기술 블로그를 기준으로 발굴하십시오. "
+                    "또한 GLOBAL RULES의 [중대 사건 지속 전개 예외] 조건을 모두 만족하는 항목이라면, 최초 사건이 24시간을 초과했더라도 유지하거나 대체 항목으로 채택할 수 있습니다 (단, 하루 최대 1건, ongoing_story_exception: true 표기 필수). "
+                    "최종 리포트는 무조건 4개의 항목으로 채워져야 합니다.\n"
+                    "4. 피드백에서 지적되지 않은 정상 항목은 불필요한 재작성 없이 원문을 최대한 유지하십시오.\n"
+                    "5. 인라인 수식 기호 절대 사용 금지. 벡터는 굵은 글씨, 변수는 일반 텍스트.\n"
+                    "6. 기존 섹션 구조(Overview, Strategic Impact, Technical Deep Dive 등)를 정확히 유지하십시오."
+                )
+            else:
+                print("⚡ 기사 교체 없는 품질 보완 피드백입니다. Google Search 없이 고속 정제 모드(Fast Refine)로 실행합니다.")
+                tools = None
+                refine_temp = 0.2
+                refine_prompt = (
+                    f"현재 실제 KST 시간은 {current_kst}입니다.\n"
+                    "피드백에 기사 삭제나 전면 교체 지시가 없으므로, 기존 4개 기사의 주제와 핵심 팩트를 그대로 유지하면서 품질을 다듬으십시오.\n"
+                    "1. 💡 [품질 보완 제안 적극 반영] 피드백의 '품질 보완 제안(📌 보완 제안)' 파트에 명시된 개선 요청 사항들(누락된 하위 아키텍처 명시, 구체적인 파트너십 브랜드 보완, 교정 명칭 반영, 분석 깊이 강화 등)을 본문에 완벽히 녹여내어 분석의 깊이를 극대화하십시오.\n"
+                    "2. 기존 4개 기사 블록의 구조(Overview, Strategic Impact, Technical Deep Dive 등), 메타데이터 태그, URL을 누락 없이 정확히 유지하십시오.\n"
+                    "3. 인라인 수식 기호 절대 사용 금지. 벡터는 굵은 글씨, 변수는 일반 텍스트.\n"
+                    "4. 피드백에서 지적되지 않은 부분은 원문의 완성도를 훼손하지 않도록 최대한 보존하십시오."
+                )
             
             sys_instruction = (
-                "You are a top-tier AI Intelligence Analyst. You MUST use the Google Search tool to replace any outdated "
-                "or invalid news items (flagged by feedback) with breaking news strictly from the last 24 hours — "
-                "EXCEPT for items whose slot_category metadata is 6 (HW-Circuit-Research), which instead follow a "
-                "7-day event-date window as defined in the GLOBAL RULES below, and EXCEPT for at most one item per day "
-                "meeting the GLOBAL RULES' [중대 사건 지속 전개 예외] (ongoing major story with a genuinely new development "
-                "in the last 24 hours). Do not apply the 24-hour cutoff to those items. "
-                "Ensure the final output always contains exactly 4 valid news items.\n\n"
+                "You are a top-tier AI Intelligence Analyst. Refine the news draft according to the feedback while maintaining strict analytical rigor.\n\n"
                 f"[GLOBAL RULES & FORMAT]\n{base_prompt_content}"
             )
 
@@ -402,14 +455,17 @@ def main():
                         f"[Instruction]\n{refine_prompt}"
                     ]
                     
+                    config_args = {
+                        "temperature": refine_temp,
+                        "system_instruction": sys_instruction
+                    }
+                    if tools:
+                        config_args["tools"] = tools
+
                     response = g_client.models.generate_content(
                         model=g_model,
                         contents=contents,
-                        config=types.GenerateContentConfig(
-                            temperature=0.3,
-                            tools=[types.Tool(google_search=types.GoogleSearch())],
-                            system_instruction=sys_instruction
-                        )
+                        config=types.GenerateContentConfig(**config_args)
                     )
                     refined_result = response.text
                     with open(p3_cache_file, "w", encoding="utf-8") as f: f.write(refined_result)
@@ -422,17 +478,17 @@ def main():
                         print(f"   {sleep_time:.1f}초 후 재시도합니다...")
                         time.sleep(sleep_time)
                     else:
-                        print("❌ Phase 3 failed after 5 attempts. Exiting.")
-                        sys.exit(1)
+                        print("⚠️ Phase 3 최종 실패: Graceful Fallback 발동. Phase 1 초안(initial_result)을 기본값으로 유지하고 Phase 4로 진행합니다.")
+                        refined_result = initial_result
 
     # ---------------------------------------------------------
-    # Phase 4: GPT-6 Luna Translation (번역)
+    # Phase 4: GPT-6 Luna Translation & Polishing (영문 정제 및 가독성 고도화)
     # ---------------------------------------------------------
     p4_cache_file = "trial/translated.txt"
     final_content = refined_result
 
-    if o_client and feedback:
-        print("\n--- Phase 4: GPT-6 Translation ---")
+    if o_client:
+        print("\n--- Phase 4: GPT-6 Translation & Polishing ---")
         if os.path.exists(p4_cache_file):
             print("✅ Phase 4: 오늘 이미 생성된 로컬 캐시(translated.txt)에서 번역본을 불러옵니다.")
             with open(p4_cache_file, "r", encoding="utf-8") as f:
@@ -464,13 +520,13 @@ def main():
 
             translated = run_gpt_chat(o_client, "gpt-6-luna", translate_messages, system=p4_system)
             if not translated:
-                print("❌ Phase 4 failed. Exiting.")
-                sys.exit(1)
-                
-            final_content = translated
-            with open(p4_cache_file, "w", encoding="utf-8") as f: 
-                f.write(final_content)
-            print(f"✅ Phase 4 complete. Saved to {p4_cache_file} (Time: {time.time() - p4_start:.2f}s)")
+                print("⚠️ Phase 4 (GPT-6 Luna) 호출 실패: Graceful Fallback 발동. Phase 3 정제본(또는 초안)을 그대로 유지합니다.")
+                final_content = refined_result
+            else:
+                final_content = translated
+                with open(p4_cache_file, "w", encoding="utf-8") as f: 
+                    f.write(final_content)
+                print(f"✅ Phase 4 complete. Saved to {p4_cache_file} (Time: {time.time() - p4_start:.2f}s)")
 
     # ---------------------------------------------------------
     # 최종 데이터 저장 (Phase 5 진입 전 안전 확보)
