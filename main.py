@@ -298,20 +298,20 @@ def main():
         print(f"✅ Phase 1 complete. Saved to {p1_cache_file} (Time: {time.time() - p1_start:.2f}s)")
 
     # ---------------------------------------------------------
-    # Phase 2: GPT-5.6 Sol Validation (초고도화 팩트체크)
+    # Phase 2: GPT-6 Sol Validation (초고도화 팩트체크)
     # ---------------------------------------------------------
     p2_cache_file = "trial/feedback.txt"
     feedback = None
     gpt_messages = []
 
     if o_client:
-        print("\n--- Phase 2: GPT-5.6 Validation ---")
+        print("\n--- Phase 2: GPT-6 Validation ---")
         if os.path.exists(p2_cache_file):
             print("✅ Phase 2: 오늘 이미 생성된 로컬 캐시(feedback.txt)에서 피드백을 불러옵니다.")
             with open(p2_cache_file, "r", encoding="utf-8") as f:
                 feedback = f.read()
         else:
-            print("Starting GPT-5.6 action (Model: gpt-5.6-sol)...")
+            print("Starting GPT-6 action (Model: gpt-6-sol)...")
             p2_start = time.time()
             current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
             p2_system = (
@@ -342,7 +342,7 @@ def main():
             )
             gpt_messages = [{"role": "user", "content": p2_user_prompt}]
             
-            feedback = run_gpt_chat(o_client, "gpt-5.6-sol", gpt_messages, system=p2_system)
+            feedback = run_gpt_chat(o_client, "gpt-6-sol", gpt_messages, system=p2_system)
             if not feedback:
                 print("❌ Phase 2 failed. Exiting.")
                 sys.exit(1)
@@ -426,19 +426,19 @@ def main():
                         sys.exit(1)
 
     # ---------------------------------------------------------
-    # Phase 4: GPT-5.6 Terra Translation (번역)
+    # Phase 4: GPT-6 Luna Translation (번역)
     # ---------------------------------------------------------
     p4_cache_file = "trial/translated.txt"
     final_content = refined_result
 
     if o_client and feedback:
-        print("\n--- Phase 4: GPT-5.6 Translation ---")
+        print("\n--- Phase 4: GPT-6 Translation ---")
         if os.path.exists(p4_cache_file):
             print("✅ Phase 4: 오늘 이미 생성된 로컬 캐시(translated.txt)에서 번역본을 불러옵니다.")
             with open(p4_cache_file, "r", encoding="utf-8") as f:
                 final_content = f.read()
         else:
-            print("Starting GPT-5.6 action (Model: gpt-5.6-terra)...")
+            print("Starting GPT-6 action (Model: gpt-6-luna)...")
             p4_start = time.time()
             current_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M KST")
             p4_system = (
@@ -458,7 +458,7 @@ def main():
                 )
             }]
 
-            translated = run_gpt_chat(o_client, "gpt-5.6-terra", translate_messages, system=p4_system)
+            translated = run_gpt_chat(o_client, "gpt-6-luna", translate_messages, system=p4_system)
             if not translated:
                 print("❌ Phase 4 failed. Exiting.")
                 sys.exit(1)
