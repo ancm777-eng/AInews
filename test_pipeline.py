@@ -1,70 +1,62 @@
-name: Smoke Test Pipeline
+import os
+import sys
+from main import (
+    ALLOWED_ICONS,
+    extract_archive_summary,
+    get_recent_archives,
+    parse_feedback_verdict,
+    validate_articles_content,
+)
 
-on:
-  workflow_dispatch:
 
-permissions:
-  contents: write
+def run_smoke_tests():
+    print("🚀 Running AI News Pipeline Smoke Tests...")
 
-jobs:
-  run-test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      TZ: Asia/Seoul
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true" # Node.js 20 Deprecated 경고 해결을 위한 강제 설정
+    # 1. 프롬프트 및 템플릿 파일 검증
+    for required_file in ("prompt/news.txt", "prompt/html_content.txt", "prompt/template.html"):
+        if not os.path.exists(required_file):
+            raise FileNotFoundError(f"필수 파일 누락: {required_file}")
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4 # 최신 버전 유지
-        with:
-          fetch-depth: 0
+    with open("prompt/news.txt", "r", encoding="utf-8") as f:
+        news_prompt = f.read()
+    assert "Specialized Image, Video, Creative & Open-Weight AI Labs" in news_prompt, "특화 모델 생태계 지침 누락"
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
+    with open("prompt/template.html", "r", encoding="utf-8") as f:
+        template_html = f.read()
+    assert "{{ARTICLES_CONTENT}}" in template_html, "템플릿 자리표시자 누락"
+    for icon_id in ALLOWED_ICONS:
+        symbol_id = f'id="{icon_id.lstrip("#")}"'
+        assert symbol_id in template_html, f"template.html에 아이콘 심볼 누락: {symbol_id}"
+    print("✅ 1. Prompt & Template integrity verified.")
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    # 2. 아카이브 요약 추출 검증
+    archive_index = get_recent_archives(30)
+    print(f"✅ 2. Archive index extraction verified ({len(archive_index)} chars).")
 
-      - name: Run Smoke Test
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
-        run: python test_pipeline.py
+    # 3. Phase 2 -> Phase 3 Verdict 파서 검증
+    assert parse_feedback_verdict("모든 항목 정상입니다.\n[VERDICT: PASS]") == "PASS"
+    assert parse_feedback_verdict("일부 수치 보완 필요.\n[VERDICT: REFINE]") == "REFINE"
+    assert parse_feedback_verdict("시간 윈도우 불충족.\n[VERDICT: REPLACE]") == "REPLACE"
+    assert parse_feedback_verdict("전압 강하(voltage drop) 설명 보완 필요.") == "REFINE"
+    assert parse_feedback_verdict("항목 1은 시간 요건 불충족으로 전면 삭제 및 대체 작성 필요.") == "REPLACE"
+    print("✅ 3. Deterministic feedback verdict parser verified.")
 
-      - name: Upload Test Results
-        if: always()
-        uses: actions/upload-artifact@v4 # v4로 업데이트하여 Node.js 경고 해결
-        with:
-          name: smoke-test-artifacts
-          path: |
-            trial/
-            data/
-            index.html
-            test_status.txt
+    # 4. Phase 5 HTML 검증기 테스트
+    sample_valid_html = """
+    <article class="paper-section" id="art1"><h2>1</h2><div id="chart-art1-a"></div><script>document.getElementById('chart-art1-a'); var d = {data: [10, 25, 40]};</script></article>
+    <article class="paper-section" id="art2"><h2>2</h2><svg><use href="#icon-media"/></svg></article>
+    <article class="paper-section" id="art3"><h2>3</h2><svg><use href="#icon-code"/></svg></article>
+    <article class="paper-section" id="art4"><h2>4</h2><svg><use href="#icon-chip"/></svg></article>
+    <section class="bento-grid-wrap"></section>
+    """
+    validate_articles_content(sample_valid_html)
+    print("✅ 4. Phase 5 HTML validator verified.")
+    print("🎉 All smoke tests passed successfully!")
 
-      # 결과물 리포지토리 자동 업데이트(Commit & Push)
-      - name: Commit and Push results
-        if: always() # 스크립트 실행 중 503 에러가 발생해도 결과를 무조건 푸시
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # ⭐️ 업데이트 확인을 무조건 보장하기 위한 더미 시간 파일 생성
-          echo "Last Smoke Test Run: $(date +'%Y-%m-%d %H:%M:%S KST')" > test_status.txt
-          
-          # 변경사항 추적 (test_status.txt 포함)
-          git add trial/ data/ index.html test_status.txt
-          
-          # 커밋 메시지에 실행 시간을 포함하여 리포지토리에서 바로 보이게 함
-          if ! git diff --staged --quiet; then
-            git commit -m "Test update: $(date +'%Y-%m-%d %H:%M:%S KST')"
-            git pull --rebase origin main
-            git push
-          else
-            echo "변경 사항이 없습니다."
-          fi
+
+if __name__ == "__main__":
+    try:
+        run_smoke_tests()
+    except Exception as exc:
+        print(f"❌ Smoke test failed: {exc}")
+        sys.exit(1)
