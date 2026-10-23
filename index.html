@@ -800,14 +800,14 @@
                 <span class="top-nav-brand-tag">DAILY</span>
                 <span>AI<span class="brand-dot">·</span>Hardware Briefing</span>
             </div>
-            <div class="top-nav-meta" id="report-date-top">October 22, 2026</div>
+            <div class="top-nav-meta" id="report-date-top">October 23, 2026</div>
         </div>
     </nav>
 
     <div class="layout-shell">
         <aside class="side-nav">
             <div class="side-nav-title">Intelligence Briefing</div>
-            <div class="side-nav-sub">October 22, 2026</div>
+            <div class="side-nav-sub">October 23, 2026</div>
             <ul class="side-nav-list" id="side-nav-list"></ul>
         </aside>
 
@@ -816,359 +816,393 @@
                 <span class="doc-category">AI Ecosystem & Hardware Architecture</span>
                 <h1>Daily AI & Semiconductor Engineering Briefing</h1>
                 <div class="meta-info">
-                    <span id="report-date">October 22, 2026</span> • Technical Intelligence Report
+                    <span id="report-date">October 23, 2026</span> • Technical Intelligence Report
                 </div>
             </header>
 
             <main>
                 <article class="paper-section" id="art1">
-  <h2>Alibaba Releases Qwen-Image-2.1-Turbo: 7B Distilled Architecture with 8-Step Flow-Matching and Native RGBA Latent Synthesis</h2>
-  
+  <h2>ComfyUI Merges MOSS-Image Edit: 5B Open DiT Unlocks Local Multi-Reference Instruction Editing</h2>
+
   <h3 class="section-title">1. Executive Summary</h3>
   <div class="abstract-quote">
-    <p>Standard diffusion and flow-matching generation pipelines remain throttled by 30 to 50 iterative denoising steps and solid raster outputs, forcing production design teams into high cloud latencies and secondary post-process matting routines. Alibaba circumvents these compositing bottlenecks with <strong>Qwen-Image-2.1-Turbo</strong>, a <strong>7-billion parameter</strong> Visual Diffusion Transformer (DiT) combining trajectory-rectified step-distillation with native four-channel RGBA latent generation. By compressing inference to <strong>8 sampling steps</strong> and generating transparent alpha masks directly from latent space, the architecture cuts sampling iterations by <strong>80%</strong> and delivers 2K assets in approximately <strong>~1.2 seconds</strong> on a single <strong>NVIDIA H100 SXM</strong> while ingesting up to <strong>10 visual reference inputs</strong> for continuous product and character staging.</p>
+    <p>
+      Creative teams relying on proprietary raster editing suites have long faced recurring seat costs, cloud data telemetry, and generative fill tools incapable of multi-asset reference fidelity. Previous open-weight diffusion transformer architectures failed to resolve local instruction-guided edits without distorting background structures or subject identities. The open-source release of <strong>chinoll/Moss-Image-Edit</strong> and its upstream integration into <strong>ComfyUI Core v0.42.4 (PR #17296)</strong> eliminates this barrier by combining a <strong>5.0B parameter DiT</strong> with coordinate-aware multi-token conditioning. Running in just <strong>13.8 GB VRAM under INT8</strong> or <strong>22.4 GB in BF16</strong> via sequential CPU offloading, this release empowers artists to execute complex multi-image composition and semantic style transfer on standard workstation GPUs without cloud subscription overhead.
+    </p>
   </div>
 
   <h3 class="section-title">2. Architecture & Performance</h3>
-  <p>The transition from generic diffusion models to integrated production tooling hinges on sampling throughput and multi-layered canvas readiness. Qwen-Image-2.1-Turbo addresses both vectors by deploying a trajectory-distilled flow-matching formulation that truncates continuous probability flow ODE evaluations into eight discrete inference stages. Simultaneously, the latent space is expanded to calculate boundary alpha channels concurrently with standard RGB latents, completely bypassing external rotoscoping models.</p>
+  <p>
+    The core innovation within PR #17296 is the architectural binding of a 504-tensor rank-64 LoRA across all 42 transformer layers of the MOSS-Image base model. By targeting key projection matrices (<span class="code-term">q</span>, <span class="code-term">k</span>, <span class="code-term">v</span>, <span class="code-term">o</span>, <span class="code-term">ffn_up_gate</span>, <span class="code-term">ffn_down</span>) with a matching alpha scale of 64, the adapter enables native token-level spatial reference concatenation. Creators can feed between one and four independent reference latent prefixes along the spatial dimension, allowing explicit cross-attention between target compositions and semantic source assets.
+  </p>
 
   <div class="stat-grid">
     <div class="stat-card">
-      <span class="stat-rank">SAMPLING SCHEDULE</span>
-      <div class="stat-number">8<span class="stat-unit">steps</span></div>
-      <div class="stat-label">Distilled Denoising (vs. 40 Baseline)</div>
+      <span class="stat-rank">LATENT PREFIX</span>
+      <div class="stat-number">4<span class="stat-unit">Slots</span></div>
+      <div class="stat-label">Concurrent Reference Inputs</div>
     </div>
     <div class="stat-card">
-      <span class="stat-rank">INFERENCE LATENCY</span>
-      <div class="stat-number">1.2<span class="stat-unit">s</span></div>
-      <div class="stat-label">2048x2048 Canvas on NVIDIA H100 SXM</div>
+      <span class="stat-rank">ADAPTER VOLUME</span>
+      <div class="stat-number">504<span class="stat-unit">Tensors</span></div>
+      <div class="stat-label">Rank-64 Layers across 42 Blocks</div>
     </div>
     <div class="stat-card">
-      <span class="stat-rank">REFERENCE CONTEXT</span>
-      <div class="stat-number">10<span class="stat-unit">assets</span></div>
-      <div class="stat-label">Simultaneous Conditioning Inputs (+233%)</div>
+      <span class="stat-rank">INT8 FOOTPRINT</span>
+      <div class="stat-number">13.8<span class="stat-unit">GB</span></div>
+      <div class="stat-label">Active Inference Memory Residency</div>
     </div>
     <div class="stat-card">
-      <span class="stat-rank">ALPHA SYNTHESIS</span>
-      <div class="stat-number">4<span class="stat-unit">ch</span></div>
-      <div class="stat-label">Native RGBA Latent Generation</div>
+      <span class="stat-rank">BASE CAPACITY</span>
+      <div class="stat-number">5.0<span class="stat-unit">B</span></div>
+      <div class="stat-label">Single-Stream DiT Architecture</div>
     </div>
   </div>
 
+  <div class="infographic-block">
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-media"/></svg>
+      <div>
+        <strong>Coordinate-Aware Token Conditioning</strong>
+        <p>Integrates bilingual typographic layout coordinates directly into the spatial latent grid, preventing unguided drift across unedited bounding boxes.</p>
+      </div>
+    </div>
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-code"/></svg>
+      <div>
+        <strong>Sequential Offload Runtime</strong>
+        <p>Decouples Qwen3.5 9B text encoder execution to system RAM, avoiding concurrent 28 GB dual-model allocation and enabling 16 GB to 24 GB GPU compatibility.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="academic-table">
+      <thead>
+        <tr>
+          <th>Pipeline Feature</th>
+          <th>Proprietary Cloud Suites</th>
+          <th>FLUX / SDXL Inpaint</th>
+          <th>MOSS-Image Edit (PR #17296)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Execution Model</td>
+          <td>Cloud API Metered</td>
+          <td>Self-Hosted Graph</td>
+          <td>Native ComfyUI Node</td>
+        </tr>
+        <tr>
+          <td>Reference Input</td>
+          <td>Single Mask Region</td>
+          <td>IP-Adapter Latents</td>
+          <td>Up to 4 Prefixes</td>
+        </tr>
+        <tr>
+          <td>Control Method</td>
+          <td>Brush Prompting</td>
+          <td>Denoising Slider</td>
+          <td>Explicit Index Tokens</td>
+        </tr>
+        <tr>
+          <td>Data Privacy</td>
+          <td>External Telemetry</td>
+          <td>Fully Offline</td>
+          <td>Zero External Calls</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
+  <p>
+    Although native ComfyUI integration democratizes high-precision generative editing, the architecture requires explicit index mapping in instructions (e.g., declaring specific image index IDs) rather than inferring compositional roles autonomously. Furthermore, steep perspective disparities between source reference assets and target compositions can induce edge-bleeding artifacts on fine organic textiles, necessitating manual compositor touch-ups for high-resolution print deliverables.
+  </p>
+</article>
+
+<article class="paper-section" id="art2">
+  <h2>NVIDIA Launches Cosmos 3 World Foundation Models and Data Factory for Physical AI Simulation</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>
+      Standard generative video architectures produce impressive cinematic sequences but consistently fail physical simulation tasks due to geometric warping, non-Newtonian dynamics, and depth inconsistencies. Autonomous robotics and vehicle platforms cannot train effectively on synthetic data that violates physical reality. NVIDIA has resolved this simulation gap through the release of the <strong>Cosmos 3 platform</strong>, which pairs spatiotemporal world foundation models with the <strong>Cosmos 3 Nano Reasoner</strong> visual critic. Powered by low-precision <strong>FP4 and FP8 Tensor Core microservices</strong> on Blackwell architectures, early enterprise adopters like Siemens and Nebius have achieved a <strong>2.1x inference speedup</strong> and reduced synthetic engineering cycles by up to <strong>40%</strong>.
+    </p>
+  </div>
+
+  <h3 class="section-title">2. Architecture & Performance</h3>
+  <p>
+    Cosmos 3 departs from unconstrained text-to-video synthesis by binding spatiotemporal diffusion passes to spatial priors, including metric depth maps, 3D camera trajectory vectors, and surface normal fields. Concurrently, the integrated Cosmos 3 Nano Reasoner model operates as an automated critic, filtering rollouts against physical momentum and collision constraints before downstream ingestion into robotics training loops.
+  </p>
+
   <div class="chart-row">
     <div class="chart-container">
-      <div class="chart-label">Denoising Step Reduction & Reference Capacity</div>
-      <div id="chart-art1-1" style="width:100%;height:100%"></div>
+      <div class="chart-label">Blackwell Inference Throughput Multiplier</div>
+      <div id="chart-art2-a" style="width:100%;height:100%"></div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-label">Industrial Engineering Cycle Reduction (%)</div>
+      <div id="chart-art2-b" style="width:100%;height:100%"></div>
     </div>
   </div>
 
   <script>
   (function(){
-    var el = document.getElementById('chart-art1-1');
+    var elA = document.getElementById('chart-art2-a');
+    if (elA && window.echarts) {
+      var chartA = echarts.init(elA, null, {renderer: 'svg'});
+      chartA.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { top: '18%', bottom: '15%', left: '12%', right: '8%' },
+        xAxis: { type: 'category', data: ['Prior Gen FP16', 'Blackwell FP8', 'Blackwell FP4'] },
+        yAxis: { type: 'value', name: 'Throughput (x)' },
+        series: [{
+          data: [1.0, 1.6, 2.1],
+          type: 'bar',
+          barWidth: '40%',
+          itemStyle: { color: '#688d7a', borderRadius: [4, 4, 0, 0] },
+          label: { show: true, position: 'top', formatter: '{c}x' }
+        }]
+      });
+      window.addEventListener('resize', function(){ chartA.resize(); });
+    }
+
+    var elB = document.getElementById('chart-art2-b');
+    if (elB && window.echarts) {
+      var chartB = echarts.init(elB, null, {renderer: 'svg'});
+      chartB.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { top: '18%', bottom: '15%', left: '15%', right: '8%' },
+        xAxis: { type: 'category', data: ['Legacy Pipeline', 'Cosmos 3 Pipeline'] },
+        yAxis: { type: 'value', name: 'Cycle Time (%)', max: 100 },
+        series: [{
+          data: [100, 60],
+          type: 'bar',
+          barWidth: '35%',
+          itemStyle: { color: '#e09f67', borderRadius: [4, 4, 0, 0] },
+          label: { show: true, position: 'top', formatter: '{c}%' }
+        }]
+      });
+      window.addEventListener('resize', function(){ chartB.resize(); });
+    }
+  })();
+  </script>
+
+  <div class="infographic-block">
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-robot"/></svg>
+      <div>
+        <strong>Physics-Conditioned Rollout Synthesis</strong>
+        <p>Injects metric depth and LiDAR vectors into spatiotemporal DiT blocks, preventing phantom acceleration and boundary violations in robotic manipulation scenes.</p>
+      </div>
+    </div>
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-datacenter"/></svg>
+      <div>
+        <strong>Cloud-Native Data Factory Blueprints</strong>
+        <p>Five turnkey production recipes deployed across Azure, Nebius, and CoreWeave for automated edge-case synthesis and multi-sensor augmentation.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
+  <p>
+    Despite integrated physical critic filtering, generative world models remain probabilistic spatiotemporal approximators rather than deterministic physics engines. Over multi-second simulation horizons in complex multi-agent environments, trajectory drift and kinematic boundary degradation can still manifest, meaning Cosmos 3 rollouts must serve as high-volume data augmentations alongside, rather than total replacements for, deterministic rigid-body solvers.
+  </p>
+</article>
+
+<article class="paper-section" id="art3">
+  <h2>Recursive SI Releases Flint: 40B-A2.5B MoE Coding Agent Secures 89.7% on SWE-bench Pro v2</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>
+      Frontier software engineering agents have historically been confined behind metered cloud APIs, introducing strict governance risks and prohibitive inference expenses when inspecting sensitive enterprise code repositories. Dense open models capable of equivalent reasoning require enterprise-scale GPU clusters that exceed standard local hardware limits. Recursive Superintelligence addressed this constraint by releasing <strong>Flint</strong>, an Apache 2.0 licensed <strong>39.8B Mixture-of-Experts (MoE)</strong> architecture activating only <strong>2.5B parameters per token</strong>. Flint achieves <strong>89.7% on SWE-bench Pro v2</strong> while maintaining decoding speeds exceeding <strong>125 tokens per second</strong> on Apple M4 Pro silicon within a 4-bit footprint of just <strong>22.2 GB</strong>.
+    </p>
+  </div>
+
+  <h3 class="section-title">2. Architecture & Performance</h3>
+  <p>
+    Flint achieves its high efficiency through an automated architecture search design: two initial dense layers feed into 47 MoE layers containing 256 fine-grained routed experts. Each forward pass routes tokens across the top-6 experts alongside one permanently active shared expert. The attention backbone alternates between 35 Sliding Window Attention layers (513 tokens) and 14 global attention layers, reducing KV-cache pressure across its native 262,144-token context window.
+  </p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-rank">SWE-BENCH PRO V2</span>
+      <div class="stat-number">89.7<span class="stat-unit">%</span></div>
+      <div class="stat-label">Production Issue Resolution Rate</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">SPARSITY RATIO</span>
+      <div class="stat-number">2.5<span class="stat-unit">B</span></div>
+      <div class="stat-label">Active of 39.8B Total Parameters</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">LOCAL DECODING</span>
+      <div class="stat-number">125+<span class="stat-unit">tok/s</span></div>
+      <div class="stat-label">Throughput on Apple M4 Pro (48GB)</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">MXFP4 FOOTPRINT</span>
+      <div class="stat-number">22.2<span class="stat-unit">GB</span></div>
+      <div class="stat-label">Quantized Unified Memory Profile</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-container" style="flex:1;">
+      <div class="chart-label">Flint Benchmark Evaluation Suite (%)</div>
+      <div id="chart-art3-a" style="width:100%;height:100%"></div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    var el = document.getElementById('chart-art3-a');
     if (el && window.echarts) {
       var chart = echarts.init(el, null, {renderer: 'svg'});
       chart.setOption({
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 35, right: 30, bottom: 25, left: 140 },
-        xAxis: { type: 'value', name: 'Count' },
-        yAxis: { type: 'category', data: ['Denoising Steps', 'Reference Capacity'] },
-        series: [
-          {
-            name: 'Qwen-Image 1.0 Baseline',
-            type: 'bar',
-            data: [40, 3],
-            itemStyle: { color: '#cbd5e1' },
-            label: { show: true, position: 'right' }
-          },
-          {
-            name: 'Qwen-Image-2.1-Turbo',
-            type: 'bar',
-            data: [8, 10],
-            itemStyle: { color: '#7dd3fc' },
-            label: { show: true, position: 'right' }
-          }
-        ]
+        grid: { top: '15%', bottom: '15%', left: '8%', right: '6%' },
+        xAxis: { type: 'category', data: ['SWE-bench Pro v2', 'SWE-bench Verified', 'IFEval (Instruction)', 'Terminal-Bench 2.1'] },
+        yAxis: { type: 'value', name: 'Accuracy (%)', max: 100 },
+        series: [{
+          data: [89.7, 74.2, 95.1, 54.9],
+          type: 'bar',
+          barWidth: '35%',
+          itemStyle: { color: '#88a0c4', borderRadius: [4, 4, 0, 0] },
+          label: { show: true, position: 'top', formatter: '{c}%' }
+        }]
       });
       window.addEventListener('resize', function(){ chart.resize(); });
     }
   })();
   </script>
 
-  <div class="inline-callout">
-    Native RGBA latent synthesis eliminates secondary segmentation pipelines (e.g., RMBG or SAM checkpoints), enabling direct headless export into game engines, node-based ComfyUI canvas pipelines, and programmatic advertising asset pipelines without separate alpha matte extraction passes.
-  </div>
-
   <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
-  <p>While 8-step distillation compresses deployment compute costs and enables responsive local workstation execution on 24GB GPUs (such as the NVIDIA RTX 4090), discrete trajectory pruning narrows output variance. This constraint manifests in boundary artifacts across semi-transparent or refractive physics, including frosted glass, particulate smoke, and dynamic liquid splatters where fractional alpha clipping can occur. Additionally, enterprise adoption requires stringent validation of dataset copyright provenance and commercial indemnification policies, as open weights do not automatically resolve enterprise intellectual property liabilities.</p>
-</article>
-
-<article class="paper-section" id="art2">
-  <h2>Base Labs and Baseten Introduce mammoth-1 and elephant-1: Deterministic Decision Models Supplanting Autoregressive Decoding for Agent Routing</h2>
-
-  <h3 class="section-title">1. Executive Summary</h3>
-  <div class="abstract-quote">
-    <p>Enterprise autonomous agent frameworks incur severe inference cost and latency penalties by executing multi-token autoregressive LLMs merely to perform deterministic policy gating, tool triaging, and conditional branch routing. Base Labs and Baseten overcome this architectural overhead by introducing <strong>mammoth-1 (27B)</strong> and <strong>elephant-1 (9B)</strong>, specialized open-weights decision models fine-tuned from Qwen foundations to output normalized categorical probability distributions in a single forward pass. By eliminating text decoding iterations and dynamic KV-cache expansion, these engines deliver median endpoint latencies of <strong>~150ms</strong>, achieve <strong>0% JSON syntax failures</strong>, and capture the #1 position on the <strong>Jev Decision Index 0.4</strong> with a score of <strong>71.24</strong>.</p>
-  </div>
-
-  <h3 class="section-title">2. Architecture & Performance</h3>
-  <p>Rather than generating free-form synthetic text or verbose JSON schemas that require downstream regex parsers and validation scrapers, mammoth-1 and elephant-1 evaluate candidate routes directly over structured context buffers up to 16,384 tokens. Probabilistic routing heads output calibrated log-probabilities across targeted classification vectors in a single evaluation forward pass.</p>
-
-  <div class="chart-row">
-    <div class="chart-container">
-      <div class="chart-label">Jev Decision Index 0.4 Benchmark</div>
-      <div id="chart-art2-1" style="width:100%;height:100%"></div>
-    </div>
-    <div class="chart-container">
-      <div class="chart-label">Artificial Analysis Decision Index</div>
-      <div id="chart-art2-2" style="width:100%;height:100%"></div>
-    </div>
-  </div>
-
-  <script>
-  (function(){
-    var el1 = document.getElementById('chart-art2-1');
-    if (el1 && window.echarts) {
-      var chart1 = echarts.init(el1, null, {renderer: 'svg'});
-      chart1.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 35, right: 30, bottom: 25, left: 110 },
-        xAxis: { type: 'value', name: 'Score', min: 50, max: 80 },
-        yAxis: { type: 'category', data: ['Sub-10B Tier', 'mammoth-1 (27B)'] },
-        series: [{
-          name: 'Jev Decision Index',
-          type: 'bar',
-          data: [64.10, 71.24],
-          itemStyle: { color: '#a7f3d0' },
-          label: { show: true, position: 'right' }
-        }]
-      });
-      window.addEventListener('resize', function(){ chart1.resize(); });
-    }
-
-    var el2 = document.getElementById('chart-art2-2');
-    if (el2 && window.echarts) {
-      var chart2 = echarts.init(el2, null, {renderer: 'svg'});
-      chart2.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 35, right: 30, bottom: 25, left: 110 },
-        xAxis: { type: 'value', name: 'Score', min: 50, max: 70 },
-        yAxis: { type: 'category', data: ['elephant-1 (9B)', 'mammoth-1 (27B)'] },
-        series: [{
-          name: 'Artificial Analysis Index',
-          type: 'bar',
-          data: [65.20, 65.90],
-          itemStyle: { color: '#fde68a' },
-          label: { show: true, position: 'right' }
-        }]
-      });
-      window.addEventListener('resize', function(){ chart2.resize(); });
-    }
-  })();
-  </script>
-
-  <div class="infographic-block">
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-code"/></svg>
-      <div>
-        <strong>Layer 1: Context & State Ingestion Buffer</strong>
-        <p>Captures conversational state, telemetry payloads, and enterprise JSON data streams up to 16K tokens without truncation.</p>
-      </div>
-    </div>
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-security"/></svg>
-      <div>
-        <strong>Layer 2: elephant-1 (9B) Policy & Safety Gate</strong>
-        <p>Executes single-pass classification for compliance boundaries, guardrails, and role-based tool invocation permissions.</p>
-      </div>
-    </div>
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-network"/></svg>
-      <div>
-        <strong>Layer 3: mammoth-1 (27B) Decision Orchestrator</strong>
-        <p>Computes categorical probability distributions over candidate routes (e.g., engineering, billing, automated code runner).</p>
-      </div>
-    </div>
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-robot"/></svg>
-      <div>
-        <strong>Layer 4: Downstream Frontier LLM / Tool Execution</strong>
-        <p>Specialized high-parameter frontier reasoning models are queried only when routing confidence thresholds are validated.</p>
-      </div>
-    </div>
-  </div>
-
-  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
-  <p>Replacing autoregressive reasoning chains with non-generative categorical probabilities sacrifices human-interpretable reasoning traces: when an agent misroutes an edge case, developers cannot inspect intermediate chain-of-thought tokens and must rely on log-probability diagnostics and counterfactual prompt perturbations. Furthermore, enterprise production deployments require rigorous empirical calibration monitoring (such as Brier score and Expected Calibration Error tracking), as mathematically normalized softmax outputs do not inherently guarantee real-world probability fidelity when subjected to out-of-distribution client prompts.</p>
-</article>
-
-<article class="paper-section" id="art3">
-  <h2>Siemens and NVIDIA Expand Agentic AI for 3D-IC Multi-Physics Codesign: Orchestrating Seven Signoff EDA Solvers</h2>
-
-  <h3 class="section-title">1. Executive Summary</h3>
-  <div class="abstract-quote">
-    <p>Vertical die stacking and dense <strong>HBM4</strong> memory integration in high-performance computing accelerators trigger extreme electrothermal coupling, where concentrated thermal dissipation magnifies metal interconnect resistance and causes catastrophic voltage droop across the power network. Siemens and NVIDIA resolve these cross-domain simulation bottlenecks by introducing an agentic multi-physics orchestration framework powered by <strong>NVIDIA Nemotron</strong> enterprise models. Coordinating 9 automated workflow stages across <strong>7 signoff-grade Siemens EDA engines</strong>, the autonomous system slashes manual setup duration by up to <strong>99%</strong>, compresses engineering effort by <strong>95%</strong>, and expands design-space exploration by <strong>50x</strong> to safeguard accelerators dissipating upwards of <strong>1,000 watts</strong> per socket.</p>
-  </div>
-
-  <div class="concept-box">
-    <p><span class="code-term">3D-IC Electrothermal Coupling</span>: The interdependent physical feedback loop where localized heat flux elevates metal resistance, exacerbating IR-drop and power delivery network (PDN) instability across vertically integrated dies.</p>
-    <p><span class="code-term">Through-Silicon Via (TSV)</span>: High-aspect-ratio vertical electrical interconnects that pass directly through silicon wafers, providing high-density inter-die signaling between stacked logic and memory tiers.</p>
-    <p><span class="code-term">Model Context Protocol (MCP)</span>: An open client-server interface protocol enabling AI models to safely parameterize, invoke, and parse data outputs from external engineering solvers and tools.</p>
-  </div>
-
-  <h3 class="section-title">2. Architecture & Performance</h3>
-  <p>Historically, heterogeneous packaging verification required multidisciplinary teams to manually translate spatial coordinate mappings, mesh definitions, and boundary condition files across isolated thermal, electromagnetic, and structural simulation engines. The agentic framework standardizes solver access via Model Context Protocol (MCP) tool adapters, executing closed-loop numerical evaluations powered by GPU-accelerated linear solvers (cuDSS).</p>
-
-  <div class="stat-grid">
-    <div class="stat-card">
-      <span class="stat-rank">SETUP REDUCTION</span>
-      <div class="stat-number">99<span class="stat-unit">%</span></div>
-      <div class="stat-label">Configuration Time (Days to Minutes)</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">LABOR COMPRESSION</span>
-      <div class="stat-number">95<span class="stat-unit">%</span></div>
-      <div class="stat-label">Manual Engineering Scripting Effort</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">EXPLORATION GAIN</span>
-      <div class="stat-number">50<span class="stat-unit">x</span></div>
-      <div class="stat-label">Evaluated Packaging Design Variations</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">SOLVER INTEGRATION</span>
-      <div class="stat-number">7<span class="stat-unit">engines</span></div>
-      <div class="stat-label">Unified Multi-Physics Toolchains</div>
-    </div>
-  </div>
-
-  <div class="infographic-block">
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-research"/></svg>
-      <div>
-        <strong>Control Tier: Nemotron Agent Orchestration Controller</strong>
-        <p>Interprets packaging design objectives, parses geometric DRC rules, and coordinates multi-step iterative solver scheduling.</p>
-      </div>
-    </div>
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-code"/></svg>
-      <div>
-        <strong>Interface Tier: Model Context Protocol (MCP) Adapters</strong>
-        <p>Normalizes API data bindings, translates agent directives into tool scripts, and captures solver convergence diagnostics.</p>
-      </div>
-    </div>
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-packaging"/></svg>
-      <div>
-        <strong>Execution Tier: Siemens Signoff Solvers</strong>
-        <p>Calibre 3DSTACK, Simcenter Flotherm, and Solido execute parasitic extraction, thermal CFD, and substrate IR-drop signoff.</p>
-      </div>
-    </div>
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-chip"/></svg>
-      <div>
-        <strong>Substrate Target: 3D Heterogeneous Assembly</strong>
-        <p>Co-optimizes base interposers, top logic dies, microbump pitch, HBM4 PHY interfaces, and high-density TSV arrays.</p>
-      </div>
-    </div>
-  </div>
-
-  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
-  <p>Although automated agent orchestration compresses setup workflows from several days to minutes, overall tape-out schedules remain physically bound by raw finite-element and CFD solver compute runtimes. Accelerating workflow coordination does not alter underlying numerical convergence equations for multi-million cell 3D meshes. Furthermore, simulation validity remains critically contingent on boundary assumptions: incorrect interfacial thermal resistance coefficients or degraded Thermal Interface Material (TIM) aging profiles will cause autonomous agents to converge on mathematically optimal architectures that fail under real-world silicon thermal stress.</p>
+  <p>
+    While Flint sets a high-water mark for static patch synthesis, its 54.9% score on Terminal-Bench 2.1 highlights operational bottlenecks in multi-turn CLI debugging and interactive shell navigation compared to frontier proprietary models. In addition, while token decoding is fast, ingesting extreme context sequences beyond 100k tokens incurs severe memory-bandwidth latency penalties during the prefill phase on unified memory architectures.
+  </p>
 </article>
 
 <article class="paper-section" id="art4">
-  <h2>NVIDIA Unveils DSX POD Modular Architecture at GTC Berlin: Factory-Built Infrastructure Targets 14-Day Onsite Commissioning</h2>
+  <h2>NVIDIA Deploys Capital Advances for Substrates and Optical Packaging Ahead of Vera Rubin Platform</h2>
 
   <h3 class="section-title">1. Executive Summary</h3>
   <div class="abstract-quote">
-    <p>Physical civil engineering timelines, electrical substation construction, and complex field plumbing have superseded chip procurement as the primary bottleneck for scaling high-density AI clusters. NVIDIA eliminates these multi-month data center construction delays by unveiling the <strong>DSX POD</strong> reference design, a standardized, factory-manufactured modular container architecture tailored for <strong>Vera Rubin NVL72</strong> liquid-cooled clusters. By shifting server rack assembly, plumbing distribution, and high-voltage busway verification from open construction sites into pre-tested factory environments, the system compresses onsite mechanical and electrical commissioning from <strong>180+ days to just 14 days</strong> at ready facilities while eliminating evaporative cooling water loss by up to <strong>54 million liters</strong> annually.</p>
+    <p>
+      Front-end lithography scaling has encountered steep economic limits, elevating advanced packaging, multi-die substrate area, and thermal dissipation into the primary bottlenecks for datacenter AI hardware. At next-generation rack power densities, standard copper interconnects suffer fatal insertion losses while massive multi-die interposers risk high warpage defects. To eliminate these physical supply hurdles ahead of its Vera Rubin platform, NVIDIA has deployed extensive commercial advance commitments, highlighted by a <strong>$1.1 billion advance to King Yuan Electronics (KYEC)</strong>. These targeted prepayments secure a collective <strong>2.5x expansion in advanced ABF substrate capacity</strong> and a <strong>15x ramp in Co-Packaged Optics (CPO) assembly</strong> at SPIL through mid-2027.
+    </p>
+  </div>
+
+  <div class="concept-box">
+    <p><strong>Ajinomoto Build-up Film (ABF) Substrates:</strong> High-density multi-layer organic mechanical carriers that route high-speed micro-vias between silicon interposers and system motherboards while mitigating warpage.</p>
+    <p><strong>Co-Packaged Optics (CPO):</strong> Advanced packaging paradigm mounting optical engines directly on the substrate with compute dies, replacing lossy electrical <span class="code-term">SerDes</span> copper channels.</p>
+    <p><strong>Wafer-Level Burn-In Sorting:</strong> High-temperature, high-power stress testing executed by dedicated OSAT partners to screen multi-die modules prior to permanent assembly integration.</p>
   </div>
 
   <h3 class="section-title">2. Architecture & Performance</h3>
-  <p>Traditional stick-built hyperscale data halls require sequential civil construction, manual manifold piping, and complex onsite fiber plant testing. The DSX POD standardizes liquid-to-air closed-loop cooling and high-power busbars within containerized enclosures, delivered as pre-certified modular building blocks ready for immediate utility connection.</p>
-
-  <div class="stat-grid">
-    <div class="stat-card">
-      <span class="stat-rank">COMMISSIONING TIMELINE</span>
-      <div class="stat-number">14<span class="stat-unit">days</span></div>
-      <div class="stat-label">Onsite Hookup at Prepared Sites (vs. 180+)</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">RACK POWER DENSITY</span>
-      <div class="stat-number">140<span class="stat-unit">kW+</span></div>
-      <div class="stat-label">Support for Vera Rubin NVL72 Clusters</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">RESOURCE EFFICIENCY</span>
-      <div class="stat-number">54<span class="stat-unit">M L</span></div>
-      <div class="stat-label">Annual Facility Water Savings (Dry Cooler Loop)</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">PRODUCTION TIMING</span>
-      <div class="stat-number">Q1<span class="stat-unit">2027</span></div>
-      <div class="stat-label">Initial Commercial Ecosystem Deployments</div>
-    </div>
-  </div>
+  <p>
+    Securing the physical foundation of the Vera Rubin NVL liquid-cooled architecture requires simultaneous interventions across three distinct manufacturing domains: raw <span class="code-term">ABF</span> substrate capacity, high-power automated die testing, and precision optical engine packaging. Prepayments distributed across IBIDEN, SEMCO, Unimicron, Amkor, KYEC, and SPIL lock in specialized tooling to avoid downstream interposer integration delays.
+  </p>
 
   <div class="chart-row">
     <div class="chart-container">
-      <div class="chart-label">Commissioning Duration (Days to Operation)</div>
-      <div id="chart-art4-1" style="width:100%;height:100%"></div>
+      <div class="chart-label">Target Manufacturing Capacity Expansion Factor</div>
+      <div id="chart-art4-a" style="width:100%;height:100%"></div>
     </div>
     <div class="chart-container">
-      <div class="chart-label">Supported Rack Power Density Evolution</div>
-      <div id="chart-art4-2" style="width:100%;height:100%"></div>
+      <div class="chart-label">Dedicated Capital & Capacity Commitments ($B)</div>
+      <div id="chart-art4-b" style="width:100%;height:100%"></div>
     </div>
   </div>
 
   <script>
   (function(){
-    var el1 = document.getElementById('chart-art4-1');
-    if (el1 && window.echarts) {
-      var chart1 = echarts.init(el1, null, {renderer: 'svg'});
-      chart1.setOption({
+    var elA = document.getElementById('chart-art4-a');
+    if (elA && window.echarts) {
+      var chartA = echarts.init(elA, null, {renderer: 'svg'});
+      chartA.setOption({
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 35, right: 30, bottom: 25, left: 140 },
-        xAxis: { type: 'value', name: 'Days' },
-        yAxis: { type: 'category', data: ['Traditional Site Build', 'DSX POD Architecture'] },
+        grid: { top: '18%', bottom: '15%', left: '15%', right: '8%' },
+        xAxis: { type: 'category', data: ['Advanced Substrates (ABF)', 'SPIL CPO Optical Engines'] },
+        yAxis: { type: 'value', name: 'Expansion Multiple (x)' },
         series: [{
-          name: 'Days to Commissioning',
+          data: [2.5, 15.0],
           type: 'bar',
-          data: [180, 14],
-          itemStyle: { color: '#fca5a5' },
-          label: { show: true, position: 'right' }
+          barWidth: '35%',
+          itemStyle: { color: '#688d7a', borderRadius: [4, 4, 0, 0] },
+          label: { show: true, position: 'top', formatter: '{c}x' }
         }]
       });
-      window.addEventListener('resize', function(){ chart1.resize(); });
+      window.addEventListener('resize', function(){ chartA.resize(); });
     }
 
-    var el2 = document.getElementById('chart-art4-2');
-    if (el2 && window.echarts) {
-      var chart2 = echarts.init(el2, null, {renderer: 'svg'});
-      chart2.setOption({
+    var elB = document.getElementById('chart-art4-b');
+    if (elB && window.echarts) {
+      var chartB = echarts.init(elB, null, {renderer: 'svg'});
+      chartB.setOption({
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 35, right: 30, bottom: 25, left: 140 },
-        xAxis: { type: 'value', name: 'kW per Rack' },
-        yAxis: { type: 'category', data: ['Traditional Data Hall', 'DSX POD (Rubin NVL72)', 'Next-Gen Optical Pods'] },
+        grid: { top: '18%', bottom: '15%', left: '15%', right: '8%' },
+        xAxis: { type: 'category', data: ['KYEC Advance Payment', 'Total Multi-Year Commitments'] },
+        yAxis: { type: 'value', name: 'Commitment Value ($B)' },
         series: [{
-          name: 'Rack Power Density',
+          data: [1.1, 279.0],
           type: 'bar',
-          data: [50, 140, 200],
-          itemStyle: { color: '#93c5fd' },
-          label: { show: true, position: 'right' }
+          barWidth: '35%',
+          itemStyle: { color: '#88a0c4', borderRadius: [4, 4, 0, 0] },
+          label: { show: true, position: 'top', formatter: '${c}B' }
         }]
       });
-      window.addEventListener('resize', function(){ chart2.resize(); });
+      window.addEventListener('resize', function(){ chartB.resize(); });
     }
   })();
   </script>
 
-  <div class="inline-callout">
-    Industrialized fabrication partners—including Dell Technologies, HPE, Lenovo, Foxconn, Schneider Electric, and Vertiv—pre-integrate Vera Rubin NVL72 compute trays, closed-loop liquid-to-air cooling manifolds, and 400V/800V busbar distribution topologies prior to transport.
+  <div class="table-wrapper">
+    <table class="academic-table">
+      <thead>
+        <tr>
+          <th>Supply Node</th>
+          <th>Lead Partner</th>
+          <th>Capital Focus</th>
+          <th>Target Window</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Wafer Testing</td>
+          <td>KYEC</td>
+          <td>$1.1B Advance Prepayment</td>
+          <td>April 2027</td>
+        </tr>
+        <tr>
+          <td>ABF Substrate</td>
+          <td>IBIDEN, SEMCO</td>
+          <td>2.5x Volume Multiplier</td>
+          <td>Mid-2027 Target</td>
+        </tr>
+        <tr>
+          <td>Multi-Die Packaging</td>
+          <td>Amkor</td>
+          <td>Interposer Line Ramp</td>
+          <td>Through 2027</td>
+        </tr>
+        <tr>
+          <td>Optical Packaging</td>
+          <td>SPIL</td>
+          <td>15x CPO Engine Throughput</td>
+          <td>Mid-2027 Target</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
-  <p>While the DSX POD standard compresses physical mechanical assembly to two weeks, the ultimate project deployment pacing item remains high-voltage utility grid interconnection. Securing substation transformer allocations, high-voltage easements, and utility interconnect approval frequently requires 12 to 24 months across European and North American metropolitan power hubs. In addition, containerized modular envelopes enforce strict spatial footprints: condensed maintenance corridors make server blade hot-swapping, cold-plate inspection, and heavy multi-chiplet tray servicing considerably more constrained than operations within conventional raised-floor data halls.</p>
+  <p>
+    Committing large capital advances exposes hardware roadmaps to financial and operational risk if yield curves degrade across multi-reticle packaging lines or if optical interface standards undergo unexpected industry revisions. Furthermore, thermomechanical mismatches between massive organic substrates, silicon interposers, and optical transceiver dies introduce acute stress failure vectors under intensive direct-to-chip liquid cooling cycles.
+  </p>
 </article>
 
 <section class="bento-grid-wrap">
@@ -1176,23 +1210,23 @@
   <div class="bento-grid">
     <div class="bento-card">
       <svg class="bento-card-icon"><use href="#icon-code"/></svg>
-      <div class="bento-card-title">Orchestration via Decision Models</div>
-      <p>Single-pass categorical evaluation models (mammoth-1, elephant-1) are decoupling deterministic routing from autoregressive token decoding, eliminating JSON formatting failures and slashing agent invocation overhead.</p>
+      <div class="bento-card-title">Workstation Agent Decentralization</div>
+      <p>Fine-grained MoE sparse architectures like Flint (2.5B active parameters) and INT8 DiT adapters decouple daily coding and creative raster editing from metered cloud APIs, shifting routine workflows onto private local workstations.</p>
     </div>
     <div class="bento-card">
-      <svg class="bento-card-icon"><use href="#icon-media"/></svg>
-      <div class="bento-card-title">Production-Ready Generative Media</div>
-      <p>Step-distilled flow models with native 4-channel RGBA latents (Qwen-Image-2.1-Turbo) bridge generative AI with professional studio compositing, reducing render iterations to 8 steps and rendering external matting obsolete.</p>
+      <svg class="bento-card-icon"><use href="#icon-robot"/></svg>
+      <div class="bento-card-title">Physical AI vs. Content Synthesis</div>
+      <p>Generative video has branched into two distinct paradigms: consumer media generation and physics-conditioned world simulation. NVIDIA Cosmos 3 proves that spatial priors and automated critic models are essential to bridge the simulation-to-reality gap.</p>
     </div>
     <div class="bento-card">
       <svg class="bento-card-icon"><use href="#icon-packaging"/></svg>
-      <div class="bento-card-title">Agentic Multi-Physics Chip Design</div>
-      <p>As 3D-IC and HBM4 packaging push thermal densities past 1,000W, Siemens and NVIDIA demonstrate that autonomous agent orchestration across signoff EDA solvers is crucial to navigate coupled electrothermal physics.</p>
+      <div class="bento-card-title">Advanced Packaging as Primary Gating Factor</div>
+      <p>With front-end lithography scaling facing diminishing returns, compute supremacy is now determined by backend packaging, warpage-resistant ABF substrates, wafer sorting throughput, and Co-Packaged Optics transitions.</p>
     </div>
     <div class="bento-card">
-      <svg class="bento-card-icon"><use href="#icon-datacenter"/></svg>
-      <div class="bento-card-title">Factory-Built AI Infrastructure</div>
-      <p>Physical facility deployment velocity is becoming the primary operational limiter. NVIDIA's DSX POD indicates a broader industry rotation toward pre-tested, modular containerized computing pods to compress build cycles.</p>
+      <svg class="bento-card-icon"><use href="#icon-deal"/></svg>
+      <div class="bento-card-title">Direct Supply Chain Capitalization</div>
+      <p>Hyperscalers and hardware designers are deploying forward capital advances (such as NVIDIA's $1.1B KYEC commitment) to directly tool and guarantee critical back-end OSAT capacity, locking out competitors ahead of multi-year architectural cycles.</p>
     </div>
   </div>
 </section>
