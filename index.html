@@ -800,14 +800,14 @@
                 <span class="top-nav-brand-tag">DAILY</span>
                 <span>AI<span class="brand-dot">·</span>Hardware Briefing</span>
             </div>
-            <div class="top-nav-meta" id="report-date-top">November 02, 2026</div>
+            <div class="top-nav-meta" id="report-date-top">November 03, 2026</div>
         </div>
     </nav>
 
     <div class="layout-shell">
         <aside class="side-nav">
             <div class="side-nav-title">Intelligence Briefing</div>
-            <div class="side-nav-sub">November 02, 2026</div>
+            <div class="side-nav-sub">November 03, 2026</div>
             <ul class="side-nav-list" id="side-nav-list"></ul>
         </aside>
 
@@ -816,420 +816,356 @@
                 <span class="doc-category">AI Ecosystem & Hardware Architecture</span>
                 <h1>Daily AI & Semiconductor Engineering Briefing</h1>
                 <div class="meta-info">
-                    <span id="report-date">November 02, 2026</span> • Technical Intelligence Report
+                    <span id="report-date">November 03, 2026</span> • Technical Intelligence Report
                 </div>
             </header>
 
             <main>
                 <article class="paper-section" id="art1">
-  <h2>Nace AI Open-Weights Drex Max v1: Eliminating Generation Latency via 27B Linear-Attention Decision Readout</h2>
+  <h2>FrameForge Adapts Video Diffusion Transformer Priors to Unlock Input-Adaptive Conditional Image Generation and Editing</h2>
   
   <h3 class="section-title">1. Executive Summary</h3>
   <div class="abstract-quote">
-    <p>Enterprise computer-use agents and orchestration pipelines have long struggled with high inference latency and ballooning API costs caused by standard autoregressive models generating wordy, token-by-token reasoning chains just to execute a single interface click or routing decision. To resolve this bottleneck, Nace AI introduced <strong>Drex Max v1</strong>, a dense <strong>27-billion-parameter</strong> multimodal decision model that bypasses autoregressive token emission entirely by evaluating high-resolution UI screen captures, DOM trees, and JSON schemas in a single forward pass through a direct <strong>255-way readout head</strong>. Built on an interleaved backbone of <strong>48 Gated DeltaNet linear-attention layers</strong> and <strong>16 non-causal bidirectional full-attention layers</strong>, the architecture achieves a competitive <strong>67.52 score on Decision Index 0.4</strong> while cutting output token fees to exactly <strong>$0.00</strong>, enabling ultra-fast, cost-effective tool routing directly on local enterprise workstations.</p>
+    <p>
+      Legacy conditional image editing workflows rely on rigid spatial adapters like <strong>ControlNet</strong> and <strong>IP-Adapter</strong>, which frequently cause semantic bleeding and disrupt non-target textures during complex multi-attribute transformations. 
+      To overcome these static constraints, <strong>FrameForge</strong> repurposes the rich spatiotemporal reasoning priors of 3D Video Diffusion Transformers (such as <strong>HunyuanVideo</strong> and <strong>Wan2.1</strong>) by mapping conditioning inputs into flexible virtual temporal attention trajectories. 
+      This architectural shift yields an <strong>18% relative gain in subject identity preservation</strong> on DreamBench and superior background protection on GEdit-Bench, establishing a unified foundation model for localized structural synthesis without fragmented 2D adapter weights.
+    </p>
   </div>
 
   <h3 class="section-title">2. Architecture & Performance</h3>
-  <p>Standard foundation models process agentic inputs sequentially, incurring quadratic attention overhead ($O(N^2)$) and accumulating latency with every emitted output token. Drex Max v1 reorganizes the transformer backbone into a 3:1 interleaved configuration, maintaining linear compute scaling across 75% of the depth while reserving non-causal bidirectional attention for global cross-modal synthesis.</p>
+  <p>
+    FrameForge reconfigures temporal Rotary Position Embedding (RoPE) mechanisms within a 3D Attention DiT backbone, using a Mixture of Temporal Experts (MoTE) and a Chain of Temporal Reasoning (CoTR) mask. Conditioning inputs are integrated via dual text/vision encoders (Qwen2.5-VL-7B-Instruct, Google ByT5-small, and SigLIP).
+  </p>
 
   <div class="chart-row">
     <div class="chart-container">
-      <div class="chart-label">Decision Index 0.4 Benchmark</div>
-      <div id="chart-art1-a" style="width:100%;height:260px;"></div>
-    </div>
-    <div class="chart-container">
-      <div class="chart-label">Backbone Layer Composition</div>
-      <div id="chart-art1-b" style="width:100%;height:260px;"></div>
+      <div class="chart-label">Subject Character Retention (DreamBench Relative Improvement)</div>
+      <div id="chart-art1-1" style="width:100%;height:100%;"></div>
     </div>
   </div>
-
   <script>
   (function(){
-    var elA = document.getElementById('chart-art1-a');
-    if (elA && window.echarts) {
-      var cA = echarts.init(elA, null, {renderer: 'svg'});
-      cA.setOption({
+    var el = document.getElementById('chart-art1-1');
+    if (el && window.echarts) {
+      var chart = echarts.init(el, null, {renderer: 'svg'});
+      chart.setOption({
+        title: { text: 'Identity Retention Baseline Comparison (%)', textStyle: { fontSize: 13, color: '#334155' } },
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 30, right: 20, bottom: 40, left: 45 },
-        xAxis: { type: 'category', data: ['Drex v2.0', 'Drex Max v1'] },
-        yAxis: { type: 'value', name: 'Score', min: 50, max: 75 },
+        grid: { left: '4%', right: '12%', bottom: '8%', top: '20%', containLabel: true },
+        xAxis: { type: 'category', data: ['Standard 2D Baseline', 'FrameForge (Video Prior)'], axisLabel: { color: '#64748b' } },
+        yAxis: { type: 'value', name: 'Retention Index (%)', min: 70, max: 100, axisLabel: { color: '#64748b' } },
         series: [{
           name: 'Score',
           type: 'bar',
           barWidth: '42%',
           data: [
-            { value: 61.25, itemStyle: { color: '#cbd5e1' } },
-            { value: 67.52, itemStyle: { color: '#64748b' } }
+            { value: 80.0, itemStyle: { color: '#cbd5e1' } },
+            { value: 94.4, itemStyle: { color: '#0ea5e9' } }
           ],
-          label: { show: true, position: 'top', formatter: '{c}' }
+          label: { show: true, position: 'top', formatter: '{c}%' }
         }]
       });
-      window.addEventListener('resize', function(){ cA.resize(); });
-    }
-
-    var elB = document.getElementById('chart-art1-b');
-    if (elB && window.echarts) {
-      var cB = echarts.init(elB, null, {renderer: 'svg'});
-      cB.setOption({
-        tooltip: { trigger: 'item', formatter: '{b}: {c} layers ({d}%)' },
-        series: [{
-          type: 'pie',
-          radius: ['45%', '72%'],
-          avoidLabelOverlap: false,
-          itemStyle: { borderRadius: 4, borderColor: '#ffffff', borderWidth: 2 },
-          label: { show: true, formatter: '{b}\n{c} Layers' },
-          data: [
-            { value: 48, name: 'Gated DeltaNet (Linear)', itemStyle: { color: '#94a3b8' } },
-            { value: 16, name: 'Bidirectional (Full)', itemStyle: { color: '#475569' } }
-          ]
-        }]
-      });
-      window.addEventListener('resize', function(){ cB.resize(); });
-    }
-  })();
-  </script>
-
-  <div class="stat-grid">
-    <div class="stat-card">
-      <span class="stat-rank">CONTEXT DEPTH</span>
-      <div class="stat-number">262<span class="stat-unit">k</span></div>
-      <div class="stat-label">Maximum Supported Input Window</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">VISUAL PARSING</span>
-      <div class="stat-number">97.3<span class="stat-unit">%</span></div>
-      <div class="stat-label">InfographicVQA Benchmark Accuracy</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">OUTPUT INFERENCE</span>
-      <div class="stat-number">0.00<span class="stat-unit">$</span></div>
-      <div class="stat-label">Cost per 1M Tokens (Direct Classification)</div>
-    </div>
-  </div>
-
-  <div class="inline-callout">
-    <strong>Direct Decision Projection Mechanics:</strong> Rather than formatting actions as structured JSON strings over multiple generative steps, the final hidden state of the input sequence is piped into a linear readout layer projecting into 255 categorical logits. This single-shot evaluation maps instantly to discrete UI operations such as click targets, form submission buttons, or routing gates.
-  </div>
-
-  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
-  <p>Drex Max v1 is fundamentally non-generative, rendering it incapable of providing open-ended textual commentary, code authoring, or conversational clarifications without chaining to an auxiliary generative LLM. Real-world tasks must be rigidly formulated into predefined action categorical bins, limiting deployment agility in unstructured conversational settings. Furthermore, while the linear-attention layers minimize compute on sequence extensions, ingestion of dense high-resolution screenshots across the remaining 16 full-attention layers still imposes sizable front-end memory requirements during initial context encoding.</p>
-</article>
-
-<article class="paper-section" id="art2">
-  <h2>DeepSeek Open-Sources dsh-superagent-prototype: Daemonizing Autonomous Coding via OS-Level Supervision</h2>
-
-  <h3 class="section-title">1. Executive Summary</h3>
-  <div class="abstract-quote">
-    <p>Current AI programming tools operate primarily as turn-by-turn conversational assistants, creating severe developer fatigue because engineers must constantly write prompts, watch line-by-line terminal outputs, and manually clean up faulty diffs. DeepSeek's Harness research lab has addressed this coordination friction by unveiling <strong>dsh-superagent-prototype</strong>, an open-source framework that converts coding agents into continuous, event-driven background system daemons. Instead of waiting for developer instructions, the daemon monitors Git repository webhooks and CI logs to reproduce bugs, test solutions in isolated sandboxes, and submit clean pull requests automatically. By integrating classic operating system principles—including <strong>process supervision</strong>, <strong>asynchronous task dispatching</strong>, and an automated <strong>watchdog process</strong> that detects infinite execution loops and rolls back failed mutations—the system allows engineering organizations to shift inference workloads from expensive daytime interactive spikes into smooth, background data center runs.</p>
-  </div>
-
-  <h3 class="section-title">2. Architecture & Performance</h3>
-  <p>The system reframes agent execution around decoupled state stores, containerized execution sandboxes, and supervisor daemons. By moving beyond interactive chat protocols, software tasks run asynchronously through centralized dispatching engines.</p>
-
-  <div class="infographic-block">
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-network"/></svg>
-      <div>
-        <strong>Event Ingestion & Dispatcher Engine</strong>
-        <p>Receives asynchronous webhooks from version control pipelines and enterprise communication streams, converting stack traces and bug tickets into structured task queues.</p>
-      </div>
-    </div>
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-datacenter"/></svg>
-      <div>
-        <strong>Isolated Ephemeral Sandboxes</strong>
-        <p>Provisions reproducible containerized environments to run reproducers, isolate regressions, and validate code patches away from production codebases.</p>
-      </div>
-    </div>
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-security"/></svg>
-      <div>
-        <strong>Supervisory Watchdog Process</strong>
-        <p>Monitors runtime telemetry and execution thresholds, terminating deadlocks and orchestrating automatic Git working-tree rollbacks upon test regression.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="table-wrapper">
-    <table class="academic-table">
-      <thead>
-        <tr>
-          <th>Architectural Vector</th>
-          <th>Conversational Coding Assistants</th>
-          <th>dsh-superagent Architecture</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Trigger Mode</td>
-          <td>Manual developer prompt</td>
-          <td>Git webhooks and events</td>
-        </tr>
-        <tr>
-          <td>Human Effort</td>
-          <td>Continuous step-by-step review</td>
-          <td>Asynchronous pull request reviews</td>
-        </tr>
-        <tr>
-          <td>Failure Recovery</td>
-          <td>Manual re-prompting</td>
-          <td>Watchdog rollback execution</td>
-        </tr>
-        <tr>
-          <td>Resource Load</td>
-          <td>Interactive burst demand</td>
-          <td>Schedulable background queues</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
-  <p>Autonomous daemon execution increases background token expenditure as speculative patches and verification suites run continuously without upfront human curation. Without strict review rate-limiting and robust policy validation, autonomous patch submissions risk causing maintainer exhaustion and pull request backlogs. Furthermore, granting background daemons persistent execution rights across private code repositories necessitates strict hardware-isolated sandboxing to prevent the unintended execution of malicious instructions or unvetted dependency pulls.</p>
-</article>
-
-<article class="paper-section" id="art3">
-  <h2>Aramco Closes $2.64B Investment in HUMAIN to Anchor a 3.0 GW Sovereign Compute Infrastructure Corridor</h2>
-
-  <h3 class="section-title">1. Executive Summary</h3>
-  <div class="abstract-quote">
-    <p>Global frontier model training and industrial AI deployments face an escalating energy bottleneck as regional electrical grids across North America and Europe suffer from multi-year grid interconnection delays. Seeking to overcome these physical utility constraints, energy major <strong>Saudi Aramco</strong> has closed a <strong>49% equity acquisition</strong> in sovereign AI venture <strong>HUMAIN</strong> via a <strong>$2.64 billion (SAR 9.9 billion)</strong> cash commitment, joining the Public Investment Fund's 51% controlling stake. This partnership establishes a capital program targeting <strong>3.0 gigawatts (GW)</strong> of dedicated data center capacity by 2030, directly co-located with primary domestic energy generation assets. By integrating high-density computing campuses directly into massive energy production sites, the joint venture bypasses strained civilian transmission lines to power enterprise workloads and regional foundation models like ALLaM at utility scale.</p>
-  </div>
-
-  <h3 class="section-title">2. Architecture & Performance</h3>
-  <p>The venture pairs Aramco's primary power infrastructure and industrial balance sheet with HUMAIN's sovereign foundation models (such as the ALLaM series) and digital compute roadmaps. Capital deployments prioritize modular high-density liquid-cooled halls capable of scaling compute density alongside dedicated energy generation.</p>
-
-  <div class="chart-row">
-    <div class="chart-container">
-      <div class="chart-label">Target Infrastructure Scale (GW Capacity)</div>
-      <div id="chart-art3-a" style="width:100%;height:260px;"></div>
-    </div>
-    <div class="chart-container">
-      <div class="chart-label">Capital & Value Realization ($B USD)</div>
-      <div id="chart-art3-b" style="width:100%;height:260px;"></div>
-    </div>
-  </div>
-
-  <script>
-  (function(){
-    var elA = document.getElementById('chart-art3-a');
-    if (elA && window.echarts) {
-      var cA = echarts.init(elA, null, {renderer: 'svg'});
-      cA.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 30, right: 20, bottom: 40, left: 45 },
-        xAxis: { type: 'category', data: ['2026 (Close)', '2027–28 (Ph 1)', '2030 (Target)'] },
-        yAxis: { type: 'value', name: 'Gigawatts (GW)', min: 0, max: 3.5 },
-        series: [{
-          name: 'Power Capacity',
-          type: 'bar',
-          barWidth: '40%',
-          data: [
-            { value: 0.25, itemStyle: { color: '#cbd5e1' } },
-            { value: 1.0, itemStyle: { color: '#94a3b8' } },
-            { value: 3.0, itemStyle: { color: '#475569' } }
-          ],
-          label: { show: true, position: 'top', formatter: '{c} GW' }
-        }]
-      });
-      window.addEventListener('resize', function(){ cA.resize(); });
-    }
-
-    var elB = document.getElementById('chart-art3-b');
-    if (elB && window.echarts) {
-      var cB = echarts.init(elB, null, {renderer: 'svg'});
-      cB.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 30, right: 20, bottom: 40, left: 50 },
-        xAxis: { type: 'category', data: ['Cash Injected', 'Value Added (2023–26)'] },
-        yAxis: { type: 'value', name: 'Billions USD ($)', min: 0, max: 14 },
-        series: [{
-          name: 'Amount',
-          type: 'bar',
-          barWidth: '38%',
-          data: [
-            { value: 2.64, itemStyle: { color: '#94a3b8' } },
-            { value: 11.3, itemStyle: { color: '#334155' } }
-          ],
-          label: { show: true, position: 'top', formatter: '${c}B' }
-        }]
-      });
-      window.addEventListener('resize', function(){ cB.resize(); });
-    }
-  })();
-  </script>
-
-  <div class="stat-grid">
-    <div class="stat-card">
-      <span class="stat-rank">EQUITY SPLIT</span>
-      <div class="stat-number">51/49<span class="stat-unit">%</span></div>
-      <div class="stat-label">PIF Majority / Aramco Industrial Stake</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">ROADMAP HORIZON</span>
-      <div class="stat-number">3.0<span class="stat-unit">GW</span></div>
-      <div class="stat-label">Planned Sovereign Power Allocation by 2030</div>
-    </div>
-  </div>
-
-  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
-  <p>Constructing multi-gigawatt compute hubs in arid desert climates demands closed-loop liquid and immersion cooling infrastructures to prevent unsustainable industrial water consumption and high parasitic cooling energy loads. Beyond physical facilities, the primary operational headwind centers on geopolitical export restrictions and international semiconductor licensing clearances, which govern access to leading-edge accelerator silicon. Sustained progress relies heavily on navigating international supply-chain compliance to secure timely deliveries of dense cluster processors.</p>
-</article>
-
-<article class="paper-section" id="art4">
-  <h2>NVIDIA Details Optics-on-Interposer Architecture: Eliminating Substrate Losses via Direct Silicon Integration</h2>
-
-  <h3 class="section-title">1. Executive Summary</h3>
-  <div class="abstract-quote">
-    <p>As next-generation AI clusters scale to per-lane signaling speeds of <strong>224 Gbps and 448 Gbps</strong>, conventional copper printed circuit boards and organic packaging substrates suffer severe high-frequency attenuation, requiring power-hungry DSP retimers that consume substantial data center energy. To resolve this interconnect wall, NVIDIA Chief Research Scientist Nikola Nedovic disclosed a prototype <strong>Optics-on-Interposer (OOI)</strong> packaging architecture that bypasses organic substrate routing entirely. By mounting silicon-photonic optical engines directly onto a shared <strong>silicon interposer</strong> alongside the GPU and High-Bandwidth Memory (HBM) stacks, high-speed electrical traces are reduced to <strong>under 5 mm</strong> via micro-bumps. This ultra-short reach slashes channel losses to <strong>under 3 dB</strong> and drives interconnect energy consumption down toward a projected <strong>sub-2 pJ/bit</strong>, establishing an efficient blueprint for massive electro-optical accelerator fabrics.</p>
-  </div>
-
-  <div class="concept-box">
-    <p><strong><span class="code-term">Optics-on-Interposer (OOI)</span></strong>: An advanced 2.5D semiconductor packaging integration where photonic transceiver chiplets are mounted directly on the silicon interposer rather than adjacent organic packaging layers.</p>
-    <p><strong><span class="code-term">Co-Packaged Optics (CPO)</span></strong>: System architectures bringing optical interfaces into the multi-chip package to replace long electrical copper links with low-attenuation optical fibers.</p>
-    <p><strong><span class="code-term">Known Good Die (KGD)</span></strong>: Rigorous pre-packaging component test methodologies required to guarantee die functionality prior to final bonding on costly multi-chip substrate assemblies.</p>
-  </div>
-
-  <h3 class="section-title">2. Architecture & Performance</h3>
-  <p>Conventional co-packaged optics (CPO) place photonic dies onto the organic substrate, forcing high-speed signals across high-loss package traces. NVIDIA’s <span class="code-term">Optics-on-Interposer (OOI)</span> design confines high-frequency electrical propagation to fine-pitch silicon interposer layers, enabling direct optical conversion adjacent to compute chiplets.</p>
-
-  <div class="chart-row">
-    <div class="chart-container">
-      <div class="chart-label">Electrical Channel Length (mm)</div>
-      <div id="chart-art4-a" style="width:100%;height:260px;"></div>
-    </div>
-    <div class="chart-container">
-      <div class="chart-label">Interconnect Power Efficiency (pJ/bit)</div>
-      <div id="chart-art4-b" style="width:100%;height:260px;"></div>
-    </div>
-  </div>
-
-  <script>
-  (function(){
-    var elA = document.getElementById('chart-art4-a');
-    if (elA && window.echarts) {
-      var cA = echarts.init(elA, null, {renderer: 'svg'});
-      cA.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 30, right: 20, bottom: 40, left: 50 },
-        xAxis: { type: 'category', data: ['Front Pluggable', 'Substrate CPO', 'NVIDIA OOI'] },
-        yAxis: { type: 'value', name: 'Reach (mm)', min: 0, max: 350 },
-        series: [{
-          name: 'Trace Length',
-          type: 'bar',
-          barWidth: '42%',
-          data: [
-            { value: 250, itemStyle: { color: '#cbd5e1' } },
-            { value: 35, itemStyle: { color: '#94a3b8' } },
-            { value: 5, itemStyle: { color: '#475569' } }
-          ],
-          label: { show: true, position: 'top', formatter: '{c} mm' }
-        }]
-      });
-      window.addEventListener('resize', function(){ cA.resize(); });
-    }
-
-    var elB = document.getElementById('chart-art4-b');
-    if (elB && window.echarts) {
-      var cB = echarts.init(elB, null, {renderer: 'svg'});
-      cB.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 30, right: 20, bottom: 40, left: 45 },
-        xAxis: { type: 'category', data: ['Pluggable Optics', 'Substrate CPO', 'NVIDIA OOI (Target)'] },
-        yAxis: { type: 'value', name: 'Efficiency (pJ/bit)', min: 0, max: 20 },
-        series: [{
-          name: 'Energy',
-          type: 'bar',
-          barWidth: '42%',
-          data: [
-            { value: 17.5, itemStyle: { color: '#cbd5e1' } },
-            { value: 6.5, itemStyle: { color: '#94a3b8' } },
-            { value: 2.0, itemStyle: { color: '#334155' } }
-          ],
-          label: { show: true, position: 'top', formatter: '{c} pJ/b' }
-        }]
-      });
-      window.addEventListener('resize', function(){ cB.resize(); });
+      window.addEventListener('resize', function(){ chart.resize(); });
     }
   })();
   </script>
 
   <div class="infographic-block">
     <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-packaging"/></svg>
+      <svg class="infographic-icon"><use href="#icon-media"/></svg>
       <div>
-        <strong>Silicon Interposer Co-Location</strong>
-        <p>Optical engines sit directly alongside compute and HBM on the high-density silicon interposer, eliminating organic substrate transmission passes.</p>
+        <strong>Virtual Spatiotemporal Trajectories</strong>
+        <p>Maps static editing operations to continuous virtual temporal steps, eliminating hardcoded 2D spatial segmentation masks.</p>
       </div>
     </div>
     <div class="infographic-item">
       <svg class="infographic-icon"><use href="#icon-chip"/></svg>
       <div>
-        <strong>8-Wavelength DWDM Prototype</strong>
-        <p>Achieves 256 Gbps aggregate throughput over a single optical fiber across 8 multiplexed channels operating at 32 Gbps per wavelength.</p>
+        <strong>Hardware Memory Footprint Impact</strong>
+        <p>Consolidated 3D DiT inference requires substantial workstation VRAM, positioning GPUs like RTX 5080 (16GB) and RTX 5090 (32GB) as mandatory baseline hardware.</p>
       </div>
     </div>
   </div>
 
-  <div class="table-wrapper">
-    <table class="academic-table">
-      <thead>
-        <tr>
-          <th>Packaging Architecture</th>
-          <th>Typical Trace Reach</th>
-          <th>Loss at 224 Gbps</th>
-          <th>Interconnect Energy</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Front-Panel Pluggables</td>
-          <td>150–300 mm</td>
-          <td>High (&gt;25 dB)</td>
-          <td>~15–20 pJ/bit</td>
-        </tr>
-        <tr>
-          <td>Substrate CPO</td>
-          <td>20–50 mm</td>
-          <td>Moderate (~10–15 dB)</td>
-          <td>~5–8 pJ/bit</td>
-        </tr>
-        <tr>
-          <td>NVIDIA OOI Prototype</td>
-          <td>&lt;5 mm</td>
-          <td>Low (&lt;3 dB)</td>
-          <td>&lt;2 pJ/bit targeted</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="inline-callout">
+    FrameForge demonstrates that temporal attention mechanisms naturally disentangle subject identity from environment lighting, replacing dozens of single-purpose LoRA layers with an integrated virtual reasoning pass.
   </div>
 
   <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
-  <p>Directly bonding optical engines onto a shared silicon interposer next to high-power compute dies generates complex thermal-mechanical challenges. Silicon-photonic modulators and laser sources are susceptible to thermal wavelength drift when placed within millimeters of processing cores exhibiting extreme thermal swings. Additionally, packaging yields represent a significant barrier: attaching optical chiplets onto high-value multi-die interposers carrying advanced GPU dies and memory stacks requires exceptionally rigorous <span class="code-term">Known Good Die (KGD)</span> validation to avoid compounding assembly line fallout.</p>
+  <p>
+    Although FrameForge establishes an expressive unified editing model, the high computational overhead of multi-step 3D DiT backbones creates substantial inference latency compared to distilled 2D models. Commercial viability across interactive web canvases requires distilling multi-turn virtual temporal attention trajectories into 4-to-8 step sampling schedules capable of sub-second response times without exhausting client-side GPU memory.
+  </p>
+</article>
+
+<article class="paper-section" id="art2">
+  <h2>DeepSeek Harness Deploys "Creator Mode": Shifting Agent Platforms to Real-Time Prompt-to-Plugin Environments</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>
+      Conventional autonomous agent frameworks fail when user requests require unmapped APIs, custom UI visualizers, or domain-specific parsers outside pre-registered static toolsets. 
+      To solve this rigidity, <strong>DeepSeek Harness</strong> introduces <strong>Creator Mode</strong>, a runtime architecture that dynamically synthesizes, compiles, and hot-mounts localized execution widgets straight from conversational prompts. 
+      By generating fully operational <strong>600+ line UI modules in under 6 minutes</strong> within an isolated Node.js environment, this platform transforms client interfaces from static function callers into adaptive desktop operating environments.
+    </p>
+  </div>
+
+  <h3 class="section-title">2. Architecture & Performance</h3>
+  <p>
+    Creator Mode replaces static schema lookups with a dynamic metaprogramming loop. The system orchestrates four key layers to translate intent into sandboxed client-side logic:
+  </p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-rank">SYNTHESIS TIME</span>
+      <div class="stat-number">&lt; 6<span class="stat-unit">min</span></div>
+      <div class="stat-label">End-to-End Dynamic Tool Mount</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">SCALE</span>
+      <div class="stat-number">600+<span class="stat-unit">lines</span></div>
+      <div class="stat-label">Verified Self-Contained UI Widget</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">SANDBOX</span>
+      <div class="stat-number">100<span class="stat-unit">%</span></div>
+      <div class="stat-label">Local Syntax & Process Isolation</div>
+    </div>
+  </div>
+
+  <div class="infographic-block">
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-code"/></svg>
+      <div>
+        <strong>Application Layer: Dynamic Desktop Client</strong>
+        <p>Renders dynamically generated React and HTML5 widgets and real-time control panels on macOS and Windows hosts.</p>
+      </div>
+    </div>
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-robot"/></svg>
+      <div>
+        <strong>Agent Orchestration: Creator Mode Controller</strong>
+        <p>Translates natural language specifications into programmatic component requirements and dependency manifests.</p>
+      </div>
+    </div>
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-security"/></svg>
+      <div>
+        <strong>Execution Sandbox: Local Node.js Process</strong>
+        <p>Executes automated syntax checks, enforces boundary isolation, and sandboxes local filesystem interactions.</p>
+      </div>
+    </div>
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-research"/></svg>
+      <div>
+        <strong>Foundation Model Core: Reasoning & Code Model</strong>
+        <p>Synthesizes full-stack script logic, inspects runtime stack traces, and iteratively patches execution exceptions.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
+  <p>
+    Empowering agent clients to generate and hot-mount native executable code introduces serious security liabilities, including indirect prompt injection risks, unintended credential discovery, and arbitrary script execution. Production enterprise adoption will depend on integrating kernel-level OS sandboxes, mandatory privilege isolation boundaries, and static analysis verification gates to prevent malicious code escalation within client infrastructure.
+  </p>
+</article>
+
+<article class="paper-section" id="art3">
+  <h2>OpenAI Releases LifeVal: Shifting Model Benchmarking from Academic Trivia to Practical Everyday Task Execution</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>
+      Frontier language models achieve near-saturated scores across academic benchmarks like MMLU and GSM8K, yet they regularly fail when orchestrating messy, multi-step real-world household and municipal logistics. 
+      To bridge this disconnect, <strong>OpenAI</strong> introduced <strong>LifeVal</strong>, an empirical evaluation suite calibrated against time-use registries (MTUS and ATUS) and validated with a <strong>3,995-participant demographic cohort</strong>. 
+      Advanced reasoning models demonstrated an average task reward of <strong>80.6% on structured workflows</strong>, while baseline instruction models fell below 50%, highlighting a decisive transition toward benchmarking multi-turn errand completion under practical real-world ambiguity.
+    </p>
+  </div>
+
+  <h3 class="section-title">2. Architecture & Performance</h3>
+  <p>
+    LifeVal evaluates performance across core functional domains—such as caregiving logistics, personal budgeting, municipal administrative navigation, and healthcare scheduling—scoring trajectories against multi-attribute rubric rewards.
+  </p>
+
+  <div class="chart-row">
+    <div class="chart-container">
+      <div class="chart-label">Everyday Administrative Task Reward Score (%)</div>
+      <div id="chart-art3-1" style="width:100%;height:100%;"></div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var el = document.getElementById('chart-art3-1');
+    if (el && window.echarts) {
+      var chart = echarts.init(el, null, {renderer: 'svg'});
+      chart.setOption({
+        title: { text: 'LifeVal Normalized Task Reward Performance', textStyle: { fontSize: 13, color: '#334155' } },
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { left: '4%', right: '10%', bottom: '8%', top: '20%', containLabel: true },
+        xAxis: { type: 'category', data: ['Standard Instruction Baseline', 'Frontier Reasoning Systems'], axisLabel: { color: '#64748b' } },
+        yAxis: { type: 'value', name: 'Task Reward (%)', min: 0, max: 100, axisLabel: { color: '#64748b' } },
+        series: [{
+          name: 'Task Reward',
+          type: 'bar',
+          barWidth: '40%',
+          data: [
+            { value: 48.2, itemStyle: { color: '#94a3b8' } },
+            { value: 80.6, itemStyle: { color: '#10b981' } }
+          ],
+          label: { show: true, position: 'top', formatter: '{c}%' }
+        }]
+      });
+      window.addEventListener('resize', function(){ chart.resize(); });
+    }
+  })();
+  </script>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-rank">HUMAN VALIDATION</span>
+      <div class="stat-number">3,995</div>
+      <div class="stat-label">Survey Participant Cohort</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">REASONING PEAK</span>
+      <div class="stat-number">80.6<span class="stat-unit">%</span></div>
+      <div class="stat-label">Frontier System Task Reward</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">DATASET FOUNDATION</span>
+      <div class="stat-number">MTUS<span class="stat-unit">/ATUS</span></div>
+      <div class="stat-label">Empirical Time-Use Registries</div>
+    </div>
+  </div>
+
+  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
+  <p>
+    Rubric-based evaluation within simulated administrative environments does not guarantee autonomous reliability in production workflows featuring dynamic web UI changes, two-factor authentication gates, or subjective legal compromises. Furthermore, long-horizon multi-turn tool interaction causes aggregate inference token consumption and KV-cache footprints to expand sharply, creating heavy cost pressures for enterprise agent deployments.
+  </p>
+</article>
+
+<article class="paper-section" id="art4">
+  <h2>onsemi Acquires Ferric for $600 Million: Securing In-Package Integrated Voltage Regulators (IVR) for High-Current AI Accelerators</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>
+      Modern AI processors drawing over 1,000 Watts at sub-0.8V core rails face severe board-level resistive losses and high parasitic inductance during sharp compute load transitions. 
+      Addressing this physical packaging constraint, <strong>onsemi</strong> executed a definitive agreement to acquire <strong>Ferric for $600 million</strong> to integrate thin-film magnetic Integrated Voltage Regulators (IVRs) directly into 2.5D/3D chip packages. 
+      By compressing power loop inductance from <strong>1.0 nH down to under 0.1 nH</strong>, this in-package approach eliminates transient voltage droop, avoids compute clock throttling, and reclaims valuable motherboard space for high-density interconnect routing.
+    </p>
+  </div>
+
+  <div class="concept-box">
+    <p><strong>Key Concepts:</strong></p>
+    <ul>
+      <li><span class="code-term">Integrated Voltage Regulator (IVR):</span> A power converter incorporating micro-inductors directly onto a substrate or interposer, bypassing board-level routing losses.</li>
+      <li><span class="code-term">Parasitic Loop Inductance:</span> Unintended magnetic inductance along PCB power paths that causes severe supply voltage drops during steep <span class="code-term">di/dt</span> current swings.</li>
+      <li><span class="code-term">Transient Voltage Droop:</span> An instantaneous supply rail sag during peak compute execution, which causes logic timing errors unless mitigated by fast point-of-load regulation.</li>
+    </ul>
+  </div>
+
+  <h3 class="section-title">2. Architecture & Performance</h3>
+  <p>
+    Ferric's micro-fabricated thin-film magnetic inductors integrate directly into semiconductor back-end-of-line (BEOL) and package interposer layers. This migration bypasses the high-impedance PCB copper distribution planes characteristic of conventional multiphase VRMs.
+  </p>
+
+  <div class="chart-row">
+    <div class="chart-container">
+      <div class="chart-label">Parasitic Loop Inductance Comparison (Lower is Better)</div>
+      <div id="chart-art4-1" style="width:100%;height:100%;"></div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var el = document.getElementById('chart-art4-1');
+    if (el && window.echarts) {
+      var chart = echarts.init(el, null, {renderer: 'svg'});
+      chart.setOption({
+        title: { text: 'Power Path Parasitic Inductance (nH)', textStyle: { fontSize: 13, color: '#334155' } },
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { left: '4%', right: '12%', bottom: '8%', top: '20%', containLabel: true },
+        xAxis: { type: 'category', data: ['Discrete Multiphase VRM', 'In-Package IVR (Ferric)'], axisLabel: { color: '#64748b' } },
+        yAxis: { type: 'value', name: 'Inductance (nH)', min: 0, max: 1.2, axisLabel: { color: '#64748b' } },
+        series: [{
+          name: 'Inductance',
+          type: 'bar',
+          barWidth: '38%',
+          data: [
+            { value: 1.0, itemStyle: { color: '#f87171' } },
+            { value: 0.1, itemStyle: { color: '#3b82f6' } }
+          ],
+          label: { show: true, position: 'top', formatter: '{c} nH' }
+        }]
+      });
+      window.addEventListener('resize', function(){ chart.resize(); });
+    }
+  })();
+  </script>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-rank">DEAL VALUATION</span>
+      <div class="stat-number">$600<span class="stat-unit">M</span></div>
+      <div class="stat-label">Upfront Cash (+$175M Milestones)</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">INDUCTANCE REDUCTION</span>
+      <div class="stat-number">10<span class="stat-unit">×</span></div>
+      <div class="stat-label">0.1 nH vs. 1.0 nH Baseline</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">OPERATING VOLTAGE</span>
+      <div class="stat-number">&lt; 0.8<span class="stat-unit">V</span></div>
+      <div class="stat-label">Target Core Logic Power Rail</div>
+    </div>
+  </div>
+
+  <div class="infographic-block">
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-packaging"/></svg>
+      <div>
+        <strong>Thin-Film Substrate Embedding</strong>
+        <p>Positions micro-fabricated magnetics onto the silicon interposer, shortening sub-1V high-current travel distances to millimeters.</p>
+      </div>
+    </div>
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-datacenter"/></svg>
+      <div>
+        <strong>Motherboard Routing Reclamation</strong>
+        <p>Frees PCB real estate adjacent to the socket, enabling denser PCIe Gen6/Gen7 traces, 224G SerDes routing, and direct liquid-cooling blocks.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
+  <p>
+    Depositing magnetic thin-film alloys directly into high-volume OSAT packaging flows introduces thermal-expansion mismatch concerns, mechanical shear stress, and potential yield penalties. Additionally, because in-package IVRs typically serve as stage-two regulators within a two-stage power delivery architecture (stepping down from an intermediate 12V or 48V rail), onsemi must validate high manufacturing yields across tier-one packaging foundries ahead of targeted 2027 server deployments.
+  </p>
 </article>
 
 <section class="bento-grid-wrap">
   <h2 class="bento-grid-title">Key Strategic Takeaways</h2>
   <div class="bento-grid">
     <div class="bento-card">
-      <svg class="bento-card-icon"><use href="#icon-chip"/></svg>
-      <div class="bento-card-title">Discriminative Decision Engines Over Token Loops</div>
-      <p>Nace AI's Drex Max v1 validates single-forward-pass classification architectures for agent orchestration, eliminating autoregressive generation latency and zeroing out output token expenditure for discrete tool selection.</p>
+      <svg class="bento-card-icon"><use href="#icon-media"/></svg>
+      <div class="bento-card-title">Convergence on Spatiotemporal Latents</div>
+      <p>Video DiT foundations are rendering discrete 2D spatial adapters obsolete, enabling unified models for static and temporal creative tasks at the expense of higher inference VRAM demands.</p>
     </div>
     <div class="bento-card">
       <svg class="bento-card-icon"><use href="#icon-code"/></svg>
-      <div class="bento-card-title">OS-Inspired Autonomous Daemonization</div>
-      <p>DeepSeek's dsh-superagent framework signals an architectural paradigm shift from interactive prompt assistants toward persistent, event-driven background daemons managed by supervisory watchdogs and automated rollback pipelines.</p>
+      <div class="bento-card-title">Agent Metaprogramming Runtimes</div>
+      <p>Autonomous agents are shifting from static function manifests to runtime code synthesis and dynamic UI mounting, requiring modern operating systems to enforce rigid execution boundaries.</p>
     </div>
     <div class="bento-card">
-      <svg class="bento-card-icon"><use href="#icon-datacenter"/></svg>
-      <div class="bento-card-title">Primary Energy Sovereign Compute Corridors</div>
-      <p>Saudi Aramco's $2.64B stake in HUMAIN reflects a structural shift toward multi-gigawatt data center roadmaps integrated directly at domestic energy sources to bypass civil grid interconnection bottlenecks.</p>
+      <svg class="bento-card-icon"><use href="#icon-research"/></svg>
+      <div class="bento-card-title">Pragmatic Task-Trajectory Benchmarks</div>
+      <p>Benchmark saturation on academic tests is steering frontier lab evaluations toward time-use administrative trajectories, aligning enterprise procurement with empirical real-world execution.</p>
     </div>
     <div class="bento-card">
       <svg class="bento-card-icon"><use href="#icon-packaging"/></svg>
-      <div class="bento-card-title">Electro-Optical Interposer Packaging Convergence</div>
-      <p>NVIDIA's Optics-on-Interposer prototype addresses the copper interconnect wall, establishing that future cluster scaling relies on mounting photonic engines directly onto silicon interposers to achieve sub-2 pJ/bit energy budgets.</p>
+      <div class="bento-card-title">Power Delivery Moves In-Package</div>
+      <p>Sub-0.8V accelerator requirements are pushing point-of-load voltage regulation off the motherboard and into 2.5D/3D packaging, establishing integrated magnetics as a primary scaling metric.</p>
     </div>
   </div>
 </section>
