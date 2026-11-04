@@ -1,43 +1,45 @@
-### 1. FrameForge Adapts Video Diffusion Transformer Priors to Unlock Input-Adaptive Conditional Image Generation and Editing
+# Strategic AI Technology & Ecosystem Daily Briefing
 
-**Source:** Hugging Face Papers / arXiv / FrameXAI Research  
-**Event Date:** 2026-11-02  
-**Source Date:** 2026-11-02  
-**Status:** Academic Paper & Open-Source Code Release  
-**Primary URL:** https://arxiv.org/abs/2610.36545  
+---
+
+### 1. SJTU DENG Lab Open-Sources Wave Forcing: Unlocking Speed-of-Light Streaming Video Generation at 134.8 FPS via Wavefront Denoising
+
+**Source:** SJTU DENG Lab / arXiv / Hugging Face  
+**Event Date:** 2026-11-03  
+**Source Date:** 2026-11-03  
+**Status:** Academic paper / Open-source weights and runtime release  
+**Primary URL:** https://arxiv.org/abs/2611.00859
 
 #### Overview
-Why does this matter? For years, AI image generation and instruction-based editing models—from Stable Diffusion and Midjourney to FLUX and proprietary "Nano Banana" editing engines—have treated condition-to-image manipulation through rigid spatial conditioning or static cross-attention layers. This rigid coupling frequently creates semantic bleeding, destroys non-target textures, or fails to execute fine-grained object transformations without tedious manual rotoscoping. Pretrained video foundation models inherently encode continuous physical dynamics, lighting shifts, and spatial transformations across time, but directly co-opting them for single-image generation has been crippled by rigid temporal frame indexing. FrameForge resolves this architectural impasse by repurposing the spatiotemporal priors of modern video Diffusion Transformers (such as HunyuanVideo and Wan architectures) to execute unified conditional image generation and localized editing. Instead of locking source and target images into arbitrary temporal indices, FrameForge introduces input-adaptive virtual temporal reasoning paths. The open-source release on Hugging Face and GitHub demonstrates that repurposing temporal attention layers offers a far more generalized framework for image editing, style transfer, and structural translation than training isolated single-image ControlNets, triggering immediate attention across creative workflow tooling communities.
+Why does this matter? Video Diffusion Transformers (DiTs) have revolutionized generative visual quality, but their autoregressive deployment remains crippled by prohibitive inference latency, making real-time interactive generation mathematically intractable under traditional batch denoising. Conventional chunk-by-chunk video generation models force downstream segments to wait for earlier chunks to complete their entire multistep diffusion trajectories, introducing severe pipeline bubbles and bounding output throughput. To break this fundamental serial compute bottleneck, researchers at Shanghai Jiao Tong University's DENG Lab have released Wave Forcing (and its open-source runtime WaveRT), introducing a wavefront scheduling paradigm for continuous video streaming. In this architecture, subsequent temporal video chunks begin their iterative denoising process well before predecessor chunks have finished, leveraging intermediate, partially cleaned latent representations as causal conditioning context. By coupling this causal scheduling with asynchronous Key/Value (K/V) transmission across distributed GPU workers, WaveRT produces one finalized output chunk for every forward execution round after pipeline warm-up. Evaluated on the open-weight Wan2.1-T2V architecture, the framework achieves an unprecedented throughput of 134.8 frames per second (FPS) across an 8-GPU NVIDIA H200 cluster—a 7x throughput leap over single-GPU baselines—while preserving visual coherence and motion stability.
 
 #### Strategic Impact
-- **Technology & Ecosystem:** FrameForge bridges the historic divide between video diffusion models and image-editing pipelines. By utilizing temporal Rotary Position Embedding (RoPE) mechanisms, single models can adaptively scale semantic transformations—from subtle facial retouching to radical structural re-contextualization—without requiring specialized multi-task sub-networks.
-- **Business & Market:** Directly threatens legacy desktop photo retouching suites (Adobe Photoshop, Affinity Photo) and dedicated image-to-image plugins. Commercial creative platforms (Krea, Recraft, Canva) can lower model training overhead by consolidating their conditional generation, character consistency, and inpainting models into a single video-derived backbone.
-- **Infrastructure & Hardware:** Video backbones are notoriously VRAM-heavy. FrameForge leverages a compressed 720p video backbone that produces 512×512 to 1024×1024 high-fidelity stills. This increases GPU inference memory requirements compared to lightweight 2D U-Nets, cementing 16GB–24GB VRAM workstation GPUs (e.g., RTX 5080/5090) as the baseline for high-precision local AI design workflows.
-- **Investment Implication:** Startups building multi-model creative suites must pivot toward foundation architectures that unify image and video latent representations rather than funding disparate point-solution checkpoint models.
+- **Technology & Ecosystem:** Wave Forcing marks a structural transition from "offline rendering" to "instantaneous video streaming". By proving that intermediate latent states provide sufficient causal conditioning for diffusion Transformers, it opens the door to interactive generative simulation, live video avatars, and real-time world exploration without requiring trillion-parameter end-to-end retraining.
+- **Business & Market:** High-latency compute has been the primary barrier preventing generative video platforms from monetizing interactive applications (such as gaming, live broadcast synthesis, and instant VFX previews). Achieving 134+ FPS at competitive visual quality slashes the per-frame serving economics, directly threatening proprietary, high-latency video APIs.
+- **Infrastructure & Hardware:** Wavefront execution shifts the distributed infrastructure requirement from raw FLOPs to communication interconnect bandwidth and memory latency. Overlapping K/V tensor exchanges across GPU rings demands low-latency inter-GPU fabrics (NVLink/NVSwitch) to maintain 1-chunk-per-round output cadences without stalling compute engines.
+- **Investment Implication:** Capital allocation is pivoting toward inference infrastructure software and specialized serving kernels. Startups optimizing the execution graph of open diffusion models (like Wan2.1 and HunyuanVideo) can deliver commercial real-time video features that were previously deemed economically impractical.
 
 #### Technical Deep Dive
-- **Key specifications:**
-  - Backbone: HunyuanVideo-1.5 / Wan2.1 DiT integration via 3D Attention.
-  - Condition Handling: Mixture of Temporal Experts (MoTE) dynamically routing virtual intervals.
-  - Latent Pathway: Chain of Temporal Reasoning (CoTR) using a bottleneck attention mask.
-  - Text & Vision Encoders: Qwen2.5-VL-7B-Instruct, Google ByT5-small, and SigLIP/FLUX-Redux.
-  - Source: https://github.com/Lyne1/FrameForge.git
-- **Comparison with previous generation:**
-  - Traditional ControlNet / InstructPix2Pix: Fixed spatial concatenation or frozen cross-attention; prone to background corruption.
-  - FrameForge: Input-adaptive virtual temporal relations; delivers superior subject-driven fidelity (+18% character retention on DreamBench) and fine-grained editing precision on GEdit-Bench without fine-tuning specific tasks.
-- **Deployment status:** Research paper published; inference scripts and LoRA checkpoint weights released on GitHub and Hugging Face.
+- **Inference Throughput (Cluster):** 134.8 FPS (achieved on an 8x NVIDIA H200 cluster running Wan2.1-T2V-1.3B).
+- **Single-GPU Baseline vs. WaveRT:** 19.06 FPS → 134.8 FPS aggregate cluster throughput (exceeding a 7x scaling factor via asynchronous pipelined execution).
+- **Denoising Step Budget:** 4-step and 5-step wave-pipelined configurations with dedicated VAE temporal partitioning stages.
+- **Pipeline Execution Contract:** 1F1C (One Finished chunk output per concurrent Forward execution round).
+- **Deployment Status:** Open-source release (Code under Apache-2.0, model weights published on Hugging Face as `SJTU-DENG-Lab/WaveForcing-1.3B`).
 
-#### Comparison Matrix Data
-- Framework | Backbone Type | Conditioning Strategy | Editing Flexibility | Primary Limitation
-- ControlNet / IP-Adapter | 2D U-Net / DiT | Fixed spatial feature injection | Rigid; task-specific weights required | Limited contextual transformation
-- Instruct-Pix2Pix | 2D Diffusion | Text-guided pixel-to-pixel residual | Medium; frequent background bleeding | Low multi-attribute fidelity
-- **FrameForge** | **3D Video DiT** | **Adaptive virtual temporal RoPE (MoTE + CoTR)** | **High; dynamic transformation pathways** | **Higher VRAM during inference**
+#### Structured Data
+
+[Comparison Matrix Data]
+- Metric / Criterion | Standard Autoregressive Video DiT | Rolling Forcing Baseline | Wave Forcing (WaveRT)
+- Execution Scheduling | Sequential step completion per chunk | Overlapped cache refresh with latency | Pipelined Wavefront Denoising
+- Latent Conditioning | Fully denoised final chunk only | Windowed KV caching with bubbles | Cleaner intermediate states as causal context
+- Cluster Output Cadence | High latency per multi-frame burst | Intermittent chunk delivery | Continuous 1 chunk per forward round (1F1C)
+- 8-GPU Throughput | Low (sub-25 FPS aggregate) | Moderate (~40-60 FPS) | Ultra-high (134.8 FPS real-time streaming)
 
 #### Critical View
-While FrameForge demonstrates that video temporal dimensions can be mathematically folded into semantic editing pathways, inference latency remains a critical bottleneck. Executing a 50-step diffusion process across a parameter-dense video backbone requires substantially more compute FLOPs than a lightweight distilled 2D model like FLUX.2 Klein. Until step-distillation kernels (such as consistency distillation or adversarial diffusion distillation) are applied to FrameForge's virtual temporal attention layers, sub-second interactive canvas rendering in consumer-facing browser apps will remain cost-prohibitive.
+While Wave Forcing demonstrates remarkable algorithmic throughput, its real-world implementation faces significant networking and memory constraints. The system relies heavily on pre-sending K/V tensors and overlapping inter-GPU communication with forward compute. In heterogeneous cloud environments lacking full-bandwidth NVLink backbones (such as PCIe-only or ethernet-bridged instances), the communication overhead can saturate available interconnect bandwidth, degrading the 1F1C cadence into execution stalls. Furthermore, conditioning on partially denoised intermediate states introduces a subtle risk of cumulative distribution drift during ultra-long video sequences, necessitating periodic keyframe anchoring or memory refresh buffers to avoid gradual object hallucination over extended generations.
 
 #### Item Metadata
-- **event_date:** 2026-11-02
+- **event_date:** 2026-11-03
 - **event_within_24h_window:** true
 - **event_within_7d_window:** true
 - **software_or_hardware_focus:** SW
@@ -48,143 +50,136 @@ While FrameForge demonstrates that video temporal dimensions can be mathematical
 
 ---
 
-### 2. DeepSeek Harness Deploys "Creator Mode": Shifting Agent Platforms to Real-Time Prompt-to-Plugin Environments
+### 2. UT Austin, Stanford, and UC Berkeley Unveil Unified Framework for Agentic Computer Graphics: Automating 2D/3D Design Pipelines Beyond Manual GUI Workflows
 
-**Source:** DeepSeek / Quartz / ShiftDelete  
-**Event Date:** 2026-11-02  
-**Source Date:** 2026-11-02  
-**Status:** Official Open-Source Platform Feature Rollout  
-**Primary URL:** https://github.com/deepseek-ai/DeepSeek-Harness  
+**Source:** UT Austin, Stanford University, UC Berkeley / arXiv / Hugging Face  
+**Event Date:** 2026-11-03  
+**Source Date:** 2026-11-03  
+**Status:** Comprehensive research report and architecture taxonomy release  
+**Primary URL:** https://arxiv.org/abs/2611.01860
 
 #### Overview
-Why does this matter? Autonomous AI agents have long struggled with the "static capability ceiling": if an agent lacks a specific tool, user interface component, or backend API integration to execute an ad-hoc task, the user must abandon the workflow or manually code and configure an external integration. Building on its "everything is a plugin" Cordis-style architecture, DeepSeek has introduced "Creator Mode" for its open-source DeepSeek Harness agent environment. Instead of merely acting as an LLM shell that queries pre-compiled tools, Harness in Creator Mode autonomously synthesizes, compiles, validates, and installs new software modules and full GUI interfaces from natural language prompts. During public demonstrations, the system generated customized timeline-based video editing workbenches, interactive 3D model visualizers, and productivity tools directly within its desktop UI in approximately five minutes. By transforming the agent client into a self-extending, dynamically compiled OS environment, DeepSeek bridges the gap between conversational prompt engineering and custom application development, challenging both closed commercial agent builders and conventional IDEs.
+Why does this matter? For decades, digital creative production across graphic design, UI/UX, motion graphics, and 3D modeling has been bottlenecked by manual, click-intensive interactions within monolithic desktop software suites like Adobe Photoshop, Illustrator, After Effects, and Autodesk Maya. While recent diffusion and text-to-image models generate visually stunning pixels, they produce static, uneditable "flat" bitmaps that lack parametric structure, editable layers, or semantic repeatability. A consortium of top graphics and AI labs—led by UT Austin, Stanford University, and UC Berkeley, in collaboration with leading graphics scholars including Maneesh Agrawala and Leonidas Guibas—has formally established the foundations of "Agentic Computer Graphics". The paper establishes a standardized taxonomy and execution framework where multimodal foundation agents generate, execute, and iteratively refactor underlying procedural code (such as vector layouts, shader programs, Python graphics scripts, and parametric CAD definitions) rather than merely outputting raw raster pixels. By creating an autonomous perception-action feedback loop—where the agent inspects intermediate visual render passes, diagnoses visual defects or layout collisions, and executes targeted script mutations—agentic systems are fundamentally dismantling traditional creative software pipelines, enabling natural-language orchestration of professional design tasks.
 
 #### Strategic Impact
-- **Technology & Ecosystem:** Pushes the AI agent architecture from fixed tool-calling schemas (e.g., basic function calling) to autonomous metaprogramming. The client application itself becomes malleable state that the reasoning model updates at runtime.
-- **Business & Market:** Disintermediates specialized low-code micro-SaaS utilities and dashboard aggregators. As open-source desktop clients (DeepSeek Harness) gain the ability to build and run local UI tools on demand, proprietary platforms charging per-seat subscriptions for basic functional widgets face rapid margin compression.
-- **Infrastructure & Hardware:** Shifting plugin compilation, sandbox testing, and execution to local environments stresses host CPU, RAM, and background container runtimes. Workstations require robust OS-level isolation (e.g., sandboxed microVMs or lightweight containers) to prevent dynamically generated code from compromising host memory or system security.
-- **Investment Implication:** Allocations in "vertical wrapper" agent startups must be scrutinized; value is accumulating at the base platform layer that controls execution sandboxes and self-extending plugin registries.
+- **Technology & Ecosystem:** Bridges the gap between generative AI and classical procedural graphics. Instead of treating AI and CAD/creative tools as disconnected silos, the agentic paradigm transforms software like Blender, Figma, and Photoshop into programmatic sandboxes controlled by multi-agent runtimes.
+- **Business & Market:** Represents an existential paradigm shift for legacy creative software vendors. When design assets are authored via self-correcting agentic code generation, the user interface layer shifts from high-friction, proprietary desktop GUI suites to language-driven, cloud-orchestrated agent platforms, eroding Adobe's traditional "seat-license" moat.
+- **Infrastructure & Hardware:** Agentic graphics workloads introduce a dual compute demand: dense neural inference (running VLMs to visually critique intermediate renders) interleaved with rapid CPU/GPU rendering engines (Blender cycles, OpenGL/Vulkan rasterizers). This mandates low-latency heterogenous compute nodes capable of executing graphics tool invocations and neural forward passes in tight loops.
+- **Investment Implication:** Software investments are rapidly pivoting away from standalone image wrapper apps toward agentic workflow runtimes that possess deep programmatic APIs, headless graphics execution environments, and automated visual feedback verification.
 
 #### Technical Deep Dive
-- **Key specifications:**
-  - Architecture: Modular plugin-driven core running via Node.js runtime / local desktop shell (macOS Apple Silicon & Win64).
-  - Synthesis Latency: Generates, installs, and verifies complex interactive plugins (e.g., 600+ lines of frontend code) in ~5 minutes 24 seconds.
-  - Supported Synthesized Targets: Dynamic UI components, timeline visualizers, 3D Canvas renderers, REST/RPC API wrappers.
-  - Licensing: Open-source under the permissive MIT license.
-  - Source: https://github.com/deepseek-ai/DeepSeek-Harness
-- **Comparison with previous generation:**
-  - Traditional Agents (ReAct / AutoGPT): Constrained to static pre-configured tool APIs; failure occurs when an unmapped tool requirement is encountered.
-  - DeepSeek Harness Creator Mode: Runtime metaprogramming loop; writes API client, builds GUI widget, verifies via sandbox unit test, and hot-loads into the live interface.
-- **Deployment status:** Public preview rolled out to global developers via Node.js (npx) and GitHub repository.
+- **Taxonomic Triad:** Defines agentic graphics across three mandatory pillars: (1) LLM/VLM-driven action decision-making; (2) Environment execution of procedural graphics operations (vector code, shaders, CAD graphs); (3) Multimodal feedback loops using visual inspection of intermediate renders to guide subsequent iterations.
+- **Application Coverage:** Spans 2D graphic layouts (SVG/Canvas), parametric CAD modeling, dynamic scene simulation (rigid-body and fluid physics), and character rigging/animation.
+- **Survey System Architecture:** Employs an autonomous multi-agent literature and code exploration system to index, categorize, and cross-evaluate hundreds of emerging graphics agent pipelines at scale.
+- **Deployment Status:** Open research specification, literature analysis harness, and system architecture benchmark.
 
-#### Structured Data: Layer Structure Data
+#### Structured Data
+
+[Layer Structure Data]
 - Position | Component | Role / Specification
-- Application Layer | Dynamic Web UI / Desktop Shell | Auto-renders newly synthesized React/HTML5 components and interactive widgets.
-- Agent Orchestration | Creator Mode Controller | Parses natural-language functional requests into architectural specs and interface mockups.
-- Execution & Compilation | Local Node.js Sandbox Engine | Compiles code, performs automated unit testing, and executes security verification.
-- Foundation Model Core | DeepSeek-V4.1-Flash / Frontier Reasoning | Generates code, manages multi-turn error correction, and calls runtime harness APIs.
+- Layer 3 (Goal & Reasoning) | Base Multimodal Model (LLM/VLM) | High-level layout planning, instruction decomposition, semantic visual evaluation
+- Layer 2 (Orchestration Harness) | Agent Runtime & Memory Engine | Plan-and-act loops, tool calling, execution state tracking, error recovery
+- Layer 1 (Procedural Graphics Engine) | Headless Software & Compilers | Parametric CAD kernels, shader pipelines, Blender/Python APIs, vector interpreters
+- Feedback Channel | Visual Critic / Grounded Verifier | Closed-loop visual rendering comparison, edge/lighting diffing, code rollback triggers
 
 #### Critical View
-Allowing an autonomous agent to generate, compile, and hot-load executable code directly into a host desktop application introduces severe security and operational containment risks. If the underlying LLM falls victim to prompt injection or malicious API hallucinations, Creator Mode could synthesize code that compromises local file system integrity or exfiltrates user session tokens. Robust, hardware-enforced hypervisor virtualization and fine-grained runtime permission barriers must be implemented before enterprise IT environments can permit unmonitored prompt-to-plugin compilation.
+Despite its immense potential, agentic computer graphics is currently limited by the high latency and cumulative token costs of closed-loop visual reasoning. Because each corrective iteration requires rendering the asset, passing a high-resolution screenshot to a VLM, and generating new code modifications, complex design tasks can take minutes to converge compared to direct user inputs. Furthermore, current visual-language models frequently struggle with fine-grained spatial precision, often hallucinating sub-pixel layout alignment, requiring specialized bounding-box regression tools or deterministic constraint solvers to prevent typographic overlaps.
 
 #### Item Metadata
-- **event_date:** 2026-11-02
+- **event_date:** 2026-11-03
 - **event_within_24h_window:** true
 - **event_within_7d_window:** true
 - **software_or_hardware_focus:** SW
-- **paradigm_shift_category:** Ecosystem
+- **paradigm_shift_category:** Creative-Workflow
 - **slot_category:** 1-5
 - **structured_data_type:** layer-structure
 - **ongoing_story_exception:** false
 
 ---
 
-### 3. OpenAI Releases LifeVal: Shifting Model Benchmarking from Academic Trivia to Practical Everyday Task Execution
+### 3. Yandex Research Releases FLAMIA Attention Kernels: Accelerating Transformer Training on NVIDIA Blackwell via MXFP8 and NVFP4 Microscaling
 
-**Source:** OpenAI Research / Unite.AI / CNN  
-**Event Date:** 2026-11-02  
-**Source Date:** 2026-11-02  
-**Status:** Official Research & Benchmark Publication  
-**Primary URL:** https://openai.com/index/lifeval  
+**Source:** Yandex Research / arXiv / GitHub  
+**Event Date:** 2026-11-03  
+**Source Date:** 2026-11-03  
+**Status:** Academic paper / Open-source high-performance kernel library  
+**Primary URL:** https://arxiv.org/abs/2611.03344
 
 #### Overview
-Why does this matter? For the past three years, the AI frontier has suffered from "benchmark saturation": models score near 100% on MMLU, GSM8K, and HumanEval, yet frequently fail when asked to complete basic real-world errands that require long-horizon context, judgment under ambiguity, and multi-step browser navigation. Academic exams measure static memorization and synthetic reasoning, failing to reflect whether an AI agent can actually reduce human labor. OpenAI has released LifeVal, a comprehensive evaluation framework designed specifically to measure AI agent capability on messy everyday human chores. Built on time-use datasets—including the American Time Use Survey (ATUS) and the Multinational Time Use Study (MTUS)—and a demographically representative study of 3,995 individuals, LifeVal tasks were authored by domain experts across childcare selection, household budgeting, navigating Byzantine municipal paperwork, and managing medical logistics. Evaluated frontier reasoning models (such as GPT-6 Astra) showed dramatic variance: scoring above 93% on structured record-retrieval and school searches, but dropping significantly when tasks required unresolved multi-party human negotiation. LifeVal sets a new North Star for agent engineering, establishing verifiable task completion rather than exam grades as the primary metric of AI progress.
+Why does this matter? Attention computation remains one of the primary memory bandwidth and execution bottlenecks in large foundation model pretraining, especially as context windows expand into tens of thousands of tokens. While NVIDIA's Blackwell GPU architecture (B200/B300) introduces dedicated hardware tensor cores designed for sub-8-bit microscaling formats—such as MXFP8 and NVFP4—harnessing these execution units during attention training has been stalled by fundamental algorithmic barriers. Specifically, conventional low-precision attention implementations suffer from severe quantization overhead, numerical divergence between the forward and backward passes, and dangerous causal information leakage caused by scale factors shared across future and past token blocks. Yandex Research has released FLAMIA (FLAsh MIcroscaling Attention), a family of open-source CUDA attention kernels specifically engineered to unlock Blackwell's low-precision hardware acceleration for causally safe transformer training. FLAMIA introduces token-block scaling that reuses quantized operands across matrix orientations, embeds document-local scale boundaries to support variable-length packed datasets without costly repacking, and ensures strict numerical consistency between the forward pass and backward gradient propagation. Benchmarked on NVIDIA B200 and B300 hardware, FLAMIA accelerates the combined forward and backward attention call by 1.10x to 1.42x compared to the fastest existing Blackwell baselines while proving zero loss degradation on Llama-scale pretraining.
 
 #### Strategic Impact
-- **Technology & Ecosystem:** Catalyzes a transition in foundation model training from generic knowledge pre-training to reinforcement learning environments grounded in browser use, operating system navigation, and personal time-use utility.
-- **Business & Market:** Aligns model development directly with enterprise and consumer monetization. Enterprise assistants (Microsoft Copilot, Apple Intelligence, Google Workspace) can no longer justify utility via standardized academic benchmarks; procurement decisions will increasingly evaluate LifeVal-style completion rates on bureaucratic workflows.
-- **Infrastructure & Hardware:** Real-world errands require persistent multi-step agent trajectories spanning dozens of browser interactions, screen parsing calls, and deep context-window lookups. This dramatically increases inference token consumption per task, escalating the demand for high-throughput, low-latency KV-cache serving infrastructure in hyperscale data centers.
-- **Investment Implication:** Frontier labs prioritizing pure academic benchmark optimization face competitive obsolescence compared to platforms engineering reliable computer-use and autonomous multi-turn API orchestration.
+- **Technology & Ecosystem:** Bridges hardware tensor core innovation with deep learning software compilation. By solving causal leakage and backward stability in microscale floating-point attention, FLAMIA establishes a practical path to training frontier models natively in MXFP8 and NVFP4 formats rather than restricting low-precision to inference.
+- **Business & Market:** Compute efficiency directly governs foundation model training CapEx. A 10% to 40% speedup in attention operations translates to millions of dollars saved during multi-month training runs on massive GPU clusters, reinforcing the competitive moat of teams operating on cutting-edge Blackwell silicon.
+- **Infrastructure & Hardware:** Directly capitalizes on the architectural enhancements of NVIDIA's Blackwell Tensor Cores. By shrinking the memory footprint and register pressure of intermediate attention tensors, it mitigates HBM bandwidth saturation and reduces thermal and power spikes during high-intensity training epochs.
+- **Investment Implication:** Low-level kernel optimization remains a key differentiator in AI infrastructure. Investors should monitor specialized systems engineering teams that extract hardware-native throughput from nascent semiconductor architectures ahead of standard framework integration.
 
 #### Technical Deep Dive
-- **Key specifications:**
-  - Foundational Dataset: 1,000,000+ diary days from MTUS (spanning 30 countries) cross-referenced with 3,995 representative survey participants.
-  - Evaluated Domains: Caregiving, Personal Finance, Municipal & Tax Filings, Health Care Navigation, Education, and Routine Logistics.
-  - Frontier Model Results (GPT-6 Astra): Average task reward of 80.6% (compared to 49.3% in previous-generation reasoning baselines).
-  - High-Performing Workflows: Deed retrieval & property record filing (100%), disaster relief coordination (98.0%), kindergarten shortlisting (93.1%).
-  - Source: https://openai.com/index/lifeval
-- **Comparison with previous generation:**
-  - Academic Benchmarks (MMLU, ARC-AGI, Humanity's Last Exam): Abstract, static question answering; blind to tool-calling errors, stale context, and UI execution barriers.
-  - LifeVal: Measures real-world task closure, multi-turn state persistence, and actual user-goal attainment in unscripted environments.
-- **Deployment status:** Research framework published; utilized internally across OpenAI reasoning and computer-use agent training pipelines.
+- **Hardware Target:** NVIDIA Blackwell architecture (specifically benchmarked and optimized for B200 and B300 GPUs).
+- **Precision Pathways:** Native MXFP8 and mixed NVFP4/FP8 training execution paths.
+- **Throughput Speedup (Combined Forward + Backward):** 1.10x to 1.40x acceleration on B200; 1.06x to 1.42x acceleration on B300 relative to optimized FlashAttention-derived baselines.
+- **Causal Safety Architecture:** Document-local block scaling that mathematically isolates scale factor computations, preventing attention weights from peeking into future tokens across packed sequences.
+- **Deployment Status:** Open-source release (Code published in the `yandex-research/flamia-blackwell-attention` repository, forked and adapted from Dao-AILab/flash-attention).
 
-#### Background Stats
-- stat: 80.6% average task reward achieved by GPT-6 Astra on LifeVal, up from 49.3% in earlier model generations.
-- context: Demonstrates that frontier reasoning models have made steep progress in practical errand execution, though critical error rates remain too high for unsupervised sensitive tasks.
-- source: OpenAI LifeVal Technical Release / CellCog (Nov 2, 2026).
+#### Structured Data
+
+[Comparison Matrix Data]
+- Metric / Criterion | Standard FlashAttention-3 (FP16/BF16) | Standard Block-Quantized Attention | FLAMIA (Blackwell Microscaling)
+- Precision Support | BF16 / FP16 native | Uniform FP8 without dynamic microscaling | Hardware-native MXFP8 & Mixed NVFP4/FP8
+- Causal Masking Safety | Inherently causal via triangular mask | High risk of scale leakage across blocks | Causally safe document-local scaling
+- Forward/Backward Matching | Exact numerical counterpart | Loss drift during backward pass | Mathematically aligned forward-backward numerics
+- Blackwell Speedup Factor | 1.0x (Baseline) | Marginal (offset by quantization overhead) | 1.10x to 1.42x net throughput improvement
 
 #### Critical View
-LifeVal currently remains an internal proprietary evaluation suite; neither the raw task prompts nor the full evaluation harness have been fully open-sourced for independent audit. Furthermore, high synthetic simulation scores do not guarantee real-world completion: an AI agent achieving a 93% score on "finding childcare" may still fail disastrously if it incorrectly confirms an unvetted facility or misinterprets licensing credentials. True validation will require reproducible, live third-party testing across diverse regulatory jurisdictions.
+While FLAMIA represents a major milestone in low-precision training numerics, its real-world enterprise adoption remains tethered to the physical deployment cadence of Blackwell clusters. The microscaling hardware units required to realize these speedups are exclusive to Blackwell and future silicon architectures; older Hopper (H100/H200) platforms cannot leverage NVFP4 or MXFP8 tensor paths natively. Additionally, while pretraining stability was verified on Llama-style architectures, scaling NVFP4 attention to ultra-deep, multi-trillion-parameter MoE configurations requires extensive empirical validation to ensure that subtle gradient noise does not destabilize long-horizon convergence.
 
 #### Item Metadata
-- **event_date:** 2026-11-02
+- **event_date:** 2026-11-03
 - **event_within_24h_window:** true
 - **event_within_7d_window:** true
-- **software_or_hardware_focus:** SW
-- **paradigm_shift_category:** Architecture
-- **slot_category:** 1-5
-- **structured_data_type:** none
+- **software_or_hardware_focus:** BOTH
+- **paradigm_shift_category:** HW-Circuit-Research
+- **slot_category:** 6
+- **structured_data_type:** comparison-matrix
 - **ongoing_story_exception:** false
 
 ---
 
-### 4. onsemi Acquires Ferric for $600 Million: Securing In-Package Integrated Voltage Regulators (IVR) for 1,000A+ AI Accelerators
+### 4. NVIDIA Open-Sources "Attribution": Pinpointing Interconnect and Signal Integrity Root Causes Across Mega-Scale GPU Clusters
 
-**Source:** onsemi SEC Form 8-K / Official Corporate Announcement  
+**Source:** NVIDIA Technical Blog / NVIDIA Developer  
 **Event Date:** 2026-11-02  
-**Source Date:** 2026-11-02  
-**Status:** Definitive M&A Agreement & SEC Filing  
-**Primary URL:** https://ir.onsemi.com/news-releases  
+**Source Date:** 2026-11-03  
+**Status:** Official engineering announcement and open-source release  
+**Primary URL:** https://developer.nvidia.com/blog/diagnose-distributed-ai-workload-failures-with-nvidia-attribution/
 
 #### Overview
-Why does this matter? As AI accelerators and custom hyperscaler ASICs cross 1,000 to 1,500 Watts per package, core operating voltages have dropped below 0.8 Volts, requiring instantaneous current levels exceeding 1,200 to 2,000 Amperes. Delivering this astronomical current from traditional multi-phase Voltage Regulator Modules (VRMs) mounted on the motherboard or carrier substrate incurs catastrophic resistance losses (proportional to current squared, I²R) and introduces parasitic inductance across the Power Delivery Network (PDN). This leads to acute transient voltage droop (di/dt) when neural network compute cores rapidly cycle between full matrix-multiplication loads and idle states, threatening silicon degradation or immediate system crashes. Semiconductor Components Industries (onsemi) has executed a definitive agreement to acquire Ferric, Inc. for $600 million in cash at closing plus up to $175 million in milestone consideration. Ferric is the foremost pioneer of thin-film magnetic Integrated Voltage Regulators (IVRs)—microscopic power converters incorporating on-chip or in-package inductors that convert higher voltages (such as 48V or 12V) directly into sub-1V core power adjacent to the silicon die. The acquisition establishes onsemi as the direct supplier of in-package power delivery for next-generation AI processors, directly unblocking the physical current bottleneck threatening advanced accelerator scaling.
+Why does this matter? As AI training clusters expand to tens of thousands of GPUs interconnected via high-speed NVLink and InfiniBand fabrics, diagnosing distributed hardware failures has become an operational nightmare. When an electrical or signal integrity issue occurs—such as high-frequency SerDes degradation or PCIe/NVLink bit-error bursts on a single node—it does not fail quietly. Instead, it triggers a catastrophic cascade of secondary software symptoms: collective communication calls (NCCL) time out across hundreds of remote ranks, generating tens of thousands of misleading application-level error logs that obscure where the failure actually originated. To eliminate this costly observability black hole, NVIDIA has open-sourced NVIDIA Attribution, the deterministic root-cause diagnosis engine that powers its own internal AI supercomputing infrastructure across millions of weekly workloads. Operating through a decoupled REST-based Attribution Service and a scheduler-connected Blueprint orchestrator (supporting Slurm and Kubernetes Kueue), Attribution correlates workload-scoped logs, GPU hardware telemetry, and cluster state against deterministic failure rules. Crucially, the system isolates deep board-level electrical faults—such as GPU XID 149 errors representing high-speed SerDes signal integrity failures—and maps them directly to the offending physical node and fabric port, separating true root causes from secondary distributed communication noise.
 
 #### Strategic Impact
-- **Technology & Ecosystem:** Accelerates the migration of power conversion from the external PCB motherboard directly into the 2.5D/3D advanced package substrate. Integrating thin-film magnetic inductors alongside chiplets eliminates centimeters of PCB trace routing, slashing parasitic inductance by an order of magnitude.
-- **Business & Market:** Positions onsemi to challenge Monolithic Power Systems (MPS), Vicor, and Infineon for dominant AI accelerator power sockets. onsemi immediately raised its 2030 AI data center revenue target by $500 million to greater than $3 billion.
-- **Infrastructure & Hardware:** Directly reshapes server and accelerator board design. Eliminating large discrete surface-mount inductors and multiphase VRM stages frees up valuable PCB area around the GPU socket, enabling denser interconnect routing (PCIe Gen6/7, 224G SerDes) and vastly simplifying cold-plate direct liquid cooling attachment.
-- **Investment Implication:** Advanced packaging is no longer just about silicon interposers and HBM stacking; power delivery inside the package (IVR, deep trench capacitors) represents the next high-margin defensible semiconductor IP frontier.
+- **Technology & Ecosystem:** Establishes an open operational standard for AI supercomputing observability. By open-sourcing its internal diagnostic logic, NVIDIA enables hyperscalers and neoclouds to automate cluster triage, drastically reducing the Mean Time to Resolution (MTTR) for failed distributed pretraining jobs.
+- **Business & Market:** Cluster downtime is the single largest hidden tax on modern foundation model development, where an unmitigated node hang can stall millions of dollars worth of idle GPUs. NVIDIA Attribution cements the company’s enterprise dominance by making its software-defined resilience stack just as indispensable as its physical hardware.
+- **Infrastructure & Hardware:** Highlights how high-speed SerDes, signal integrity (SI), and power integrity (PI) at the board and package level directly dictate system-level software reliability. As per-lane SerDes speeds advance to 224 Gbps, subtle channel loss and connector jitter manifest as distributed software halts, necessitating hardware-software co-designed diagnostic tooling.
+- **Investment Implication:** Data center automation and cluster resilience tools are becoming critical infrastructure investments. Solutions that tightly couple bare-metal hardware telemetry to distributed workload schedulers will capture substantial value in high-availability AI data center operations.
 
 #### Technical Deep Dive
-- **Key specifications:**
-  - Deal Value: $600 million cash at closing + $175 million in performance earnouts.
-  - Technology Core: Integrated Voltage Regulators (IVRs) featuring patented thin-film magnetic core inductors fabricated directly on silicon/interposer layers.
-  - Target Operating Point: >1,000A to 2,000A core rail delivery at <0.75V.
-  - Switching Frequency: Multi-megahertz to gigahertz switching speeds, enabling microsecond-level transient droop compensation.
-  - Source: SEC Form 8-K / onsemi Investor Relations.
-- **Comparison with previous generation:**
-  - Motherboard VRMs: Heavy PCB copper plane losses, high parasitic loop inductance (~0.5–1.0 nH), severe voltage droop under >1,000A transients requiring massive decoupling capacitor banks.
-  - In-Package IVR (Ferric): Sub-substrate or co-packaged placement, near-zero parasitic loop inductance (<0.05 nH), >4x faster transient response, and up to 10% reduction in total board power losses.
-- **Deployment status:** Commercial acquisition signed; technology sampling with Tier-1 hyperscale accelerator architects with high-volume production slated for 2027 platforms.
+- **Operational Scale:** Deployed across hundreds of thousands of GPUs analyzing millions of workloads weekly on NVIDIA’s internal AI infrastructure.
+- **Architecture Components:** Two-part deployment: (1) Attribution Service (REST API backend running deterministic event correlation rules); (2) Attribution Blueprint (Python orchestrator connecting Slurm, Kubernetes Kueue, Loki, PromQL, and pod logs).
+- **Hardware-to-Software Diagnostic Mapping:** Directly correlates GPU firmware/silicon faults (e.g., NVIDIA XID 149 indicating physical NVLink signal integrity degradation) to downstream NCCL collective timeouts across ranks.
+- **Diagnostic Engine:** Fully deterministic rule engine (eschewing non-deterministic LLM evaluation to ensure strict, repeatable root-cause verifiability).
+- **Deployment Status:** Open-source release (Code published in the `dsx-ai-factory/attribution` GitHub repository under an open software license).
 
-#### Structured Data: Roadmap Data
-- Phase | Timing | Architecture | Typical Current Density | Power Loss Mitigation
-- Discrete Multiphase VRM | 2022–2024 | Motherboard-mounted PMIC & Inductors | ~0.5–0.8 A/mm² | Base baseline; high PCB thermal footprint
-- Vertical Power Delivery (VPD) | 2024–2026 | Backside PCB / Interposer Pin Power | ~1.2–1.8 A/mm² | Reduces trace resistance, but still requires bulky inductors
-- **In-Package IVR (Ferric/onsemi)** | **2026–2028** | **Thin-Film Magnetic Inductors on Substrate/Die** | **>3.0 A/mm²** | **Eliminates parasitic loop inductance; cuts transient droop by >60%**
+#### Structured Data
+
+[Layer Structure Data]
+- Position | Component | Role / Specification
+- Application Layer | Distributed Workload (PyTorch / Megatron-LM) | Collective communication operations (NCCL AllReduce / AllToAll)
+- Orchestration Layer | Scheduler & Connectors (Slurm / Kueue / Blueprint) | Task mapping, node allocation tracking, telemetry ingest from Loki & Prometheus
+- Diagnostic Engine | NVIDIA Attribution Service (REST API) | Deterministic event timeline correlation, symptom filtering, root-cause isolation
+- Physical & Silicon Layer | GPU & NVLink Fabric (SerDes / Interconnect / PCB) | Physical signal integrity monitoring, transceiver state, hardware error registers (XID 149)
 
 #### Critical View
-Fabricating high-permeability magnetic thin-film materials directly within standard semiconductor or advanced substrate manufacturing workflows is notoriously difficult. Integrating magnetic materials into wafer back-end-of-line (BEOL) or organic/glass substrates introduces contamination risks, thermal expansion mismatch (CTE stress), and packaging yield degradation. onsemi must demonstrate that Ferric's IVR manufacturing can be scaled to hundreds of thousands of wafers across foundry partners (such as TSMC CoWoS or Intel Foundry) without depressing package assembly yields.
+While open-sourcing NVIDIA Attribution provides enormous value to cluster operators, the tool’s diagnostic accuracy is heavily biased toward NVIDIA’s proprietary hardware ecosystem. Its deterministic rule trees are finely calibrated against NVIDIA-specific hardware telemetry, firmware registers, and XID event codes. Consequently, it offers limited diagnostic depth for heterogeneous clusters incorporating third-party accelerators, custom ASICs, or alternative interconnect fabrics like Ultra Accelerator Link (UALink). Furthermore, while Attribution successfully identifies the faulty node, automated remediation—such as hot-swapping healthy spare nodes without restarting the entire workload—requires companion systems like NVIDIA Workload Recovery, which remains experimental in early open releases.
 
 #### Item Metadata
 - **event_date:** 2026-11-02
@@ -193,49 +188,35 @@ Fabricating high-permeability magnetic thin-film materials directly within stand
 - **software_or_hardware_focus:** HW
 - **paradigm_shift_category:** HW-Board-System
 - **slot_category:** 6
-- **structured_data_type:** roadmap
+- **structured_data_type:** layer-structure
 - **ongoing_story_exception:** false
 
 ---
 
-### Integrated Value Chain Analysis & Forward Outlook
-
-```
-[WORKLOAD & SPECIALIZED MEDIA] FrameForge (Video-to-Image Priors) & DeepSeek Creator Mode
-                                        │
-                                        ▼ (Expanding Context Windows & Multi-Turn Web Trajectories)
-[REASONING & SYSTEM BENCHMARK] OpenAI LifeVal (Everyday Task Execution vs. Academic Saturation)
-                                        │
-                                        ▼ (Surging Sustained Inference Compute & High-Density Silicon)
-[SEMICONDUCTOR & PACKAGING] Next-Gen AI ASICs (>1,000A Core Rails at <0.8V)
-                                        │
-                                        ▼ (Severe Transient Voltage Droop / I²R Board Losses)
-[POWER & BOARD INFRASTRUCTURE] onsemi / Ferric Thin-Film In-Package IVR Power Delivery
-```
+### [SUMMARY & FORWARD-LOOKING OUTLOOK]
 
 #### 1. What changed today?
-The AI software stack witnessed a double shift toward practical utility and dynamic architectures: video foundation models are now actively cannibalizing specialized 2D image-editing pipelines via FrameForge's virtual temporal prior transfer, while agent platforms (DeepSeek Harness) evolved from rigid toolboxes into self-compiling, prompt-to-plugin operating systems. Concurrently, OpenAI established LifeVal, decisively pivoting the industry away from saturated academic benchmarks toward messy everyday task execution. In hardware, onsemi's $600M acquisition of Ferric signaled that board-level power delivery has hit a hard physical wall, forcing power conversion off the motherboard and directly into the chiplet package.
+The AI frontier experienced a coordinated push toward real-time responsiveness and hardware-software execution harmony. In generative visual media, the breakthrough of Wave Forcing proved that diffusion Transformers can stream video at an astonishing 134.8 FPS by overlapping intermediate denoising stages across GPU pipelines, transforming generative video from offline rendering to live streaming. Simultaneously, the academic release of the Agentic Computer Graphics taxonomy demonstrated that creative software disruption is shifting away from flat bitmap generators toward autonomous agents that iteratively author and critique parametric code and shaders, directly challenging Adobe's legacy desktop monopoly. At the infrastructure and silicon layer, Yandex’s FLAMIA attention kernels unlocked Blackwell’s native MXFP8/NVFP4 microscaling units for causally safe transformer training, while NVIDIA open-sourced its Attribution platform, translating complex board-level SerDes signal integrity failures into deterministic root-cause diagnoses across mega-clusters.
 
 #### 2. What structural trend is becoming stronger?
-The physical consolidation of the AI stack. In software, modality boundaries are collapsing: video generation backbones are proving to be superior general-purpose spatial-temporal engines for single-image manipulation. In hardware, board-level discrete components are being aggressively absorbed into advanced heterogeneous packaging. Just as high-speed memory migrated onto the package via HBM and optical interconnect is migrating via co-packaged optics (CPO), power delivery is now moving inside the package via integrated voltage regulators (IVRs) to beat electrical resistance losses.
+The dissolution of the boundary between low-level hardware physics and high-level software orchestration is accelerating rapidly. Whether through microscaling attention kernels tailored for Blackwell's specialized tensor core logic (FLAMIA) or distributed failure attribution connecting SerDes signal degradation to application timeouts (NVIDIA Attribution), optimal AI performance can no longer be achieved by treating silicon as a black-box commodity. In parallel, generative media is shifting from single-turn generation to continuous, closed-loop agentic iteration—where video streams incrementally and graphics assets evolve through programmatic code execution.
 
 #### 3. What bottleneck is emerging?
-The "Last-Centimeter" Power Delivery Wall. As AI chips draw more than 1,000 Amperes at operating voltages under 0.8V, the copper traces on standard multi-layer server motherboards cannot deliver sufficient current without unacceptable heat and voltage instability. Even sub-milliohm parasitic impedances generate fatal transient voltage spikes during dynamic agentic inference bursts, making in-package power management the gating factor for next-generation silicon scaling.
+The primary operational bottleneck is shifting from raw compute arithmetic (FLOPs) to interconnect bandwidth, communication latency, and physical reliability. As frameworks like Wave Forcing parallelize intermediate latent transfers across GPU clusters, inter-GPU fabric congestion becomes the limiting throughput factor. Simultaneously, as SerDes speeds climb to 224 Gbps and beyond, subtle high-frequency channel losses and thermal fluctuations at the board and connector level trigger cascading software timeouts, making physical signal integrity a direct constraint on large-scale model pretraining.
 
 #### 4. Which layer of the AI stack may become strategically more important?
-Advanced packaging substrate power integrity (PI) and in-package magnetics. Hardware differentiation is moving away from standalone digital accelerator logic toward package-level co-design, where thin-film inductors, deep trench capacitors (DTC), and micro-regulators are co-packaged alongside silicon compute tiles to ensure power and signal integrity.
+The "Systems Optimization and Kernel Execution" layer—situated directly between foundation model architectures and semiconductor micro-architectures—is becoming the most critical strategic battleground. Generic frameworks like vanilla PyTorch are insufficient to capture the raw capabilities of new low-precision floating-point formats (MXFP8, NVFP4) or pipelined diffusion schedules. Organizations that master custom kernel fusion, microscaling numerics, and deterministic cluster observability will achieve significant throughput and cost advantages over competitors relying on off-the-shelf software stacks.
 
 #### 5. What should be monitored next?
-- **High-Volume Packaging Yields for IVRs:** Track how major foundries (TSMC, Intel Foundry) integrate thin-film magnetic deposition into their CoWoS and EMIB packaging flows without creating thermal stress or warpage defects.
-- **Agent Sandbox Containment Standards:** Monitor whether runtime security frameworks emerge to sandbox the execution of dynamically compiled plugins generated by DeepSeek Harness Creator Mode before enterprise deployments.
-- **Video Backbone Distillation:** Watch for real-time 4-step distilled kernels applied to video-driven image editing (FrameForge), which could trigger commercial disruption across the Adobe Creative Cloud ecosystem.
+- **Commercialization of Streaming Video Runtimes:** Monitor whether leading video generation labs (Runway, Kling, Luma, Wan) integrate wavefront scheduling into production consumer APIs to offer interactive, sub-second video synthesis.
+- **Blackwell Low-Precision Adoption:** Track whether frontier foundation model developers adopt native MXFP8/NVFP4 pretraining recipes for next-generation frontier LLMs following FLAMIA's open-source release.
+- **High-Speed Interconnect Reliability Standards:** Watch the upcoming DesignCon and OCP working groups for standardized physical-layer telemetry reporting to unify SerDes/PCIe/NVLink error logging across multi-vendor AI clusters.
 
 ---
 
-### Upcoming Tech Calendar (Q4 2026 – Q1 2027)
-- **2026-11-03 – 2026-11-05:** FYUZ 26 (Seattle, WA) — Focus on Disaggregated Distributed Backbone Routers (DDBR) and scheduled lossless Ethernet for AI cluster scale-out.
-- **2026-11-08 – 2026-11-12:** ACM/IEEE ICCAD 2026 (San Jose, CA) — Premier conference on computer-aided design, featuring AI-driven physical design and package-board power co-simulation.
-- **2026-11-10 – 2026-11-13:** Electronica & SEMICON Europa 2026 (Munich, Germany) — Demonstrations of 12kW 800V AI rack power distribution boards (Infineon) and precision chiplet active alignment bonder tools.
-- **2026-11-15 – 2026-11-20:** SC26 (Supercomputing 2026, Chicago, IL) — Hyperscale AI infrastructure, disaggregated scale-up topologies, and direct-to-chip liquid cooling deployments.
-- **2026-12-12 – 2026-12-16:** IEEE International Electron Devices Meeting (IEDM 2026, San Francisco, CA) — Unveiling next-generation transistor architectures (CFET, sub-2nm nodes), 3D power delivery, and hybrid bonding pitches.
-- **2027-01-21 – 2027-01-23:** DesignCon 2027 (Santa Clara, CA) — Industry benchmark conference for 224G/448G SerDes, high-speed signal integrity (SI), and package-level power integrity (PI) verification.
+### [UPCOMING TECH CALENDAR]
+
+- **2026-11-17 ~ 2026-11-22:** SC26 (The International Conference for High Performance Computing, Networking, Storage, and Analysis) — Expected technical sessions on ultra-scale optical interconnects, liquid-cooled AI cluster deployments, and distributed training resilience.
+- **2026-12-08 ~ 2026-12-14:** NeurIPS 2026 (Conference on Neural Information Processing Systems) — Major research tracks on diffusion transformer acceleration, inference-time reasoning, and agentic workflows.
+- **2026-12-13 ~ 2026-12-16:** IEEE International Electron Devices Meeting (IEDM 2026) — Key industry disclosures on sub-2nm gate-all-around (GAA) scaling, backside power delivery networks (BSPDN), and 3D hybrid bonding packaging architectures.
+- **2027-01-27 ~ 2027-01-29:** DesignCon 2027 — Premier conference for chip, package, board, and system designers; focal points include 448G SerDes development, PCIe 7.0 signal integrity, and high-power AI server power delivery networks (PDN).
