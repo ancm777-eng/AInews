@@ -800,14 +800,14 @@
                 <span class="top-nav-brand-tag">DAILY</span>
                 <span>AI<span class="brand-dot">·</span>Hardware Briefing</span>
             </div>
-            <div class="top-nav-meta" id="report-date-top">November 04, 2026</div>
+            <div class="top-nav-meta" id="report-date-top">November 05, 2026</div>
         </div>
     </nav>
 
     <div class="layout-shell">
         <aside class="side-nav">
             <div class="side-nav-title">Intelligence Briefing</div>
-            <div class="side-nav-sub">November 04, 2026</div>
+            <div class="side-nav-sub">November 05, 2026</div>
             <ul class="side-nav-list" id="side-nav-list"></ul>
         </aside>
 
@@ -816,212 +816,380 @@
                 <span class="doc-category">AI Ecosystem & Hardware Architecture</span>
                 <h1>Daily AI & Semiconductor Engineering Briefing</h1>
                 <div class="meta-info">
-                    <span id="report-date">November 04, 2026</span> • Technical Intelligence Report
+                    <span id="report-date">November 05, 2026</span> • Technical Intelligence Report
                 </div>
             </header>
 
             <main>
                 <article class="paper-section" id="art1">
-  <h2>SJTU DENG Lab Open-Sources Wave Forcing: Pipelined Streaming Video Generation Reaches 134.8 FPS on 8-GPU Cluster</h2>
-
+  <h2>OpenAI Images 2.6: Low-Latency Sprite Sequences and Programmatic Vector Workflows</h2>
+  
   <h3 class="section-title">1. Executive Summary</h3>
   <div class="abstract-quote">
-    <p>Generating long video sequences chunk by chunk normally forces each segment to finish its entire multi-step denoising path before the next can begin, stranding distributed accelerators in costly idle states. Researchers at Shanghai Jiao Tong University's DENG Lab broke this sequential stall with <strong>Wave Forcing</strong> and its runtime <strong>WaveRT</strong>, overlapping temporal chunk denoising across GPUs by feeding intermediate, partially cleaned latents forward as causal conditioning context. When evaluated on the <strong>Wan2.1-T2V (1.3B)</strong> model across an 8-GPU <strong>NVIDIA H200</strong> cluster, the system achieved a sustained aggregate throughput of <strong>134.8 FPS</strong>—delivering a <strong>7.07x speedup</strong> over single-GPU baselines and moving video AI from slow batch rendering into real-time interactive streaming.</p>
+    <p>
+      Digital creative pipelines have historically hit an operational bottleneck when translating static diffusion outputs into production-grade design assets, forcing designers into friction-heavy manual retouching across third-party software suites. OpenAI addresses this friction with <strong>Images 2.6</strong>, introducing dual checkpoints—<strong>GPT-Image-2.6 Flare</strong> for ultra-fast generation and <strong>GPT-Image-2.6 Sunburst</strong> for prompt fidelity—alongside native multi-panel sprite sequencing and API-level <strong>Scalable Vector Graphics (SVG)</strong> code generation. This architectural update slashes baseline turnaround times by <strong>50%</strong> (delivering draft passes in approximately <strong>6.0 seconds</strong>) while supporting an ecosystem throughput surpassing <strong>4 billion visual assets per week</strong>. By coupling sub-second structural editing with direct vector code export, the platform transitions generative imagery from isolated pixel rendering into interactive, code-native digital production workflows.
+    </p>
   </div>
 
   <h3 class="section-title">2. Architecture & Performance</h3>
-  <p>Standard autoregressive Video Diffusion Transformers (DiTs) incur severe GPU pipeline bubbles because temporal blocks execute in lockstep. Wave Forcing restructures this execution graph into an asynchronous wavefront: once pipeline warm-up finishes, the cluster sustains a cadence of one finalized chunk per forward execution round (1F1C) via continuous inter-GPU Key/Value (K/V) cache synchronization.</p>
-
   <div class="stat-grid">
     <div class="stat-card">
-      <span class="stat-rank">THROUGHPUT</span>
-      <div class="stat-number">134.8<span class="stat-unit">FPS</span></div>
-      <div class="stat-label">8-GPU NVIDIA H200 Cluster (Wan2.1-T2V 1.3B)</div>
+      <span class="stat-rank">SPEED PROFILE</span>
+      <div class="stat-number">6.0<span class="stat-unit">s</span></div>
+      <div class="stat-label">Flare Draft Latency (~50% Reduction)</div>
     </div>
     <div class="stat-card">
-      <span class="stat-rank">SCALING FACTOR</span>
-      <div class="stat-number">7.07<span class="stat-unit">x</span></div>
-      <div class="stat-label">Versus Single H200 Baseline (19.06 FPS)</div>
+      <span class="stat-rank">OUTPUT VOLUME</span>
+      <div class="stat-number">>4<span class="stat-unit">B/wk</span></div>
+      <div class="stat-label">Total Assets Generated Across Ecosystem</div>
     </div>
     <div class="stat-card">
-      <span class="stat-rank">PARALLEL EFFICIENCY</span>
-      <div class="stat-number">88.4<span class="stat-unit">%</span></div>
-      <div class="stat-label">Sustained Wavefront Pipeline Efficiency</div>
+      <span class="stat-rank">TOKEN PRICING</span>
+      <div class="stat-number">30.00<span class="stat-unit">$/1M</span></div>
+      <div class="stat-label">Standard Image Output Token Rate</div>
     </div>
     <div class="stat-card">
-      <span class="stat-rank">PIPELINE CADENCE</span>
-      <div class="stat-number">1F1C</div>
-      <div class="stat-label">1 Chunk Delivered Per Forward Execution Round</div>
+      <span class="stat-rank">MOTION EXTENSION</span>
+      <div class="stat-number">6–12<span class="stat-unit">Frames</span></div>
+      <div class="stat-label">Sprite Loop Sequence Horizons</div>
     </div>
   </div>
 
   <div class="chart-row">
     <div class="chart-container">
-      <div class="chart-label">Streaming Throughput Across Systems (FPS)</div>
-      <div id="chart-art1-1" style="width:100%;height:260px"></div>
-    </div>
-    <div class="chart-container">
-      <div class="chart-label">H200 Hardware Scaling: Single vs. 8-GPU Cluster (FPS)</div>
-      <div id="chart-art1-2" style="width:100%;height:260px"></div>
+      <div class="chart-label">End-to-End Asset Generation Latency (Seconds)</div>
+      <div id="chart-art1-1" style="width:100%;height:260px;"></div>
     </div>
   </div>
-
   <script>
   (function(){
-    var el1 = document.getElementById('chart-art1-1');
-    if (el1 && window.echarts) {
-      var c1 = echarts.init(el1, null, {renderer: 'svg'});
-      c1.setOption({
+    var el = document.getElementById('chart-art1-1');
+    if (el && window.echarts) {
+      var chart = echarts.init(el, null, {renderer: 'svg'});
+      chart.setOption({
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 35, right: 25, bottom: 35, left: 50 },
-        xAxis: { type: 'category', data: ['Standard DiT', 'Rolling Forcing', 'WaveRT (Ours)'], axisLabel: { fontSize: 11 } },
-        yAxis: { type: 'value', name: 'FPS', nameTextStyle: { fontSize: 11 } },
+        grid: { left: '4%', right: '6%', bottom: '8%', top: '12%', containLabel: true },
+        xAxis: { 
+          type: 'category', 
+          data: ['Images 2.5 (Baseline)', 'Images 2.6 Sunburst', 'Images 2.6 Flare (Draft)'],
+          axisLine: { lineStyle: { color: '#8892b0' } },
+          axisLabel: { color: '#4a5568', fontSize: 11 }
+        },
+        yAxis: { 
+          type: 'value', 
+          name: 'Latency (s)', 
+          axisLine: { lineStyle: { color: '#8892b0' } },
+          splitLine: { lineStyle: { color: '#e2e8f0' } }
+        },
         series: [{
+          name: 'Turnaround Time',
           type: 'bar',
-          data: [24.0, 52.0, 134.8],
-          itemStyle: { color: '#7EA28B', borderRadius: [4, 4, 0, 0] },
-          label: { show: true, position: 'top', formatter: '{c} FPS', fontSize: 11 }
+          barWidth: '38%',
+          data: [
+            { value: 12.0, itemStyle: { color: '#cbd5e1' } },
+            { value: 20.0, itemStyle: { color: '#f6ad55' } },
+            { value: 6.0, itemStyle: { color: '#68d391' } }
+          ],
+          label: { show: true, position: 'top', formatter: '{c} s', fontWeight: 600 }
         }]
       });
-      window.addEventListener('resize', function(){ c1.resize(); });
-    }
-    var el2 = document.getElementById('chart-art1-2');
-    if (el2 && window.echarts) {
-      var c2 = echarts.init(el2, null, {renderer: 'svg'});
-      c2.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 35, right: 25, bottom: 35, left: 50 },
-        xAxis: { type: 'category', data: ['1x H200 Baseline', '8x H200 Cluster (Ideal 8x)', '8x H200 WaveRT'], axisLabel: { fontSize: 11 } },
-        yAxis: { type: 'value', name: 'FPS', nameTextStyle: { fontSize: 11 } },
-        series: [{
-          type: 'bar',
-          data: [19.06, 152.48, 134.8],
-          itemStyle: { color: '#88A8BA', borderRadius: [4, 4, 0, 0] },
-          label: { show: true, position: 'top', formatter: '{c}', fontSize: 11 }
-        }]
-      });
-      window.addEventListener('resize', function(){ c2.resize(); });
+      window.addEventListener('resize', function(){ chart.resize(); });
     }
   })();
   </script>
 
-  <div class="inline-callout">
-    <strong>Infrastructure Trade-Off:</strong> While aggregate cluster throughput jumps 7.07x, running 8 GPUs concurrently increases total GPU-hours invested per frame by roughly 13.1% over a single-card serial baseline. WaveRT intentionally trades compute-hour parsimony for sustained streaming velocity.
-  </div>
-
-  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
-  <p>Although Wave Forcing sustains 134.8 FPS once running, its pipeline warm-up requirement means time-to-first-frame (TTFT) remains bound to the baseline diffusion step latency, preventing instantaneous input reaction. Furthermore, because downstream segments condition on partially denoised latents rather than fully finalized frames, long-horizon video generation risks compounding temporal drift, requiring periodic keyframe anchoring. Finally, the framework relies heavily on low-latency NVLink fabric; running on commodity Ethernet instances without high-bandwidth collective transfers causes interconnect bubbles that collapse the wavefront pipeline.</p>
-</article>
-
-<article class="paper-section" id="art2">
-  <h2>Researchers from UT Austin, Stanford, and UC Berkeley Propose Taxonomy and Framework for Agentic Computer Graphics</h2>
-
-  <h3 class="section-title">1. Executive Summary</h3>
-  <div class="abstract-quote">
-    <p>Standard generative image models produce flat raster images lacking procedural history, vector layers, or parametric constraints, making them almost impossible to modify in professional engineering and design suites. Researchers from <strong>UT Austin</strong>, <strong>Stanford</strong>, and <strong>UC Berkeley</strong> formalized <strong>Agentic Computer Graphics</strong>, a blueprint where multimodal agents write and refine executable program code—such as <strong>SVG layouts</strong>, <strong>GLSL shaders</strong>, and <strong>parametric CAD scripts</strong>—instead of outputting raw pixels. By pairing automated code synthesis with closed-loop visual critique, this paradigm transforms passive creative engines into autonomous sandboxes that convert high-level design instructions into editable, production-grade assets.</p>
-  </div>
-
-  <h3 class="section-title">2. Architecture & Performance</h3>
-  <p>Rather than treating generative design as a one-shot forward pass, Agentic Computer Graphics establishes a three-tiered execution stack backed by continuous visual regression testing. The agent inspects intermediate outputs directly from the rendering sandbox, verifying geometric bounds, lighting, and semantic hierarchy before committing procedural code.</p>
-
   <div class="infographic-block">
     <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-research"/></svg>
+      <svg class="infographic-icon"><use href="#icon-media"/></svg>
       <div>
-        <strong>Layer 3: Goal Decomposition & Visual Reasoning</strong>
-        <p>Vision-Language Models interpret user intent, break down composition objectives into parametric primitives, and perform aesthetic and structural critique on rendered canvases.</p>
+        <strong>Spatio-Temporal Sprite Assembly</strong>
+        <p>Generates aligned multi-frame character sequences packaged into editable looping GIFs directly on the chat interface layer without complex video diffusion overhead.</p>
       </div>
     </div>
     <div class="infographic-item">
       <svg class="infographic-icon"><use href="#icon-code"/></svg>
       <div>
-        <strong>Layer 2: Orchestration Runtime & State Memory</strong>
-        <p>Manages plan-act-verify execution loops, tracking symbolic state trees, managing tool invocations, and triggering automated code rollbacks upon visual failure.</p>
-      </div>
-    </div>
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-media"/></svg>
-      <div>
-        <strong>Layer 1: Deterministic Procedural Graphics Engines</strong>
-        <p>Headless browser canvases, CAD solid modeling kernels, and Blender Python APIs execute generated scripts to produce deterministic geometric artifacts.</p>
-      </div>
-    </div>
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-security"/></svg>
-      <div>
-        <strong>Feedback Loop: Grounded Visual Verification</strong>
-        <p>Closed-loop inspection channel comparing intermediate frame rasterizations against geometric constraints, edge boundaries, and targeted styling prompts.</p>
+        <strong>Programmatic SVG Path Synthesis</strong>
+        <p>Bypasses lossy raster vectorization by emitting native, scalable vector instructions via API token streams, bridging visual layout design and frontend code.</p>
       </div>
     </div>
   </div>
 
   <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
-  <p>Commercial deployment of agentic graphics is presently constrained by round-trip latency and token costs: executing multi-step plan-render-critique loops across high-resolution images can require several minutes to converge on a final scene graph. Moreover, contemporary vision-language models struggle with sub-pixel alignment, exact bounding box calculations, and 3D depth tolerances. Near-term enterprise implementations will consequently rely on hybrid engines that combine neural reasoning agents with deterministic geometric constraint solvers to guarantee engineering tolerances.</p>
+  <p>
+    While Images 2.6 eliminates routine steps in UI layout and icon creation, its looping mechanism remains constrained to short temporal windows of 6 to 12 frames, lacking the continuous physical simulation of specialized video models like Sora or Gen-3. Additionally, programmatic SVG generation operates via tokenized path prediction rather than native continuous vector geometry, occasionally resulting in non-optimized path nodes or layer tangling on intricate illustrations. Adobe Creative Cloud and established graphics software will retain defensibility across complex multi-layer CMYK print workflows, though consumption-based visual APIs continue to compress traditional desktop seat licensing budgets.
+  </p>
+</article>
+
+<article class="paper-section" id="art2">
+  <h2>Tencent Hy4: 770B Parameter MoE Integrates GUI Control for Professional 3D & CAD</h2>
+  
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>
+      Enterprise computer-use models have predominantly targeted standard web browsers and document workflows, leaving complex spatial environments like CAD systems and 3D design suites reliant on manual operator inputs. Tencent resolves this multimodal execution gap with <strong>Hy4</strong>, a flagship <strong>770-billion parameter Mixture-of-Experts (MoE)</strong> architecture activating <strong>49 billion parameters</strong> per forward token across a <strong>1-million-token context window</strong>. Trained on proprietary spatial execution traces and Blender Python APIs from Tencent Interactive Entertainment Group, Hy4 maps dynamic screen coordinates directly to desktop shell events, lowering internal factual guessing errors from <strong>23.1% to 5.6%</strong> and domain hallucinations to <strong>7.2%</strong>. This deployment introduces a viable high-capacity alternative for professional graphics automation while committing to a staged open-weights release for enterprise on-premise infrastructure.
+    </p>
+  </div>
+
+  <h3 class="section-title">2. Architecture & Performance</h3>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-rank">SPARSE MOE</span>
+      <div class="stat-number">770<span class="stat-unit">B Total</span></div>
+      <div class="stat-label">49B Active Parameters per Token</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">CONTEXT WINDOW</span>
+      <div class="stat-number">1,048<span class="stat-unit">K</span></div>
+      <div class="stat-label">Maximum Supported Context Tokens</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">ACCURACY PROFILE</span>
+      <div class="stat-number">7.2<span class="stat-unit">%</span></div>
+      <div class="stat-label">Domain Hallucination Rate (Down from 12.95%)</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">API ECONOMICS</span>
+      <div class="stat-number">0.834<span class="stat-unit">$/1M</span></div>
+      <div class="stat-label">Cloud Ingestion Input Token Pricing</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-container">
+      <div class="chart-label">Reliability Benchmark Comparisons: Hy4 vs Prior Generation (%)</div>
+      <div id="chart-art2-1" style="width:100%;height:260px;"></div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var el = document.getElementById('chart-art2-1');
+    if (el && window.echarts) {
+      var chart = echarts.init(el, null, {renderer: 'svg'});
+      chart.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        legend: { data: ['Prior Iteration', 'Hy4 Architecture'], bottom: '0%' },
+        grid: { left: '4%', right: '6%', bottom: '15%', top: '10%', containLabel: true },
+        xAxis: { 
+          type: 'category', 
+          data: ['Hallucination Rate', 'Guessing Error Rate'],
+          axisLine: { lineStyle: { color: '#8892b0' } },
+          axisLabel: { color: '#4a5568' }
+        },
+        yAxis: { 
+          type: 'value', 
+          name: 'Error Margin (%)', 
+          axisLine: { lineStyle: { color: '#8892b0' } },
+          splitLine: { lineStyle: { color: '#e2e8f0' } }
+        },
+        series: [
+          {
+            name: 'Prior Iteration',
+            type: 'bar',
+            barWidth: '28%',
+            data: [12.95, 23.10],
+            itemStyle: { color: '#feb2b2' },
+            label: { show: true, position: 'top', formatter: '{c}%' }
+          },
+          {
+            name: 'Hy4 Architecture',
+            type: 'bar',
+            barWidth: '28%',
+            data: [7.20, 5.60],
+            itemStyle: { color: '#63b3ed' },
+            label: { show: true, position: 'top', formatter: '{c}%' }
+          }
+        ]
+      });
+      window.addEventListener('resize', function(){ chart.resize(); });
+    }
+  })();
+  </script>
+
+  <div class="infographic-block">
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-robot"/></svg>
+      <div>
+        <strong>Dynamic Multimodal Vision Tokenizer</strong>
+        <p>Maps high-resolution screen frames and arbitrary desktop coordinates directly into token spaces for low-latency operating system control.</p>
+      </div>
+    </div>
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-code"/></svg>
+      <div>
+        <strong>CAD & 3D Spatial Adapter Bridge</strong>
+        <p>Translates spatial planning into headless Blender Python execution and parametric boundary solving inside production game engines.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
+  <p>
+    Although sparse MoE execution confines computational latency to 49 billion active parameters, hosting the full 770-billion parameter footprint presents acute hardware memory challenges. Storing the complete weight matrix requires roughly 385 GB in INT4/FP4 quantization or 770 GB in uncompressed FP8, immediately outstripping standard 8x 80GB GPU server configurations once KV-cache reserves are factored in. Production deployments demand high-capacity nodes (such as 8x 141GB/192GB accelerators) or distributed multi-node clusters. Furthermore, open-source adoption remains contingent upon Tencent publishing verifiable weights and execution runtimes to allow independent security auditing of its operating system agent actions.
+  </p>
 </article>
 
 <article class="paper-section" id="art3">
-  <h2>Yandex Research Introduces FLAMIA Attention Kernels: Accelerating Blackwell Pretraining via MXFP8 and NVFP4 Microscaling</h2>
-
+  <h2>Confluent Streamhouse & Lightning Tables: Unifying Real-Time Streams and Agent Memory</h2>
+  
   <h3 class="section-title">1. Executive Summary</h3>
   <div class="abstract-quote">
-    <p>Transformers spend up to 40% of their pretraining runtime inside attention layers, yet utilizing next-generation low-precision hardware formats has been hobbled by causal scale leakage and numerical drift between forward and backward passes. Yandex Research resolved these numerical hurdles with <strong>FLAMIA</strong>, an open-source suite of custom CUDA attention kernels designed for <strong>NVIDIA Blackwell</strong> microscaling Tensor Cores. By enforcing document-local scaling boundaries and mathematically aligning backward gradient numerics, FLAMIA accelerates combined forward-backward attention by up to <strong>1.42x</strong> on <strong>B200</strong> and <strong>B300</strong> silicon under <strong>MXFP8</strong> and mixed <strong>NVFP4/FP8</strong> precisions without compromising Llama pretraining stability.</p>
+    <p>
+      Enterprise AI agents deployed for live supply chain operations and financial settlement face high failure rates due to stale operational contexts caused by multi-stage batch ETL pipelines between streaming message logs and cloud data warehouses. Confluent addresses this synchronization divide through its <strong>Streamhouse architecture</strong> and the General Availability of <strong>Lightning Tables on AWS</strong>. By merging streaming data buses with in-place, queryable table state, the engine allows autonomous models to run standard ANSI SQL and <strong>Model Context Protocol (MCP)</strong> queries against live streaming events with <strong>sub-second latency</strong>. This framework removes intermediate operational caching tiers, lowering cross-zone cloud data transfer costs while ensuring autonomous reasoning loops operate on microsecond-fresh reality.
+    </p>
+  </div>
+
+  <h3 class="section-title">2. Architecture & Performance</h3>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-rank">FRESHNESS</span>
+      <div class="stat-number">&lt;1<span class="stat-unit">s</span></div>
+      <div class="stat-label">In-Place Query Response Latency</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">UNIFIED PILLARS</span>
+      <div class="stat-number">5<span class="stat-unit">Tiers</span></div>
+      <div class="stat-label">Stream, Connect, Process, Govern, Query</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">TOPOLOGY</span>
+      <div class="stat-number">Zero<span class="stat-unit">ETL</span></div>
+      <div class="stat-label">Eliminates Intermediate Staging Stores</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">INTERFACES</span>
+      <div class="stat-number">SQL+MCP</div>
+      <div class="stat-label">Native Support for Agent Frameworks</div>
+    </div>
+  </div>
+
+  <div class="infographic-block">
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-network"/></svg>
+      <div>
+        <strong>Legacy Topology: Decoupled Multi-Hop ETL</strong>
+        <p>Kafka Streaming Logs &rarr; Periodic Micro-Batch Extraction &rarr; Analytical Lakehouse Snapshot &rarr; Agent Vector/SQL Store (Data latency: Minutes to Hours).</p>
+      </div>
+    </div>
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-datacenter"/></svg>
+      <div>
+        <strong>Streamhouse Topology: Direct Lightning Tables</strong>
+        <p>Continuous Event Ingestion &rarr; Live In-Place Queryable State Engine &rarr; Direct Model Retrieval via MCP/ANSI SQL (Data latency: Sub-second).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="inline-callout">
+    <strong>Infrastructure Efficiency Shift:</strong> Consolidating queryable table state onto active event logs eliminates cross-availability-zone replication egress charges and curtails CPU cycles spent managing asynchronous change-data-capture (CDC) pipelines.
+  </div>
+
+  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
+  <p>
+    Direct stream querying eliminates state divergence for transactional retrieval, but engineering architects must recognize distinct analytical boundaries. Maintaining dynamic, materialized tables within memory-optimized streaming clusters incurs significantly higher unit storage costs than maintaining compressed Parquet or Apache Iceberg tables in commodity cloud object stores. Organizations should implement hybrid data topologies: time-sensitive agent tool-use and rapid state retrieval should target Lightning Tables, whereas deep historical training and multi-year analytical reporting should remain anchored in cost-optimized analytical lakehouses.
+  </p>
+</article>
+
+<article class="paper-section" id="art4">
+  <h2>Tenstorrent Galaxy: Modular GDDR6 Clusters Unlock 2x Memory-per-Dollar Advantage</h2>
+  
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>
+      Large-model inference economics suffer from escalating capital expenditure driven by scarce High Bandwidth Memory (HBM3/e) and complex 2.5D packaging bottlenecks like TSMC CoWoS. Tenstorrent resolves this cost scaling barrier in its evaluation of the <strong>Galaxy Blackhole cluster</strong>, interconnecting <strong>32 modular accelerators</strong> over a unified direct 2D-torus network. By deploying standard <strong>GDDR6 memory packages</strong> (32 GB per socket, 512 GB/s) paired with <strong>210 MB of on-chip SRAM</strong> and RISC-V Tensix cores, the architecture achieves <strong>102 GB/s memory bandwidth</strong> and <strong>6.4 GB capacity per $1,000</strong>—yielding a <strong>2x memory-per-dollar advantage</strong> over premier HBM GPU servers. This modular topology provides hyperscalers with an accessible hardware path for memory-bound token decoding without competing for high-density silicon interposer packaging allocations.
+    </p>
   </div>
 
   <div class="concept-box">
-    <p><strong>Key Concepts:</strong></p>
-    <ul style="margin: 0; padding-left: 20px;">
-      <li><span class="code-term">Microscaling (MXFP8 / NVFP4)</span>: Hardware-managed floating-point representation where shared microscopic scale factors are applied across narrow vectors of numbers, boosting dynamic range and compute throughput.</li>
-      <li><span class="code-term">Causal Scale Leakage</span>: A numerical bug in packed-sequence attention where block quantization scale factors inadvertently blend information across causal document boundaries.</li>
-      <li><span class="code-term">Document-Local Scaling</span>: Kernel partitioning technique that strictly resets microscaling bounding boxes at document frontiers to guarantee causal autoregressive isolation.</li>
+    <p><strong>Key Architecture Concepts:</strong></p>
+    <ul style="margin: 0.5rem 0 0 1rem; padding: 0;">
+      <li><span class="code-term">Tensix Matrix Engines</span>: Proprietary RISC-V compute cores optimized for block FP8 matrix execution and dynamic communication packet scheduling.</li>
+      <li><span class="code-term">Direct Torus Fabric</span>: Native board-level differential signaling interconnect connecting chips in pipelined rings without external PCIe switches.</li>
+      <li><span class="code-term">CoWoS-Free Packaging</span>: Mounting standard GDDR6 DRAM onto standard organic printed substrates, bypassing high-density silicon interposer supply chains.</li>
     </ul>
   </div>
 
   <h3 class="section-title">2. Architecture & Performance</h3>
-  <p>FLAMIA replaces standard uniform quantization with hardware-native microscaling schedules, mapping attention matrices directly into Blackwell's specialized tensor pipelines while preserving transposition invariants needed during backpropagation.</p>
-
-  <div class="chart-row">
-    <div class="chart-container">
-      <div class="chart-label">Attention Speedup Range vs FlashAttention-3 (x)</div>
-      <div id="chart-art3-1" style="width:100%;height:260px"></div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-rank">CAPITAL GAIN</span>
+      <div class="stat-number">2.0<span class="stat-unit">x</span></div>
+      <div class="stat-label">Memory Capacity & BW per Dollar vs HBM</div>
     </div>
-    <div class="chart-container">
-      <div class="chart-label">Isolated Attention Compute Time Reduction (%)</div>
-      <div id="chart-art3-2" style="width:100%;height:260px"></div>
+    <div class="stat-card">
+      <span class="stat-rank">PER SOCKET BW</span>
+      <div class="stat-number">512<span class="stat-unit">GB/s</span></div>
+      <div class="stat-label">Standard GDDR6 Commodity Memory</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">ON-CHIP CACHE</span>
+      <div class="stat-number">210<span class="stat-unit">MB</span></div>
+      <div class="stat-label">Ultra-Low Latency SRAM per Blackhole ASIC</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-rank">CLUSTER DENSITY</span>
+      <div class="stat-number">32<span class="stat-unit">Chips</span></div>
+      <div class="stat-label">Interconnected Galaxy Topology Shelf</div>
     </div>
   </div>
 
+  <div class="chart-row">
+    <div class="chart-container">
+      <div class="chart-label">Memory Bandwidth Delivered per $1,000 Hardware Cost (GB/s)</div>
+      <div id="chart-art4-1" style="width:100%;height:260px;"></div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-label">Memory Capacity Delivered per $1,000 Hardware Cost (GB)</div>
+      <div id="chart-art4-2" style="width:100%;height:260px;"></div>
+    </div>
+  </div>
   <script>
   (function(){
-    var el1 = document.getElementById('chart-art3-1');
+    var el1 = document.getElementById('chart-art4-1');
     if (el1 && window.echarts) {
       var c1 = echarts.init(el1, null, {renderer: 'svg'});
       c1.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 35, right: 25, bottom: 35, left: 60 },
-        xAxis: { type: 'category', data: ['FA-3 Baseline', 'FLAMIA (B200 Min)', 'FLAMIA (B200 Max)', 'FLAMIA (B300 Max)'], axisLabel: { fontSize: 10 } },
-        yAxis: { type: 'value', name: 'Speedup', nameTextStyle: { fontSize: 11 }, min: 0.8, max: 1.6 },
+        tooltip: { trigger: 'axis' },
+        grid: { left: '4%', right: '6%', bottom: '10%', top: '15%', containLabel: true },
+        xAxis: { 
+          type: 'category', 
+          data: ['HBM3/e Premier GPU Node', 'Tenstorrent Galaxy (Blackhole)'],
+          axisLabel: { color: '#4a5568', fontSize: 11 }
+        },
+        yAxis: { type: 'value', name: 'GB/s per $1k' },
         series: [{
           type: 'bar',
-          data: [1.00, 1.10, 1.40, 1.42],
-          itemStyle: { color: '#E5A995', borderRadius: [4, 4, 0, 0] },
-          label: { show: true, position: 'top', formatter: '{c}x', fontSize: 11 }
+          barWidth: '40%',
+          data: [
+            { value: 51, itemStyle: { color: '#cbd5e1' } },
+            { value: 102, itemStyle: { color: '#4fd1c5' } }
+          ],
+          label: { show: true, position: 'top', formatter: '{c} GB/s' }
         }]
       });
       window.addEventListener('resize', function(){ c1.resize(); });
     }
-    var el2 = document.getElementById('chart-art3-2');
+
+    var el2 = document.getElementById('chart-art4-2');
     if (el2 && window.echarts) {
       var c2 = echarts.init(el2, null, {renderer: 'svg'});
       c2.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { top: 35, right: 25, bottom: 35, left: 50 },
-        xAxis: { type: 'category', data: ['FA-3 Baseline', 'FLAMIA Lower Bound', 'FLAMIA Upper Bound'], axisLabel: { fontSize: 11 } },
-        yAxis: { type: 'value', name: 'Reduction %', nameTextStyle: { fontSize: 11 } },
+        tooltip: { trigger: 'axis' },
+        grid: { left: '4%', right: '6%', bottom: '10%', top: '15%', containLabel: true },
+        xAxis: { 
+          type: 'category', 
+          data: ['HBM3/e Premier GPU Node', 'Tenstorrent Galaxy (Blackhole)'],
+          axisLabel: { color: '#4a5568', fontSize: 11 }
+        },
+        yAxis: { type: 'value', name: 'GB per $1k' },
         series: [{
           type: 'bar',
-          data: [0.0, 9.1, 29.6],
-          itemStyle: { color: '#E2C37D', borderRadius: [4, 4, 0, 0] },
-          label: { show: true, position: 'top', formatter: '{c}%', fontSize: 11 }
+          barWidth: '40%',
+          data: [
+            { value: 3.2, itemStyle: { color: '#cbd5e1' } },
+            { value: 6.4, itemStyle: { color: '#9ae6b4' } }
+          ],
+          label: { show: true, position: 'top', formatter: '{c} GB' }
         }]
       });
       window.addEventListener('resize', function(){ c2.resize(); });
@@ -1029,128 +1197,51 @@
   })();
   </script>
 
-  <div class="stat-grid">
-    <div class="stat-card">
-      <span class="stat-rank">PEAK ACCELERATION</span>
-      <div class="stat-number">1.42<span class="stat-unit">x</span></div>
-      <div class="stat-label">Forward + Backward Pass Speedup on B300</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">PRECISION MODES</span>
-      <div class="stat-number">NVFP4<span class="stat-unit">/MXFP8</span></div>
-      <div class="stat-label">Native Blackwell Microscaling Execution</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">TIME REDUCTION</span>
-      <div class="stat-number">29.6<span class="stat-unit">%</span></div>
-      <div class="stat-label">Max Attention Compute Latency Saved</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">LOSS INTEGRITY</span>
-      <div class="stat-number">0.0<span class="stat-unit">Δ</span></div>
-      <div class="stat-label">No Observable Degradation on Llama Pretraining</div>
-    </div>
-  </div>
-
-  <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
-  <p>FLAMIA's primary limitation is architectural lock-in: because its core speedups stem from microscaling instruction units, older Hopper (H100/H200) clusters cannot execute these kernels natively. Furthermore, while training convergence was confirmed on dense Llama configurations, extending sub-8-bit microscaled training to multi-trillion parameter Mixture-of-Experts (MoE) architectures remains unproven and will require validation to guarantee that low-precision routing gradients do not introduce cumulative drift.</p>
-</article>
-
-<article class="paper-section" id="art4">
-  <h2>NVIDIA Open-Sources "Attribution": Pinpointing Cluster-Level Interconnect and Hardware Faults in Distributed AI Workloads</h2>
-
-  <h3 class="section-title">1. Executive Summary</h3>
-  <div class="abstract-quote">
-    <p>When an optical transceiver or SerDes link degrades in a tens-of-thousands GPU cluster, collective communication libraries like <strong>NCCL</strong> stall across the fabric, generating secondary timeout errors that drown operators in misleading diagnostic noise. NVIDIA open-sourced <strong>Attribution</strong>, an infrastructure triage platform that maps high-level distributed job crashes directly to physical hardware and fabric anomalies. Connecting to schedulers like <strong>Slurm</strong> and <strong>Kubernetes Kueue</strong>, Attribution applies deterministic rule engines to hardware register telemetry—including <strong>GPU XID codes</strong>—instantly stripping away symptom cascades to isolate the exact physical failing node.</p>
-  </div>
-
-  <div class="concept-box">
-    <p><strong>Key Concepts:</strong></p>
-    <ul style="margin: 0; padding-left: 20px;">
-      <li><span class="code-term">XID Error Codes</span>: Low-level driver and firmware event codes generated by NVIDIA GPUs indicating thermal, memory, bus, or engine faults.</li>
-      <li><span class="code-term">NCCL Watchdog Timeout</span>: Cluster-wide abort triggered when collective operations fail to sync across nodes within a prescribed grace period.</li>
-      <li><span class="code-term">Symptom Suppression</span>: Deterministic filtering that eliminates downstream timeout alerts across healthy ranks to highlight the true root-cause hardware failure.</li>
-    </ul>
-  </div>
-
-  <h3 class="section-title">2. Architecture & Performance</h3>
-  <p>Attribution operates as a decoupled, dual-component service designed to process high-throughput cluster telemetry without requiring black-box neural heuristics.</p>
-
   <div class="infographic-block">
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-network"/></svg>
-      <div>
-        <strong>Application Layer: Distributed Workloads</strong>
-        <p>PyTorch, Megatron-LM, and vLLM frameworks performing collective communications (NCCL AllReduce/AllToAll) across distributed compute ranks.</p>
-      </div>
-    </div>
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-datacenter"/></svg>
-      <div>
-        <strong>Orchestration Layer: Workload Telemetry Connectors</strong>
-        <p>Slurm, Kubernetes Kueue, Prometheus, and Loki bridges capturing per-job node assignments, run lifecycles, and aggregated system logs.</p>
-      </div>
-    </div>
-    <div class="infographic-item">
-      <svg class="infographic-icon"><use href="#icon-security"/></svg>
-      <div>
-        <strong>Diagnostic Engine: NVIDIA Attribution Service</strong>
-        <p>REST API backend executing deterministic rule correlation trees to suppress symptom noise and identify candidate suspect hardware nodes.</p>
-      </div>
-    </div>
     <div class="infographic-item">
       <svg class="infographic-icon"><use href="#icon-chip"/></svg>
       <div>
-        <strong>Physical Layer: Silicon & Interconnect Fabrics</strong>
-        <p>Telemetry sources including GPU firmware XID codes, PCIe bridges, NVLink SerDes channels, and optical transceiver signal monitors.</p>
+        <strong>Organic Substrate Board Routing</strong>
+        <p>Positions commercial <span class="code-term">GDDR6 DRAM</span> packages adjacent to the Blackhole ASIC, circumventing wafer-level packaging capacity queues.</p>
+      </div>
+    </div>
+    <div class="infographic-item">
+      <svg class="infographic-icon"><use href="#icon-packaging"/></svg>
+      <div>
+        <strong>Hardware Pipelined Latency Hiding</strong>
+        <p>Integrated hardware communication engines stream token activations across ring neighbors during matrix multiply execution steps, shielding inter-device hop latency.</p>
       </div>
     </div>
   </div>
 
-  <div class="stat-grid">
-    <div class="stat-card">
-      <span class="stat-rank">DIAGNOSTIC MODEL</span>
-      <div class="stat-number">100<span class="stat-unit">%</span></div>
-      <div class="stat-label">Deterministic Rule Trees (Audit-Compliant)</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">ORCHESTRATION</span>
-      <div class="stat-number">SLURM<span class="stat-unit">/K8s</span></div>
-      <div class="stat-label">Native Kueue & Workload Scheduler Support</div>
-    </div>
-    <div class="stat-card">
-      <span class="stat-rank">TELEMETRY SCOPE</span>
-      <div class="stat-number">XID<span class="stat-unit">+SerDes</span></div>
-      <div class="stat-label">Firmware to Distributed Collective Correlation</div>
-    </div>
-  </div>
-
   <h3 class="section-title">3. Strategic Outlook & Limitations</h3>
-  <p>Attribution's deterministic correlation rules are engineered specifically around NVIDIA's proprietary telemetry stack and driver error registers, restricting out-of-the-box utility in heterogeneous data centers utilizing AMD Instinct, Intel Gaudi, or Ultra Ethernet fabrics. Additionally, fault isolation resolves only half of cluster MTTR; automated self-healing—such as dynamically isolating bad nodes and resuming workloads from in-memory snapshots without invoking cold job restarts—remains an operational frontier requiring tighter scheduler co-design.</p>
+  <p>
+    Despite clear capital expenditure efficiencies during memory-bound autoregressive decoding, Galaxy’s raw monolithic FLOP density remains lower than premier solutions like NVIDIA Blackwell or AMD Instinct MI325X. During compute-intensive prompt prefill phases, execution across distributed discrete chips is vulnerable to hop latency overhead across the torus network. Furthermore, Tenstorrent's commercial penetration hinges on software maturity; the TT-Metalium compiler stack must provide frictionless PyTorch kernel parity and drop-in developer experiences to displace established CUDA runtime ecosystems in enterprise datacenters.
+  </p>
 </article>
 
 <section class="bento-grid-wrap">
   <h2 class="bento-grid-title">Key Strategic Takeaways</h2>
   <div class="bento-grid">
     <div class="bento-card">
-      <svg class="bento-card-icon"><use href="#icon-network"/></svg>
-      <div class="bento-card-title">Interconnect Bandwidth Dictates Real-Time Serving</div>
-      <p>WaveRT's 134.8 FPS breakthrough proves that intermediate diffusion latents can stream asynchronously across GPUs, shifting generative video bottlenecks from raw matrix math to high-speed inter-accelerator fabric latency.</p>
+      <svg class="bento-card-icon"><use href="#icon-deal"/></svg>
+      <div class="bento-card-title">Creative Software Disruption</div>
+      <p>Programmatic vector outputs and sub-second sprite loops allow multimodal models to bypass traditional desktop rasterization, shifting creative budgets from seat licenses to token consumption.</p>
     </div>
     <div class="bento-card">
-      <svg class="bento-card-icon"><use href="#icon-code"/></svg>
-      <div class="bento-card-title">Generative Media Pivots to Programmatic Agents</div>
-      <p>The academic taxonomy for Agentic Computer Graphics signals a structural shift from flat raster generation toward closed-loop code synthesis (CAD/SVG/GLSL), moving design AI into production-ready software pipelines.</p>
-    </div>
-    <div class="bento-card">
-      <svg class="bento-card-icon"><use href="#icon-chip"/></svg>
-      <div class="bento-card-title">Microscaling Kernels Unlock Next-Gen Pretraining</div>
-      <p>FLAMIA's 1.42x attention acceleration on Blackwell proves that sub-8-bit floating-point formats (MXFP8/NVFP4) can achieve causal numerical stability, establishing low-precision primitives as critical cluster cost drivers.</p>
+      <svg class="bento-card-icon"><use href="#icon-robot"/></svg>
+      <div class="bento-card-title">Spatial Desktop Automation</div>
+      <p>Frontier open architectures like Hy4 (770B MoE) expand OS-level computer control into complex CAD and 3D modeling environments, though serving requires high-density memory clusters.</p>
     </div>
     <div class="bento-card">
       <svg class="bento-card-icon"><use href="#icon-datacenter"/></svg>
-      <div class="bento-card-title">Physical-to-Software Observability Protects Capex</div>
-      <p>NVIDIA Attribution highlights that as 224G SerDes and multi-tier fabrics scale, automated triage platforms that link low-level hardware register telemetry to distributed software timeouts are essential to safeguarding cluster uptime.</p>
+      <div class="bento-card-title">Zero-ETL Real-Time Context</div>
+      <p>Streamhouse topologies replace delayed analytical batch pipelines with in-place event querying, providing operational agents with sub-second business state synchronization via native SQL and MCP.</p>
+    </div>
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-chip"/></svg>
+      <div class="bento-card-title">Non-HBM Hardware Economics</div>
+      <p>Interconnecting modular GDDR6 chips over native board meshes delivers 2x the memory bandwidth per dollar of stacked HBM, offering an economical path for scale-out LLM inference decoding.</p>
     </div>
   </div>
 </section>
