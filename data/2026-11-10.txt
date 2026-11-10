@@ -1,0 +1,281 @@
+# Strategic AI Technology & Ecosystem Daily Briefing
+
+---
+
+### 1. Kuaishou Kolors Unveils LongBanana: Graph-Grounded Benchmark and Agentic Harness for Dense Multi-Reference Image Synthesis
+
+**Source:** Kolors Research Team (Kuaishou Technology) / arXiv  
+**Event Date:** 2026-11-09  
+**Source Date:** 2026-11-09  
+**Status:** Research preprint and open benchmark release (arXiv:2611.06856)  
+**Primary URL:** `https://long-banana.com/`
+
+#### [Overview]
+Why does this matter? While modern text-to-image models generate visually stunning standalone graphics in seconds, production creative design pipelines require strict adherence across dozens of visual reference assets without style drift or accidental merging of distinct elements. To benchmark and address this operational challenge in automated design, Kuaishou’s Kolors Team has introduced LongBanana, a benchmark suite and agentic harness built for multi-reference visual synthesis. In real-world marketing and commercial production, designers must align brand logos, product geometries, typography guidelines, and background plates. Existing single-pass diffusion transformers (DiTs) degrade when conditioned on dense visual references, frequently exhibiting attribute binding failures where features from one asset bleed into another. LongBanana establishes a structured 3x3 taxonomy across 90 curated enterprise tasks that average roughly 32 reference assets, 20 relational constraints, and 51.9 checklist verification items per scenario (totaling 4,670 atomic evaluation criteria). Alongside the dataset, the researchers presented LongBanana-Gen, an agent framework that shifts image creation into an iterative ReAct-Plan-Exec-Reflect workflow. By decomposing compositional generation into structured planning, spatial isolation, and downstream vision-language model verification, the framework demonstrates measurable adherence gains over direct single-pass generation on complex multi-asset tasks.
+
+#### [Strategic Impact]
+* **Technology & Ecosystem:** Demonstrates that for dense, multi-constraint visual layouts, agentic coordination and verification can achieve higher adherence than unguided, single-pass latent diffusion models.
+* **Business & Market:** Positions automated image generation closer to commercial raster pipelines (e.g., Adobe Photoshop workflows) by enabling programmatic ingestion of brand assets and structured layout guidelines.
+* **Infrastructure & Hardware:** Iterative agentic generation cycles—incorporating multiple intermediate passes, selective inpainting, and visual-language model inspection—increase per-asset inference compute demand, elevating the value of low-cost, high-throughput batch inference over purely low-latency generation.
+* **Investment Implication:** Allocates strategic value toward workflow execution frameworks and layout-verification harnesses that bridge the gap between base foundation models and enterprise design consistency.
+
+#### [Technical Deep Dive]
+* **Benchmark Dimensions:** 90 multi-reference enterprise tasks containing an average of ~32 reference images and ~50 checklist items per task (4,670 total atomic evaluation items).  
+  *Source:* `https://arxiv.org/abs/2611.06856`
+* **Annotation Reliability:** 89.4% exact agreement on double-annotated verification subsets (quadratic weighted kappa: 0.83).  
+  *Source:* `https://long-banana.com/`
+* **Comparison with previous generation:**  
+  * Task Context Evaluation Scope: Prior benchmarks typically evaluate 1–4 conditioned reference inputs; LongBanana expands the evaluated task envelope to roughly 32 concurrent references.
+  * Multi-Constraint Synthesis: On the dense multi-constraint tasks evaluated in the paper, baseline single-pass DiTs frequently fail complex attribute binding checks; the LongBanana-Gen iterative agent harness yields measurable recovery on checklist compliance through targeted inpainting and structural revisions.
+* **Deployment Status:** Open evaluation dataset, benchmark splits, and agent code published on Hugging Face and GitHub repositories.
+
+#### [Structured Data]
+**Comparison Matrix Data**
+
+| Evaluation Dimension | Standard T2I (e.g., SDXL / FLUX Dev Baseline) | Prompt-Conditioned Multimodal DiTs | LongBanana-Gen (Agentic Harness) |
+| :--- | :--- | :--- | :--- |
+| **Evaluated Reference Density** | 1–2 reference images via adapter layers | 3–5 reference images within prompt context | Tasks evaluating ~32 visual references via structured retrieval |
+| **Attribute Binding Control** | Susceptible to feature bleed across subjects | Improved prompt attention; occasional cross-subject bleeding | Explicit layout partitioning with agent-directed localized repair |
+| **Execution Flow** | Single-pass latent diffusion generation | Single-pass multimodal conditioned generation | Multi-turn planning, localized inpainting, and VLM verification |
+| **Error Handling** | Requires full prompt regeneration | Requires prompt or random seed adjustment | Targeted regional inpainting guided by checklist feedback |
+
+#### [Critical View]
+While LongBanana-Gen demonstrates that agentic verification workflows yield higher compliance on complex compositional benchmarks, the iterative architecture introduces significant inference latency and resource overhead. Running multiple generation passes interleaved with vision-language model (VLM) inspection limits interactive usability for real-time creative tools. Furthermore, the framework's effectiveness remains tied to the visual generation limits of the underlying base diffusion checkpoint; weaknesses in raw spatial rendering or typography cannot always be resolved through iterative inpainting cycles.
+
+#### [Item Metadata]
+* `event_date:` 2026-11-09
+* `event_within_24h_window:` true
+* `event_within_7d_window:` true
+* `software_or_hardware_focus:` SW
+* `paradigm_shift_category:` Generative-Media
+* `slot_category:` 1-5
+* `structured_data_type:` comparison-matrix
+* `ongoing_story_exception:` false
+
+---
+
+### 2. EvoWorld Proposes Brain-Renderer Architecture to Improve Out-of-Sight Causal Consistency in Video Generation
+
+**Source:** EvoWorld Research Group (Collaborative Academic Preprint) / arXiv  
+**Event Date:** 2026-11-09  
+**Source Date:** 2026-11-09  
+**Status:** Academic research preprint and benchmark release (arXiv:2611.06748)  
+**Primary URL:** `https://arxiv.org/abs/2611.06748`
+
+#### [Overview]
+Why does this matter? A critical technical limitation across generative video models is maintaining physical state continuity when objects leave the visual frame. While state-of-the-art spatiotemporal diffusion architectures generate compelling short sequences, they often suffer from temporal inconsistency: when a subject places an item into an enclosed container or walks out of frame, the object frequently mutates or vanishes entirely upon the camera's return. This breakdown occurs because standard temporal attention windows lack an explicit, persistent world-state representation. To address this, the EvoWorld research team released a preprint presenting a decoupled "brain-renderer" architecture designed to enhance out-of-sight causal tracking. The framework separates high-level scene reasoning from pixel generation. A multimodal vision-language model functions as the "world brain," updating an internal state representation of scene elements—including occluded or out-of-frame objects—and tracking dynamic interactions across frames. A segment-autoregressive diffusion renderer then uses these state tokens to synthesize the visual sequence. Evaluated across 120 causal scenarios on the newly introduced EvoWorld-Bench, the architecture significantly mitigates object vanishing upon camera return compared to unaugmented diffusion baselines.
+
+#### [Strategic Impact]
+* **Technology & Ecosystem:** Demonstrates the value of hybrid architectures that pair symbolic or autoregressive state tracking with latent diffusion rendering for complex, long-horizon video synthesis.
+* **Business & Market:** Enhances the utility of synthetic video pipelines for simulation environments, virtual production, and robotics data generation, where object permanence across camera cuts is essential.
+* **Infrastructure & Hardware:** Decoupling state tracking from pixel synthesis enables heterogeneous compute mapping: the state tracking model can run on standard host memory and latency-optimized inference accelerators, while the GPU cluster focuses on high-throughput diffusion rendering.
+* **Investment Implication:** Highlights growing opportunities for world-model frameworks that integrate structured state tracking alongside raw video diffusion.
+
+#### [Technical Deep Dive]
+* **Benchmark Scope:** EvoWorld-Bench comprising 120 dedicated causal evaluation scenarios measuring subject permanence, event consequences, and trajectory tracking.  
+  *Source:* `https://arxiv.org/abs/2611.06748`
+* **System Partitioning:** Two-tier architecture pairing an autoregressive multimodal model for scene tracking with a segment-autoregressive Diffusion Transformer (DiT) for video frame generation.  
+  *Source:* `https://huggingface.co/papers/2611.06748`
+* **Comparison with previous generation:**  
+  * Occluded Entity Persistence: Evaluated standard diffusion baselines display frequent object degradation and hallucination upon camera revisitation across the benchmark scenarios; EvoWorld retains structural and spatial entity identity across evaluated camera return paths.
+  * Temporal Consistency Window: Conventional single-pass video models are typically constrained by temporal attention limits (commonly 8–16 seconds per generation chunk); EvoWorld sustains scene continuity across multiple successive segments via structured state token conditioning.
+* **Deployment Status:** Open research paper, code implementation, and benchmark dataset files published via arXiv and Hugging Face.
+
+#### [Structured Data]
+**Layer Structure Data**
+
+| Position | System Component | Primary Role & Architectural Specification |
+| :--- | :--- | :--- |
+| **Top Layer** | World State Tracker (VLM) | Analyzes video segments, updates representation of visible and occluded entities, and tracks causal scene transitions. |
+| **Middle Layer** | Conditioning Interface | Translates structured state representations into conditioning tokens and spatial coordinates for the rendering engine. |
+| **Bottom Layer** | Segment-Autoregressive Renderer | Spatiotemporal Diffusion Transformer (DiT) synthesizing output video frames aligned with state token conditions. |
+
+#### [Critical View]
+Although the decoupled architecture substantially improves causal continuity on evaluated benchmark sets, it introduces synchronization and pipelining challenges between the state-tracking model and the diffusion renderer. Generating conditioning tokens before pixel synthesis increases per-segment latency, requiring pipelining or speculative execution to approach interactive streaming speeds. Additionally, state representations can accumulate tracking errors over extended horizons, and modeling complex non-rigid physical phenomena (such as fluid dynamics or particulate matter) remains difficult for high-level semantic trackers.
+
+#### [Item Metadata]
+* `event_date:` 2026-11-09
+* `event_within_24h_window:` true
+* `event_within_7d_window:` true
+* `software_or_hardware_focus:` SW
+* `paradigm_shift_category:` Architecture
+* `slot_category:` 1-5
+* `structured_data_type:` layer-structure
+* `ongoing_story_exception:` false
+
+---
+
+### 3. AMD and Google Cloud Deploy 5th Gen EPYC Host Processors for Cloud TPU Infrastructure
+
+**Source:** AMD Corporate Newsroom / Google Cloud Infrastructure  
+**Event Date:** 2026-11-09  
+**Source Date:** 2026-11-09  
+**Status:** Official hyperscale enterprise infrastructure partnership  
+**Primary URL:** `https://ir.amd.com/news-events/press-releases/`
+
+#### [Overview]
+Why does this matter? In hyperscale AI infrastructure, the host CPU subsystem plays a vital operational role in driving accelerator performance, managing high-throughput data pipelines, scheduling distributed cluster workloads, and enforcing virtualization security. On November 9, 2026, AMD and Google Cloud announced that 5th Generation AMD EPYC server processors have been integrated to drive host compute infrastructure for Google Cloud’s TPU clusters. Host nodes handle memory orchestration, data preprocessing, and network security boundaries across distributed training and inference deployments. Through this deployment, Google Cloud utilizes AMD EPYC's hardware-based security capabilities, specifically Secure Encrypted Virtualization-Secure Nested Paging (SEV-SNP), to protect host-level virtual machine boundaries and tenant workloads. By pairing high-core-density x86 host compute with Google’s custom TPU infrastructure over PCIe 5.0 and high-speed network fabrics, the architecture minimizes data delivery bottlenecks while isolating sensitive enterprise host workloads from underlying virtualization layers.
+
+```
+Host Compute Node (5th Gen AMD EPYC 9005 Platform)
+┌────────────────────────────────────────────────────────┐
+│  AMD SEV-SNP Host VM Hardware Isolation                │
+│  - Zen 5 / Zen 5c Architectures                        │
+│  - High-Throughput Token Ingestion & Preprocessing     │
+└───────────────────────────┬────────────────────────────┘
+                            │ PCIe 5.0 Host Link
+                            ▼
+Google TPU Accelerator Pod Infrastructure
+┌────────────────────────────────────────────────────────┐
+│  Google Cloud TPU Cluster Interconnect Fabric          │
+│  - High-Bandwidth Scale-Up & Scale-Out Topologies      │
+│  - Distributed Accelerator Matrix Processing           │
+└────────────────────────────────────────────────────────┘
+```
+
+#### [Strategic Impact]
+* **Technology & Ecosystem:** Demonstrates the continuing co-design between x86 host architectures and custom hyperscale AI ASICs, emphasizing host memory bandwidth, I/O density, and hardware-enforced virtualization security.
+* **Business & Market:** Solidifies AMD’s market share in hyperscale host computing, maintaining strong momentum as a top CPU host provider across leading public cloud AI platforms.
+* **Infrastructure & Hardware:** Emphasizes that accelerator performance depends directly on host compute balance; high-throughput PCIe 5.0 lanes and host memory channels prevent accelerator starvation during data preprocessing and parameter loading.
+* **Investment Implication:** Underscores that hyperscale CapEx expansion benefits not only specialized matrix accelerators but also the underlying host processor, power, and high-speed interface ecosystem.
+
+#### [Technical Deep Dive]
+* **Host Processor Architecture:** 5th Gen AMD EPYC (AMD EPYC 9005 Series, utilizing Zen 5 and dense Zen 5c cores depending on SKU configuration).  
+  *Source:* `https://ir.amd.com/`
+* **Host-to-Device Interconnect:** Standardized PCIe 5.0 and CXL 2.0 host platform interfaces providing high-throughput links to accelerator boards and system fabric controllers.
+* **Host Security Architecture:** Hardware-rooted AMD SEV-SNP (Secure Encrypted Virtualization-Secure Nested Paging) isolating tenant virtual machines from privileged hypervisors.
+* **Deployment Status:** Active production deployment across Google Cloud regions supporting hyperscale enterprise AI infrastructure.
+
+#### [Structured Data]
+**Roadmap Data**
+
+| Generation Baseline | Deployment Era | Host CPU Platform | Accelerator Silicon | Host Interconnect Standard | Host Virtualization Security |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **TPU v4 Pods** | 2021–2022 | 3rd Gen Intel Xeon Scalable | Google TPU v4 ASIC | PCIe 4.0 | Standard Cloud Isolation |
+| **TPU v5e / v5p** | 2023–2024 | 4th Gen AMD EPYC | Google TPU v5 ASIC | PCIe 5.0 | AMD SEV Host Encryption |
+| **Modern TPU Clusters** | Late 2026 | 5th Gen AMD EPYC (Zen 5/5c) | Google TPU Infrastructure | PCIe 5.0 / CXL 2.0 | AMD SEV-SNP Hardware Isolation |
+
+#### [Critical View]
+While 5th Gen AMD EPYC processors provide high compute density and strong host isolation through SEV-SNP, enterprises must distinguish between host virtualization security and broader accelerator subsystem security. AMD SEV-SNP protects the host virtual machine memory from hypervisor compromise, but protecting proprietary model weights and intermediate tensors across custom accelerator interconnects and TPU on-package memory requires separate cryptographic attestation and data-protection layers managed by the accelerator runtime. Additionally, high-density host configurations demand careful thermal and power distribution management across standard server racks.
+
+#### [Item Metadata]
+* `event_date:` 2026-11-09
+* `event_within_24h_window:` true
+* `event_within_7d_window:` true
+* `software_or_hardware_focus:` HW
+* `paradigm_shift_category:` Infrastructure
+* `slot_category:` 1-5
+* `structured_data_type:` roadmap
+* `ongoing_story_exception:` false
+
+---
+
+### 4. PCBRouteAgent: Multimodal LLM Agent Framework Explores Automated Board-Level Routing in Native KiCad Environments
+
+**Source:** Electronic Design Automation & AI Research Group / arXiv  
+**Event Date:** 2026-11-09  
+**Source Date:** 2026-11-09  
+**Status:** Research preprint and open codebase release (arXiv:2611.08175)  
+**Primary URL:** `https://arxiv.org/abs/2611.08175`
+
+#### [Overview]
+Why does this matter? Printed Circuit Board (PCB) routing remains a major physical engineering bottleneck, requiring tight navigation across geometric spacing, trace length matching, layer stack transitions, and physical Design Rule Checking (DRC) constraints. While traditional heuristic auto-routers have existed for decades, they frequently struggle with dense, complex layouts—generating DRC violations, excessive via transitions, or unroutable bottlenecks that force hardware engineers into extensive manual routing. On November 9, 2026, researchers released PCBRouteAgent, a multimodal agent framework that pairs visual spatial planning with deterministic CAD tool execution. In board design, layout engineers evaluate macro board topology, identify routing corridors, and budget layer transitions before routing fine traces. PCBRouteAgent reflects this method via a two-stage approach: a Multimodal Global Routing Planner analyzes board images and netlist connectivity to establish topology guides and layer allocation strategies, while a Detailed Routing Executor interfaces with KiCad’s routing engine to place traces, utilizing DRC feedback to iteratively resolve congested board sections.
+
+```
+                  [Board Netlist & Geometric Specs]
+                                  │
+                                  ▼
+         ┌─────────────────────────────────────────────────┐
+         │     Multimodal Global Routing Planner (LLM)     │
+         │  - Visual Board Topography Inspection           │
+         │  - High-Level Corridor & Net Priority Planning  │
+         │  - Layer Transition & Via Budget Strategy       │
+         └────────────────────────┬────────────────────────┘
+                                  │ Topology Guides & Constraints
+                                  ▼
+         ┌─────────────────────────────────────────────────┐
+         │        Detailed Routing Executor (KiCad)        │
+         │  - Geometric Trace Routing Execution            │
+         │  - Native DRC Verification                      │
+         └────────────────────────┬────────────────────────┘
+                                  │
+           ┌──────────────────────┴──────────────────────┐
+           │ Passes DRC                                  │ DRC Violations
+           ▼                                             ▼
+[DRC-Clean Routed Layout]                 [Structured Feedback Loop]
+                                          (Triggers Targeted Re-routing)
+```
+
+#### [Strategic Impact]
+* **Technology & Ecosystem:** Illustrates an emerging trend in Electronic Design Automation (EDA) where AI agents serve as high-level planning layers directing proven, deterministic CAD tools (such as KiCad) rather than attempting to route geometry via unconstrained neural networks.
+* **Business & Market:** Holds potential to accelerate rapid PCB prototyping iterations for hardware development teams and electronics manufacturers, automating preliminary routing phases on small-to-midsize boards.
+* **Infrastructure & Hardware:** Aids early-stage hardware exploration by shortening turnaround times for auxiliary test boards, peripheral modules, and sensor break-out cards.
+* **Investment Implication:** Demonstrates that open-source toolchains augmented by agentic wrappers can increasingly perform specialized engineering tasks, encouraging commercial EDA vendors to develop programmatic agent interfaces.
+
+#### [Technical Deep Dive]
+* **Evaluation Benchmark:** 247 synthetic and real-world boards across four PCBWorld-Bench splits (D2, D3-A, D3-B, D3-C).  
+  *Source:* `https://arxiv.org/abs/2611.08175`
+* **CAD Environment Integration:** Programmatic Python automation interfacing with KiCad to execute geometric routing algorithms and capture DRC reports.
+* **Comparison with previous generation:**  
+  * DRC-Clean Completion on D3-A Split: 58.9% (Best Evaluated Heuristic Baseline) → 94.9% (PCBRouteAgent) (+36.0 percentage points).
+  * DRC-Clean Completion on D3-B Split: 86.1% (Evaluated Baseline) → 100.0% (PCBRouteAgent) (+13.9 percentage points).
+  * DRC-Clean Completion on D3-C Split: 30.0% (Evaluated Baseline) → 40.0% (PCBRouteAgent) (+10.0 percentage points).
+* **Deployment Status:** Open-source Python codebase, benchmarking harness, and dataset configurations published on GitHub and arXiv.
+
+#### [Structured Data]
+**Comparison Matrix Data**
+
+| Evaluation Metric / Dimension | Traditional Heuristic Autorouter (Evaluated Baseline) | Direct Reinforcement Learning Approach | PCBRouteAgent (Multimodal Agent + CAD Engine) |
+| :--- | :--- | :--- | :--- |
+| **High-Level Corridor Planning** | Localized path search without macro spatial context | State-space reward approximation | Multimodal visual inspection of board layout topology |
+| **Design Rule Enforcement** | Deterministic but prone to local traps on dense nets | Frequent micro-clearance violations | Deterministic KiCad DRC feedback with iterative revisions |
+| **Benchmark D3-A Clean-Pass Rate** | 58.9% DRC-clean completion | Under 50% completion | 94.9% DRC-clean completion |
+| **Benchmark D3-C Clean-Pass Rate** | 30.0% DRC-clean completion | Under 25% completion | 40.0% DRC-clean completion |
+
+#### [Critical View]
+While PCBRouteAgent demonstrates strong routing completion gains on less congested 2-to-4 layer boards, high-density layouts remain an active engineering challenge. On the dense D3-C split, the framework's DRC-clean completion rate reached 40%, indicating that heavily constrained routing channels, tight pin matrices, and complex escape routing still present obstacles for autonomous systems. Furthermore, achieving a DRC-clean layout does not equate to high-frequency verification; the agent framework does not model 3D electromagnetic fields, transmission line impedance targets, or signal/power integrity (SI/PI) parameters, meaning high-speed layouts still require specialized simulation and verification tools like Ansys HFSS or Cadence Clarity.
+
+#### [Item Metadata]
+* `event_date:` 2026-11-09
+* `event_within_24h_window:` true
+* `event_within_7d_window:` true
+* `software_or_hardware_focus:` HW
+* `paradigm_shift_category:` HW-Board-System
+* `slot_category:` 6
+* `structured_data_type:` comparison-matrix
+* `ongoing_story_exception:` false
+
+---
+
+### [SUMMARY & FORWARD-LOOKING OUTLOOK]
+
+#### 1. What changed today?
+Today’s developments highlight how AI systems are expanding beyond unconstrained, single-pass generation into **structured, multi-stage architectures pairing neural models with external engines and verification loops**:
+* In specialized media, Kuaishou's **LongBanana-Gen** framework showed that handling dense visual references across enterprise tasks benefits from an iterative planning, inpainting, and verification harness.
+* In video generation, **EvoWorld** demonstrated that resolving out-of-sight causal consistency over extended sequences is aided by separating semantic state tracking from pixel rendering.
+* In board design automation, **PCBRouteAgent** demonstrated the viability of using multimodal agents for macro spatial planning while relying on established CAD engines (KiCad) for geometric execution.
+* In enterprise cloud infrastructure, **AMD and Google Cloud** highlighted the continued co-design of 5th Gen AMD EPYC processors and custom TPU infrastructure to support secure, high-density AI host environments.
+
+#### 2. What structural trend is becoming stronger?
+The trend toward **"Decoupled Planning and Execution"** is gaining traction across multiple domains. In visual creative workflows, neural diffusion models are increasingly guided by structured agents that verify relational constraints. In electronic design automation, LLMs are not tasked with manually calculating millimeter-precise polygon coordinates; instead, they act as strategic planners directing deterministic CAD engines. Across both software and physical design, foundational models are increasingly deployed alongside domain-specific rule checkers.
+
+#### 3. What bottleneck is emerging?
+**Latency overhead and compute expansion from iterative feedback cycles.** While agentic loops improve consistency—whether verifying visual assets, tracking temporal world states, or correcting DRC violations—they require multiple inference calls per task. This shifts infrastructure requirements toward cost-effective, high-throughput inference serving to handle the expanded token and frame volume required by iterative workflows.
+
+#### 4. Which layer of the AI stack may become strategically more important?
+**The Host Processor, Memory Bandwidth, and Interconnect Fabric.** As shown in hyperscale TPU and accelerator deployments, compute performance depends heavily on the host CPU subsystem's ability to ingest, preprocess, and transfer data without starving matrix execution units. Balancing high-core-density host platforms, PCIe 5.0 lanes, and hardware virtualization security remains fundamental to infrastructure stability.
+
+#### 5. What should be monitored next?
+* **Agentic Integration in Enterprise EDA:** Track whether commercial toolmakers (such as Cadence, Synopsys, and Altium) introduce formal multimodal agent interfaces to support automated layout planning.
+* **Inference Optimization for Decoupled Video Models:** Observe whether brain-renderer architectures like EvoWorld can reach near-interactive rendering rates through speculative execution or state caching.
+* **Host-to-Accelerator Co-Design:** Monitor the adoption of advanced CXL memory sharing and high-speed PCIe architectures as hyperscalers scale custom accelerator clusters.
+
+---
+
+### [UPCOMING TECH CALENDAR]
+
+* **November 18–21, 2026:** Microsoft Ignite (Focus on enterprise agentic workflows and Azure cloud AI infrastructure).
+* **December 06–12, 2026:** NeurIPS 2026 (Focus on frontier foundation models, reasoning architectures, and generative media benchmarks).
+* **December 09–12, 2026:** IEEE International Electron Devices Meeting (IEDM 2026, San Francisco — Advanced packaging, 3D gate-all-around architectures, and backside power delivery).
+* **January 26–29, 2027:** DesignCon 2027 (Santa Clara — High-speed SerDes design, board-level SI/PI, and accelerator interface engineering).
+* **February 14–18, 2027:** IEEE International Solid-State Circuits Conference (ISSCC 2027, San Francisco — Next-generation AI accelerators, integrated power delivery, and low-power circuits).
