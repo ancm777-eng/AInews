@@ -672,7 +672,7 @@ def main():
         print("❌ Phase 5 failed: html_content.txt 프롬프트를 찾을 수 없습니다 (HTML_PROMPT_URL 또는 prompt/html_content.txt 확인 필요).")
         sys.exit(1)
 
-    gemini_model_id = "gemini-3.8-flash"
+    gemini_model_id = "gemini-4-hydrogen"
     print(f"Generating article content using model: {gemini_model_id}...")
 
     base_user_prompt = f"다음 데이터를 바탕으로 시스템 지시사항에 맞춰 4개 기사(<article>) 블록과 마무리 Bento Grid(<section class=\"bento-grid-wrap\">)만 생성하십시오:\n\n{final_content}"
