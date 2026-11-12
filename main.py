@@ -310,7 +310,7 @@ def main():
         sys.exit(1)
 
     g_client = genai.Client(api_key=g_api_key)
-    g_model = get_latest_gemini_model(g_client)
+    g_model = "gemini-4-hydrogen"
 
     o_client = OpenAI(api_key=o_api_key, max_retries=0) if (o_api_key and OpenAI) else None
 
