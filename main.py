@@ -5,6 +5,8 @@ import argparse
 import re
 import datetime
 import random
+import html
+import json
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -241,6 +243,456 @@ def validate_articles_content(text):
         numbers = [float(n.strip()) for n in data_str.split(',') if n.strip()]
         if len(numbers) > 1 and len(set(numbers)) == 1:
             raise ValueError(f"모든 값이 동일한 무의미한 가짜 차트 데이터 감지: {numbers}. 차트 대신 stat-grid 또는 infographic-block을 사용하십시오.")
+
+
+def _ensure_takeaways_id(articles_html):
+    """Ensure the closing Bento Grid section carries id='takeaways' for ScrollSpy and TOC links."""
+    if re.search(r'<section\b[^>]*class="[^"]*bento-grid-wrap[^"]*"[^>]*\bid="takeaways"', articles_html):
+        return articles_html
+    return re.sub(
+        r'(<section\b[^>]*class="[^"]*bento-grid-wrap[^"]*")(?![^>]*\bid=)',
+        r'\1 id="takeaways"',
+        articles_html,
+        count=1,
+    )
+
+
+def _strip_tags(text):
+    return html.unescape(re.sub(r'<[^>]+>', '', text or '')).strip()
+
+
+def build_navigation_html(articles_html):
+    """Pre-render static sidebar TOC items, mobile select options, and quick-jump pills."""
+    sections = []
+    for match in re.finditer(
+        r'<article\b[^>]*class="[^"]*paper-section[^"]*"[^>]*\bid="([^"]+)"[^>]*>.*?<h2[^>]*>(.*?)</h2>',
+        articles_html,
+        re.DOTALL,
+    ):
+        sections.append((match.group(1), _strip_tags(match.group(2))))
+
+    takeaways_match = re.search(
+        r'<section\b[^>]*class="[^"]*bento-grid-wrap[^"]*"[^>]*\bid="([^"]+)"[^>]*>.*?<h2[^>]*>(.*?)</h2>',
+        articles_html,
+        re.DOTALL,
+    )
+    if takeaways_match:
+        sections.append((takeaways_match.group(1), _strip_tags(takeaways_match.group(2))))
+
+    side_items = []
+    mobile_options = []
+    mobile_pills = []
+
+    for idx, (sec_id, raw_title) in enumerate(sections):
+        num = f"{idx + 1:02d}"
+        short_title = (raw_title[:44] + "…") if len(raw_title) > 44 else raw_title
+        safe_title = html.escape(short_title)
+        safe_id = html.escape(sec_id, quote=True)
+        active_cls = " active" if idx == 0 else ""
+        current_attr = ' aria-current="location"' if idx == 0 else ""
+
+        side_items.append(
+            f'<li><a href="#{safe_id}" class="side-nav-link{active_cls}" data-target="{safe_id}"{current_attr}>'
+            f'<span class="nav-num">{num}</span><span class="nav-text">{safe_title}</span></a></li>'
+        )
+        mobile_options.append(f'<option value="#{safe_id}">{num} · {safe_title}</option>')
+        pill_label = "Sum" if sec_id == "takeaways" else num
+        mobile_pills.append(
+            f'<a href="#{safe_id}" class="mobile-pill{active_cls}" data-target="{safe_id}">{pill_label}</a>'
+        )
+
+    return "\n                ".join(side_items), "\n                ".join(mobile_options), "\n                ".join(mobile_pills)
+
+
+def _find_balanced_block(text, start_idx, open_ch, close_ch):
+    """Return substring (including delimiters) for balanced {...} or [...] starting at start_idx."""
+    if start_idx < 0 or start_idx >= len(text) or text[start_idx] != open_ch:
+        return None
+    depth = 0
+    in_str = None
+    escaped = False
+    for idx in range(start_idx, len(text)):
+        ch = text[idx]
+        if in_str:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == in_str:
+                in_str = None
+            continue
+        if ch in ("'", '"'):
+            in_str = ch
+        elif ch == open_ch:
+            depth += 1
+        elif ch == close_ch:
+            depth -= 1
+            if depth == 0:
+                return text[start_idx:idx + 1]
+    return None
+
+
+def _extract_js_strings(array_literal):
+    """Parse JS string literals inside an array literal [...]."""
+    items = []
+    if not array_literal or len(array_literal) < 2:
+        return items
+    inner = array_literal[1:-1]
+    idx = 0
+    while idx < len(inner):
+        ch = inner[idx]
+        if ch in ("'", '"'):
+            quote = ch
+            idx += 1
+            buf = []
+            while idx < len(inner):
+                c = inner[idx]
+                if c == "\\" and idx + 1 < len(inner):
+                    nxt = inner[idx + 1]
+                    if nxt == "n":
+                        buf.append(" ")
+                    else:
+                        buf.append(nxt)
+                    idx += 2
+                    continue
+                if c == quote:
+                    idx += 1
+                    break
+                buf.append(c)
+                idx += 1
+            items.append("".join(buf).strip())
+        else:
+            idx += 1
+    return items
+
+
+def _extract_js_numbers(array_literal):
+    """Parse numeric values from a JS array literal ([10, 20] or [{value: 10}, ...])."""
+    nums = []
+    if not array_literal or len(array_literal) < 2:
+        return nums
+    inner = array_literal[1:-1].strip()
+    if not inner:
+        return nums
+    idx = 0
+    while idx < len(inner):
+        if inner[idx] == "{":
+            obj = _find_balanced_block(inner, idx, "{", "}")
+            if not obj:
+                break
+            m = re.search(r'\bvalue\s*:\s*(-?\d+(?:\.\d+)?)', obj)
+            if m:
+                nums.append(float(m.group(1)))
+            idx += len(obj)
+        else:
+            m = re.match(r'(-?\d+(?:\.\d+)?)', inner[idx:])
+            if m and (idx == 0 or inner[idx - 1] in "[, \t\r\n"):
+                nums.append(float(m.group(1)))
+                idx += len(m.group(1))
+            else:
+                idx += 1
+    return nums
+
+
+def _extract_echarts_specs(articles_html):
+    """Extract {chart_id: {labels: [...], series: [(name, [vals...])]}} from inline ECharts scripts."""
+    specs = {}
+    for script_match in re.finditer(r'<script\b[^>]*>(.*?)</script>', articles_html, re.DOTALL):
+        script_body = script_match.group(1)
+        var_to_id = {}
+        for init_match in re.finditer(
+            r"(?:var|let|const)\s+([a-zA-Z_$][\w$]*)\s*=\s*document\.getElementById\(\s*['\"](chart-[^'\"]+)['\"]\s*\)",
+            script_body,
+        ):
+            var_to_id[init_match.group(1)] = init_match.group(2)
+
+        chart_to_el = {}
+        for echart_match in re.finditer(
+            r"(?:var|let|const)\s+([a-zA-Z_$][\w$]*)\s*=\s*echarts\.init\(\s*([a-zA-Z_$][\w$]*)",
+            script_body,
+        ):
+            el_var = echart_match.group(2)
+            if el_var in var_to_id:
+                chart_to_el[echart_match.group(1)] = var_to_id[el_var]
+
+        for set_match in re.finditer(r'([a-zA-Z_$][\w$]*)\.setOption\s*\(\s*\{', script_body):
+            chart_var = set_match.group(1)
+            chart_id = chart_to_el.get(chart_var)
+            if not chart_id:
+                continue
+            obj_start = set_match.end() - 1
+            option_block = _find_balanced_block(script_body, obj_start, "{", "}")
+            if not option_block:
+                continue
+
+            labels = []
+            xaxis_match = re.search(r'\bxAxis\s*:\s*\{', option_block)
+            if xaxis_match:
+                xaxis_block = _find_balanced_block(option_block, xaxis_match.end() - 1, "{", "}")
+                if xaxis_block:
+                    xdata_match = re.search(r'\bdata\s*:\s*\[', xaxis_block)
+                    if xdata_match:
+                        xdata_arr = _find_balanced_block(xaxis_block, xdata_match.end() - 1, "[", "]")
+                        labels = _extract_js_strings(xdata_arr)
+
+            series_list = []
+            series_match = re.search(r'\bseries\s*:\s*\[', option_block)
+            if series_match:
+                series_arr = _find_balanced_block(option_block, series_match.end() - 1, "[", "]")
+                if series_arr:
+                    pos = 1
+                    while pos < len(series_arr) - 1:
+                        if series_arr[pos] == "{":
+                            s_obj = _find_balanced_block(series_arr, pos, "{", "}")
+                            if not s_obj:
+                                break
+                            name_m = re.search(r"""\bname\s*:\s*(['"])(.*?)\1""", s_obj)
+                            s_name = name_m.group(2) if name_m else f"Series {len(series_list) + 1}"
+                            sdata_m = re.search(r'\bdata\s*:\s*\[', s_obj)
+                            s_vals = []
+                            if sdata_m:
+                                sdata_arr = _find_balanced_block(s_obj, sdata_m.end() - 1, "[", "]")
+                                s_vals = _extract_js_numbers(sdata_arr)
+                            if s_vals:
+                                series_list.append((s_name, s_vals))
+                            pos += len(s_obj)
+                        else:
+                            pos += 1
+
+            if labels and series_list:
+                specs[chart_id] = {"labels": labels, "series": series_list}
+    return specs
+
+
+def _render_chart_fallback_html(spec):
+    """Build a static inline SVG bar visualization + accessible HTML table for a chart."""
+    labels = spec["labels"]
+    series = spec["series"]
+    n_cats = len(labels)
+    if n_cats == 0 or not series:
+        return ""
+
+    all_vals = [v for _, vals in series for v in vals]
+    max_val = max(all_vals) if all_vals else 1.0
+    if max_val <= 0:
+        max_val = 1.0
+
+    palette = ["#5b7c99", "#6b9080", "#d98a6c", "#d4a373"]
+    svg_w, svg_h = 560, 175
+    pad_l, pad_r, pad_t, pad_b = 34, 16, 20, 44
+    plot_w = svg_w - pad_l - pad_r
+    plot_h = svg_h - pad_t - pad_b
+    group_w = plot_w / n_cats
+    n_series = len(series)
+    bar_w = min(34.0, (group_w * 0.72) / max(1, n_series))
+
+    svg_parts = [
+        f'<svg class="chart-fallback-svg" viewBox="0 0 {svg_w} {svg_h}" role="img" aria-label="Static chart data fallback">',
+        f'<line x1="{pad_l}" y1="{pad_t + plot_h}" x2="{svg_w - pad_r}" y2="{pad_t + plot_h}" stroke="#d1d5db" stroke-width="1"/>',
+    ]
+
+    for c_idx, cat_label in enumerate(labels):
+        cx = pad_l + c_idx * group_w + group_w / 2.0
+        total_bars_w = n_series * bar_w + max(0, n_series - 1) * 4.0
+        start_x = cx - total_bars_w / 2.0
+        for s_idx, (_, vals) in enumerate(series):
+            val = vals[c_idx] if c_idx < len(vals) else 0.0
+            bh = max(2.0, (max(0.0, val) / max_val) * (plot_h - 14))
+            bx = start_x + s_idx * (bar_w + 4.0)
+            by = pad_t + plot_h - bh
+            color = palette[s_idx % len(palette)]
+            val_txt = f"{val:g}"
+            svg_parts.append(f'<rect x="{bx:.1f}" y="{by:.1f}" width="{bar_w:.1f}" height="{bh:.1f}" rx="3" fill="{color}"/>')
+            svg_parts.append(
+                f'<text x="{bx + bar_w / 2.0:.1f}" y="{max(12.0, by - 4):.1f}" text-anchor="middle" '
+                f'font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">{html.escape(val_txt)}</text>'
+            )
+        short_cat = (cat_label[:16] + "…") if len(cat_label) > 16 else cat_label
+        svg_parts.append(
+            f'<text x="{cx:.1f}" y="{pad_t + plot_h + 16}" text-anchor="middle" '
+            f'font-family="Inter, sans-serif" font-size="10" fill="#4b5563">{html.escape(short_cat)}</text>'
+        )
+    svg_parts.append("</svg>")
+
+    headers = "".join(f"<th>{html.escape(s_name)}</th>" for s_name, _ in series)
+    rows = []
+    for c_idx, cat_label in enumerate(labels):
+        cells = "".join(
+            f"<td>{vals[c_idx]:g}</td>" if c_idx < len(vals) else "<td>—</td>"
+            for _, vals in series
+        )
+        rows.append(f"<tr><td>{html.escape(cat_label)}</td>{cells}</tr>")
+
+    table_html = (
+        '<table class="chart-fallback-table">'
+        f"<thead><tr><th>Category</th>{headers}</tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table>"
+    )
+    return f'<div class="chart-fallback">{"".join(svg_parts)}{table_html}</div>'
+
+
+def inject_chart_fallbacks(articles_html):
+    """Inject static inline SVG + HTML table fallbacks inside each .chart-container."""
+    specs = _extract_echarts_specs(articles_html)
+    if not specs:
+        return articles_html
+
+    def _replace_chart_div(match):
+        full_tag = match.group(0)
+        chart_id = match.group(1)
+        spec = specs.get(chart_id)
+        if not spec:
+            return full_tag
+        fallback_html = _render_chart_fallback_html(spec)
+        return f"{full_tag}\n      {fallback_html}"
+
+    # Avoid double injection if .chart-fallback already follows
+    pattern = re.compile(r'<div\b[^>]*\bid="(chart-art\d+-[a-zA-Z0-9]+)"[^>]*>\s*</div>(?!\s*<div class="chart-fallback">)')
+    return pattern.sub(_replace_chart_div, articles_html)
+
+
+def collect_archive_dates(data_dir="data", archive_dir="archive", include_today=None):
+    """Collect sorted briefing dates across data/*.txt and archive/*.html."""
+    entries_by_date = {}
+    if os.path.exists(data_dir):
+        for fname in os.listdir(data_dir):
+            if RE_ARCHIVE_FILENAME.match(fname):
+                fpath = os.path.join(data_dir, fname)
+                if os.path.getsize(fpath) >= 200:
+                    d_str = fname.replace(".txt", "")
+                    entries_by_date.setdefault(d_str, {"date": d_str})["data"] = f"data/{fname}"
+
+    if os.path.exists(archive_dir):
+        for fname in os.listdir(archive_dir):
+            if re.match(r'^\d{4}-\d{2}-\d{2}\.html$', fname):
+                d_str = fname.replace(".html", "")
+                entries_by_date.setdefault(d_str, {"date": d_str})["html"] = f"archive/{fname}"
+
+    if include_today:
+        entry = entries_by_date.setdefault(include_today, {"date": include_today})
+        entry["html"] = f"archive/{include_today}.html"
+        if os.path.exists(os.path.join(data_dir, f"{include_today}.txt")):
+            entry["data"] = f"data/{include_today}.txt"
+
+    ordered = []
+    for d_str in sorted(entries_by_date.keys()):
+        try:
+            dt = datetime.date.fromisoformat(d_str)
+            label = dt.strftime("%B %d, %Y")
+        except ValueError:
+            label = d_str
+        item = entries_by_date[d_str]
+        item["label"] = label
+        ordered.append(item)
+    return ordered
+
+
+def write_archive_manifest(entries, archive_dir="archive"):
+    """Write archive/manifest.json and archive/manifest.js for static archive navigation."""
+    os.makedirs(archive_dir, exist_ok=True)
+    latest_date = entries[-1]["date"] if entries else ""
+    payload = {
+        "latest": latest_date,
+        "dates": list(reversed(entries)),
+    }
+    with open(os.path.join(archive_dir, "manifest.json"), "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    with open(os.path.join(archive_dir, "manifest.js"), "w", encoding="utf-8") as f:
+        f.write("window.AINEWS_ARCHIVE = " + json.dumps(payload, ensure_ascii=False) + ";\n")
+
+
+def _resolve_archive_href(entry, latest_date, asset_prefix=""):
+    if not entry:
+        return "#"
+    if entry["date"] == latest_date:
+        return f"{asset_prefix}index.html"
+    if entry.get("html"):
+        return f"{asset_prefix}{entry['html']}"
+    return f"{asset_prefix}archive.html?date={entry['date']}"
+
+
+def build_archive_nav_html(entries, current_date, latest_date, asset_prefix=""):
+    """Build Prev / Date Select / Next archive controls for the top navigation bar."""
+    if not entries:
+        return f'<div class="top-nav-meta" id="report-date-top">{html.escape(current_date)}</div>'
+
+    dates_asc = [e["date"] for e in entries]
+    idx = dates_asc.index(current_date) if current_date in dates_asc else len(entries) - 1
+    prev_entry = entries[idx - 1] if idx > 0 else None
+    next_entry = entries[idx + 1] if idx < len(entries) - 1 else None
+
+    prev_href = _resolve_archive_href(prev_entry, latest_date, asset_prefix) if prev_entry else "#"
+    next_href = _resolve_archive_href(next_entry, latest_date, asset_prefix) if next_entry else "#"
+    prev_cls = "archive-nav-btn" + ("" if prev_entry else " is-disabled")
+    next_cls = "archive-nav-btn" + ("" if next_entry else " is-disabled")
+
+    options_html = []
+    # Keep static HTML lean with the 15 most recent dates; archive/manifest.js hydrates the full history
+    recent_slice = list(reversed(entries[-15:]))
+    if current_date not in {e["date"] for e in recent_slice}:
+        for e in entries:
+            if e["date"] == current_date:
+                recent_slice.append(e)
+                break
+    for entry in recent_slice:
+        href = _resolve_archive_href(entry, latest_date, asset_prefix)
+        selected = " selected" if entry["date"] == current_date else ""
+        options_html.append(
+            f'<option value="{html.escape(href, quote=True)}" data-date="{entry["date"]}"{selected}>'
+            f'{html.escape(entry["label"])}</option>'
+        )
+
+    latest_pill = ""
+    if asset_prefix and current_date != latest_date:
+        latest_pill = f'<a class="archive-latest-pill" href="{asset_prefix}index.html">Latest</a>'
+
+    return (
+        f'<div class="archive-nav" aria-label="Daily archive navigation">'
+        f'<a class="{prev_cls}" href="{html.escape(prev_href, quote=True)}" title="Previous briefing" aria-label="Previous briefing">‹ <span class="nav-btn-label">Prev</span></a>'
+        f'<div class="archive-date-wrap">'
+        f'<span class="archive-status-dot" aria-hidden="true"></span>'
+        f'<select id="archive-date-select" class="archive-date-select" data-current-date="{html.escape(current_date, quote=True)}" aria-label="Select briefing date">'
+        f'{"".join(options_html)}'
+        f'</select>'
+        f'</div>'
+        f'<a class="{next_cls}" href="{html.escape(next_href, quote=True)}" title="Next briefing" aria-label="Next briefing"><span class="nav-btn-label">Next</span> ›</a>'
+        f'</div>'
+        f'{latest_pill}'
+    )
+
+
+def assemble_html_document(
+    template_content,
+    articles_content,
+    report_date_str,
+    current_iso_date,
+    archive_entries=None,
+    latest_iso_date=None,
+    asset_prefix="",
+):
+    """Assemble final static HTML with pre-rendered TOC, chart fallbacks, and archive controls."""
+    enhanced_articles = _ensure_takeaways_id(articles_content)
+    enhanced_articles = inject_chart_fallbacks(enhanced_articles)
+    side_nav_items, mobile_nav_options, mobile_nav_pills = build_navigation_html(enhanced_articles)
+
+    entries = archive_entries or []
+    latest_date = latest_iso_date or current_iso_date
+    archive_nav_html = build_archive_nav_html(entries, current_iso_date, latest_date, asset_prefix=asset_prefix)
+
+    replacements = {
+        "{{ARTICLES_CONTENT}}": enhanced_articles,
+        "{{REPORT_DATE}}": report_date_str,
+        "{{SIDE_NAV_ITEMS}}": side_nav_items,
+        "{{MOBILE_NAV_OPTIONS}}": mobile_nav_options,
+        "{{MOBILE_NAV_PILLS}}": mobile_nav_pills,
+        "{{ARCHIVE_NAV_HTML}}": archive_nav_html,
+        "{{ASSET_PREFIX}}": asset_prefix,
+    }
+    html_code = template_content
+    for token, value in replacements.items():
+        html_code = html_code.replace(token, value)
+    return html_code
 
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), retry_error_callback=return_none_on_error)
@@ -718,7 +1170,27 @@ def main():
         sys.exit(1)
 
     report_date_str = now_kst().strftime("%B %d, %Y")
-    html_code = template_content.replace("{{ARTICLES_CONTENT}}", articles_content).replace("{{REPORT_DATE}}", report_date_str)
+    archive_entries = collect_archive_dates(data_dir="data", archive_dir="archive", include_today=today_str)
+    write_archive_manifest(archive_entries, archive_dir="archive")
+
+    html_code = assemble_html_document(
+        template_content,
+        articles_content,
+        report_date_str,
+        current_iso_date=today_str,
+        archive_entries=archive_entries,
+        latest_iso_date=today_str,
+        asset_prefix="",
+    )
+    archive_html_code = assemble_html_document(
+        template_content,
+        articles_content,
+        report_date_str,
+        current_iso_date=today_str,
+        archive_entries=archive_entries,
+        latest_iso_date=today_str,
+        asset_prefix="../",
+    )
 
     if "{{ARTICLES_CONTENT}}" in html_code or "{{REPORT_DATE}}" in html_code or "<!DOCTYPE html>" not in html_code or "</html>" not in html_code:
         print("❌ Phase 5 failed: 최종 HTML 조립에 실패했습니다. index.html을 덮어쓰지 않습니다.")
@@ -727,10 +1199,14 @@ def main():
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_code)
 
+    os.makedirs("archive", exist_ok=True)
+    with open(f"archive/{today_str}.html", "w", encoding="utf-8") as f:
+        f.write(archive_html_code)
+
     with open("data/.html_synced", "w", encoding="utf-8") as f:
         f.write(today_str)
 
-    print(f"✅ Phase 5 complete. Saved to index.html (Time: {time.time() - p5_start:.2f}s)")
+    print(f"✅ Phase 5 complete. Saved to index.html and archive/{today_str}.html (Time: {time.time() - p5_start:.2f}s)")
 
 
 if __name__ == "__main__":

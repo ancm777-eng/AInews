@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archive — Daily AI &amp; Semiconductor Engineering Briefing</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        :root {
+            --pastel-peach: #f6c4a6;
+            --pastel-peach-soft: #fef0e7;
+            --pastel-peach-text: #c45e2a;
+            --pastel-peach-border: #f8cdb4;
+
+            --pastel-yellow: #fed78a;
+            --pastel-yellow-soft: #fef8e7;
+            --pastel-yellow-text: #a16c14;
+            --pastel-yellow-border: #fde3a7;
+
+            --pastel-green: #b5d6a7;
+            --pastel-green-soft: #eef6ed;
+            --pastel-green-text: #417539;
+            --pastel-green-border: #cae8c2;
+
+            --pastel-blue: #a9c9e8;
+            --pastel-blue-soft: #edf5fc;
+            --pastel-blue-text: #316d9e;
+            --pastel-blue-border: #c8e0f7;
+
+            --bg-main: #fbfbfa;
+            --bg-card: #ffffff;
+            --bg-surface: #f4f4f2;
+            --bg-surface-subtle: #f8f8f6;
+
+            --text-main: #1f2937;
+            --text-body: #4b5563;
+            --text-muted: #6b7280;
+            --text-faint: #9ca3af;
+
+            --border-light: #e5e7eb;
+            --border-medium: #d1d5db;
+
+            --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.03);
+            --shadow-card: 0 2px 5px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(229, 231, 235, 0.85);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --nav-height: 62px;
+            --reading-measure: 72ch;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-body);
+            line-height: 1.72;
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            color: var(--text-main);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.84em;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            color: var(--text-main);
+            padding: 1px 6px;
+            border-radius: 5px;
+        }
+
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-light);
+            height: var(--nav-height);
+            display: flex;
+            align-items: center;
+        }
+        #scroll-progress {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            height: 2.5px;
+            background: linear-gradient(90deg, var(--pastel-peach-text), var(--pastel-yellow), var(--pastel-green-text), var(--pastel-blue-text));
+            width: 0%;
+            z-index: 60;
+        }
+        .top-nav-inner {
+            width: 100%;
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .top-nav-brand {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.02rem;
+            color: var(--text-main);
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            text-decoration: none;
+        }
+        .top-nav-brand-tag {
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2.5px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .brand-dot { color: var(--pastel-peach-text); }
+        .top-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+        }
+        .archive-nav {
+            display: inline-flex;
+            align-items: center;
+            background: var(--pastel-blue-soft);
+            border: 1px solid var(--pastel-blue-border);
+            border-radius: 20px;
+            padding: 2px 4px;
+            gap: 2px;
+        }
+        .archive-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            height: 26px;
+            padding: 0 8px;
+            border-radius: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--pastel-blue-text);
+            text-decoration: none;
+        }
+        .archive-nav-btn:hover:not(.is-disabled) {
+            background: rgba(255, 255, 255, 0.85);
+            color: var(--text-main);
+        }
+        .archive-nav-btn.is-disabled {
+            opacity: 0.38;
+            pointer-events: none;
+        }
+        .archive-date-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 6px;
+        }
+        .archive-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--pastel-yellow-text);
+        }
+        .archive-date-select {
+            appearance: none;
+            -webkit-appearance: none;
+            border: none;
+            background: transparent;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            padding: 3px 16px 3px 2px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 2px center;
+        }
+        .archive-latest-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--pastel-peach-text);
+            background: var(--pastel-peach-soft);
+            border: 1px solid var(--pastel-peach-border);
+            padding: 4px 10px;
+            border-radius: 16px;
+            text-decoration: none;
+        }
+
+        .mobile-toc-bar { display: none; }
+        @media (max-width: 1023px) {
+            .mobile-toc-bar {
+                display: block;
+                position: sticky;
+                top: var(--nav-height);
+                z-index: 45;
+                background: rgba(251, 251, 250, 0.94);
+                backdrop-filter: blur(12px);
+                border-bottom: 1px solid var(--border-light);
+            }
+            .mobile-toc-inner {
+                max-width: 1160px;
+                margin: 0 auto;
+                padding: 0.55rem 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+            }
+            .mobile-toc-select {
+                flex: 1;
+                min-width: 0;
+                font-size: 0.81rem;
+                font-weight: 600;
+                color: var(--text-main);
+                background: var(--bg-card);
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius-sm);
+                padding: 0.38rem 0.6rem;
+            }
+        }
+
+        .layout-shell {
+            display: flex;
+            max-width: 1160px;
+            margin: 0 auto;
+            align-items: flex-start;
+        }
+        .side-nav {
+            width: 264px;
+            flex-shrink: 0;
+            position: sticky;
+            top: var(--nav-height);
+            height: calc(100vh - var(--nav-height));
+            overflow-y: auto;
+            padding: 2.5rem 1.5rem 2rem 1.25rem;
+        }
+        .side-nav-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-faint);
+            margin-bottom: 0.35rem;
+        }
+        .side-nav-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            margin-bottom: 1.35rem;
+        }
+        .side-nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .side-nav-link {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.55rem;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.52rem 0.7rem 0.52rem 0.85rem;
+            border-left: 2.5px solid transparent;
+            line-height: 1.42;
+            border-radius: 0 8px 8px 0;
+        }
+        .side-nav-link.active {
+            color: var(--text-main);
+            border-left-color: var(--pastel-peach-text);
+            background: linear-gradient(90deg, var(--pastel-peach-soft) 0%, rgba(255, 255, 255, 0.15) 100%);
+            font-weight: 600;
+        }
+        .side-nav-link .nav-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--text-faint);
+        }
+        .side-nav-link.active .nav-num { color: var(--pastel-peach-text); }
+        @media (max-width: 1023px) { .side-nav { display: none; } }
+
+        .content-wrap {
+            flex: 1;
+            min-width: 0;
+            padding: 0 1.8rem 0 1.2rem;
+        }
+        header.masthead {
+            padding: 2.8rem 0 2.1rem 0;
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 2.4rem;
+        }
+        .doc-category {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.73rem;
+            font-weight: 700;
+            color: var(--pastel-blue-text);
+            background: var(--pastel-blue-soft);
+            border: 1px solid var(--pastel-blue-border);
+            padding: 3px 11px;
+            border-radius: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.9rem;
+            display: inline-block;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.22;
+            margin-bottom: 0.75rem;
+            max-width: 24ch;
+        }
+        .meta-info {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.55rem 0.9rem;
+        }
+        .paper-section {
+            background: var(--bg-card);
+            padding: 2.5rem 2.7rem;
+            margin-bottom: 2.4rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            scroll-margin-top: calc(var(--nav-height) + 3.2rem);
+        }
+        .paper-section h2 {
+            font-size: 1.58rem;
+            line-height: 1.35;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+            max-width: 44ch;
+        }
+        .article-meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            margin-bottom: 1.4rem;
+        }
+        .article-meta-bar a {
+            color: var(--pastel-blue-text);
+            text-decoration: none;
+        }
+        .article-meta-bar a:hover { text-decoration: underline; }
+        .section-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin: 1.9rem 0 0.95rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+        }
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 14px;
+            background: var(--pastel-peach);
+            border-radius: 2px;
+        }
+        .paper-section p, .abstract-quote, .archive-bullets {
+            max-width: var(--reading-measure);
+        }
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-body);
+            font-size: 0.955rem;
+        }
+        .abstract-quote {
+            background: linear-gradient(135deg, var(--pastel-peach-soft) 0%, #fffcf9 100%);
+            border: 1px solid var(--pastel-peach-border);
+            border-left: 4px solid var(--pastel-peach);
+            border-radius: var(--radius-md);
+            padding: 1.35rem 1.6rem;
+            margin-bottom: 1.6rem;
+        }
+        .abstract-quote p { color: var(--text-main); margin-bottom: 0; }
+        .abstract-quote p + p { margin-top: 0.85rem; }
+        .archive-bullets {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            margin-bottom: 1rem;
+        }
+        .archive-bullets li {
+            position: relative;
+            padding: 0.75rem 1rem 0.75rem 1.75rem;
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            font-size: 0.92rem;
+            line-height: 1.62;
+        }
+        .archive-bullets li::before {
+            content: '';
+            position: absolute;
+            left: 0.8rem;
+            top: 1.2rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--pastel-peach-text);
+        }
+        .archive-status-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .site-footer {
+            border-top: 1px solid var(--border-light);
+            padding: 2.2rem 0 3.2rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.5rem;
+            justify-content: space-between;
+        }
+        .site-footer a { color: var(--text-muted); text-decoration: none; }
+        .site-footer a:hover { color: var(--pastel-peach-text); }
+
+        @media (max-width: 768px) {
+            .top-nav-inner { padding: 0 1rem; }
+            .top-nav-brand-label { display: none; }
+            .paper-section { padding: 1.5rem 1.2rem; }
+            .content-wrap { padding: 0 1rem; }
+            h1 { font-size: 1.75rem; }
+            .archive-nav-btn span.nav-btn-label { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="top-nav-inner">
+            <a class="top-nav-brand" href="index.html">
+                <span class="top-nav-brand-tag">ARCHIVE</span>
+                <span class="top-nav-brand-label">AI<span class="brand-dot">·</span>Hardware Briefing</span>
+            </a>
+            <div class="top-nav-actions">
+                <div class="archive-nav">
+                    <a class="archive-nav-btn is-disabled" id="arch-prev" href="#">‹ <span class="nav-btn-label">Prev</span></a>
+                    <div class="archive-date-wrap">
+                        <span class="archive-status-dot"></span>
+                        <select id="archive-date-select" class="archive-date-select" aria-label="Select archive date"></select>
+                    </div>
+                    <a class="archive-nav-btn is-disabled" id="arch-next" href="#"><span class="nav-btn-label">Next</span> ›</a>
+                </div>
+                <a class="archive-latest-pill" href="index.html">Latest</a>
+            </div>
+        </div>
+        <div id="scroll-progress"></div>
+    </nav>
+
+    <div class="mobile-toc-bar">
+        <div class="mobile-toc-inner">
+            <select id="mobile-toc-select" class="mobile-toc-select" aria-label="Jump to article"></select>
+        </div>
+    </div>
+
+    <div class="layout-shell">
+        <aside class="side-nav">
+            <div class="side-nav-title">Archived Briefing</div>
+            <div class="side-nav-sub" id="side-nav-date">Loading…</div>
+            <ul class="side-nav-list" id="side-nav-list"></ul>
+        </aside>
+
+        <div class="content-wrap">
+            <header class="masthead">
+                <span class="doc-category">Archived Intelligence Edition</span>
+                <h1>Daily AI &amp; Semiconductor Engineering Briefing</h1>
+                <div class="meta-info">
+                    <span id="report-date">Loading…</span>
+                    <span>•</span>
+                    <span>Historical Markdown Archive</span>
+                </div>
+            </header>
+
+            <main id="archive-main">
+                <div class="archive-status-box">Loading archived briefing…</div>
+            </main>
+
+            <footer class="site-footer">
+                <span>Generated daily via automated intelligence pipeline.</span>
+                <a href="https://github.com/ancm777-eng/AInews" target="_blank" rel="noopener">github.com/ancm777-eng/AInews</a>
+            </footer>
+        </div>
+    </div>
+
+    <script src="archive/manifest.js"></script>
+    <script>
+        (function () {
+            var params = new URLSearchParams(window.location.search);
+            var manifest = window.AINEWS_ARCHIVE || { latest: '', dates: [] };
+            var datesDesc = Array.isArray(manifest.dates) ? manifest.dates.slice() : [];
+            datesDesc.sort(function (a, b) { return a.date < b.date ? 1 : (a.date > b.date ? -1 : 0); });
+            var datesAsc = datesDesc.slice().reverse();
+
+            var requestedDate = params.get('date') || (datesDesc[1] ? datesDesc[1].date : (datesDesc[0] ? datesDesc[0].date : ''));
+            var currentEntry = datesAsc.find(function (d) { return d.date === requestedDate; }) || { date: requestedDate, label: requestedDate, data: 'data/' + requestedDate + '.txt' };
+
+            if (currentEntry.html && requestedDate) {
+                window.location.replace(currentEntry.date === manifest.latest ? 'index.html' : currentEntry.html);
+                return;
+            }
+
+            function resolveHref(entry) {
+                if (!entry) return '#';
+                if (manifest.latest && entry.date === manifest.latest) return 'index.html';
+                if (entry.html) return entry.html;
+                return 'archive.html?date=' + encodeURIComponent(entry.date);
+            }
+
+            var select = document.getElementById('archive-date-select');
+            datesDesc.forEach(function (entry) {
+                var opt = document.createElement('option');
+                opt.value = resolveHref(entry);
+                opt.textContent = entry.label || entry.date;
+                if (entry.date === currentEntry.date) opt.selected = true;
+                select.appendChild(opt);
+            });
+            select.addEventListener('change', function () {
+                if (select.value) window.location.href = select.value;
+            });
+
+            var idx = datesAsc.findIndex(function (e) { return e.date === currentEntry.date; });
+            var prevEl = document.getElementById('arch-prev');
+            var nextEl = document.getElementById('arch-next');
+            if (idx > 0) {
+                prevEl.href = resolveHref(datesAsc[idx - 1]);
+                prevEl.classList.remove('is-disabled');
+            }
+            if (idx >= 0 && idx < datesAsc.length - 1) {
+                nextEl.href = resolveHref(datesAsc[idx + 1]);
+                nextEl.classList.remove('is-disabled');
+            }
+
+            var displayLabel = currentEntry.label || currentEntry.date || 'Archive';
+            document.title = displayLabel + ' — Archive Briefing';
+            document.getElementById('report-date').textContent = displayLabel;
+            document.getElementById('side-nav-date').textContent = displayLabel;
+
+            function escapeHtml(s) {
+                return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            }
+
+            function formatInline(s) {
+                return escapeHtml(s)
+                    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                    .replace(/`([^`]+)`/g, '<code>$1</code>');
+            }
+
+            function splitParagraphs(text) {
+                var sentences = text.trim().split(/(?<=[.!?])\s+(?=[A-Z0-9])/);
+                if (sentences.length <= 3) return [text.trim()];
+                var mid = Math.ceil(sentences.length / 2);
+                return [sentences.slice(0, mid).join(' '), sentences.slice(mid).join(' ')];
+            }
+
+            function renderMarkdownArchive(md) {
+                var main = document.getElementById('archive-main');
+                var sideList = document.getElementById('side-nav-list');
+                var mobileSelect = document.getElementById('mobile-toc-select');
+                var blocks = md.split(/\n(?=#{2,3}\s+(?:\[?\d+\]?|\d+\.))/).filter(function (b) {
+                    return /^#{2,3}\s+(?:\[?\d+\]?|\d+\.)/.test(b.trim());
+                });
+
+                if (!blocks.length) {
+                    main.innerHTML = '<div class="archive-status-box">No structured articles found in this archive file.</div>';
+                    return;
+                }
+
+                main.innerHTML = '';
+                sideList.innerHTML = '';
+                mobileSelect.innerHTML = '';
+
+                blocks.forEach(function (block, i) {
+                    var lines = block.trim().split(/\r?\n/);
+                    var title = lines[0].replace(/^#{2,3}\s+(?:\[?\d+\]?\.?\s*|\d+\.\s*)/, '').trim();
+                    var artId = 'art' + (i + 1);
+                    var num = (i + 1 < 10 ? '0' : '') + (i + 1);
+                    var shortTitle = title.length > 44 ? title.slice(0, 44) + '…' : title;
+
+                    var li = document.createElement('li');
+                    li.innerHTML = '<a href="#' + artId + '" class="side-nav-link' + (i === 0 ? ' active' : '') + '" data-target="' + artId + '"><span class="nav-num">' + num + '</span><span>' + escapeHtml(shortTitle) + '</span></a>';
+                    sideList.appendChild(li);
+
+                    var opt = document.createElement('option');
+                    opt.value = '#' + artId;
+                    opt.textContent = num + ' · ' + shortTitle;
+                    mobileSelect.appendChild(opt);
+
+                    var sourceMatch = block.match(/\*\*Source:\*\*\s*(.+)/i);
+                    var urlMatch = block.match(/\*\*Primary URL:\*\*\s*(https?:\/\/\S+)/i);
+                    var overviewMatch = block.match(/####\s*\[?Overview\]?\s*\r?\n([\s\S]*?)(?=\r?\n####|$)/i);
+                    var impactMatch = block.match(/####\s*\[?Strategic Impact\]?\s*\r?\n([\s\S]*?)(?=\r?\n####|$)/i);
+                    var criticalMatch = block.match(/####\s*\[?CRITICAL VIEW\]?\s*\r?\n([\s\S]*?)(?=\r?\n####|$)/i);
+
+                    var html = '<article class="paper-section" id="' + artId + '"><h2>' + escapeHtml(title) + '</h2>';
+                    html += '<div class="article-meta-bar">';
+                    if (sourceMatch) html += '<span>Source: ' + escapeHtml(sourceMatch[1].trim()) + '</span>';
+                    if (urlMatch) html += '<a href="' + escapeHtml(urlMatch[1].trim()) + '" target="_blank" rel="noopener">Primary Source ↗</a>';
+                    html += '</div>';
+
+                    if (overviewMatch) {
+                        html += '<h3 class="section-title">1. Executive Summary</h3><div class="abstract-quote">';
+                        splitParagraphs(overviewMatch[1].replace(/\r?\n/g, ' ')).forEach(function (p) {
+                            html += '<p>' + formatInline(p) + '</p>';
+                        });
+                        html += '</div>';
+                    }
+
+                    if (impactMatch) {
+                        html += '<h3 class="section-title">2. Architecture &amp; Strategic Impact</h3><ul class="archive-bullets">';
+                        impactMatch[1].split(/\r?\n/).forEach(function (line) {
+                            var trimmed = line.trim();
+                            if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+                                html += '<li>' + formatInline(trimmed.slice(2)) + '</li>';
+                            }
+                        });
+                        html += '</ul>';
+                    }
+
+                    if (criticalMatch) {
+                        html += '<h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>';
+                        splitParagraphs(criticalMatch[1].replace(/\r?\n/g, ' ')).forEach(function (p) {
+                            html += '<p>' + formatInline(p) + '</p>';
+                        });
+                    }
+
+                    html += '</article>';
+                    main.insertAdjacentHTML('beforeend', html);
+                });
+
+                mobileSelect.addEventListener('change', function () {
+                    var target = document.querySelector(mobileSelect.value);
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
+
+            if (!currentEntry.date) {
+                document.getElementById('archive-main').innerHTML = '<div class="archive-status-box">No archive date selected. <a href="index.html">Return to latest briefing</a>.</div>';
+            } else {
+                fetch(currentEntry.data || ('data/' + currentEntry.date + '.txt'))
+                    .then(function (res) {
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        return res.text();
+                    })
+                    .then(renderMarkdownArchive)
+                    .catch(function () {
+                        document.getElementById('archive-main').innerHTML =
+                            '<div class="archive-status-box">Could not load archive for <strong>' + escapeHtml(currentEntry.date) +
+                            '</strong>. When opening locally via <code>file://</code>, static HTML snapshots in <code>archive/</code> open directly while raw <code>.txt</code> archives require HTTP serving (e.g. GitHub Pages).</div>';
+                    });
+            }
+
+            window.addEventListener('scroll', function () {
+                var winScroll = window.scrollY || document.documentElement.scrollTop || 0;
+                var h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                var pct = h > 0 ? Math.min(100, (winScroll / h) * 100) : 0;
+                document.getElementById('scroll-progress').style.width = pct.toFixed(1) + '%';
+            }, { passive: true });
+        })();
+    </script>
+</body>
+</html>
