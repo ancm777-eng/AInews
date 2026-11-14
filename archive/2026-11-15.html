@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily AI &amp; Semiconductor Engineering Briefing — November 15, 2026</title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NEQ3MVRM28');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        :root {
+            /* 1. Warm Editorial 4-Pastel Key Colors */
+            --pastel-peach: #f6c4a6;
+            --pastel-peach-soft: #fef0e7;
+            --pastel-peach-text: #c45e2a;
+            --pastel-peach-border: #f8cdb4;
+
+            --pastel-yellow: #fed78a;
+            --pastel-yellow-soft: #fef8e7;
+            --pastel-yellow-text: #a16c14;
+            --pastel-yellow-border: #fde3a7;
+
+            --pastel-green: #b5d6a7;
+            --pastel-green-soft: #eef6ed;
+            --pastel-green-text: #417539;
+            --pastel-green-border: #cae8c2;
+
+            --pastel-blue: #a9c9e8;
+            --pastel-blue-soft: #edf5fc;
+            --pastel-blue-text: #316d9e;
+            --pastel-blue-border: #c8e0f7;
+
+            /* 2. Warm Cream / Off-White Surfaces */
+            --bg-main: #fbfbfa;
+            --bg-card: #ffffff;
+            --bg-surface: #f4f4f2;
+            --bg-surface-subtle: #f8f8f6;
+
+            /* 3. Deep Charcoal & Warm Slate Ink */
+            --text-main: #1f2937;
+            --text-body: #4b5563;
+            --text-muted: #6b7280;
+            --text-faint: #9ca3af;
+
+            /* 4. Borders */
+            --border-light: #e5e7eb;
+            --border-medium: #d1d5db;
+
+            /* 5. Soft Elevation */
+            --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.03);
+            --shadow-card: 0 2px 5px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(229, 231, 235, 0.85);
+            --shadow-card-hover: 0 12px 24px -6px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(209, 213, 219, 0.9);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --nav-height: 62px;
+            --reading-measure: 72ch;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-body);
+            line-height: 1.72;
+            font-size: 15px;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'tnum';
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            color: var(--text-main);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+            vertical-align: middle;
+        }
+
+        code, .code-term {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.84em;
+            font-weight: 500;
+            color: var(--text-main);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            padding: 1px 6px;
+            border-radius: 5px;
+            white-space: nowrap;
+        }
+
+        a:focus-visible, button:focus-visible, select:focus-visible {
+            outline: 2px solid var(--pastel-blue-text);
+            outline-offset: 2px;
+        }
+
+        /* ===== Top Nav & Integrated Reading Progress Bar ===== */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-light);
+            height: var(--nav-height);
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        #scroll-progress {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            height: 2.5px;
+            background: linear-gradient(90deg, var(--pastel-peach-text) 0%, var(--pastel-yellow) 35%, var(--pastel-green-text) 70%, var(--pastel-blue-text) 100%);
+            z-index: 60;
+            width: 0%;
+            transition: width 0.08s linear;
+            pointer-events: none;
+        }
+        .top-nav-inner {
+            width: 100%;
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .top-nav-brand {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.02rem;
+            color: var(--text-main);
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            text-decoration: none;
+            min-width: 0;
+        }
+        .top-nav-brand-tag {
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2.5px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+        .top-nav-brand span.brand-dot {
+            color: var(--pastel-peach-text);
+        }
+        .top-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            flex-shrink: 0;
+        }
+
+        /* ===== Daily Archive Switcher ===== */
+        .archive-nav {
+            display: inline-flex;
+            align-items: center;
+            background: var(--pastel-blue-soft);
+            border: 1px solid var(--pastel-blue-border);
+            border-radius: 20px;
+            padding: 2px 4px;
+            gap: 2px;
+        }
+        .archive-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 26px;
+            padding: 0 8px;
+            border-radius: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--pastel-blue-text);
+            text-decoration: none;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            user-select: none;
+        }
+        .archive-nav-btn:hover:not(.is-disabled) {
+            background: rgba(255, 255, 255, 0.85);
+            color: var(--text-main);
+        }
+        .archive-nav-btn.is-disabled {
+            opacity: 0.38;
+            pointer-events: none;
+            cursor: default;
+        }
+        .archive-date-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 6px;
+        }
+        .archive-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--pastel-green-text);
+            flex-shrink: 0;
+        }
+        .archive-date-select {
+            appearance: none;
+            -webkit-appearance: none;
+            border: none;
+            background: transparent;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            padding: 3px 16px 3px 2px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 2px center;
+        }
+        .archive-date-select:focus {
+            outline: none;
+        }
+        .archive-latest-pill {
+            display: inline-flex;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--pastel-peach-text);
+            background: var(--pastel-peach-soft);
+            border: 1px solid var(--pastel-peach-border);
+            padding: 4px 10px;
+            border-radius: 16px;
+            text-decoration: none;
+        }
+        .archive-latest-pill:hover {
+            background: #fde4d4;
+        }
+
+        /* ===== Mobile Sticky Jump Bar (< 1024px) ===== */
+        .mobile-toc-bar {
+            display: none;
+        }
+        @media (max-width: 1023px) {
+            .mobile-toc-bar {
+                display: block;
+                position: sticky;
+                top: var(--nav-height);
+                z-index: 45;
+                background: rgba(251, 251, 250, 0.94);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border-bottom: 1px solid var(--border-light);
+            }
+            .mobile-toc-inner {
+                max-width: 1160px;
+                margin: 0 auto;
+                padding: 0.55rem 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.65rem;
+            }
+            .mobile-toc-select {
+                flex: 1;
+                min-width: 0;
+                font-family: 'Inter', sans-serif;
+                font-size: 0.81rem;
+                font-weight: 600;
+                color: var(--text-main);
+                background: var(--bg-card);
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius-sm);
+                padding: 0.38rem 0.6rem;
+                text-overflow: ellipsis;
+            }
+            .mobile-toc-pills {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+                flex-shrink: 0;
+            }
+            .mobile-pill {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 28px;
+                height: 28px;
+                padding: 0 7px;
+                border-radius: 7px;
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 0.72rem;
+                font-weight: 600;
+                color: var(--text-muted);
+                background: var(--bg-surface);
+                border: 1px solid transparent;
+                text-decoration: none;
+                transition: all 0.15s ease;
+            }
+            .mobile-pill.active {
+                color: var(--pastel-peach-text);
+                background: var(--pastel-peach-soft);
+                border-color: var(--pastel-peach-border);
+            }
+        }
+
+        /* ===== Layout Shell ===== */
+        .layout-shell {
+            display: flex;
+            max-width: 1160px;
+            margin: 0 auto;
+            align-items: flex-start;
+        }
+        .side-nav {
+            width: 264px;
+            flex-shrink: 0;
+            position: sticky;
+            top: var(--nav-height);
+            height: calc(100vh - var(--nav-height));
+            overflow-y: auto;
+            padding: 2.5rem 1.5rem 2rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .side-nav-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-faint);
+            margin-bottom: 0.35rem;
+        }
+        .side-nav-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            opacity: 0.9;
+            margin-bottom: 1.35rem;
+        }
+        .side-nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .side-nav-link {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.55rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 450;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.52rem 0.7rem 0.52rem 0.85rem;
+            border-left: 2.5px solid transparent;
+            line-height: 1.42;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .side-nav-link .nav-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-faint);
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+        .side-nav-link:hover {
+            color: var(--text-main);
+            border-left-color: var(--border-medium);
+            background: rgba(0, 0, 0, 0.02);
+        }
+        .side-nav-link.active {
+            color: var(--text-main);
+            border-left-color: var(--pastel-peach-text);
+            background: linear-gradient(90deg, var(--pastel-peach-soft) 0%, rgba(255, 255, 255, 0.15) 100%);
+            font-weight: 600;
+        }
+        .side-nav-link.active .nav-num {
+            color: var(--pastel-peach-text);
+        }
+
+        .side-nav-progress {
+            margin-top: 1.75rem;
+            padding-top: 1.1rem;
+            border-top: 1px solid var(--border-light);
+        }
+        .side-nav-progress-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.69rem;
+            color: var(--text-faint);
+            margin-bottom: 0.45rem;
+        }
+        .side-nav-progress-track {
+            width: 100%;
+            height: 4px;
+            background: var(--bg-surface);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .side-nav-progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--pastel-peach-text), var(--pastel-blue-text));
+            transition: width 0.1s linear;
+        }
+
+        @media (max-width: 1023px) { .side-nav { display: none; } }
+
+        .content-wrap {
+            flex: 1;
+            min-width: 0;
+            padding: 0 1.8rem 0 1.2rem;
+        }
+
+        header.masthead {
+            padding: 2.9rem 0 2.2rem 0;
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 2.6rem;
+        }
+        .doc-category {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.73rem;
+            font-weight: 700;
+            color: var(--pastel-peach-text);
+            background: var(--pastel-peach-soft);
+            border: 1px solid var(--pastel-peach-border);
+            padding: 3px 11px;
+            border-radius: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.9rem;
+            display: inline-block;
+        }
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            line-height: 1.22;
+            margin-bottom: 0.8rem;
+            letter-spacing: -0.03em;
+            color: var(--text-main);
+            max-width: 24ch;
+        }
+        .meta-info {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.55rem 0.9rem;
+        }
+
+        main { max-width: 100%; }
+
+        /* ===== Article Cards ===== */
+        .paper-section {
+            background: var(--bg-card);
+            padding: 2.6rem 2.8rem;
+            margin-bottom: 2.6rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            scroll-margin-top: calc(var(--nav-height) + 3.4rem);
+            transition: box-shadow 0.22s ease;
+            position: relative;
+        }
+        .paper-section:hover {
+            box-shadow: var(--shadow-card-hover);
+        }
+        .paper-section h2 {
+            font-size: 1.62rem;
+            font-weight: 750;
+            color: var(--text-main);
+            margin-bottom: 1.7rem;
+            padding-bottom: 1.15rem;
+            border-bottom: 1px solid var(--border-light);
+            line-height: 1.34;
+            letter-spacing: -0.025em;
+            max-width: 44ch;
+        }
+
+        .section-title {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin: 2.1rem 0 1.05rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+        }
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 14px;
+            background: var(--pastel-peach);
+            border-radius: 2px;
+        }
+
+        /* Constrain long-form prose measure to ~72ch for optimal eye tracking */
+        .paper-section > p,
+        .abstract-quote,
+        .abstract-box,
+        .inline-callout,
+        .concept-box,
+        .outlook-lead,
+        .outlook-list {
+            max-width: var(--reading-measure);
+        }
+
+        p {
+            margin-bottom: 1.15rem;
+            color: var(--text-body);
+            text-align: left;
+            font-size: 0.96rem;
+            line-height: 1.72;
+        }
+        p strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* ===== Executive Summary ===== */
+        .abstract-quote,
+        .abstract-box {
+            position: relative;
+            background: linear-gradient(135deg, var(--pastel-peach-soft) 0%, #fffcf9 100%);
+            border: 1px solid var(--pastel-peach-border);
+            border-left: 4px solid var(--pastel-peach);
+            border-radius: var(--radius-md);
+            padding: 1.4rem 1.7rem;
+            margin: 0 0 2rem 0;
+            box-shadow: 0 2px 4px rgba(246, 196, 166, 0.14);
+        }
+        .abstract-quote::before,
+        .abstract-box::before {
+            content: 'EXECUTIVE SUMMARY';
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--pastel-peach-text);
+            background: #fff;
+            border: 1px solid var(--pastel-peach-border);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 0.85rem;
+        }
+        .abstract-quote p,
+        .abstract-box p {
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-size: 0.955rem;
+            font-weight: 400;
+            line-height: 1.7;
+            color: var(--text-main);
+            margin-bottom: 0;
+            text-align: left;
+        }
+        .abstract-quote p + p,
+        .abstract-box p + p {
+            margin-top: 0.9rem;
+        }
+        .abstract-quote p strong,
+        .abstract-box p strong {
+            color: #111827;
+            font-weight: 600;
+            background: rgba(246, 196, 166, 0.25);
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+
+        /* ===== Hardware & Packaging Key Concepts Box ===== */
+        .concept-box {
+            background: linear-gradient(135deg, var(--pastel-yellow-soft) 0%, #fffdf8 100%);
+            border: 1px solid var(--pastel-yellow-border);
+            border-left: 4px solid var(--pastel-yellow);
+            border-radius: var(--radius-md);
+            padding: 1.35rem 1.65rem;
+            margin: 0 0 2rem 0;
+        }
+        .concept-box h4 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--pastel-yellow-text);
+            background: #ffffff;
+            border: 1px solid var(--pastel-yellow-border);
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 4px;
+            margin-bottom: 0.9rem;
+        }
+        .concept-box ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+        .concept-box li {
+            position: relative;
+            padding-left: 1.1rem;
+            font-size: 0.9rem;
+            line-height: 1.62;
+            color: var(--text-body);
+        }
+        .concept-box li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.62em;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--pastel-yellow-text);
+            opacity: 0.78;
+        }
+        .concept-box li strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+        .concept-box p {
+            font-size: 0.9rem;
+            line-height: 1.62;
+            margin-bottom: 0;
+        }
+        .concept-box p + p {
+            margin-top: 0.65rem;
+        }
+
+        /* ===== Strategic Outlook Bullets ===== */
+        .outlook-lead {
+            margin-bottom: 1rem;
+            color: var(--text-body);
+        }
+        .outlook-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin: 0.35rem 0 0.25rem 0;
+        }
+        .outlook-list li {
+            position: relative;
+            padding: 0.85rem 1.1rem 0.85rem 1.85rem;
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            font-size: 0.925rem;
+            line-height: 1.65;
+            color: var(--text-body);
+        }
+        .outlook-list li::before {
+            content: '';
+            position: absolute;
+            left: 0.85rem;
+            top: 1.32rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--pastel-peach-text);
+        }
+        .outlook-list li strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* ===== Inline Callout Box ===== */
+        .inline-callout {
+            background: var(--pastel-blue-soft);
+            border: 1px solid var(--pastel-blue-border);
+            border-left: 4px solid var(--pastel-blue);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem 1.5rem;
+            margin: 1.8rem 0;
+        }
+        .inline-callout p {
+            font-size: 0.91rem;
+            color: var(--text-body);
+            line-height: 1.65;
+            margin-bottom: 0;
+        }
+
+        /* ===== Stat Card Grid ===== */
+        .stat-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.1rem;
+            margin: 2rem 0;
+        }
+        .stat-card {
+            flex: 1 1 175px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.35rem 1.4rem;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -2px rgba(0, 0, 0, 0.05);
+        }
+        .stat-card:nth-child(4n+1) { border-top: 3px solid var(--pastel-peach); }
+        .stat-card:nth-child(4n+1) .stat-rank {
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
+        }
+        .stat-card:nth-child(4n+2) { border-top: 3px solid var(--pastel-blue); }
+        .stat-card:nth-child(4n+2) .stat-rank {
+            background: var(--pastel-blue-soft);
+            color: var(--pastel-blue-text);
+            border: 1px solid var(--pastel-blue-border);
+        }
+        .stat-card:nth-child(4n+3) { border-top: 3px solid var(--pastel-green); }
+        .stat-card:nth-child(4n+3) .stat-rank {
+            background: var(--pastel-green-soft);
+            color: var(--pastel-green-text);
+            border: 1px solid var(--pastel-green-border);
+        }
+        .stat-card:nth-child(4n+4) { border-top: 3px solid var(--pastel-yellow); }
+        .stat-card:nth-child(4n+4) .stat-rank {
+            background: var(--pastel-yellow-soft);
+            color: var(--pastel-yellow-text);
+            border: 1px solid var(--pastel-yellow-border);
+        }
+        .stat-rank {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.67rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 2.5px 8px;
+            border-radius: 5px;
+            margin-bottom: 0.7rem;
+            text-transform: uppercase;
+        }
+        .stat-number {
+            font-family: 'JetBrains Mono', 'Plus Jakarta Sans', sans-serif;
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.12;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.035em;
+        }
+        .stat-number .stat-unit {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-left: 3px;
+        }
+        .stat-label {
+            font-size: 0.83rem;
+            color: var(--text-muted);
+            line-height: 1.46;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ===== Inline SVG Architecture / System Flow Diagram ===== */
+        .arch-diagram-wrap {
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border-light);
+            border-top: 3px solid var(--pastel-green);
+            border-radius: var(--radius-md);
+            padding: 1.35rem 1.45rem;
+            margin: 2rem 0;
+        }
+        .arch-diagram-title {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .arch-diagram-title::before {
+            content: '';
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--pastel-green-text);
+        }
+        .arch-diagram-stage {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 0.85rem;
+            overflow-x: auto;
+        }
+        .arch-diagram-stage svg {
+            width: 100%;
+            min-width: 520px;
+            height: auto;
+            display: block;
+        }
+        .arch-diagram-caption {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.52;
+            margin: 0.75rem 0 0 0;
+            max-width: var(--reading-measure);
+        }
+
+        /* ===== Infographic Block ===== */
+        .infographic-block {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            align-items: stretch;
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            margin: 2rem 0;
+            padding: 1.35rem;
+        }
+        .infographic-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.2s ease;
+        }
+        .infographic-item:hover {
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.04);
+            transform: translateY(-1.5px);
+        }
+        .infographic-item:nth-child(4n+1) .infographic-icon,
+        .infographic-item:nth-child(4n+1) svg {
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
+        }
+        .infographic-item:nth-child(4n+2) .infographic-icon,
+        .infographic-item:nth-child(4n+2) svg {
+            background: var(--pastel-blue-soft);
+            color: var(--pastel-blue-text);
+            border: 1px solid var(--pastel-blue-border);
+        }
+        .infographic-item:nth-child(4n+3) .infographic-icon,
+        .infographic-item:nth-child(4n+3) svg {
+            background: var(--pastel-green-soft);
+            color: var(--pastel-green-text);
+            border: 1px solid var(--pastel-green-border);
+        }
+        .infographic-item:nth-child(4n+4) .infographic-icon,
+        .infographic-item:nth-child(4n+4) svg {
+            background: var(--pastel-yellow-soft);
+            color: var(--pastel-yellow-text);
+            border: 1px solid var(--pastel-yellow-border);
+        }
+        .infographic-icon,
+        .infographic-item svg,
+        .infographic-hero-icon {
+            width: 42px !important;
+            height: 42px !important;
+            min-width: 42px !important;
+            min-height: 42px !important;
+            padding: 9px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+        .infographic-item strong {
+            display: block;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 0.94rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.4rem;
+            line-height: 1.38;
+        }
+        .infographic-item p {
+            font-size: 0.87rem;
+            color: var(--text-muted);
+            line-height: 1.58;
+            margin-bottom: 0;
+            text-align: left;
+        }
+
+        /* ===== Charts & Static Fallback ===== */
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin: 2.1rem 0;
+        }
+        .chart-row .chart-container {
+            margin: 0;
+        }
+        .chart-label {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.85rem;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .chart-label::before {
+            content: '';
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--pastel-blue-text);
+            flex-shrink: 0;
+        }
+        .chart-container {
+            width: 100%;
+            min-height: 330px;
+            margin: 2.1rem 0;
+            border: 1px solid var(--border-light);
+            background: var(--bg-card);
+            padding: 1.35rem 1.4rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-subtle);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-top: 3px solid var(--pastel-blue);
+        }
+        .chart-container > div[id^="chart-"] {
+            width: 100%;
+            height: 280px !important;
+            flex: none;
+        }
+        .chart-fallback {
+            display: none;
+            margin-top: 0.25rem;
+        }
+        .chart-container.chart-fallback-active > div[id^="chart-"] {
+            display: none !important;
+        }
+        .chart-container.chart-fallback-active .chart-fallback {
+            display: block;
+        }
+        .chart-fallback-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+        .chart-fallback-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .chart-fallback-table th,
+        .chart-fallback-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border-light);
+            text-align: left;
+        }
+        .chart-fallback-table th {
+            color: var(--text-muted);
+            background: var(--bg-surface-subtle);
+            font-weight: 600;
+        }
+
+        /* ===== Bento Grid (Takeaways) ===== */
+        .bento-grid-wrap {
+            margin: 3.2rem 0 2.2rem 0;
+            padding-top: 2.6rem;
+            border-top: 1px solid var(--border-light);
+            scroll-margin-top: calc(var(--nav-height) + 3.4rem);
+        }
+        .bento-grid-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: -0.025em;
+            color: var(--text-main);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+        }
+        .bento-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.6rem;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.22s ease;
+        }
+        .bento-card:hover {
+            box-shadow: 0 10px 20px -4px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+        .bento-card:nth-child(4n+1) { border-top: 3.5px solid var(--pastel-peach); }
+        .bento-card:nth-child(4n+1) .bento-card-icon {
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
+        }
+        .bento-card:nth-child(4n+2) { border-top: 3.5px solid var(--pastel-blue); }
+        .bento-card:nth-child(4n+2) .bento-card-icon {
+            background: var(--pastel-blue-soft);
+            color: var(--pastel-blue-text);
+            border: 1px solid var(--pastel-blue-border);
+        }
+        .bento-card:nth-child(4n+3) { border-top: 3.5px solid var(--pastel-green); }
+        .bento-card:nth-child(4n+3) .bento-card-icon {
+            background: var(--pastel-green-soft);
+            color: var(--pastel-green-text);
+            border: 1px solid var(--pastel-green-border);
+        }
+        .bento-card:nth-child(4n+4) { border-top: 3.5px solid var(--pastel-yellow); }
+        .bento-card:nth-child(4n+4) .bento-card-icon {
+            background: var(--pastel-yellow-soft);
+            color: var(--pastel-yellow-text);
+            border: 1px solid var(--pastel-yellow-border);
+        }
+        .bento-card-icon {
+            width: 40px !important;
+            height: 40px !important;
+            padding: 9px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: inline-flex;
+            box-sizing: border-box;
+        }
+        .bento-card-title {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 1.02rem;
+            color: var(--text-main);
+            margin-bottom: 0.6rem;
+            line-height: 1.35;
+        }
+        .bento-card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        /* ===== Modern Academic Table ===== */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1.9rem 0;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+        }
+        .academic-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+            table-layout: fixed;
+        }
+        .academic-table th,
+        .academic-table td {
+            padding: 11px 15px;
+            vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+        .academic-table th {
+            font-weight: 600;
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-light);
+        }
+        .academic-table td {
+            border-bottom: 1px solid var(--bg-surface);
+            color: var(--text-body);
+        }
+        .academic-table tr:last-child td {
+            border-bottom: none;
+        }
+        .academic-table tr:hover td {
+            background: rgba(0, 0, 0, 0.015);
+        }
+
+        /* ===== Site Footer & Back to Top ===== */
+        .site-footer {
+            border-top: 1px solid var(--border-light);
+            padding: 2.4rem 0 3.4rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.5rem;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .site-footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        .site-footer a:hover {
+            color: var(--pastel-peach-text);
+        }
+
+        .back-to-top {
+            position: fixed;
+            right: 1.4rem;
+            bottom: 1.4rem;
+            z-index: 40;
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid var(--border-light);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            color: var(--text-main);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(8px);
+            transition: all 0.2s ease;
+        }
+        .back-to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        .back-to-top:hover {
+            border-color: var(--pastel-peach-border);
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+        }
+
+        @media (max-width: 768px) {
+            .top-nav-inner { padding: 0 1rem; }
+            .top-nav-brand-label { display: none; }
+            .top-nav-brand-short { display: inline !important; }
+            .paper-section { padding: 1.55rem 1.25rem; margin-bottom: 1.9rem; }
+            .paper-section h2 { font-size: 1.38rem; }
+            h1 { font-size: 1.75rem; }
+            .content-wrap { padding: 0 1rem; }
+            .infographic-block { grid-template-columns: 1fr; padding: 1rem; }
+            .chart-row { grid-template-columns: 1fr; }
+            .archive-nav-btn span.nav-btn-label { display: none; }
+        }
+        .top-nav-brand-short { display: none; }
+
+        @media print {
+            .top-nav, .mobile-toc-bar, .side-nav, .back-to-top { display: none !important; }
+            .paper-section { box-shadow: none; border: 1px solid var(--border-light); break-inside: avoid; }
+            body { background: #ffffff; }
+        }
+    </style>
+    <noscript>
+        <style>
+            .chart-container > div[id^="chart-"] { display: none !important; }
+            .chart-fallback { display: block !important; }
+        </style>
+    </noscript>
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+            <symbol id="icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+            <symbol id="icon-network" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2.5"/><circle cx="4" cy="20" r="2.5"/><circle cx="20" cy="20" r="2.5"/><path d="M12 6.5v5.5M12 12l-6 5.5M12 12l6 5.5"/></symbol>
+            <symbol id="icon-deal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l4-4 4 4 6-6 4 4"/><path d="M13 6h4v4"/></symbol>
+            <symbol id="icon-security" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+            <symbol id="icon-regulation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 8l4.5 4 4.5-4M3 8h9M12 8h9m-4.5 4l4.5-4M7 21h10"/></symbol>
+            <symbol id="icon-packaging" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
+            <symbol id="icon-robot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 2v6M9 2h6"/><circle cx="9" cy="13" r="1.5"/><circle cx="15" cy="13" r="1.5"/><line x1="9" y1="17" x2="15" y2="17"/></symbol>
+            <symbol id="icon-datacenter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><line x1="6" y1="7" x2="6.01" y2="7"/><line x1="6" y1="17" x2="6.01" y2="17"/></symbol>
+            <symbol id="icon-research" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v5.5l-5 8.5a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-8.5V3"/></symbol>
+            <symbol id="icon-media" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
+            <symbol id="icon-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+        </defs>
+    </svg>
+
+    <nav class="top-nav" aria-label="Primary Header">
+        <div class="top-nav-inner">
+            <a class="top-nav-brand" href="../index.html">
+                <span class="top-nav-brand-tag">DAILY</span>
+                <span class="top-nav-brand-label">AI<span class="brand-dot">·</span>Hardware Briefing</span>
+                <span class="top-nav-brand-short">AI<span class="brand-dot">·</span>HW</span>
+            </a>
+            <div class="top-nav-actions">
+                <div class="archive-nav" aria-label="Daily archive navigation"><a class="archive-nav-btn" href="../archive/2026-11-14.html" title="Previous briefing" aria-label="Previous briefing">‹ <span class="nav-btn-label">Prev</span></a><div class="archive-date-wrap"><span class="archive-status-dot" aria-hidden="true"></span><select id="archive-date-select" class="archive-date-select" data-current-date="2026-11-15" aria-label="Select briefing date"><option value="../index.html" data-date="2026-11-15" selected>November 15, 2026</option><option value="../archive/2026-11-14.html" data-date="2026-11-14">November 14, 2026</option><option value="../archive/2026-11-13.html" data-date="2026-11-13">November 13, 2026</option><option value="../archive.html?date=2026-11-12" data-date="2026-11-12">November 12, 2026</option><option value="../archive.html?date=2026-11-11" data-date="2026-11-11">November 11, 2026</option><option value="../archive.html?date=2026-11-10" data-date="2026-11-10">November 10, 2026</option><option value="../archive.html?date=2026-11-09" data-date="2026-11-09">November 09, 2026</option><option value="../archive.html?date=2026-11-08" data-date="2026-11-08">November 08, 2026</option><option value="../archive.html?date=2026-11-07" data-date="2026-11-07">November 07, 2026</option><option value="../archive.html?date=2026-11-06" data-date="2026-11-06">November 06, 2026</option><option value="../archive.html?date=2026-11-05" data-date="2026-11-05">November 05, 2026</option><option value="../archive.html?date=2026-11-04" data-date="2026-11-04">November 04, 2026</option><option value="../archive.html?date=2026-11-03" data-date="2026-11-03">November 03, 2026</option><option value="../archive.html?date=2026-11-02" data-date="2026-11-02">November 02, 2026</option><option value="../archive.html?date=2026-11-01" data-date="2026-11-01">November 01, 2026</option></select></div><a class="archive-nav-btn is-disabled" href="#" title="Next briefing" aria-label="Next briefing"><span class="nav-btn-label">Next</span> ›</a></div>
+            </div>
+        </div>
+        <div id="scroll-progress" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+    </nav>
+
+    <div class="mobile-toc-bar" aria-label="Article Quick Jump">
+        <div class="mobile-toc-inner">
+            <select id="mobile-toc-select" class="mobile-toc-select" aria-label="Jump to article section">
+                <option value="#art1">01 · Luma AI Launches Agentic Smart Organizer for…</option>
+                <option value="#art2">02 · Tesla Opens Invite-Only Cybercab Pre-Orders …</option>
+                <option value="#art3">03 · AMD Expands Instinct MI400 With 288 GB HBM4 …</option>
+                <option value="#art4">04 · NVIDIA Unveils SubGPU Pipelining on B200, Li…</option>
+                <option value="#takeaways">05 · Key Strategic Takeaways</option>
+            </select>
+            <div class="mobile-toc-pills" id="mobile-toc-pills">
+                <a href="#art1" class="mobile-pill active" data-target="art1">01</a>
+                <a href="#art2" class="mobile-pill" data-target="art2">02</a>
+                <a href="#art3" class="mobile-pill" data-target="art3">03</a>
+                <a href="#art4" class="mobile-pill" data-target="art4">04</a>
+                <a href="#takeaways" class="mobile-pill" data-target="takeaways">Sum</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="layout-shell">
+        <aside class="side-nav" aria-label="Intelligence Briefing Contents">
+            <div class="side-nav-title">Intelligence Briefing</div>
+            <div class="side-nav-sub">November 15, 2026</div>
+            <ul class="side-nav-list" id="side-nav-list">
+                <li><a href="#art1" class="side-nav-link active" data-target="art1" aria-current="location"><span class="nav-num">01</span><span class="nav-text">Luma AI Launches Agentic Smart Organizer for…</span></a></li>
+                <li><a href="#art2" class="side-nav-link" data-target="art2"><span class="nav-num">02</span><span class="nav-text">Tesla Opens Invite-Only Cybercab Pre-Orders …</span></a></li>
+                <li><a href="#art3" class="side-nav-link" data-target="art3"><span class="nav-num">03</span><span class="nav-text">AMD Expands Instinct MI400 With 288 GB HBM4 …</span></a></li>
+                <li><a href="#art4" class="side-nav-link" data-target="art4"><span class="nav-num">04</span><span class="nav-text">NVIDIA Unveils SubGPU Pipelining on B200, Li…</span></a></li>
+                <li><a href="#takeaways" class="side-nav-link" data-target="takeaways"><span class="nav-num">05</span><span class="nav-text">Key Strategic Takeaways</span></a></li>
+            </ul>
+            <div class="side-nav-progress">
+                <div class="side-nav-progress-meta">
+                    <span>PROGRESS</span>
+                    <span id="side-nav-progress-pct">0%</span>
+                </div>
+                <div class="side-nav-progress-track">
+                    <div class="side-nav-progress-fill" id="side-nav-progress-fill"></div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="content-wrap">
+            <header class="masthead" id="top">
+                <span class="doc-category">AI Ecosystem &amp; Hardware Architecture</span>
+                <h1>Daily AI &amp; Semiconductor Engineering Briefing</h1>
+                <div class="meta-info">
+                    <span id="report-date">November 15, 2026</span>
+                    <span>•</span>
+                    <span>Technical Intelligence Report</span>
+                </div>
+            </header>
+
+            <main>
+                <article class="paper-section" id="art1">
+  <h2>Luma AI Launches Agentic Smart Organizer for Generative Video and 3D Canvases</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>As generative video, image, and 3D tools enter enterprise production, the primary bottleneck has shifted from generating individual clips to organizing thousands of iterative takes and brand variations. On November 14, 2026, <strong>Luma AI</strong> introduced an agentic <strong>Smart Organizer</strong> inside its collaborative canvas that responds to plain-language commands to infer visual relationships and group scattered items into labeled sections.</p>
+    <p>The workflow processes boards holding up to <strong>10,000 assets</strong> section-by-section, pausing for explicit user approval before moving items and supporting <strong>non-destructive rollback</strong> so teams can undo an organizational pass without losing later manual edits. This release signals Luma's push beyond raw rendering APIs into persistent, stateful creative orchestration alongside incumbents like Adobe and Figma.</p>
+  </div>
+
+  <h3 class="section-title">2. Architecture &amp; Performance</h3>
+  <p>Traditional moodboards and cloud media tools force creators into manual drag-and-drop sorting or rigid folder trees that break down during rapid AI iteration. Luma's Smart Organizer replaces static hierarchies with on-demand <span class="code-term">vision-language model (VLM)</span> indexing that classifies frames, images, and canvas context into coherent clusters only when explicitly invoked.</p>
+  <div class="inline-callout">
+    <p><strong>Human-in-the-Loop State Safety:</strong> Rather than mutating active workspaces autonomously, the agent generates a proposed section layout, requires pre-move user confirmation, and maintains transactional undo states independent of subsequent manual canvas edits.</p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-value">10,000</div>
+      <div class="stat-label">Max Board Asset Scale (Section-by-Section)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">On-Demand</div>
+      <div class="stat-label">Natural-Language Agent Invocation</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">Pre-Move</div>
+      <div class="stat-label">Mandatory User Approval Gate</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">Safe Undo</div>
+      <div class="stat-label">Non-Destructive Rollback Support</div>
+    </div>
+  </div>
+
+  <div class="arch-diagram-wrap">
+    <div class="arch-diagram-title">System Architecture: Luma Agentic Smart Organizer Pipeline</div>
+    <div class="arch-diagram-stage">
+      <svg viewBox="0 0 720 190" role="img" aria-label="Luma Smart Organizer agentic workflow diagram">
+        <defs>
+          <marker id="arrow-art1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <rect x="18" y="42" width="142" height="96" rx="10" fill="#edf5fc" stroke="#c8e0f7" stroke-width="1.5"/>
+        <text x="89" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">1. User Trigger</text>
+        <text x="89" y="94" text-anchor="middle" font-size="11" fill="#4b5563">Plain-language prompt</text>
+        <text x="89" y="112" text-anchor="middle" font-size="11" fill="#4b5563">(On-demand run)</text>
+
+        <line x1="160" y1="90" x2="192" y2="90" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow-art1)"/>
+
+        <rect x="196" y="42" width="154" height="96" rx="10" fill="#fef0e7" stroke="#f8cdb4" stroke-width="1.5"/>
+        <text x="273" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">2. VLM Indexing</text>
+        <text x="273" y="94" text-anchor="middle" font-size="11" fill="#4b5563">Context &amp; metadata scan</text>
+        <text x="273" y="112" text-anchor="middle" font-size="11" fill="#4b5563">(Up to 10,000 assets)</text>
+
+        <line x1="350" y1="90" x2="382" y2="90" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow-art1)"/>
+
+        <rect x="386" y="42" width="148" height="96" rx="10" fill="#fef8e7" stroke="#fde3a7" stroke-width="1.5"/>
+        <text x="460" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">3. Approval Gate</text>
+        <text x="460" y="94" text-anchor="middle" font-size="11" fill="#4b5563">Preview proposed groups</text>
+        <text x="460" y="112" text-anchor="middle" font-size="11" fill="#4b5563">(Confirm before move)</text>
+
+        <line x1="534" y1="90" x2="566" y2="90" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow-art1)"/>
+
+        <rect x="570" y="42" width="132" height="96" rx="10" fill="#eef6ed" stroke="#cae8c2" stroke-width="1.5"/>
+        <text x="636" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">4. Sectioned State</text>
+        <text x="636" y="94" text-anchor="middle" font-size="11" fill="#4b5563">Labeled clusters +</text>
+        <text x="636" y="112" text-anchor="middle" font-size="11" fill="#4b5563">non-destructive undo</text>
+      </svg>
+    </div>
+    <p class="arch-diagram-caption">End-to-end agentic clustering flow: user-triggered VLM classification passes through an explicit approval checkpoint before committing reversible section layouts.</p>
+  </div>
+
+  <div class="infographic-block">
+    <div class="infographic-card">
+      <svg class="infographic-icon"><use href="#icon-media"/></svg>
+      <h4>Workflow Stickiness</h4>
+      <p>Owning version history and review loops raises switching costs beyond commoditized video APIs.</p>
+    </div>
+    <div class="infographic-card">
+      <svg class="infographic-icon"><use href="#icon-datacenter"/></svg>
+      <h4>Compute Shift</h4>
+      <p>10,000-asset clustering shifts cloud load toward low-latency VLM inference and object storage.</p>
+    </div>
+  </div>
+
+  <h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>
+  <p class="outlook-lead">By embedding agentic state management directly into its collaborative canvas, Luma AI is positioning itself as a studio system of record rather than a stateless rendering utility.</p>
+  <ul class="outlook-list">
+    <li><strong>Unverified Rollout &amp; Asset Parity:</strong> Luma has not confirmed whether the 10,000-asset figure is a hard workspace ceiling or batch limit, whether 3D assets match 2D image and video clustering depth, or whether pre-move approval applies across all subscription tiers.</li>
+    <li><strong>Opaque Inference Economics:</strong> Underlying VLM classification latency, credit consumption, and exact announcement timestamps remain undisclosed in primary newsroom summaries.</li>
+    <li><strong>Desktop Finishing Gap:</strong> While canvas orchestration reduces early-stage creative friction, high-precision post-production and frame-accurate timeline finishing still depend on incumbent desktop suites.</li>
+  </ul>
+</article>
+
+<article class="paper-section" id="art2">
+  <h2>Tesla Opens Invite-Only Cybercab Pre-Orders at $29,990 With Mandatory $299/Month Autonomy Fee</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>On November 13, 2026 (23:43 UTC / November 14, 08:43 KST), <strong>Tesla</strong> opened invite-only pre-orders for private consumers to purchase its steering-wheel-free, pedal-free <strong>Cybercab</strong>, marking a major shift away from fleet-only Level 4 autonomy. Priced at <strong>$29,990</strong> before taxes with a <strong>$1,000</strong> non-refundable deposit and targeted December 2026 Texas deliveries, the two-seat vehicle undercuts a baseline Model 3 by <strong>$8,640</strong> (about <strong>22.4%</strong>).</p>
+    <p>Crucially, the vehicle cannot operate without an active, mandatory <strong>$299/month</strong> Autonomy Subscription (first month included) and is strictly geofenced to Tesla-supported zones across <strong>eight cities</strong> in Texas and Florida. This pricing structure brings three-year pre-tax hardware-plus-software spend to <strong>$40,455</strong>, turning consumer vehicles into recurring AI-as-a-Service terminals ahead of an unresolved <strong>NHTSA FMVSS 135</strong> safety inquiry.</p>
+  </div>
+
+  <h3 class="section-title">2. Architecture &amp; Performance</h3>
+  <p>Eliminating the steering column, brake and accelerator pedals, and side mirrors simplifies cabin wiring harnesses and mechanical assembly. Bill-of-materials value instead concentrates in onboard AI inference <span class="code-term">SoCs</span>, redundant braking and steering actuators, multi-camera vision arrays, and cellular telemetry links enforcing geofence boundaries.</p>
+  <p>Operationally, Tesla AI lead Ashok Elluswamy confirmed the vehicle runs unsupervised inside supported zones strictly for personal trips, barring private owners from commercial ride-hailing. CEO Elon Musk noted on November 14 that the $299 monthly fee is "too high" and should eventually trend toward roughly $115 per month.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-value">$29,990</div>
+      <div class="stat-label">Hardware Sticker ($1,000 Deposit)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">$299 / mo</div>
+      <div class="stat-label">Mandatory Autonomy Subscription</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">8 Cities</div>
+      <div class="stat-label">TX (5) &amp; FL (3) Geofenced Zones</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">20.1 cu. ft.</div>
+      <div class="stat-label">Cargo Space (2-Seat, 21" Screen)</div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-label">Cybercab Upfront Discount vs. Mandatory Multi-Year Software Spend (USD)</div>
+    <div id="chart-art2-a" style="width:100%;height:100%"></div>
+      <div class="chart-fallback"><svg class="chart-fallback-svg" viewBox="0 0 560 175" role="img" aria-label="Static chart data fallback"><line x1="34" y1="131" x2="544" y2="131" stroke="#d1d5db" stroke-width="1"/><rect x="80.8" y="38.4" width="34.0" height="92.6" rx="3" fill="#5b7c99"/><text x="97.8" y="34.4" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">38630</text><text x="97.8" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Model 3 Base (Ha…</text><rect x="208.2" y="59.1" width="34.0" height="71.9" rx="3" fill="#5b7c99"/><text x="225.2" y="55.1" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">29990</text><text x="225.2" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Cybercab (Hardwa…</text><rect x="335.8" y="34.0" width="34.0" height="97.0" rx="3" fill="#5b7c99"/><text x="352.8" y="30.0" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">40455</text><text x="352.8" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Cybercab (3-Yr T…</text><rect x="463.2" y="88.7" width="34.0" height="42.3" rx="3" fill="#5b7c99"/><text x="480.2" y="84.7" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">17641</text><text x="480.2" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Cybercab 5-Yr (S…</text></svg><table class="chart-fallback-table"><thead><tr><th>Category</th><th>Series 1</th></tr></thead><tbody><tr><td>Model 3 Base (Hardware)</td><td>38630</td></tr><tr><td>Cybercab (Hardware)</td><td>29990</td></tr><tr><td>Cybercab (3-Yr Total*)</td><td>40455</td></tr><tr><td>Cybercab 5-Yr (Software Only*)</td><td>17641</td></tr></tbody></table></div>
+  </div>
+  <script>
+  (function(){
+    var el = document.getElementById('chart-art2-a');
+    if (el && window.echarts) {
+      var chart = echarts.init(el, null, {renderer: 'svg'});
+      chart.setOption({
+        backgroundColor: 'transparent',
+        title: {
+          text: 'Tesla Cybercab vs. Base Model 3 Cost Structure',
+          left: 'center',
+          top: 6,
+          textStyle: { fontSize: 13, fontWeight: 600, color: '#1f2937' }
+        },
+        tooltip: { trigger: 'axis', valueFormatter: function(v){ return '$' + v.toLocaleString(); } },
+        grid: { top: 48, left: 54, right: 20, bottom: 48, containLabel: true },
+        xAxis: {
+          type: 'category',
+          data: ['Model 3 Base\n(Hardware)', 'Cybercab\n(Hardware)', 'Cybercab\n(3-Yr Total*)', 'Cybercab 5-Yr\n(Software Only*)'],
+          axisLabel: { color: '#4b5563', fontSize: 11, interval: 0 }
+        },
+        yAxis: {
+          type: 'value',
+          name: 'USD ($)',
+          nameTextStyle: { color: '#4b5563', fontSize: 11 },
+          axisLabel: { color: '#4b5563', fontSize: 11, formatter: function(v){ return '$' + (v/1000) + 'k'; } },
+          splitLine: { lineStyle: { color: '#e5e7eb', type: 'dashed' } }
+        },
+        series: [{
+          type: 'bar',
+          barWidth: '46%',
+          data: [
+            { value: 38630, itemStyle: { color: '#5b7c99' } },
+            { value: 29990, itemStyle: { color: '#6b9080' } },
+            { value: 40455, itemStyle: { color: '#d98a6c' } },
+            { value: 17641, itemStyle: { color: '#d4a373' } }
+          ],
+          label: {
+            show: true,
+            position: 'top',
+            color: '#1f2937',
+            fontSize: 11,
+            formatter: function(p){ return '$' + p.value.toLocaleString(); }
+          }
+        }]
+      });
+      window.addEventListener('resize', function(){ chart.resize(); });
+    }
+  })();
+  </script>
+
+  <h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>
+  <p class="outlook-lead">Selling geofenced autonomous hardware to private buyers allows Tesla to scale fleet output off its corporate balance sheet while locking in recurring AI software revenue—if federal regulators approve.</p>
+  <ul class="outlook-list">
+    <li><strong>FMVSS 135 Regulatory Binary Risk:</strong> Unlike Amazon's Zoox, which sought a federal Part 555 exemption for control-free vehicles, Tesla relied on self-certification and faces an active NHTSA Special Order probing brake-pedal-less compliance, putting December 2026 handovers at legal risk.</li>
+    <li><strong>Strict Geofence &amp; Utility Limits:</strong> Without steering wheels or pedals, owners cannot manually drive outside supported corridors across Austin (~272 sq mi), Dallas, Houston, Fort Worth, San Antonio, Miami, Orlando, and Tampa, nor monetize idle vehicles via commercial ride-hailing.</li>
+    <li><strong>Total Cost of Ownership Creep:</strong> Adding 35 paid months of mandatory $299/month software yields $40,455 over three years—and $17,641 in 59-month incremental software fees over five years—before taxes, insurance, or routine maintenance.</li>
+  </ul>
+</article>
+
+<article class="paper-section" id="art3">
+  <h2>AMD Expands Instinct MI400 With 288 GB HBM4 MI450X and Discloses Internal MI455X Benchmarks</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>High-bandwidth memory capacity and stack supply have emerged as the primary cost bottleneck in frontier AI clusters, often forcing operators to overpay for 432 GB configurations when inference models fit comfortably under 288 GB. On November 12, 2026, <strong>AMD</strong> expanded its CDNA 5 Instinct MI400 lineup with the <strong>MI450X</strong>—pairing <strong>288 GB of HBM4</strong> (8 stacks) with the full <strong>40.3 PFLOPs FP4</strong> compute and <strong>23.3 TB/s</strong> memory bandwidth of the flagship <strong>432 GB MI455X</strong> (12 stacks).</p>
+    <p>Alongside the launch, AMD disclosed October 2026 internal testing of the <strong>MI455X</strong> inside its 72-GPU <strong>Helios</strong> rack platform reaching <strong>21,333 tokens/s per GPU</strong> on DeepSeek-R1—calculated by AMD as up to <strong>30% higher</strong> than NVIDIA Vera Rubin NVL72's published MLPerf Inference v6.1 Closed Division result. Splitting the lineup into 8-stack and 12-stack SKUs allows AMD to stretch constrained HBM4 stack inventory across <strong>50% more GPUs</strong> while matching Vera Rubin's 288 GB tier.</p>
+  </div>
+
+  <div class="concept-box">
+    <h4>Key Hardware &amp; Packaging Concepts</h4>
+    <ul>
+      <li><strong>HBM4 (High-Bandwidth Memory 4):</strong> Fourth-generation vertically stacked DRAM bonded beside compute dies; total capacity scales by stack count (8 vs. 12 stacks), while aggregate bandwidth depends on per-pin signaling rate and bus width.</li>
+      <li><strong>EAM (Enhanced Accelerator Module):</strong> AMD's standardized liquid-cooled server module form factor replacing older OAM designs to support 72-GPU rack-scale power and thermal envelopes.</li>
+      <li><strong>UALoE (UALink over Ethernet) &amp; DLC:</strong> High-speed scale-up fabric delivering 3.6 TB/s bidirectional GPU-to-GPU bandwidth per chip, paired with Direct Liquid Cooling (DLC) cold plates to dissipate up to 246 kW per Helios rack.</li>
+      <li><strong>VRM (Voltage Regulator Module):</strong> Board-level power conversion circuitry delivering tightly regulated low-voltage, high-current power to 320-billion-transistor silicon under rapid AI load swings.</li>
+    </ul>
+  </div>
+
+  <h3 class="section-title">2. Architecture &amp; Performance</h3>
+  <p>Both the MI450X and MI455X share AMD's <span class="code-term">CDNA 5</span> chiplet architecture, integrating eight TSMC <span class="code-term">2nm</span> compute dies (XCDs) with <span class="code-term">3nm</span> I/O and cache dies totaling 320 billion transistors (+73% over MI355X) and 192 MB of shared cache. While the HPC-focused <span class="code-term">MI430X</span> retains native FP64 math with 432 GB HBM4, both AI SKUs deliver 40.3 PFLOPs MXFP4 and 20.1 PFLOPs FP8 compute—a ~4.0x leap over the 10.1 PFLOPs MI355X.</p>
+  <p>At the rack level, the physical system chain scales sharply across compute, package, board, and cooling layers. Each GPU in a 72-GPU Helios rack drives 72 lanes of 200G UALoE through twelve 102.4T Broadcom Tomahawk 6 switches (3.6 TB/s bidirectional scale-up) plus 800G Vulcano scale-out NICs (600 GB/s), driving rack power envelopes up to 246 kW under Direct Liquid Cooling.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-value">320B</div>
+      <div class="stat-label">Transistors (TSMC 2nm + 3nm CDNA 5)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">40.3 PF</div>
+      <div class="stat-label">Peak FP4 Compute (~4.0x vs. MI355X)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">23.3 TB/s</div>
+      <div class="stat-label">Peak HBM4 Bandwidth (+191%)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">21,333</div>
+      <div class="stat-label">Tok/s/GPU DeepSeek-R1 (Internal)</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-container">
+      <div class="chart-label">Peak Memory Bandwidth Scaling (TB/s)</div>
+      <div id="chart-art3-a" style="width:100%;height:100%"></div>
+      <div class="chart-fallback"><svg class="chart-fallback-svg" viewBox="0 0 560 175" role="img" aria-label="Static chart data fallback"><line x1="34" y1="131" x2="544" y2="131" stroke="#d1d5db" stroke-width="1"/><rect x="102.0" y="97.7" width="34.0" height="33.3" rx="3" fill="#5b7c99"/><text x="119.0" y="93.7" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">8</text><text x="119.0" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">MI355X (HBM3E)</text><rect x="272.0" y="34.0" width="34.0" height="97.0" rx="3" fill="#5b7c99"/><text x="289.0" y="30.0" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">23.3</text><text x="289.0" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">MI450X (8-Stack …</text><rect x="442.0" y="34.0" width="34.0" height="97.0" rx="3" fill="#5b7c99"/><text x="459.0" y="30.0" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">23.3</text><text x="459.0" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">MI455X (12-Stack…</text></svg><table class="chart-fallback-table"><thead><tr><th>Category</th><th>Series 1</th></tr></thead><tbody><tr><td>MI355X (HBM3E)</td><td>8</td></tr><tr><td>MI450X (8-Stack HBM4)</td><td>23.3</td></tr><tr><td>MI455X (12-Stack HBM4)</td><td>23.3</td></tr></tbody></table></div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-label">HBM Memory Capacity &amp; Stack Tiering (GB)</div>
+      <div id="chart-art3-b" style="width:100%;height:100%"></div>
+      <div class="chart-fallback"><svg class="chart-fallback-svg" viewBox="0 0 560 175" role="img" aria-label="Static chart data fallback"><line x1="34" y1="131" x2="544" y2="131" stroke="#d1d5db" stroke-width="1"/><rect x="102.0" y="66.3" width="34.0" height="64.7" rx="3" fill="#5b7c99"/><text x="119.0" y="62.3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">288</text><text x="119.0" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">MI355X (HBM3E)</text><rect x="272.0" y="66.3" width="34.0" height="64.7" rx="3" fill="#5b7c99"/><text x="289.0" y="62.3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">288</text><text x="289.0" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">MI450X (8-Stack …</text><rect x="442.0" y="34.0" width="34.0" height="97.0" rx="3" fill="#5b7c99"/><text x="459.0" y="30.0" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">432</text><text x="459.0" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">MI455X (12-Stack…</text></svg><table class="chart-fallback-table"><thead><tr><th>Category</th><th>Series 1</th></tr></thead><tbody><tr><td>MI355X (HBM3E)</td><td>288</td></tr><tr><td>MI450X (8-Stack HBM4)</td><td>288</td></tr><tr><td>MI455X (12-Stack HBM4)</td><td>432</td></tr></tbody></table></div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var elA = document.getElementById('chart-art3-a');
+    if (elA && window.echarts) {
+      var chartA = echarts.init(elA, null, {renderer: 'svg'});
+      chartA.setOption({
+        backgroundColor: 'transparent',
+        title: { text: 'Peak Memory Bandwidth (TB/s)', left: 'center', top: 6, textStyle: { fontSize: 13, fontWeight: 600, color: '#1f2937' } },
+        tooltip: { trigger: 'axis', valueFormatter: function(v){ return v + ' TB/s'; } },
+        grid: { top: 44, left: 48, right: 20, bottom: 48, containLabel: true },
+        xAxis: {
+          type: 'category',
+          data: ['MI355X\n(HBM3E)', 'MI450X\n(8-Stack HBM4)', 'MI455X\n(12-Stack HBM4)'],
+          axisLabel: { color: '#4b5563', fontSize: 11, interval: 0 }
+        },
+        yAxis: {
+          type: 'value',
+          name: 'TB/s',
+          nameTextStyle: { color: '#4b5563', fontSize: 11 },
+          axisLabel: { color: '#4b5563', fontSize: 11 },
+          splitLine: { lineStyle: { color: '#e5e7eb', type: 'dashed' } }
+        },
+        series: [{
+          type: 'bar',
+          barWidth: '46%',
+          data: [
+            { value: 8.0, itemStyle: { color: '#5b7c99' } },
+            { value: 23.3, itemStyle: { color: '#6b9080' } },
+            { value: 23.3, itemStyle: { color: '#d98a6c' } }
+          ],
+          label: { show: true, position: 'top', color: '#1f2937', fontSize: 11, formatter: '{c} TB/s' }
+        }]
+      });
+      window.addEventListener('resize', function(){ chartA.resize(); });
+    }
+
+    var elB = document.getElementById('chart-art3-b');
+    if (elB && window.echarts) {
+      var chartB = echarts.init(elB, null, {renderer: 'svg'});
+      chartB.setOption({
+        backgroundColor: 'transparent',
+        title: { text: 'HBM Memory Capacity (GB)', left: 'center', top: 6, textStyle: { fontSize: 13, fontWeight: 600, color: '#1f2937' } },
+        tooltip: { trigger: 'axis', valueFormatter: function(v){ return v + ' GB'; } },
+        grid: { top: 44, left: 48, right: 20, bottom: 48, containLabel: true },
+        xAxis: {
+          type: 'category',
+          data: ['MI355X\n(HBM3E)', 'MI450X\n(8-Stack HBM4)', 'MI455X\n(12-Stack HBM4)'],
+          axisLabel: { color: '#4b5563', fontSize: 11, interval: 0 }
+        },
+        yAxis: {
+          type: 'value',
+          name: 'GB',
+          nameTextStyle: { color: '#4b5563', fontSize: 11 },
+          axisLabel: { color: '#4b5563', fontSize: 11 },
+          splitLine: { lineStyle: { color: '#e5e7eb', type: 'dashed' } }
+        },
+        series: [{
+          type: 'bar',
+          barWidth: '46%',
+          data: [
+            { value: 288, itemStyle: { color: '#5b7c99' } },
+            { value: 288, itemStyle: { color: '#6b9080' } },
+            { value: 432, itemStyle: { color: '#d98a6c' } }
+          ],
+          label: { show: true, position: 'top', color: '#1f2937', fontSize: 11, formatter: '{c} GB' }
+        }]
+      });
+      window.addEventListener('resize', function(){ chartB.resize(); });
+    }
+  })();
+  </script>
+
+  <h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>
+  <p class="outlook-lead">With global HBM demand at $58 billion in 2026 and HBM4 forecast to grow at a 64.0% CAGR to $21.95 billion by 2035, AMD's dual-tier HBM4 strategy targets both capacity-bound MoE training and cost-sensitive inference—though key silicon and benchmark disclosures await independent proof.</p>
+  <ul class="outlook-list">
+    <li><strong>Unaudited Benchmark Comparison:</strong> AMD's 21,333 tokens/s DeepSeek-R1 figure is an internal MLPerf-style Offline measurement compared against NVIDIA's September MLPerf v6.1 Closed Division submission rather than an audited, same-round MLCommons head-to-head.</li>
+    <li><strong>HBM4 Pin-Speed Physics on MI450X:</strong> Sustaining 23.3 TB/s across 8 stacks (assuming a 2,048-bit interface per stack) implies ~11.38 Gbps/pin versus ~7.58 Gbps/pin across 12 stacks on the MI455X, requiring substantially faster HBM4 memory bins whose specs await official datasheets.</li>
+    <li><strong>Module &amp; Supply Verification:</strong> Sharing CDNA 5 and the EAM form factor does not confirm drop-in interposer, VRM, or cold-plate interchangeability without board redesign, and the MI450X lacks a disclosed general availability date.</li>
+  </ul>
+</article>
+
+<article class="paper-section" id="art4">
+  <h2>NVIDIA Unveils SubGPU Pipelining on B200, Lifting HBM Bandwidth Utilization to 83.6%</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>Autoregressive LLM decoding routinely leaves flagship Blackwell B200 accelerators underutilized because short, memory-bound kernels execute sequentially, creating alternating bursts of compute and memory-bus traffic. On November 11, 2026, <strong>NVIDIA researchers</strong> published <strong>SubGPU Pipelining</strong> (<code>arXiv:2611.14904</code>), an intra-GPU spatial execution scheme that splits operator graphs into disjoint <strong>Streaming Multiprocessor (SM)</strong> pools via <strong>CUDA Green Contexts</strong> and streams microbatches concurrently across on-chip stages.</p>
+    <p>In single-GPU <strong>Blackwell B200</strong> silicon experiments emulating a 32-GPU deployment of GPT-OSS 120B (global batch 2,048, two-stage pipeline), mean HBM read-plus-write bandwidth utilization jumped from <strong>71.8% to 83.6%</strong> of peak (+11.8 percentage points), trimming 36-layer decoder iteration time by <strong>10.33%</strong> (~<strong>11.5%</strong> higher throughput). Separate analytical modeling projects up to <strong>2.2x</strong> higher per-user throughput or <strong>1.9x</strong> higher per-GPU throughput across broader operating points.</p>
+  </div>
+
+  <div class="concept-box">
+    <h4>Key Hardware &amp; Microarchitecture Concepts</h4>
+    <ul>
+      <li><strong>SM (Streaming Multiprocessor):</strong> The core parallel compute execution cluster inside an NVIDIA GPU; monolithic kernels traditionally occupy all SMs sequentially even when bottlenecked by memory transfers.</li>
+      <li><strong>CUDA Green Contexts:</strong> A low-level spatial partitioning primitive allowing compilers like TensorRT-LLM to bind separate operator segments to mutually exclusive SM pools on the same die.</li>
+      <li><strong>Temporal vs. Spatial Execution:</strong> Temporal execution runs one kernel across the whole chip after another; spatial pipelining overlaps memory-heavy KV-cache reads with compute-heavy stages concurrently.</li>
+      <li><strong>PDN (Power-Delivery Network) &amp; PI (Power Integrity):</strong> The package and board wiring supplying stable voltage to the GPU die; smoother spatial workloads may reduce abrupt current spikes (di/dt), though electrical telemetry was not measured in this study.</li>
+    </ul>
+  </div>
+
+  <h3 class="section-title">2. Architecture &amp; Performance</h3>
+  <p>SubGPU Pipelining partitions a model's contiguous operator graph into ordered pipeline stages, maps each stage onto a dedicated <span class="code-term">SM pool</span> using <span class="code-term">CUDA Green Contexts</span> and custom <span class="code-term">TensorRT-LLM</span> kernels, and feeds microbatches continuously across stages. Overlapping memory-bound attention phases with compute phases on neighboring SM partitions eliminates whole-chip synchronization stalls.</p>
+  <p>Crucially, the paper distinguishes physical silicon validation from analytical modeling. While analytical shared-resource simulation maps Pareto frontier gains up to 2.2x per-user throughput at matched GPU throughput (or 1.9x GPU throughput at matched user latency), the physical two-stage B200 test established an immediate 10.33% latency drop through software scheduling alone.</p>
+
+  <div class="arch-diagram-wrap">
+    <div class="arch-diagram-title">Microarchitecture Flow: Conventional Temporal Execution vs. SubGPU Spatial Pipelining</div>
+    <div class="arch-diagram-stage">
+      <svg viewBox="0 0 720 190" role="img" aria-label="Temporal vs SubGPU spatial SM partitioning diagram">
+        <defs>
+          <marker id="arrow-art4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <text x="20" y="34" font-size="12" font-weight="700" fill="#4b5563">Conventional Temporal Execution (All SMs Sequential)</text>
+        <rect x="20" y="46" width="195" height="40" rx="6" fill="#fef0e7" stroke="#f8cdb4" stroke-width="1.5"/>
+        <text x="117" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2937">Kernel A: Memory-Bound</text>
+        <line x1="215" y1="66" x2="245" y2="66" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow-art4)"/>
+        <rect x="249" y="46" width="195" height="40" rx="6" fill="#edf5fc" stroke="#c8e0f7" stroke-width="1.5"/>
+        <text x="346" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2937">Kernel B: Compute-Bound</text>
+        <line x1="444" y1="66" x2="474" y2="66" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow-art4)"/>
+        <rect x="478" y="46" width="222" height="40" rx="6" fill="#fef8e7" stroke="#fde3a7" stroke-width="1.5"/>
+        <text x="589" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="#4b5563">71.8% Mean HBM BW (Bursty)</text>
+
+        <text x="20" y="114" font-size="12" font-weight="700" fill="#1f2937">SubGPU Spatial Pipelining (Disjoint SM Pools via CUDA Green Contexts)</text>
+        <rect x="20" y="126" width="210" height="46" rx="6" fill="#eef6ed" stroke="#cae8c2" stroke-width="1.5"/>
+        <text x="125" y="146" text-anchor="middle" font-size="11" font-weight="700" fill="#1f2937">SM Pool 1 (Stage 1)</text>
+        <text x="125" y="163" text-anchor="middle" font-size="11" fill="#4b5563">Microbatch N+1 KV-Cache Read</text>
+
+        <line x1="230" y1="149" x2="262" y2="149" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow-art4)"/>
+
+        <rect x="266" y="126" width="210" height="46" rx="6" fill="#edf5fc" stroke="#c8e0f7" stroke-width="1.5"/>
+        <text x="371" y="146" text-anchor="middle" font-size="11" font-weight="700" fill="#1f2937">SM Pool 2 (Stage 2)</text>
+        <text x="371" y="163" text-anchor="middle" font-size="11" fill="#4b5563">Microbatch N Concurrent Compute</text>
+
+        <line x1="476" y1="149" x2="508" y2="149" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow-art4)"/>
+
+        <rect x="512" y="126" width="188" height="46" rx="6" fill="#eef6ed" stroke="#cae8c2" stroke-width="1.5"/>
+        <text x="606" y="146" text-anchor="middle" font-size="11" font-weight="700" fill="#1f2937">83.6% Mean HBM BW</text>
+        <text x="606" y="163" text-anchor="middle" font-size="11" fill="#4b5563">-10.33% Iteration Latency</text>
+      </svg>
+    </div>
+    <p class="arch-diagram-caption">Splitting a monolithic GPU into disjoint SM pools overlaps memory-heavy and compute-heavy microbatches simultaneously, raising sustained HBM utilization.</p>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-container">
+      <div class="chart-label">B200 Silicon Test: Mean HBM Utilization (%)</div>
+      <div id="chart-art4-a" style="width:100%;height:100%"></div>
+      <div class="chart-fallback"><svg class="chart-fallback-svg" viewBox="0 0 560 175" role="img" aria-label="Static chart data fallback"><line x1="34" y1="131" x2="544" y2="131" stroke="#d1d5db" stroke-width="1"/><rect x="144.5" y="47.7" width="34.0" height="83.3" rx="3" fill="#5b7c99"/><text x="161.5" y="43.7" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">71.8</text><text x="161.5" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Temporal Baselin…</text><rect x="399.5" y="34.0" width="34.0" height="97.0" rx="3" fill="#5b7c99"/><text x="416.5" y="30.0" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">83.6</text><text x="416.5" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">SubGPU Pipelinin…</text></svg><table class="chart-fallback-table"><thead><tr><th>Category</th><th>Series 1</th></tr></thead><tbody><tr><td>Temporal Baseline (GPT-OSS 120B)</td><td>71.8</td></tr><tr><td>SubGPU Pipelining (2-Stage B200)</td><td>83.6</td></tr></tbody></table></div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-label">Silicon vs. Analytical Model Throughput Gains (x)</div>
+      <div id="chart-art4-b" style="width:100%;height:100%"></div>
+      <div class="chart-fallback"><svg class="chart-fallback-svg" viewBox="0 0 560 175" role="img" aria-label="Static chart data fallback"><line x1="34" y1="131" x2="544" y2="131" stroke="#d1d5db" stroke-width="1"/><rect x="80.8" y="86.9" width="34.0" height="44.1" rx="3" fill="#5b7c99"/><text x="97.8" y="82.9" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">1</text><text x="97.8" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Temporal Baselin…</text><rect x="208.2" y="81.8" width="34.0" height="49.2" rx="3" fill="#5b7c99"/><text x="225.2" y="77.8" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">1.115</text><text x="225.2" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">B200 Silicon (Me…</text><rect x="335.8" y="47.2" width="34.0" height="83.8" rx="3" fill="#5b7c99"/><text x="352.8" y="43.2" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">1.9</text><text x="352.8" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Per-GPU (Simulat…</text><rect x="463.2" y="34.0" width="34.0" height="97.0" rx="3" fill="#5b7c99"/><text x="480.2" y="30.0" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">2.2</text><text x="480.2" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Per-User (Simula…</text></svg><table class="chart-fallback-table"><thead><tr><th>Category</th><th>Series 1</th></tr></thead><tbody><tr><td>Temporal Baseline</td><td>1</td></tr><tr><td>B200 Silicon (Measured)</td><td>1.115</td></tr><tr><td>Per-GPU (Simulated)</td><td>1.9</td></tr><tr><td>Per-User (Simulated)</td><td>2.2</td></tr></tbody></table></div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var elA = document.getElementById('chart-art4-a');
+    if (elA && window.echarts) {
+      var chartA = echarts.init(elA, null, {renderer: 'svg'});
+      chartA.setOption({
+        backgroundColor: 'transparent',
+        title: { text: 'Measured HBM Read+Write BW (B200 Silicon)', left: 'center', top: 6, textStyle: { fontSize: 13, fontWeight: 600, color: '#1f2937' } },
+        tooltip: { trigger: 'axis', valueFormatter: function(v){ return v + '%'; } },
+        grid: { top: 44, left: 48, right: 20, bottom: 48, containLabel: true },
+        xAxis: {
+          type: 'category',
+          data: ['Temporal Baseline\n(GPT-OSS 120B)', 'SubGPU Pipelining\n(2-Stage B200)'],
+          axisLabel: { color: '#4b5563', fontSize: 11, interval: 0 }
+        },
+        yAxis: {
+          type: 'value',
+          name: '% of Peak',
+          max: 100,
+          nameTextStyle: { color: '#4b5563', fontSize: 11 },
+          axisLabel: { color: '#4b5563', fontSize: 11, formatter: '{value}%' },
+          splitLine: { lineStyle: { color: '#e5e7eb', type: 'dashed' } }
+        },
+        series: [{
+          type: 'bar',
+          barWidth: '42%',
+          data: [
+            { value: 71.8, itemStyle: { color: '#5b7c99' } },
+            { value: 83.6, itemStyle: { color: '#6b9080' } }
+          ],
+          label: { show: true, position: 'top', color: '#1f2937', fontSize: 11, formatter: '{c}%' }
+        }]
+      });
+      window.addEventListener('resize', function(){ chartA.resize(); });
+    }
+
+    var elB = document.getElementById('chart-art4-b');
+    if (elB && window.echarts) {
+      var chartB = echarts.init(elB, null, {renderer: 'svg'});
+      chartB.setOption({
+        backgroundColor: 'transparent',
+        title: { text: 'Silicon Gain vs. Analytical Pareto Ceiling', left: 'center', top: 6, textStyle: { fontSize: 13, fontWeight: 600, color: '#1f2937' } },
+        tooltip: { trigger: 'axis', valueFormatter: function(v){ return v + 'x'; } },
+        grid: { top: 44, left: 48, right: 20, bottom: 48, containLabel: true },
+        xAxis: {
+          type: 'category',
+          data: ['Temporal\nBaseline', 'B200 Silicon\n(Measured)', 'Per-GPU\n(Simulated)', 'Per-User\n(Simulated)'],
+          axisLabel: { color: '#4b5563', fontSize: 11, interval: 0 }
+        },
+        yAxis: {
+          type: 'value',
+          name: 'Speedup (x)',
+          nameTextStyle: { color: '#4b5563', fontSize: 11 },
+          axisLabel: { color: '#4b5563', fontSize: 11, formatter: '{value}x' },
+          splitLine: { lineStyle: { color: '#e5e7eb', type: 'dashed' } }
+        },
+        series: [{
+          type: 'bar',
+          barWidth: '46%',
+          data: [
+            { value: 1.0, itemStyle: { color: '#5b7c99' } },
+            { value: 1.115, itemStyle: { color: '#6b9080' } },
+            { value: 1.9, itemStyle: { color: '#d4a373' } },
+            { value: 2.2, itemStyle: { color: '#d98a6c' } }
+          ],
+          label: { show: true, position: 'top', color: '#1f2937', fontSize: 11, formatter: '{c}x' }
+        }]
+      });
+      window.addEventListener('resize', function(){ chartB.resize(); });
+    }
+  })();
+  </script>
+
+  <h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>
+  <p class="outlook-lead">SubGPU Pipelining demonstrates that compiler-driven spatial scheduling can extract significant memory bandwidth and unit-economics gains from existing Blackwell clusters without silicon revisions.</p>
+  <ul class="outlook-list">
+    <li><strong>Single-GPU Emulation vs. Multi-Node Clusters:</strong> The physical B200 test emulated 32-GPU batch and layer conditions on a single die; live multi-node NVLink collective communication jitter and shared L2 cache contention could dampen spatial overlap at scale.</li>
+    <li><strong>Simulation vs. Silicon Gap:</strong> The headline 1.9x–2.2x throughput gains come from analytical shared-resource modeling rather than the physical two-stage test (~1.115x / -10.33% latency) and are not yet a production TensorRT-LLM default.</li>
+    <li><strong>Unmeasured Electrical &amp; PDN Effects:</strong> While smoothing bursty SM execution could theoretically dampen high di/dt transients on the PDN and VRM phases, no physical power-rail or transient measurements were reported.</li>
+  </ul>
+</article>
+
+<section class="bento-grid-wrap" id="takeaways">
+  <h2 class="bento-grid-title">Key Strategic Takeaways</h2>
+  <div class="bento-grid">
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-chip"/></svg>
+      <div class="bento-card-title">Memory Economics Drive Silicon</div>
+      <p>Both AMD's 8-stack vs. 12-stack HBM4 tiering (MI450X/MI455X) and NVIDIA's spatial SM partitioning attack the memory wall to optimize realized tokens-per-dollar.</p>
+    </div>
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-code"/></svg>
+      <div class="bento-card-title">Runtime &amp; Compiler Leverage</div>
+      <p>Software primitives like CUDA Green Contexts unlock +11.8 percentage points of HBM bandwidth on deployed B200 silicon, sharpening software-hardware co-design moats.</p>
+    </div>
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-media"/></svg>
+      <div class="bento-card-title">Stateful Workflow Ownership</div>
+      <p>Luma's 10,000-asset Smart Organizer reflects generative labs moving up-stack from commoditized rendering APIs into persistent, approval-gated creative orchestration.</p>
+    </div>
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-regulation"/></svg>
+      <div class="bento-card-title">Physical AI Hits Regulatory Gates</div>
+      <p>Tesla's $29,990 Cybercab plus $299/month subscription pioneers consumer Physical AI SaaS, but NHTSA's FMVSS 135 review remains a sharp binary gate for December 2026 deliveries.</p>
+    </div>
+  </div>
+</section>
+            </main>
+
+            <footer class="site-footer">
+                <span>Generated daily via automated intelligence pipeline.</span>
+                <a href="https://github.com/ancm777-eng/AInews" target="_blank" rel="noopener">github.com/ancm777-eng/AInews</a>
+            </footer>
+        </div>
+    </div>
+
+    <button type="button" class="back-to-top" id="back-to-top" aria-label="Back to top" title="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+
+    <script src="../archive/manifest.js"></script>
+
+    <script>
+        // ECharts readiness check, resize safety net, and static SVG/table fallback activation
+        (function () {
+            function syncChartContainers() {
+                var containers = document.querySelectorAll('.chart-container');
+                containers.forEach(function (container) {
+                    var el = container.querySelector('[id^="chart-"]');
+                    if (!el) return;
+                    var instance = (window.echarts && echarts.getInstanceByDom) ? echarts.getInstanceByDom(el) : null;
+                    if (instance) {
+                        container.classList.remove('chart-fallback-active');
+                        instance.resize();
+                    } else if (container.querySelector('.chart-fallback')) {
+                        container.classList.add('chart-fallback-active');
+                    }
+                });
+            }
+            window.addEventListener('load', syncChartContainers);
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(syncChartContainers);
+            }
+            window.addEventListener('resize', syncChartContainers);
+            setTimeout(syncChartContainers, 350);
+        })();
+    </script>
+
+    <script>
+        // ScrollSpy (static-TOC compatible), Mobile Jump Bar, and Reading Progress
+        (function () {
+            var list = document.getElementById('side-nav-list');
+            var mobileSelect = document.getElementById('mobile-toc-select');
+            var mobilePills = document.getElementById('mobile-toc-pills');
+            var sections = Array.prototype.slice.call(document.querySelectorAll('main .paper-section, main .bento-grid-wrap'));
+            var items = [];
+
+            // Progressive enhancement fallback if static TOC items were not pre-rendered
+            if (list && !list.querySelector('.side-nav-link')) {
+                sections.forEach(function (sec, idx) {
+                    var heading = sec.querySelector('h2');
+                    if (!heading) return;
+                    if (!sec.id) sec.id = sec.classList.contains('bento-grid-wrap') ? 'takeaways' : ('art' + (idx + 1));
+                    var num = (idx + 1 < 10 ? '0' : '') + (idx + 1);
+                    var titleText = heading.textContent.trim();
+                    var shortTitle = titleText.length > 44 ? titleText.slice(0, 44) + '…' : titleText;
+
+                    var li = document.createElement('li');
+                    var a = document.createElement('a');
+                    a.href = '#' + sec.id;
+                    a.className = 'side-nav-link' + (idx === 0 ? ' active' : '');
+                    a.setAttribute('data-target', sec.id);
+                    a.innerHTML = '<span class="nav-num">' + num + '</span><span class="nav-text"></span>';
+                    a.querySelector('.nav-text').textContent = shortTitle;
+                    li.appendChild(a);
+                    list.appendChild(li);
+
+                    if (mobileSelect) {
+                        var opt = document.createElement('option');
+                        opt.value = '#' + sec.id;
+                        opt.textContent = num + ' · ' + shortTitle;
+                        mobileSelect.appendChild(opt);
+                    }
+                    if (mobilePills) {
+                        var pill = document.createElement('a');
+                        pill.href = '#' + sec.id;
+                        pill.className = 'mobile-pill' + (idx === 0 ? ' active' : '');
+                        pill.setAttribute('data-target', sec.id);
+                        pill.textContent = sec.id === 'takeaways' ? 'Sum' : num;
+                        mobilePills.appendChild(pill);
+                    }
+                });
+            }
+
+            sections.forEach(function (sec) {
+                if (!sec.id) return;
+                items.push({
+                    id: sec.id,
+                    el: sec,
+                    sideLink: list ? list.querySelector('.side-nav-link[data-target="' + sec.id + '"]') : null,
+                    pillLink: mobilePills ? mobilePills.querySelector('.mobile-pill[data-target="' + sec.id + '"]') : null
+                });
+            });
+
+            if (mobileSelect) {
+                mobileSelect.addEventListener('change', function () {
+                    var target = document.querySelector(mobileSelect.value);
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
+
+            function setActive(activeId) {
+                items.forEach(function (item) {
+                    var isActive = item.id === activeId;
+                    if (item.sideLink) {
+                        item.sideLink.classList.toggle('active', isActive);
+                        if (isActive) item.sideLink.setAttribute('aria-current', 'location');
+                        else item.sideLink.removeAttribute('aria-current');
+                    }
+                    if (item.pillLink) {
+                        item.pillLink.classList.toggle('active', isActive);
+                    }
+                });
+                if (mobileSelect && activeId) {
+                    var targetVal = '#' + activeId;
+                    if (mobileSelect.value !== targetVal) {
+                        mobileSelect.value = targetVal;
+                    }
+                }
+            }
+
+            var bar = document.getElementById('scroll-progress');
+            var sidePct = document.getElementById('side-nav-progress-pct');
+            var sideFill = document.getElementById('side-nav-progress-fill');
+            var backTop = document.getElementById('back-to-top');
+
+            function onScroll() {
+                var winScroll = window.scrollY || document.documentElement.scrollTop || 0;
+                var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                var pct = docHeight > 0 ? Math.min(100, Math.max(0, (winScroll / docHeight) * 100)) : 0;
+                var pctRound = Math.round(pct);
+
+                if (bar) {
+                    bar.style.width = pct.toFixed(1) + '%';
+                    bar.setAttribute('aria-valuenow', String(pctRound));
+                }
+                if (sidePct) sidePct.textContent = pctRound + '%';
+                if (sideFill) sideFill.style.width = pct.toFixed(1) + '%';
+                if (backTop) backTop.classList.toggle('visible', winScroll > 420);
+
+                if (!items.length) return;
+                var activeId = items[0].id;
+                var offset = 150;
+                if (docHeight > 0 && winScroll >= docHeight - 40) {
+                    activeId = items[items.length - 1].id;
+                } else {
+                    for (var i = 0; i < items.length; i++) {
+                        var rect = items[i].el.getBoundingClientRect();
+                        if (rect.top <= offset) {
+                            activeId = items[i].id;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                setActive(activeId);
+            }
+
+            window.addEventListener('scroll', onScroll, { passive: true });
+            window.addEventListener('resize', onScroll, { passive: true });
+            onScroll();
+
+            if (backTop) {
+                backTop.addEventListener('click', function () {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+        })();
+    </script>
+
+    <script>
+        // Daily Archive Selector enhancement (works on GitHub Pages and local file://)
+        (function () {
+            var select = document.getElementById('archive-date-select');
+            if (!select) return;
+            var prefix = '../';
+            var currentIso = select.getAttribute('data-current-date') || '';
+            var manifest = window.AINEWS_ARCHIVE;
+
+            function resolveHref(entry) {
+                if (!entry) return '';
+                if (manifest && manifest.latest && entry.date === manifest.latest) {
+                    return prefix + 'index.html';
+                }
+                if (entry.html) {
+                    return prefix + entry.html;
+                }
+                return prefix + 'archive.html?date=' + encodeURIComponent(entry.date);
+            }
+
+            if (manifest && Array.isArray(manifest.dates) && manifest.dates.length) {
+                var existing = {};
+                Array.prototype.slice.call(select.options).forEach(function (o) { existing[o.value] = true; });
+                var ordered = manifest.dates.slice().sort(function (a, b) {
+                    return a.date < b.date ? 1 : (a.date > b.date ? -1 : 0);
+                });
+                select.innerHTML = '';
+                ordered.forEach(function (entry) {
+                    var opt = document.createElement('option');
+                    opt.value = resolveHref(entry);
+                    opt.setAttribute('data-date', entry.date);
+                    opt.textContent = entry.label || entry.date;
+                    if (entry.date === currentIso) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            }
+
+            select.addEventListener('change', function () {
+                if (select.value) {
+                    window.location.href = select.value;
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>
