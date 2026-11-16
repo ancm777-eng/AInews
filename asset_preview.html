@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fairy Alchemy Studio · Phase 2 3D Asset Preview &amp; QC</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: rgba(148, 163, 184, 0.24);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --gold: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: radial-gradient(circle at 20% 0%, #1e1b4b, #0f172a 65%);
+      color: var(--text);
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+    header {
+      max-width: 1360px;
+      margin: 0 auto 20px;
+      padding: 18px 22px;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    h1 { margin: 0 0 4px; font-size: 20px; }
+    .sub { color: var(--muted); font-size: 13px; }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    button {
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--text);
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button.active {
+      background: #0284c7;
+      border-color: #7dd3fc;
+      color: #fff;
+    }
+    main {
+      max-width: 1360px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .qc-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .panel {
+      background: rgba(30, 41, 59, 0.82);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: #e2e8f0;
+    }
+    .anim-stage {
+      height: 220px;
+      border-radius: 12px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding-bottom: 18px;
+    }
+    .anim-stage img {
+      height: 170px;
+      width: 170px;
+      object-fit: contain;
+      transform-origin: 50% 90%;
+    }
+    .tile-grid-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .tile-test {
+      height: 180px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background-size: 33.333% 33.333%;
+      background-repeat: repeat;
+      position: relative;
+    }
+    .tile-badge {
+      position: absolute;
+      left: 8px;
+      bottom: 8px;
+      background: rgba(15, 23, 42, 0.82);
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .thumb {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .thumb.bg-checker {
+      background-color: #cbd5e1;
+      background-image:
+        linear-gradient(45deg, #94a3b8 25%, transparent 25%),
+        linear-gradient(-45deg, #94a3b8 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #94a3b8 75%),
+        linear-gradient(-45deg, transparent 75%, #94a3b8 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+    }
+    .thumb.bg-night { background: #182236; }
+    .thumb.bg-meadow { background: #77b86e; }
+    .thumb img {
+      width: 88%;
+      height: 88%;
+      object-fit: contain;
+    }
+    .thumb img.tile-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .anchor-dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      margin: -6px 0 0 -6px;
+      border: 2px solid #ef4444;
+      border-radius: 999px;
+      background: rgba(254, 226, 226, 0.7);
+      pointer-events: none;
+      box-shadow: 0 0 0 1px #0f172a;
+    }
+    .meta {
+      padding: 10px 12px 12px;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .meta .name { font-weight: 800; color: #f8fafc; font-size: 13px; }
+    .meta .id { color: var(--accent); font-family: ui-monospace, monospace; font-size: 11px; }
+    .meta .dims { color: var(--muted); font-size: 11px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 7px 8px;
+      text-align: left;
+    }
+    th { color: var(--gold); font-weight: 700; }
+    .hidden { display: none !important; }
+    .api-btn-hdr {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      border-color: #c4b5fd;
+      color: #ffffff;
+    }
+    .api-preview-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .api-note-box {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(139, 92, 246, 0.45);
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: #e2e8f0;
+    }
+    .api-note-box code {
+      background: rgba(139, 92, 246, 0.25);
+      color: #ddd6fe;
+      padding: 1px 5px;
+      border-radius: 5px;
+    }
+    .api-form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .api-form-row input {
+      flex: 1 1 280px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: ui-monospace, monospace;
+      font-size: 12.5px;
+    }
+    .api-preview-status {
+      font-size: 12px;
+      color: #7dd3fc;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Fairy Alchemy Studio · Phase 2 3D Asset Preview</h1>
+      <div class="sub" id="summary-line">Loading asset_manifest.json...</div>
+    </div>
+    <div class="controls" id="cat-tabs">
+      <button class="active" data-cat="all">전체</button>
+      <button data-cat="characters">characters</button>
+      <button data-cat="buildings">buildings</button>
+      <button data-cat="environment">environment</button>
+      <button data-cat="items">items</button>
+      <button data-cat="ui">ui</button>
+    </div>
+    <div class="controls" id="bg-tabs">
+      <button class="active" data-bg="bg-checker">체커보드</button>
+      <button data-bg="bg-night">밤 숲</button>
+      <button data-bg="bg-meadow">맑은 초원</button>
+      <button class="active" id="btn-anchor">피벗 기준점</button>
+      <button class="api-btn-hdr" id="btn-toggle-api">🔑 Gemini API 키 입력 · AI 에셋 생성</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel hidden" id="api-preview-panel">
+      <h2>🔑 Gemini API 연동 필요 항목 &amp; AI 스프라이트 재생성</h2>
+      <div class="api-preview-grid">
+        <div class="api-note-box">
+          <b>필수 입력:</b> Google AI Studio <code>GEMINI_API_KEY</code> (<code>AIza...</code> 형식) ·
+          <b>모델:</b> <code>gemini-nano-banana-2.1</code> (<code>v1beta/interactions</code>)<br />
+          키를 입력하고 실행하면 대표 5종(<code>wizard_idle</code>, <code>cauldron_station</code>, <code>sales_stall</code>, <code>slime_king</code>, <code>fairy_tree_1</code>)을 AI 생성 후 갤러리에 즉시 반영합니다.
+        </div>
+        <div class="api-form-row">
+          <input type="password" id="preview-api-key" placeholder="AIzaSy... 형태의 Gemini API 키를 입력하세요" autocomplete="off" />
+          <button id="btn-preview-save-key">💾 키 저장</button>
+          <button class="api-btn-hdr" id="btn-preview-run-ai">✨ AI 스프라이트 생성 실행</button>
+        </div>
+        <div class="api-preview-status" id="preview-api-status">API 키 미입력 상태 — 로컬 3D 베이크 에셋 35종 표시 중</div>
+      </div>
+    </section>
+
+    <section class="qc-row">
+      <div class="panel">
+        <h2>주인공 마법사 2.5D 상태 전환 및 Squash &amp; Stretch QC</h2>
+        <div class="anim-stage bg-meadow thumb" id="wizard-stage">
+          <img id="wizard-preview-img" alt="Wizard Animation Preview" />
+        </div>
+        <div class="controls" style="margin-top:10px;">
+          <button class="active" id="btn-wiz-cycle">자동 사이클</button>
+          <button data-state="wizard_idle">Idle</button>
+          <button data-state="wizard_run">Run</button>
+          <button data-state="wizard_swing">Swing</button>
+          <span id="wiz-state-label" style="font-size:12px;color:#7dd3fc;margin-left:6px;">wizard_idle</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>3×3 심리스 타일 연결 QC (meadow_tile / timber_plank_tile)</h2>
+        <div class="tile-grid-wrap">
+          <div class="tile-test" id="tile-meadow"><span class="tile-badge">meadow_tile (3x3)</span></div>
+          <div class="tile-test" id="tile-timber"><span class="tile-badge">timber_plank_tile (3x3)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="gallery-grid" id="gallery"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Manifest Metadata Table (assets/asset_manifest.json)</h2>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>한글명</th>
+              <th>Category</th>
+              <th>Resolution</th>
+              <th>World Size</th>
+              <th>Anchor (X, Y)</th>
+              <th>Tileable</th>
+              <th>Path</th>
+            </tr>
+          </thead>
+          <tbody id="manifest-rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/asset_bundle.js"></script>
+  <script>
+    (function () {
+      const manifest = window.ASSET_MANIFEST;
+      const dataUrls = window.ASSET_DATA_URLS || {};
+      if (!manifest || !Array.isArray(manifest.assets)) {
+        document.getElementById("summary-line").textContent = "assets/asset_bundle.js 를 찾을 수 없습니다.";
+        return;
+      }
+
+      let currentCat = "all";
+      let currentBg = "bg-checker";
+      let showAnchor = true;
+      let wizAuto = true;
+      let wizFixed = "wizard_idle";
+
+      const srcOf = (entry) => dataUrls[entry.id] || entry.path;
+
+      document.getElementById("summary-line").textContent =
+        `${manifest.project} · ${manifest.assets.length}종 에셋 · ${manifest.resolution}×${manifest.resolution} RGBA · 외곽선 ${manifest.outlineColor}`;
+
+      const byId = Object.fromEntries(manifest.assets.map((a) => [a.id, a]));
+      if (byId.meadow_tile) {
+        document.getElementById("tile-meadow").style.backgroundImage = `url("${srcOf(byId.meadow_tile)}")`;
+      }
+      if (byId.timber_plank_tile) {
+        document.getElementById("tile-timber").style.backgroundImage = `url("${srcOf(byId.timber_plank_tile)}")`;
+      }
+
+      const gallery = document.getElementById("gallery");
+      const rows = document.getElementById("manifest-rows");
+
+      manifest.assets.forEach((entry) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.cat = entry.category;
+
+        const thumb = document.createElement("div");
+        thumb.className = `thumb ${currentBg}`;
+
+        const img = document.createElement("img");
+        img.src = srcOf(entry);
+        img.alt = entry.id;
+        img.dataset.assetThumb = entry.id;
+        if (entry.tileable) img.className = "tile-img";
+        thumb.appendChild(img);
+
+        if (entry.anchor && !entry.tileable) {
+          const dot = document.createElement("div");
+          dot.className = "anchor-dot";
+          const pctX = 6 + entry.anchor.x * 88;
+          const pctY = 6 + entry.anchor.y * 88;
+          dot.style.left = pctX + "%";
+          dot.style.top = pctY + "%";
+          dot.title = `Anchor (${entry.anchor.x}, ${entry.anchor.y})`;
+          thumb.appendChild(dot);
+        }
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        const ws = entry.worldSize ? `${entry.worldSize.w}×${entry.worldSize.h}m` : "tile";
+        const anc = entry.anchor ? `(${entry.anchor.x}, ${entry.anchor.y})` : "-";
+        meta.innerHTML =
+          `<div class="name">${entry.nameKo}</div>` +
+          `<div class="id">${entry.id}</div>` +
+          `<div class="dims">${entry.category} · ${entry.width}×${entry.height} · ${ws} · pivot ${anc}</div>`;
+
+        card.appendChild(thumb);
+        card.appendChild(meta);
+        gallery.appendChild(card);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML =
+          `<td><code>${entry.id}</code></td>` +
+          `<td>${entry.nameKo}</td>` +
+          `<td>${entry.category}</td>` +
+          `<td>${entry.width}×${entry.height}</td>` +
+          `<td>${ws}</td>` +
+          `<td>${anc}</td>` +
+          `<td>${entry.tileable ? "Yes" : "No"}</td>` +
+          `<td><code>${entry.path}</code></td>`;
+        rows.appendChild(tr);
+      });
+
+      function applyFilters() {
+        document.querySelectorAll(".card").forEach((c) => {
+          c.classList.toggle("hidden", currentCat !== "all" && c.dataset.cat !== currentCat);
+        });
+        document.querySelectorAll(".card .thumb").forEach((t) => {
+          t.classList.remove("bg-checker", "bg-night", "bg-meadow");
+          t.classList.add(currentBg);
+        });
+        document.querySelectorAll(".anchor-dot").forEach((d) => {
+          d.classList.toggle("hidden", !showAnchor);
+        });
+      }
+
+      document.getElementById("cat-tabs").addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-cat]");
+        if (!btn) return;
+        currentCat = btn.dataset.cat;
+        document.querySelectorAll("#cat-tabs button").forEach((b) => b.classList.toggle("active", b === btn));
+        applyFilters();
+      });
+
+      document.getElementById("bg-tabs").addEventListener("click", (e) => {
+        const btn = e.target.closest("button");
+        if (!btn) return;
+        if (btn.id === "btn-anchor") {
+          showAnchor = !showAnchor;
+          btn.classList.toggle("active", showAnchor);
+        } else if (btn.dataset.bg) {
+          currentBg = btn.dataset.bg;
+          document.querySelectorAll("#bg-tabs button[data-bg]").forEach((b) => b.classList.toggle("active", b === btn));
+        }
+        applyFilters();
+      });
+
+      const wizButtons = document.querySelectorAll("[data-state]");
+      const btnCycle = document.getElementById("btn-wiz-cycle");
+      btnCycle.addEventListener("click", () => {
+        wizAuto = true;
+        btnCycle.classList.add("active");
+        wizButtons.forEach((b) => b.classList.remove("active"));
+      });
+      wizButtons.forEach((b) => b.addEventListener("click", () => {
+        wizAuto = false;
+        wizFixed = b.dataset.state;
+        btnCycle.classList.remove("active");
+        wizButtons.forEach((x) => x.classList.toggle("active", x === b));
+      }));
+
+      const wizImg = document.getElementById("wizard-preview-img");
+      const wizLbl = document.getElementById("wiz-state-label");
+      const states = ["wizard_idle", "wizard_run", "wizard_swing"];
+      let startMs = performance.now();
+      function tick(now) {
+        const t = (now - startMs) * 0.001;
+        const st = wizAuto ? states[Math.floor(t / 1.4) % states.length] : wizFixed;
+        const entry = byId[st];
+        if (entry) {
+          const url = srcOf(entry);
+          if (wizImg.dataset.cur !== url) {
+            wizImg.src = url;
+            wizImg.dataset.cur = url;
+          }
+        }
+        wizLbl.textContent = st;
+        let sx = 1, sy = 1, ty = 0, rot = 0;
+        if (st === "wizard_idle") {
+          sy = 1 + Math.sin(t * 3.5) * 0.03;
+          sx = 1 - Math.sin(t * 3.5) * 0.02;
+        } else if (st === "wizard_run") {
+          ty = -Math.abs(Math.sin(t * 10)) * 14;
+          rot = Math.sin(t * 10) * 6;
+          sy = 1 + Math.cos(t * 20) * 0.05;
+        } else {
+          rot = -Math.sin((t * 6) % Math.PI) * 14;
+          sx = 1.05;
+          sy = 0.96;
+        }
+        wizImg.style.transform = `translateY(${ty.toFixed(1)}px) rotate(${rot.toFixed(1)}deg) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+
+      const GEMINI_KEY_STORAGE = "fairy_alchemy_gemini_key";
+      const HERO_PROMPTS = {
+        wizard_idle: "3D stylized mobile hyper-casual fantasy chibi wizard character holding a glowing cyan crystal wand upright, pastel sky-blue starry pointed hat with golden trim, cute expressive eyes, chunky cel-shaded 3D lighting with deep plum #241434 outline, isometric three-quarter front view, isolated centered on solid pure white background, no floor text, no UI.",
+        cauldron_station: "3D stylized enchanted giant golden-bronze alchemy cauldron overflowing with glowing magenta rainbow potion bubbles, carved star runes, rim lighting, deep plum #241434 stylized outline, isometric 3/4 view, isolated centered on solid pure white background.",
+        sales_stall: "3D stylized cozy fairy-forest wooden shop stall with coral-and-cream striped fabric awning, polished oak counter and golden star lantern accents, mobile casual game art style with deep plum #241434 outline, isometric 3/4 view, isolated centered on solid pure white background.",
+        slime_king: "3D stylized boss monster King Slime made of glossy translucent rose-magenta jelly wearing an ornate faceted golden crown studded with cyan gems, cute fierce brow, specular highlights, deep plum #241434 outline, isometric 3/4 view, isolated centered on solid pure white background.",
+        fairy_tree_1: "3D stylized storybook magical cherry blossom tree with layered fluffy pink and lavender clouds canopy, warm gnarled bark trunk, tiny glowing star lantern hanging from branch, cel-shaded 3D mobile game style, deep plum #241434 outline, isolated centered on solid pure white background."
+      };
+
+      const apiPanel = document.getElementById("api-preview-panel");
+      const apiInput = document.getElementById("preview-api-key");
+      const apiStatus = document.getElementById("preview-api-status");
+
+      try {
+        const stored = window.localStorage.getItem(GEMINI_KEY_STORAGE) || "";
+        if (stored && apiInput) {
+          apiInput.value = stored;
+          apiStatus.textContent = `저장된 API 키 로드됨 (${stored.slice(0, 8)}...)`;
+        }
+      } catch (e) {}
+
+      document.getElementById("btn-toggle-api").addEventListener("click", () => {
+        apiPanel.classList.toggle("hidden");
+      });
+
+      document.getElementById("btn-preview-save-key").addEventListener("click", () => {
+        const key = (apiInput.value || "").trim();
+        if (!key.startsWith("AIza")) {
+          apiStatus.textContent = "⚠️ 유효한 Google AI Studio Gemini API 키(AIza... 형식)를 입력해 주세요.";
+          return;
+        }
+        try { window.localStorage.setItem(GEMINI_KEY_STORAGE, key); } catch (e) {}
+        apiStatus.textContent = "✅ API 키가 저장되었습니다. [✨ AI 스프라이트 생성 실행]을 누르세요.";
+      });
+
+      function stripWhiteBg(base64Png) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, 512, 512);
+            const imgData = ctx.getImageData(0, 0, 512, 512);
+            const px = imgData.data;
+            const w = 512, h = 512;
+            const corners = [0, w - 1, (h - 1) * w, h * w - 1];
+            let sr = 0, sg = 0, sb = 0;
+            for (const c of corners) { sr += px[c * 4]; sg += px[c * 4 + 1]; sb += px[c * 4 + 2]; }
+            const ar = sr >> 2, ag = sg >> 2, ab = sb >> 2;
+            const visited = new Uint8Array(w * h);
+            const q = new Int32Array(w * h);
+            let head = 0, tail = 0;
+            for (const c of corners) { visited[c] = 1; q[tail++] = c; }
+            while (head < tail) {
+              const p = q[head++], idx = p * 4;
+              const dist = Math.abs(px[idx] - ar) + Math.abs(px[idx + 1] - ag) + Math.abs(px[idx + 2] - ab);
+              if (px[idx + 3] >= 10 && dist > 102) continue;
+              px[idx + 3] = 0;
+              const x = p % w, y = (p - x) / w;
+              if (x > 0 && !visited[p - 1]) { visited[p - 1] = 1; q[tail++] = p - 1; }
+              if (x + 1 < w && !visited[p + 1]) { visited[p + 1] = 1; q[tail++] = p + 1; }
+              if (y > 0 && !visited[p - w]) { visited[p - w] = 1; q[tail++] = p - w; }
+              if (y + 1 < h && !visited[p + w]) { visited[p + w] = 1; q[tail++] = p + w; }
+            }
+            ctx.putImageData(imgData, 0, 0);
+            resolve(canvas.toDataURL("image/png"));
+          };
+          img.onerror = () => reject(new Error("AI 이미지 디코딩 실패"));
+          img.src = "data:image/png;base64," + base64Png;
+        });
+      }
+
+      document.getElementById("btn-preview-run-ai").addEventListener("click", async () => {
+        const key = (apiInput.value || "").trim();
+        if (!key.startsWith("AIza")) {
+          apiPanel.classList.remove("hidden");
+          apiStatus.textContent = "⚠️ Gemini API를 사용하려면 Google AI Studio API 키(AIza...)를 먼저 입력해 주세요.";
+          return;
+        }
+        try { window.localStorage.setItem(GEMINI_KEY_STORAGE, key); } catch (e) {}
+        const entries = Object.entries(HERO_PROMPTS);
+        let done = 0;
+        for (let i = 0; i < entries.length; i++) {
+          const [id, prompt] = entries[i];
+          apiStatus.textContent = `⏳ [${i + 1}/${entries.length}] ${id} 생성 중... (gemini-nano-banana-2.1)`;
+          try {
+            const resp = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": key,
+                "Api-Revision": "2026-05-20"
+              },
+              body: JSON.stringify({
+                model: "gemini-nano-banana-2.1",
+                input: prompt,
+                response_format: { type: "image", aspect_ratio: "1:1", mime_type: "image/png" }
+              })
+            });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const body = await resp.json();
+            let b64 = body?.output_image?.data || "";
+            if (!b64 && Array.isArray(body.steps)) {
+              for (const st of body.steps) {
+                if (st?.type === "model_output" && Array.isArray(st.content)) {
+                  for (const blk of st.content) {
+                    if (blk?.type === "image" && blk.data) b64 = blk.data;
+                  }
+                }
+              }
+            }
+            if (!b64) throw new Error("이미지 데이터 없음");
+            const cleanUrl = await stripWhiteBg(b64);
+            dataUrls[id] = cleanUrl;
+            document.querySelectorAll(`img[data-asset-thumb="${id}"]`).forEach((el) => { el.src = cleanUrl; });
+            if (id === "wizard_idle") wizImg.dataset.cur = "";
+            done++;
+          } catch (err) {
+            apiStatus.textContent = `⚠️ ${id} 생성 오류: ${err.message}`;
+            return;
+          }
+        }
+        apiStatus.textContent = `✨ 완료! ${done}/${entries.length}종 AI 스프라이트가 갤러리에 반영되었습니다.`;
+      });
+    })();
+  </script>
+</body>
+</html>

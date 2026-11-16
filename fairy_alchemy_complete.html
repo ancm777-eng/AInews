@@ -1,0 +1,4523 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>FAIRY ALCHEMY · 연금술 서바이벌</title>
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      background: #dce7f2;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, -apple-system, sans-serif;
+    }
+
+    #gameCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+
+    /* =======================================================================
+     * PLAYABLE-AD MINIMALIST HUD (Matching YouTube Video e85L80J0YHM)
+     * ======================================================================= */
+    #ad-top-left {
+      position: fixed;
+      top: calc(8px + var(--safe-top));
+      left: calc(10px + var(--safe-left));
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      pointer-events: none;
+    }
+
+    .brand-sub {
+      display: none;
+    }
+
+    .logo-lockup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 0.94;
+      background: linear-gradient(180deg, #9e5824 0%, #633210 100%);
+      border: 2px solid #f7d694;
+      border-radius: 10px;
+      padding: 4px 10px 5px;
+      box-shadow:
+        0 3px 0 #3f1d06,
+        0 5px 10px rgba(10, 22, 46, 0.42);
+    }
+
+    .logo-main {
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      color: #ffffff;
+      -webkit-text-stroke: 1.4px #1b3154;
+      text-shadow:
+        0 2px 0 #2b4978,
+        0 3px 0 #162642;
+      background: linear-gradient(180deg, #ffffff 42%, #cbeaff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-accent {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      background: linear-gradient(180deg, #ffeb7a 0%, #ff9329 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      -webkit-text-stroke: 0.6px #4a1c04;
+      margin-top: 2px;
+    }
+
+    #btn-play-drawer {
+      pointer-events: auto;
+      cursor: pointer;
+      border: 1.5px solid rgba(255, 255, 255, 0.72);
+      border-radius: 999px;
+      padding: 4px 16px;
+      margin-top: 1px;
+      background: linear-gradient(180deg, #2be470 0%, #0ea848 100%);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      box-shadow:
+        0 3px 0 #09682c,
+        0 4px 10px rgba(0, 0, 0, 0.28);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+      transition: transform 0.1s ease;
+    }
+
+    #btn-play-drawer:active {
+      transform: translateY(2px);
+    }
+
+    /* Top-Right: Ultra-clean >> trigger + single dark cash pill (matching video) */
+    #ad-top-right {
+      position: fixed;
+      top: calc(8px + var(--safe-top));
+      right: calc(12px + var(--safe-right));
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+      pointer-events: none;
+    }
+
+    .top-icon-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      pointer-events: auto;
+    }
+
+    .circle-icon-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      background: rgba(24, 30, 40, 0.46);
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      padding: 0;
+    }
+
+    .circle-icon-btn.boss-trigger {
+      width: auto;
+      height: 22px;
+      padding: 0 7px;
+      border-radius: 999px;
+      gap: 3px;
+      background: rgba(24, 30, 40, 0.46);
+    }
+
+    .boss-mini-timer {
+      font-size: 9px;
+      opacity: 0.86;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cash-pill {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      height: 30px;
+      min-width: 118px;
+      padding: 2px 14px 2px 4px;
+      border-radius: 999px;
+      background: rgba(24, 29, 36, 0.72);
+      border: 1.5px solid rgba(255, 255, 255, 0.24);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.24);
+      backdrop-filter: blur(6px);
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .bill-svg {
+      width: 34px;
+      height: 24px;
+      margin-left: -6px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.45));
+    }
+
+    .sheet-sub-currencies {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 14px;
+      background: rgba(0, 0, 0, 0.22);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 12px;
+      font-weight: 800;
+      color: #dbeaff;
+      flex-wrap: wrap;
+    }
+
+    .sheet-sub-pill {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+
+    /* Boss HP Bar (shown only during active Boss Wave) */
+    #boss-bar-wrap {
+      display: none;
+      position: fixed;
+      top: calc(108px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 22;
+      width: min(360px, 86vw);
+      padding: 6px 12px;
+      border-radius: 12px;
+      background: rgba(34, 14, 24, 0.85);
+      border: 2px solid rgba(255, 114, 146, 0.8);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+      pointer-events: none;
+    }
+
+    #boss-bar-wrap.active {
+      display: block;
+    }
+
+    .boss-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 900;
+      color: #ffe2eb;
+      margin-bottom: 4px;
+    }
+
+    .boss-hp-track {
+      width: 100%;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    .boss-hp-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #4ae868, #ffe054);
+      transition: width 0.12s ease;
+    }
+
+    /* Toast Notification */
+    #toast-banner {
+      position: fixed;
+      top: calc(114px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      z-index: 24;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(18, 24, 34, 0.86);
+      border: 1.5px solid rgba(255, 255, 255, 0.38);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: 0 5px 16px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      max-width: 88vw;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #toast-banner.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Left-Center Home Button (matches video's left-middle gray circle icon) */
+    #btn-home {
+      position: fixed;
+      left: calc(10px + var(--safe-left));
+      top: 52%;
+      transform: translateY(-50%);
+      z-index: 20;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.55);
+      background: rgba(34, 42, 54, 0.5);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.26);
+    }
+
+    /* Bottom-Right Chibi Character Badge (matches video's bottom-right icon) */
+    #ad-bottom-right {
+      position: fixed;
+      right: calc(12px + var(--safe-right));
+      bottom: calc(12px + var(--safe-bottom));
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+    }
+
+    .chibi-badge {
+      width: 56px;
+      height: 56px;
+      border-radius: 13px;
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      background: linear-gradient(135deg, #d8e9ff 0%, #f5f9ff 100%);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.34);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 0;
+      position: relative;
+    }
+
+    .chibi-lv {
+      position: absolute;
+      bottom: 2px;
+      right: 3px;
+      background: rgba(20, 28, 40, 0.88);
+      color: #ffe26b;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 999px;
+      padding: 0px 5px;
+      font-size: 9px;
+      font-weight: 900;
+      line-height: 1.3;
+    }
+
+    /* Clean Overlay Sheet (Opened ONLY when clicking emerald button or chibi badge) */
+    #drawer-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(12, 16, 26, 0.56);
+      backdrop-filter: blur(4px);
+      padding: 12px 10px calc(12px + var(--safe-bottom));
+    }
+
+    #drawer-modal.open {
+      display: flex;
+    }
+
+    .sheet-card {
+      width: min(640px, 100%);
+      max-height: 76vh;
+      background: rgba(24, 29, 46, 0.96);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-radius: 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: rgba(14, 18, 30, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .sheet-title {
+      font-size: 14px;
+      font-weight: 900;
+      color: #ffe885;
+    }
+
+    .sheet-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sheet-mini-btn {
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-radius: 8px;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .sheet-mini-btn.danger {
+      background: rgba(190, 48, 72, 0.78);
+    }
+
+    .drawer-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 8px;
+      background: rgba(16, 20, 34, 0.65);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      overflow-x: auto;
+      scrollbar-width: none;
+      touch-action: pan-x;
+    }
+
+    .drawer-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      flex: 1 0 auto;
+      padding: 7px 11px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.07);
+      color: #b8c2dc;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #27d66b, #1496c9);
+      color: #fff;
+    }
+
+    .drawer-body {
+      padding: 10px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .upgrade-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 8px;
+    }
+
+    .upg-card {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 9px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .upg-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .upg-title {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .upg-lv {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(255, 216, 107, 0.18);
+      color: #ffd86b;
+      white-space: nowrap;
+    }
+
+    .upg-desc {
+      font-size: 11px;
+      color: #b8c2dc;
+      line-height: 1.35;
+    }
+
+    .upg-btn {
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: 9px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #27d66b, #0fa352);
+      color: #fff;
+    }
+
+    .upg-btn.star {
+      background: linear-gradient(135deg, #ffd86b, #ff88b8);
+      color: #1c1828;
+    }
+
+    .upg-btn:disabled {
+      background: rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.42);
+      cursor: not-allowed;
+    }
+
+    .info-box {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #e4eaf8;
+    }
+
+    .info-box h4 {
+      margin: 0 0 6px;
+      color: #ffd86b;
+      font-size: 13px;
+    }
+
+    /* Reset Confirmation Modal */
+    #reset-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(8, 10, 20, 0.74);
+      backdrop-filter: blur(6px);
+      padding: 16px;
+    }
+
+    #reset-modal.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(350px, 92vw);
+      background: #1f2542;
+      border: 1.5px solid rgba(255, 160, 180, 0.5);
+      border-radius: 18px;
+      padding: 18px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .modal-card h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: #ffd3df;
+    }
+
+    .modal-card p {
+      margin: 0 0 14px;
+      font-size: 13px;
+      color: #c2cce4;
+      line-height: 1.45;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: none;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    @media (max-width: 560px) {
+      .logo-main { font-size: 18px; }
+      .logo-accent { font-size: 13px; }
+      #btn-play-drawer { padding: 5px 12px; font-size: 12px; }
+      .cash-pill { min-width: 96px; font-size: 15px; padding: 4px 10px 4px 7px; }
+      .upgrade-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- Top-Left: Playable-Ad Logo + Emerald Pill Button -->
+  <div id="ad-top-left">
+    <div class="brand-sub">Fairy Alchemy</div>
+    <div class="logo-lockup">
+      <div class="logo-main">FAIRY ALCHEMY</div>
+      <div class="logo-accent">연금술 서바이벌</div>
+    </div>
+    <button id="btn-play-drawer">지금 플레이</button>
+  </div>
+
+  <!-- Top-Right: Minimalist Controls + Dark Cash Pill (exact video silhouette) -->
+  <div id="ad-top-right">
+    <div class="top-icon-row">
+      <button class="circle-icon-btn boss-trigger" id="btn-summon-boss" title="보스 웨이브 즉시 소환">&gt;&gt; <span class="boss-mini-timer" id="ui-boss-timer">03:00</span></button>
+      <button class="circle-icon-btn" id="btn-mute" title="효과음 켜기/끄기">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+      </button>
+    </div>
+    <div class="cash-pill" title="마나 보석 (화폐)">
+      <svg class="bill-svg" viewBox="0 0 38 26" aria-hidden="true">
+        <rect x="3" y="8" width="32" height="16" rx="2.5" fill="#176933" stroke="#0c3d1d" stroke-width="1.5"/>
+        <rect x="2" y="5" width="32" height="16" rx="2.5" fill="#239649" stroke="#0e4a22" stroke-width="1.5"/>
+        <rect x="1" y="2" width="32" height="16" rx="2.5" fill="#3cd96d" stroke="#13612c" stroke-width="1.5"/>
+        <rect x="4.5" y="4.8" width="25" height="10.4" rx="1.6" fill="#7cf2a1"/>
+        <circle cx="17" cy="10" r="4" fill="#1e803f"/>
+        <text x="17" y="12.5" text-anchor="middle" font-size="7" font-weight="900" fill="#ffffff">$</text>
+      </svg>
+      <span id="ui-gems">0</span>
+    </div>
+  </div>
+
+  <!-- Active Boss Bar -->
+  <div id="boss-bar-wrap">
+    <div class="boss-header">
+      <span id="ui-boss-name">👑 Wave 1: 대왕 슬라임</span>
+      <span id="ui-boss-hp">800 / 800</span>
+    </div>
+    <div class="boss-hp-track">
+      <div id="ui-boss-fill" class="boss-hp-fill"></div>
+    </div>
+  </div>
+
+  <div id="toast-banner"></div>
+
+  <!-- Bottom-Left: Back to Camp Circle Button -->
+  <button id="btn-home" title="캠프 광장으로 복귀">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+  </button>
+
+  <!-- Bottom-Right: Handcrafted White-Haired Fox-Ear Chibi Alchemist Bust -->
+  <div id="ad-bottom-right" title="마법사 스탯 & 강화 상점 열기">
+    <div class="chibi-badge">
+      <svg viewBox="0 0 64 64" width="54" height="54" aria-hidden="true">
+        <defs>
+          <linearGradient id="bgSky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4dcff"/><stop offset="1" stop-color="#f7fbff"/></linearGradient>
+        </defs>
+        <rect x="0" y="0" width="64" height="64" fill="url(#bgSky)"/>
+        <!-- Winter navy-teal parka collar -->
+        <path d="M8 64 Q14 45 32 45 Q50 45 56 64 Z" fill="#2a8fd6" stroke="#241c1a" stroke-width="2.2"/>
+        <ellipse cx="32" cy="48" rx="16" ry="7" fill="#ffffff" stroke="#241c1a" stroke-width="2"/>
+        <!-- White back hair drape -->
+        <path d="M13 30 Q12 52 20 56 L44 56 Q52 52 51 30 Z" fill="#e6edf7" stroke="#241c1a" stroke-width="2"/>
+        <!-- Fluffy White Fox/Cat Ears -->
+        <path d="M14 24 L11 7 L26 16 Z" fill="#f7f9fc" stroke="#241c1a" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M15 20 L14 11 L22 16 Z" fill="#ffb8c8"/>
+        <path d="M50 24 L53 7 L38 16 Z" fill="#f7f9fc" stroke="#241c1a" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M49 20 L50 11 L42 16 Z" fill="#ffb8c8"/>
+        <!-- Chibi Head & Blush -->
+        <ellipse cx="32" cy="31" rx="15" ry="13.5" fill="#ffe6d4" stroke="#241c1a" stroke-width="2"/>
+        <ellipse cx="22.5" cy="34.5" rx="3" ry="1.6" fill="#ff98aa" opacity="0.72"/>
+        <ellipse cx="41.5" cy="34.5" rx="3" ry="1.6" fill="#ff98aa" opacity="0.72"/>
+        <!-- Large Ice-Blue Anime Eyes -->
+        <ellipse cx="25.8" cy="31" rx="3.0" ry="3.7" fill="#23648e"/>
+        <ellipse cx="38.2" cy="31" rx="3.0" ry="3.7" fill="#23648e"/>
+        <ellipse cx="25.8" cy="32.2" rx="2.0" ry="1.8" fill="#5fd8ff"/>
+        <ellipse cx="38.2" cy="32.2" rx="2.0" ry="1.8" fill="#5fd8ff"/>
+        <circle cx="24.8" cy="29.4" r="1.2" fill="#ffffff"/>
+        <circle cx="37.2" cy="29.4" r="1.2" fill="#ffffff"/>
+        <path d="M29.8 36.8 Q32 38.6 34.2 36.8" fill="none" stroke="#8c4c44" stroke-width="1.6" stroke-linecap="round"/>
+        <!-- Silver-white bangs & side locks -->
+        <path d="M15 29 Q17 14 32 14 Q47 14 49 29 Q43 22 39 27 Q35 21 32 27 Q28 21 24 27 Q20 22 15 29 Z" fill="#f9fbff" stroke="#241c1a" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M15 28 Q12 39 17 45 Q19 37 18 30 Z" fill="#f3f7fc" stroke="#241c1a" stroke-width="1.8"/>
+        <path d="M49 28 Q52 39 47 45 Q45 37 46 30 Z" fill="#f3f7fc" stroke="#241c1a" stroke-width="1.8"/>
+      </svg>
+      <span class="chibi-lv" id="ui-wiz-lv">Lv.1</span>
+    </div>
+  </div>
+
+  <!-- Optional Upgrade / Guide Sheet Modal -->
+  <div id="drawer-modal">
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <div class="sheet-title" id="ui-sheet-title">✨ 연금술 성장 상점 · Lv.1 (60 FPS)</div>
+        <div class="sheet-actions">
+          <button class="sheet-mini-btn" id="btn-save">💾 저장</button>
+          <button class="sheet-mini-btn danger" id="btn-reset">🗑️ 초기화</button>
+          <button class="sheet-mini-btn" id="btn-close-drawer">✕ 닫기</button>
+        </div>
+      </div>
+      <div class="sheet-sub-currencies">
+        <span class="sheet-sub-pill">✨ 별빛 수정: <b id="ui-crystals">0</b></span>
+        <span class="sheet-sub-pill">⭐ 별조각: <b id="ui-shards">0</b></span>
+        <span class="sheet-sub-pill">🎒 배낭: <b id="ui-bag">0/25</b></span>
+      </div>
+      <div class="drawer-tabs">
+        <button class="tab-btn active" data-tab="wizard">🧙 마법사 (Lv.25)</button>
+        <button class="tab-btn" data-tab="automation">🧚 요정·수레·정제소</button>
+        <button class="tab-btn" data-tab="defense">🏰 포탑·가마솥·구역</button>
+        <button class="tab-btn" data-tab="relics">⭐ 별조각 성소</button>
+        <button class="tab-btn" data-tab="guide">📖 경제·공략</button>
+      </div>
+      <div class="drawer-body" id="drawer-body"></div>
+    </div>
+  </div>
+
+  <!-- Save Reset Modal -->
+  <div id="reset-modal">
+    <div class="modal-card">
+      <h3>🗑️ 저장 데이터 초기화</h3>
+      <p>현재까지의 모든 화폐, 업그레이드, 해금 구역, 포탑 및 별조각 기록이 초기화됩니다. 처음부터 다시 시작할까요?</p>
+      <div class="modal-actions">
+        <button id="btn-cancel-reset" style="background:#37416b;color:#fff;">취소</button>
+        <button id="btn-confirm-reset" style="background:linear-gradient(135deg,#ff5e7e,#ff8d6b);color:#fff;">초기화하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      /* =========================================================================
+       * 1. 30-MINUTE ECONOMIC PROGRESSION MODEL & DEFINITIONS
+       * ========================================================================= */
+      const SAVE_KEY = "fairy_alchemy_complete_v1";
+      const WORLD_HALF_W = 1600;
+      const WORLD_HALF_H = 1400;
+      const BOSS_INTERVAL = 180; // 3 minutes per Boss Wave
+
+      const ZONES = [
+        {
+          id: 0,
+          name: "1구역: 햇살 초원",
+          unlockCost: 0,
+          groundColor: "#e6eef6",
+          patchColor: "#d3e4d7",
+          mistCenter: { x: -720, y: 560 },
+          bounds: { x1: -1550, y1: 180, x2: -140, y2: 1320 },
+          cartSpawn: { x: -465, y: 345 }
+        },
+        {
+          id: 1,
+          name: "2구역: 발광 버섯 숲",
+          unlockCost: 1000,
+          groundColor: "#b8dad4",
+          patchColor: "#7bb5ab",
+          mistCenter: { x: -760, y: -640 },
+          bounds: { x1: -1550, y1: -1320, x2: -140, y2: -160 },
+          cartSpawn: { x: -465, y: -355 }
+        },
+        {
+          id: 2,
+          name: "3구역: 수정 동굴",
+          unlockCost: 12000,
+          groundColor: "#c5d1ef",
+          patchColor: "#8b9cd6",
+          mistCenter: { x: 760, y: -640 },
+          bounds: { x1: 140, y1: -1320, x2: 1550, y2: -160 },
+          cartSpawn: { x: 465, y: -355 }
+        },
+        {
+          id: 3,
+          name: "4구역: 별똥별 언덕",
+          unlockCost: 95000,
+          groundColor: "#d4c3e8",
+          patchColor: "#a284c9",
+          mistCenter: { x: 760, y: 600 },
+          bounds: { x1: 140, y1: 180, x2: 1550, y2: 1320 },
+          cartSpawn: { x: 465, y: 345 }
+        }
+      ];
+
+      const RESOURCES = {
+        starlight_crystal: { id: "starlight_crystal", name: "별빛 수정", zone: 0, price: 6, hp: 15, respawn: 3.5, color: "#5cd8ff", topColor: "#e6faff", shape: "crystal", crystalBonus: 15 },
+        rainbow_berry: { id: "rainbow_berry", name: "무지개 열매", zone: 0, price: 10, hp: 20, respawn: 4.0, color: "#e35b6a", topColor: "#ffe5ea", shape: "slab", crystalBonus: 0 },
+        slime_jelly: { id: "slime_jelly", name: "슬라임 젤리", zone: 0, price: 25, hp: 0, respawn: 0, color: "#5be38c", topColor: "#dffff0", shape: "slab", crystalBonus: 0 },
+
+        moonstone_ore: { id: "moonstone_ore", name: "문스톤 광석", zone: 1, price: 28, hp: 45, respawn: 4.5, color: "#7aaeff", topColor: "#eef6ff", shape: "crystal", crystalBonus: 0 },
+        glow_mushroom: { id: "glow_mushroom", name: "발광 버섯", zone: 1, price: 45, hp: 60, respawn: 5.0, color: "#4de3be", topColor: "#d6fff5", shape: "mushroom", crystalBonus: 0 },
+        golem_core: { id: "golem_core", name: "골렘 코어", zone: 1, price: 110, hp: 0, respawn: 0, color: "#ffab54", topColor: "#fff1d0", shape: "slab", crystalBonus: 0 },
+
+        ancient_aether: { id: "ancient_aether", name: "고대 에테르", zone: 2, price: 120, hp: 110, respawn: 5.5, color: "#b17aff", topColor: "#f3e3ff", shape: "crystal", crystalBonus: 0 },
+        mana_crystal: { id: "mana_crystal", name: "마나 결정", zone: 2, price: 190, hp: 140, respawn: 6.0, color: "#5498ff", topColor: "#dcebff", shape: "crystal", crystalBonus: 15 },
+        crystal_wing: { id: "crystal_wing", name: "수정 날개", zone: 2, price: 450, hp: 0, respawn: 0, color: "#ee7eff", topColor: "#ffe8ff", shape: "slab", crystalBonus: 0 },
+
+        stardust: { id: "stardust", name: "스타더스트", zone: 3, price: 520, hp: 260, respawn: 6.5, color: "#ffd852", topColor: "#fffbe0", shape: "star", crystalBonus: 0 },
+        dragon_scale: { id: "dragon_scale", name: "드래곤 비늘", zone: 3, price: 850, hp: 340, respawn: 7.0, color: "#ff5c77", topColor: "#ffdbe2", shape: "crystal", crystalBonus: 0 },
+        abyss_pumpkin: { id: "abyss_pumpkin", name: "심연 호박씨", zone: 3, price: 1800, hp: 0, respawn: 0, color: "#ff7e38", topColor: "#ffe4b5", shape: "slab", crystalBonus: 0 }
+      };
+
+      const MONSTER_TYPES = [
+        { zone: 0, id: "slime", name: "눈꽃 야수 슬라임", hp: 45, speed: 62, dmg: 6, xp: 14, drop: "slime_jelly", radius: 27, color: "#f2f6fa" },
+        { zone: 1, id: "golem", name: "바위 버섯 골렘", hp: 160, speed: 52, dmg: 14, xp: 38, drop: "golem_core", radius: 27, color: "#95a3b8" },
+        { zone: 2, id: "bat", name: "수정 박쥐 군단", hp: 480, speed: 94, dmg: 26, xp: 95, drop: "crystal_wing", radius: 23, color: "#b688ff" },
+        { zone: 3, id: "pumpkin", name: "심연의 호박 군단", hp: 1400, speed: 78, dmg: 46, xp: 240, drop: "abyss_pumpkin", radius: 29, color: "#ff8547" }
+      ];
+
+      const BOSS_CATALOG = [
+        { name: "대왕 슬라임", color: "#5be896", accent: "#fff3a1", drop: "slime_jelly", radius: 52 },
+        { name: "고대 트리앤트", color: "#689e64", accent: "#88ffd4", drop: "golem_core", radius: 58 },
+        { name: "크리스탈 아크드레이크", color: "#9c7dff", accent: "#a8e6ff", drop: "crystal_wing", radius: 60 },
+        { name: "심연의 호박 대왕", color: "#ff7638", accent: "#ffe074", drop: "abyss_pumpkin", radius: 62 },
+        { name: "별똥별 고대 드래곤", color: "#ff76bd", accent: "#fff38a", drop: "dragon_scale", radius: 66 }
+      ];
+
+      const TURRET_TYPES = {
+        starlight: { name: "별빛 속사 포탑", icon: "🌟", color: "#ffd86b", range: 360, fireRate: 3.1, baseDmg: 22, desc: "빠른 연사 속도로 별빛 마법탄을 발사합니다." },
+        frost: { name: "빙결 슬로우 포탑", icon: "❄️", color: "#79e2ff", range: 330, fireRate: 1.25, baseDmg: 30, desc: "범위 냉기 폭발로 적의 이동 속도를 55% 늦춥니다." },
+        lightning: { name: "연쇄 번개 포탑", icon: "⚡", color: "#c996ff", range: 390, fireRate: 0.95, baseDmg: 58, desc: "최대 6명의 적을 동시에 관통하는 연쇄 번개를 내리칩니다." },
+        meteor: { name: "범위 폭발 운석 포탑", icon: "☄️", color: "#ff8c5a", range: 430, fireRate: 0.65, baseDmg: 145, desc: "고각 운석을 떨어뜨려 넓은 범위의 적에게 폭발 피해를 줍니다." }
+      };
+
+      const TURRET_PAD_BLUEPRINTS = [
+        { id: "t_sw", type: "starlight", x: -310, y: 285, currency: "crystals", cost: 300, label: "별빛 포탑" },
+        { id: "t_nw", type: "frost", x: -330, y: -270, currency: "gems", cost: 800, label: "빙결 포탑" },
+        { id: "t_ne", type: "lightning", x: 330, y: -270, currency: "gems", cost: 3500, label: "번개 포탑" },
+        { id: "t_se", type: "meteor", x: 345, y: 285, currency: "gems", cost: 15000, label: "운석 포탑" },
+        { id: "t_n", type: "starlight", x: 0, y: -335, currency: "crystals", cost: 600, label: "북부 별빛" },
+        { id: "t_w", type: "frost", x: -515, y: 40, currency: "gems", cost: 2400, label: "서부 빙결" },
+        { id: "t_e", type: "lightning", x: 515, y: 40, currency: "gems", cost: 10000, label: "동부 번개" },
+        { id: "t_s", type: "meteor", x: 0, y: 365, currency: "gems", cost: 38000, label: "남부 운석" }
+      ];
+
+      const WIZARD_TITLES = [
+        "견습 꼬마 마법사",
+        "별빛 마법학도",
+        "황금 가마솥 연금술사",
+        "성좌의 대마도사",
+        "무지개 그랜드마스터"
+      ];
+
+      /* =========================================================================
+       * 2. WEB AUDIO API PROCEDURAL SOUND SYNTHESIZER
+       * ========================================================================= */
+      const SoundEngine = {
+        ctx: null,
+        muted: false,
+        lastHarvestTime: 0,
+        lastTickTime: 0,
+        lastShootTime: 0,
+        pentatonicSemitones: [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24],
+
+        ensure() {
+          if (this.muted) return null;
+          if (!this.ctx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return null;
+            this.ctx = new AC();
+          }
+          if (this.ctx.state === "suspended") {
+            this.ctx.resume().catch(() => {});
+          }
+          return this.ctx;
+        },
+
+        playTone(freq, duration, type = "sine", vol = 0.08, delay = 0, slideTo = null) {
+          const ctx = this.ensure();
+          if (!ctx) return;
+          const now = ctx.currentTime + delay;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, now);
+          if (slideTo) {
+            osc.frequency.exponentialRampToValueAtTime(Math.max(40, slideTo), now + duration);
+          }
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(vol, now + 0.012);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + duration + 0.02);
+        },
+
+        playHarvest(tier = 0) {
+          const nowMs = performance.now();
+          if (nowMs - this.lastHarvestTime < 65) return;
+          this.lastHarvestTime = nowMs;
+          const semi = this.pentatonicSemitones[(tier * 2 + Math.floor(Math.random() * 5)) % 8];
+          const freq = 523.25 * Math.pow(2, semi / 12);
+          this.playTone(freq, 0.14, "sine", 0.07);
+          this.playTone(freq * 2, 0.08, "triangle", 0.025);
+        },
+
+        playGemCollect(comboIndex) {
+          const idx = Math.min(comboIndex, this.pentatonicSemitones.length - 1);
+          const semi = this.pentatonicSemitones[idx];
+          const freq = 523.25 * Math.pow(2, semi / 12);
+          this.playTone(freq, 0.16, "triangle", 0.085);
+          this.playTone(freq * 1.5, 0.12, "sine", 0.035, 0.02);
+        },
+
+        playPadTick(progress) {
+          const nowMs = performance.now();
+          if (nowMs - this.lastTickTime < 75) return;
+          this.lastTickTime = nowMs;
+          const freq = 340 + progress * 460;
+          this.playTone(freq, 0.055, "sine", 0.045);
+        },
+
+        playBuildPop() {
+          [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => this.playTone(f, 0.22, "triangle", 0.08, i * 0.055));
+        },
+
+        playShoot(kind = "wand") {
+          const nowMs = performance.now();
+          if (nowMs - this.lastShootTime < 85) return;
+          this.lastShootTime = nowMs;
+          if (kind === "lightning") this.playTone(920, 0.1, "sawtooth", 0.03, 0, 220);
+          else if (kind === "meteor") this.playTone(210, 0.22, "triangle", 0.06, 0, 75);
+          else this.playTone(760, 0.09, "sine", 0.038, 0, 420);
+        },
+
+        playBossWarning() {
+          [220, 196, 220, 293.66].forEach((f, i) => this.playTone(f, 0.26, "sawtooth", 0.06, i * 0.18));
+        },
+
+        playLevelUp() {
+          [523.25, 659.25, 783.99, 987.77, 1046.5].forEach((f, i) => this.playTone(f, 0.25, "sine", 0.075, i * 0.06));
+        }
+      };
+
+      /* =========================================================================
+       * 3. GAME STATE & FORMULAS
+       * ========================================================================= */
+      function createInitialState() {
+        return {
+          gems: 0,
+          crystals: 0,
+          starShards: 0,
+          totalStarShards: 0,
+          totalEarnedGems: 0,
+          playTime: 0,
+          bossTimer: BOSS_INTERVAL,
+          bossWave: 1,
+          xp: 0,
+          wizLevel: 1,
+          cauldronLevel: 1,
+          refineryBuilt: false,
+          refineryLevel: 1,
+          hiredFairies: 0,
+          rescuedBubbles: [false, false, false, false],
+          unlockedZones: [true, false, false, false],
+          cartsUnlocked: [false, false, false, false],
+          turrets: {},
+          stats: {
+            moveSpeed: 1,
+            backpackCap: 1,
+            harvestPower: 1,
+            wandPower: 1,
+            fairySpeed: 1,
+            fairyCap: 1,
+            cartRefinery: 1
+          },
+          relics: {
+            goldTouch: 0,
+            starStorm: 0,
+            swiftBlessing: 0,
+            fairyGrace: 0
+          },
+          inventory: [],
+          counterStock: [],
+          uncollectedGems: 0,
+          refineryQueue: [],
+          refineryProgress: 0,
+          muted: false,
+          hasMovedOnce: false
+        };
+      }
+
+      let state = createInitialState();
+
+      function statUpgradeCost(lv) { return Math.round(50 * Math.pow(1.32, lv - 1)); }
+      function cauldronUpgradeCost(lv) { return Math.round(300 * Math.pow(1.48, lv - 1)); }
+      function refineryUpgradeCost(lv) { return Math.round(450 * Math.pow(1.45, lv)); }
+      function fairyHireCost(hiredCount) { return Math.round(100 * Math.pow(1.42, hiredCount)); }
+      function turretUpgradeCost(bp, lv) { return Math.round(bp.cost * Math.pow(1.65, lv)); }
+      function relicUpgradeCost(lv) { return 4 + lv * 4; }
+
+      function getTotalFairies() {
+        return Math.min(15, state.hiredFairies + state.rescuedBubbles.filter(Boolean).length);
+      }
+
+      function getMaxBackpack() {
+        return Math.round(25 + Math.pow((state.stats.backpackCap - 1) / 24, 1.15) * 535);
+      }
+
+      function getPlayerSpeed() {
+        return (210 + (state.stats.moveSpeed - 1) * 10) * (1 + state.relics.swiftBlessing * 0.08);
+      }
+
+      function getHarvestStats() {
+        const lv = state.stats.harvestPower;
+        const relicMult = 1 + state.relics.swiftBlessing * 0.12;
+        return {
+          dmg: Math.round((12 + Math.pow((lv - 1) / 24, 1.35) * 248) * relicMult),
+          range: Math.round(75 + ((lv - 1) / 24) * 100)
+        };
+      }
+
+      function getWandStats() {
+        const lv = state.stats.wandPower;
+        const shardBonus = 1 + 0.06 * state.totalStarShards;
+        const relicBonus = 1 + state.relics.starStorm * 0.18;
+        const baseDmg = 18 + Math.pow((lv - 1) / 24, 1.48) * 662;
+        return {
+          dmg: Math.round(baseDmg * shardBonus * relicBonus),
+          fireRate: 1.8 + ((lv - 1) / 24) * 3.0,
+          bolts: Math.min(5, 1 + Math.floor(lv / 5)),
+          range: 270 + lv * 5
+        };
+      }
+
+      function getFairyStats() {
+        const grace = 1 + state.relics.fairyGrace * 0.15;
+        return {
+          speed: (155 + (state.stats.fairySpeed - 1) * 10) * (1 + state.relics.fairyGrace * 0.06),
+          cap: Math.round((8 + ((state.stats.fairyCap - 1) / 24) * 72) * grace),
+          power: Math.round((8 + Math.pow((state.stats.fairyCap - 1) / 24, 1.3) * 112) * grace)
+        };
+      }
+
+      function getCartRefineryMult() {
+        return (1 + (state.stats.cartRefinery - 1) * 0.1) * (1 + state.relics.fairyGrace * 0.15);
+      }
+
+      function getRefineryMultiplier() {
+        return 3.0 + 0.25 * (state.refineryLevel - 1);
+      }
+
+      function getSaleValue(item) {
+        const relicVal = 1 + state.relics.goldTouch * 0.15;
+        const globalMult = (1 + 0.15 * (state.cauldronLevel - 1)) * (1 + 0.05 * state.totalStarShards) * relicVal;
+        if (typeof item === "string") {
+          const res = RESOURCES[item];
+          return Math.round((res ? res.price : 6) * globalMult);
+        }
+        if (item && item.id === "rainbow_potion") {
+          const baseRes = RESOURCES[item.source] ? RESOURCES[item.source].price : 10;
+          return Math.round(baseRes * globalMult * getRefineryMultiplier());
+        }
+        return 10;
+      }
+
+      function getCustomerBuyInterval() {
+        return Math.max(0.18, 1.1 * Math.pow(0.9, state.cauldronLevel - 1));
+      }
+
+      function getCustomerBatchCount() {
+        return 1 + Math.floor(state.cauldronLevel / 2);
+      }
+
+      function getWizardVisualTier() {
+        const avg = (state.stats.moveSpeed + state.stats.backpackCap + state.stats.harvestPower + state.stats.wandPower) / 4;
+        if (avg >= 20) return 5;
+        if (avg >= 14) return 4;
+        if (avg >= 9) return 3;
+        if (avg >= 4) return 2;
+        return 1;
+      }
+
+      function getBossHP(wave) {
+        return Math.round(800 * Math.pow(2.15, wave - 1));
+      }
+
+      function fmtNum(n) {
+        if (!Number.isFinite(n)) return "0";
+        n = Math.floor(n);
+        if (n >= 1e9) return (n / 1e9).toFixed(2) + "B";
+        if (n >= 1e6) return (n / 1e6).toFixed(2) + "M";
+        if (n >= 1e4) return (n / 1e3).toFixed(1) + "K";
+        return n.toLocaleString("ko-KR");
+      }
+
+      /* =========================================================================
+       * 4. OBJECT POOLS (60 FPS Mobile Optimization)
+       * ========================================================================= */
+      function createPool(size, factory) {
+        const arr = new Array(size);
+        for (let i = 0; i < size; i++) arr[i] = factory();
+        return arr;
+      }
+
+      function allocFromPool(pool) {
+        for (let i = 0; i < pool.length; i++) {
+          if (!pool[i].active) return pool[i];
+        }
+        return null;
+      }
+
+      const particlePool = createPool(600, () => ({
+        active: false, x: 0, y: 0, vx: 0, vy: 0, size: 4, color: "#fff",
+        life: 0, maxLife: 0.5, gravity: 0, kind: "circle"
+      }));
+      const projectilePool = createPool(220, () => ({
+        active: false, x: 0, y: 0, vx: 0, vy: 0, dmg: 10, color: "#ffd86b",
+        radius: 6, life: 0, maxLife: 1.5, kind: "star", slow: 0, aoe: 0,
+        targetX: 0, targetY: 0, startX: 0, startY: 0, progress: 0
+      }));
+      const flyingItemPool = createPool(320, () => ({
+        active: false, sx: 0, sy: 0, tx: 0, ty: 0, progress: 0, speed: 2.2,
+        arcHeight: 70, color: "#7be3ff", topColor: "#fff", onArrive: null
+      }));
+      const footstepPool = createPool(240, () => ({
+        active: false, x: 0, y: 0, life: 0, maxLife: 1.8, color: "#ffb8dc",
+        size: 5, petals: 5, rot: 0
+      }));
+      const floatTextPool = createPool(120, () => ({
+        active: false, x: 0, y: 0, vy: -32, text: "", color: "#fff", life: 0, maxLife: 0.9, scale: 1
+      }));
+      const lightningPool = createPool(40, () => ({
+        active: false, points: [], life: 0, maxLife: 0.18, color: "#d5a6ff"
+      }));
+      const slashPool = createPool(40, () => ({
+        active: false, x: 0, y: 0, angle: 0, life: 0, maxLife: 0.22
+      }));
+
+      function spawnParticle(x, y, vx, vy, size, color, maxLife = 0.45, gravity = 0, kind = "circle") {
+        const p = allocFromPool(particlePool);
+        if (!p) return;
+        p.active = true;
+        p.x = x; p.y = y; p.vx = vx; p.vy = vy;
+        p.size = size; p.color = color;
+        p.life = 0; p.maxLife = maxLife;
+        p.gravity = gravity; p.kind = kind;
+      }
+
+      function spawnBurst(x, y, color, count = 8, speed = 110, size = 4) {
+        for (let i = 0; i < count; i++) {
+          const a = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+          const sp = speed * (0.5 + Math.random() * 0.7);
+          spawnParticle(x, y, Math.cos(a) * sp, Math.sin(a) * sp, size * (0.7 + Math.random() * 0.6), color, 0.35 + Math.random() * 0.25);
+        }
+      }
+
+      function spawnSlash(x, y, angle) {
+        const s = allocFromPool(slashPool);
+        if (!s) return;
+        s.active = true;
+        s.x = x; s.y = y; s.angle = angle;
+        s.life = 0; s.maxLife = 0.2;
+      }
+
+      function spawnFloatText(x, y, text, color = "#fff", scale = 1) {
+        const t = allocFromPool(floatTextPool);
+        if (!t) return;
+        t.active = true;
+        t.x = x; t.y = y; t.vy = -38;
+        t.text = text; t.color = color;
+        t.life = 0; t.maxLife = 0.9; t.scale = scale;
+      }
+
+      function spawnFlyingArc(sx, sy, tx, ty, color, topColor, speed = 2.6, arcHeight = 68, onArrive = null) {
+        const f = allocFromPool(flyingItemPool);
+        if (!f) {
+          if (onArrive) onArrive();
+          return;
+        }
+        f.active = true;
+        f.sx = sx; f.sy = sy; f.tx = tx; f.ty = ty;
+        f.progress = 0; f.speed = speed; f.arcHeight = arcHeight;
+        f.color = color; f.topColor = topColor;
+        f.onArrive = onArrive;
+      }
+
+      function spawnFootstep(x, y) {
+        const f = allocFromPool(footstepPool);
+        if (!f) return;
+        const colors = ["#ffb6d9", "#ffe88e", "#9ff3d8", "#b4dcff", "#d8b8ff"];
+        f.active = true;
+        f.x = x + (Math.random() - 0.5) * 14;
+        f.y = y + (Math.random() - 0.5) * 8;
+        f.life = 0;
+        f.maxLife = 1.9;
+        f.color = colors[Math.floor(Math.random() * colors.length)];
+        f.size = 4 + Math.random() * 3.5;
+        f.petals = 5 + (Math.random() > 0.5 ? 1 : 0);
+        f.rot = Math.random() * Math.PI * 2;
+      }
+
+      /* =========================================================================
+       * 5. CAMP & WORLD ENTITIES (2.5D Isometric Camp Layout)
+       * ========================================================================= */
+      const VILLAGE = {
+        cauldron: { x: -50, y: -96 },
+        sellCounter: { x: -128, y: 20 },
+        sellPad: { x: -78, y: 78, r: 42 },
+        gemZone: { x: -86, y: -24, r: 48 },
+        refinery: { x: 145, y: -15 },
+        refineryPad: { x: 105, y: 45, r: 40 }
+      };
+
+      const player = {
+        x: 0,
+        y: 35,
+        vx: 0,
+        vy: 0,
+        facing: 1,
+        hp: 120,
+        maxHp: 120,
+        invuln: 0,
+        walkPhase: 0,
+        footstepAccum: 0,
+        harvestTimer: 0,
+        wandTimer: 0,
+        sellTimer: 0,
+        refineFeedTimer: 0,
+        gemCombo: 0,
+        gemComboTimer: 0,
+        cashVisTimer: 0,
+        stackInertiaX: 0,
+        stackInertiaY: 0,
+        stackVelX: 0,
+        stackVelY: 0,
+        prevVx: 0,
+        prevVy: 0
+      };
+
+      const camera = { x: 0, y: 0, shake: 0, viewW: 800, viewH: 600 };
+
+      const resourceNodes = [];
+      const decorProps = [];
+      const fairyWorkers = [];
+      const autoCarts = [];
+      const customers = [];
+      const monsters = [];
+      const stepPads = [];
+      const bubbleFairies = [];
+      const rainbowWaves = [];
+      const fogPuffs = [];
+
+      let activeBoss = null;
+      let customerSpawnTimer = 0.6;
+      let customerBuyTimer = 0;
+      let monsterSpawnTimer = 1.5;
+
+      function seedWorld() {
+        resourceNodes.length = 0;
+        decorProps.length = 0;
+        bubbleFairies.length = 0;
+        fogPuffs.length = 0;
+        stepPads.length = 0;
+
+        let seed = 42197;
+        const rand = () => {
+          seed = (seed * 1664525 + 1013904223) >>> 0;
+          return seed / 4294967296;
+        };
+
+        for (let i = 0; i < 165; i++) {
+          const x = (rand() * 2 - 1) * (WORLD_HALF_W - 80);
+          const y = (rand() * 2 - 1) * (WORLD_HALF_H - 80);
+          if (Math.hypot(x, y) < 520 || (x > 40 && x < 560 && y > -260 && y < 180)) continue;
+          let z = 0;
+          if (x < 0 && y < 0) z = 1;
+          else if (x >= 0 && y < 0) z = 2;
+          else if (x >= 0 && y >= 0) z = 3;
+          decorProps.push({
+            x, y, zone: z,
+            kind: rand() < 0.48 ? "pine" : (rand() < 0.75 ? "flower" : "rock"),
+            scale: 0.78 + rand() * 0.62
+          });
+        }
+        // Bare reddish-brown winter trees framing outside the snowy camp perimeter (never inside floor!)
+        decorProps.push({ x: 100, y: -178, zone: 0, kind: "pine", scale: 1.15 });
+        decorProps.push({ x: 385, y: -40, zone: 0, kind: "pine", scale: 1.15 });
+
+        const zoneResourcePairs = [
+          ["starlight_crystal", "rainbow_berry"],
+          ["moonstone_ore", "glow_mushroom"],
+          ["ancient_aether", "mana_crystal"],
+          ["stardust", "dragon_scale"]
+        ];
+
+        ZONES.forEach((z, zi) => {
+          const pair = zoneResourcePairs[zi];
+          const b = z.bounds;
+          const cols = 4;
+          const rows = 4;
+          let count = 0;
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+              if (r === 0 && c === 0) continue;
+              if (count >= 14) break;
+              const nx = b.x1 + 140 + (c + 0.25 + rand() * 0.5) * ((b.x2 - b.x1 - 240) / cols);
+              const ny = b.y1 + 140 + (r + 0.25 + rand() * 0.5) * ((b.y2 - b.y1 - 240) / rows);
+              const resId = pair[(r + c) % 2];
+              const res = RESOURCES[resId];
+              resourceNodes.push({
+                id: `${zi}_${count}`,
+                zone: zi,
+                resId,
+                x: nx,
+                y: ny,
+                hp: res.hp,
+                maxHp: res.hp,
+                respawnTimer: 0,
+                shake: 0
+              });
+              count++;
+            }
+          }
+
+          bubbleFairies.push({
+            zone: zi,
+            x: (b.x1 + b.x2) * 0.5 + (zi % 2 === 0 ? -120 : 120),
+            y: (b.y1 + b.y2) * 0.5,
+            bobOffset: zi * 1.4
+          });
+
+          if (zi > 0) {
+            for (let f = 0; f < 18; f++) {
+              const fx = b.x1 + 120 + rand() * (b.x2 - b.x1 - 240);
+              const fy = b.y1 + 120 + rand() * (b.y2 - b.y1 - 240);
+              if (Math.hypot(fx, fy) < 640) continue;
+              fogPuffs.push({
+                zone: zi,
+                x: fx,
+                y: fy,
+                r: 130 + rand() * 85,
+                phase: rand() * Math.PI * 2
+              });
+            }
+          }
+        });
+
+        // Starter Zone 1 nodes right outside NE & SW camp gates so mobile & desktop see them immediately
+        [
+          { resId: "starlight_crystal", x: -245, y: 340 },
+          { resId: "rainbow_berry", x: -375, y: 205 },
+          { resId: "starlight_crystal", x: -395, y: 430 },
+          { resId: "rainbow_berry", x: -195, y: 420 },
+          { resId: "rainbow_berry", x: 375, y: -150 },
+          { resId: "starlight_crystal", x: 445, y: -40 }
+        ].forEach((sn, idx) => {
+          const res = RESOURCES[sn.resId];
+          resourceNodes.push({
+            id: `starter_${idx}`,
+            zone: 0,
+            resId: sn.resId,
+            x: sn.x,
+            y: sn.y,
+            hp: res.hp,
+            maxHp: res.hp,
+            respawnTimer: 0,
+            shake: 0
+          });
+        });
+
+        // Starter Snow Beasts patrolling right outside the North-East palisade gate (like video!)
+        const starterTpl = MONSTER_TYPES[0];
+        [
+          { x: 255, y: -95 },
+          { x: 315, y: -135 },
+          { x: 345, y: -65 },
+          { x: 285, y: -175 },
+          { x: 385, y: -110 }
+        ].forEach((pos) => {
+          monsters.push({
+            isBoss: false, zone: 0, name: starterTpl.name,
+            x: pos.x, y: pos.y, homeX: pos.x, homeY: pos.y,
+            hp: starterTpl.hp, maxHp: starterTpl.hp,
+            speed: starterTpl.speed, dmg: starterTpl.dmg,
+            xp: starterTpl.xp, drop: starterTpl.drop,
+            radius: starterTpl.radius, color: starterTpl.color,
+            flash: 0, slowTimer: 0, slowFactor: 0, attackTimer: 0,
+            aggroVillage: false
+          });
+        });
+
+        buildStepPads();
+      }
+
+      function buildStepPads() {
+        stepPads.length = 0;
+
+        // 1. Cauldron Upgrade Pad
+        stepPads.push({
+          id: "cauldron_upg",
+          x: -8, y: -28, r: 36,
+          iconType: "cauldron",
+          currency: "gems",
+          paid: 0,
+          cooldown: 0,
+          getRatio: () => `${state.cauldronLevel}/15`,
+          getLabel: () => state.cauldronLevel >= 15 ? "가마솥 MAX" : `가마솥 Lv.${state.cauldronLevel + 1}`,
+          getCost: () => state.cauldronLevel >= 15 ? 0 : cauldronUpgradeCost(state.cauldronLevel),
+          isDone: () => state.cauldronLevel >= 15,
+          onComplete: () => {
+            state.cauldronLevel++;
+            showToast(`🍯 가마솥 Lv.${state.cauldronLevel}! 판매 단가 +15% & 구매속도 증가!`);
+            SoundEngine.playBuildPop();
+            spawnBurst(VILLAGE.cauldron.x, VILLAGE.cauldron.y, "#ffd86b", 22, 160, 6);
+          }
+        });
+
+        // 2. Fairy Worker Hire Pad (person silhouette + 1/15 like video!)
+        stepPads.push({
+          id: "hire_fairy",
+          x: 28, y: 92, r: 38,
+          iconType: "person",
+          currency: "gems",
+          paid: 0,
+          cooldown: 0,
+          getRatio: () => `${getTotalFairies()}/15`,
+          getLabel: () => "요정 고용",
+          getCost: () => getTotalFairies() >= 15 ? 0 : fairyHireCost(state.hiredFairies),
+          isDone: () => getTotalFairies() >= 15,
+          onComplete: () => {
+            state.hiredFairies++;
+            syncWorkersAndCarts();
+            showToast(`🧚 요정 일꾼 합류! (${getTotalFairies()}/15)`);
+            SoundEngine.playBuildPop();
+            spawnBurst(28, 92, "#ffb3df", 18, 140, 5);
+          }
+        });
+
+        // 3. In-Camp Wizard Attack & Harvest Upgrade Pad (crossed axe/wand like video!)
+        stepPads.push({
+          id: "wiz_power_pad",
+          x: 105, y: 155, r: 38,
+          iconType: "axe",
+          currency: "gems",
+          paid: 0,
+          cooldown: 0,
+          getRatio: () => `Lv.${state.stats.wandPower}`,
+          getLabel: () => "지팡이·채집",
+          getCost: () => {
+            const lv = Math.min(state.stats.wandPower, state.stats.harvestPower);
+            return lv >= 25 ? 0 : statUpgradeCost(lv);
+          },
+          isDone: () => state.stats.wandPower >= 25 && state.stats.harvestPower >= 25,
+          onComplete: () => {
+            if (state.stats.wandPower <= state.stats.harvestPower && state.stats.wandPower < 25) {
+              state.stats.wandPower++;
+              showToast(`🪄 지팡이 공격력 Lv.${state.stats.wandPower} 강화!`);
+            } else if (state.stats.harvestPower < 25) {
+              state.stats.harvestPower++;
+              showToast(`⛏️ 채집 파워 Lv.${state.stats.harvestPower} 강화!`);
+            }
+            SoundEngine.playBuildPop();
+            spawnBurst(105, 155, "#7ef2d4", 16, 130, 5);
+          }
+        });
+
+        // 4. In-Camp Speed & Backpack Upgrade Pad
+        stepPads.push({
+          id: "wiz_speed_pad",
+          x: -15, y: 175, r: 38,
+          iconType: "bag",
+          currency: "gems",
+          paid: 0,
+          cooldown: 0,
+          getRatio: () => `${getMaxBackpack()}칸`,
+          getLabel: () => "배낭·이속",
+          getCost: () => {
+            const lv = Math.min(state.stats.backpackCap, state.stats.moveSpeed);
+            return lv >= 25 ? 0 : statUpgradeCost(lv);
+          },
+          isDone: () => state.stats.backpackCap >= 25 && state.stats.moveSpeed >= 25,
+          onComplete: () => {
+            if (state.stats.backpackCap <= state.stats.moveSpeed && state.stats.backpackCap < 25) {
+              state.stats.backpackCap++;
+              showToast(`🎒 배낭 최대 ${getMaxBackpack()}개 확장!`);
+            } else if (state.stats.moveSpeed < 25) {
+              state.stats.moveSpeed++;
+              showToast(`👢 이동속도 Lv.${state.stats.moveSpeed} 강화!`);
+            }
+            SoundEngine.playBuildPop();
+            spawnBurst(-15, 175, "#ffe48c", 16, 130, 5);
+          }
+        });
+
+        // 5. Auto Alchemy Refinery Build & Upgrade Pad
+        stepPads.push({
+          id: "refinery_pad",
+          x: 165, y: 85, r: 38,
+          iconType: "refinery",
+          currency: "gems",
+          paid: 0,
+          cooldown: 0,
+          getRatio: () => state.refineryBuilt ? `Lv.${state.refineryLevel}` : "3.0x",
+          getLabel: () => !state.refineryBuilt ? "정제소 건설" : "정제소 승급",
+          getCost: () => !state.refineryBuilt ? 600 : (state.refineryLevel >= 15 ? 0 : refineryUpgradeCost(state.refineryLevel)),
+          isDone: () => state.refineryBuilt && state.refineryLevel >= 15,
+          onComplete: () => {
+            if (!state.refineryBuilt) {
+              state.refineryBuilt = true;
+              showToast("⚗️ 자동 연금술 정제소 건설 완료! (3배 포션 자동 가공)");
+            } else {
+              state.refineryLevel++;
+              showToast(`⚗️ 정제소 Lv.${state.refineryLevel} (${getRefineryMultiplier().toFixed(2)}배)!`);
+            }
+            SoundEngine.playBuildPop();
+            spawnBurst(VILLAGE.refinery.x, VILLAGE.refinery.y, "#7ef2d4", 24, 170, 6);
+          }
+        });
+
+        // 6. Zone Unlock Pads (2, 3, 4)
+        const zonePadCoords = [
+          null,
+          { x: -175, y: -165, cost: 1000, label: "2구역 개방" },
+          { x: 175, y: -165, cost: 12000, label: "3구역 개방" },
+          { x: 175, y: 315, cost: 95000, label: "4구역 개방" }
+        ];
+        zonePadCoords.forEach((zp, zi) => {
+          if (!zp) return;
+          stepPads.push({
+            id: `zone_${zi}`,
+            x: zp.x, y: zp.y, r: 42,
+            iconType: "gate",
+            currency: "gems",
+            paid: 0,
+            cooldown: 0,
+            getRatio: () => `${zi + 1}구역`,
+            getLabel: () => zp.label,
+            getCost: () => zp.cost,
+            isDone: () => state.unlockedZones[zi],
+            onComplete: () => {
+              state.unlockedZones[zi] = true;
+              rainbowWaves.push({ x: zp.x, y: zp.y, radius: 20, maxRadius: 1550, alpha: 1 });
+              SoundEngine.playLevelUp();
+              showToast(`🌈 ${ZONES[zi].name} 개방! 무지개 파동이 안개를 걷어냅니다!`);
+            }
+          });
+        });
+
+        // 7. Auto-Harvester Cart Pads (1 per zone)
+        const cartCosts = [400, 3200, 24000, 160000];
+        ZONES.forEach((z, zi) => {
+          stepPads.push({
+            id: `cart_${zi}`,
+            x: z.cartSpawn.x, y: z.cartSpawn.y, r: 40,
+            iconType: "cart",
+            currency: "gems",
+            paid: 0,
+            cooldown: 0,
+            requiresZone: zi,
+            getRatio: () => `${zi + 1}구역`,
+            getLabel: () => "자동 수레",
+            getCost: () => cartCosts[zi],
+            isDone: () => state.cartsUnlocked[zi],
+            onComplete: () => {
+              state.cartsUnlocked[zi] = true;
+              syncWorkersAndCarts();
+              SoundEngine.playBuildPop();
+              spawnBurst(z.cartSpawn.x, z.cartSpawn.y, "#ffe48c", 22, 160, 6);
+              showToast(`🛒 ${zi + 1}구역 자동 수확 수레 가동!`);
+            }
+          });
+        });
+
+        // 8. 8 Defense Turret Pads
+        TURRET_PAD_BLUEPRINTS.forEach((bp) => {
+          const tInfo = TURRET_TYPES[bp.type];
+          stepPads.push({
+            id: bp.id,
+            x: bp.x, y: bp.y, r: 38,
+            iconType: "turret",
+            currency: bp.currency,
+            paid: 0,
+            cooldown: 0,
+            turretBp: bp,
+            getRatio: () => {
+              const cur = state.turrets[bp.id];
+              return cur ? `Lv.${cur.level}` : tInfo.icon;
+            },
+            getLabel: () => bp.label,
+            getCost: () => {
+              const cur = state.turrets[bp.id];
+              if (!cur) return bp.cost;
+              return cur.level >= 10 ? 0 : turretUpgradeCost(bp, cur.level);
+            },
+            isDone: () => {
+              const cur = state.turrets[bp.id];
+              return cur && cur.level >= 10;
+            },
+            onComplete: () => {
+              const cur = state.turrets[bp.id];
+              if (!cur) {
+                state.turrets[bp.id] = { type: bp.type, level: 1, timer: 0, angle: 0, pop: 1 };
+                showToast(`${tInfo.icon} ${bp.label} 건설 완료!`);
+              } else {
+                cur.level++;
+                cur.pop = 1;
+                showToast(`${tInfo.icon} ${bp.label} Lv.${cur.level} 강화!`);
+              }
+              SoundEngine.playBuildPop();
+              spawnBurst(bp.x, bp.y, tInfo.color, 20, 150, 5);
+            }
+          });
+        });
+      }
+
+      function syncWorkersAndCarts() {
+        const targetFairies = getTotalFairies();
+        while (fairyWorkers.length < targetFairies) {
+          const idx = fairyWorkers.length;
+          const angle = (idx / 15) * Math.PI * 2;
+          fairyWorkers.push({
+            id: idx,
+            x: Math.cos(angle) * 110,
+            y: Math.sin(angle) * 110,
+            bag: [],
+            state: "gather",
+            targetNode: null,
+            harvestTimer: 0,
+            wingPhase: Math.random() * Math.PI * 2,
+            color: ["#48c8ff", "#ff9fd2", "#7ef2b8", "#ffe48f", "#c9a8ff"][idx % 5]
+          });
+        }
+        if (fairyWorkers.length > targetFairies) fairyWorkers.length = targetFairies;
+
+        autoCarts.length = 0;
+        ZONES.forEach((z, zi) => {
+          if (state.cartsUnlocked[zi]) {
+            autoCarts.push({
+              zone: zi,
+              x: z.cartSpawn.x,
+              y: z.cartSpawn.y,
+              angle: 0,
+              bag: [],
+              state: "sweep",
+              targetNode: null
+            });
+          }
+        });
+      }
+
+      /* =========================================================================
+       * 6. INPUT HANDLER: FLOATING WHITE JOYSTICK + WASD
+       * ========================================================================= */
+      const keys = {};
+      const joystick = {
+        active: false,
+        pointerId: null,
+        originX: 0,
+        originY: 0,
+        currX: 0,
+        currY: 0,
+        dx: 0,
+        dy: 0,
+        maxRadius: 58
+      };
+
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d", { alpha: false });
+
+      window.addEventListener("keydown", (e) => {
+        keys[e.code] = true;
+        if (["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
+          state.hasMovedOnce = true;
+        }
+      });
+      window.addEventListener("keyup", (e) => { keys[e.code] = false; });
+
+      canvas.addEventListener("pointerdown", (e) => {
+        SoundEngine.ensure();
+        if (joystick.active) return;
+        joystick.active = true;
+        joystick.pointerId = e.pointerId;
+        joystick.originX = e.clientX;
+        joystick.originY = e.clientY;
+        joystick.currX = e.clientX;
+        joystick.currY = e.clientY;
+        joystick.dx = 0;
+        joystick.dy = 0;
+        canvas.setPointerCapture(e.pointerId);
+      });
+
+      canvas.addEventListener("pointermove", (e) => {
+        if (!joystick.active || e.pointerId !== joystick.pointerId) return;
+        const ox = joystick.originX;
+        const oy = joystick.originY;
+        let rx = e.clientX - ox;
+        let ry = e.clientY - oy;
+        const dist = Math.hypot(rx, ry);
+        if (dist > joystick.maxRadius) {
+          rx = (rx / dist) * joystick.maxRadius;
+          ry = (ry / dist) * joystick.maxRadius;
+        }
+        joystick.currX = ox + rx;
+        joystick.currY = oy + ry;
+        joystick.dx = dist > 6 ? rx / joystick.maxRadius : 0;
+        joystick.dy = dist > 6 ? ry / joystick.maxRadius : 0;
+        if (dist > 10) state.hasMovedOnce = true;
+      });
+
+      function endJoystick(e) {
+        if (!joystick.active || e.pointerId !== joystick.pointerId) return;
+        joystick.active = false;
+        joystick.pointerId = null;
+        joystick.dx = 0;
+        joystick.dy = 0;
+      }
+
+      canvas.addEventListener("pointerup", endJoystick);
+      canvas.addEventListener("pointercancel", endJoystick);
+
+      function getMoveVector() {
+        let mx = 0;
+        let my = 0;
+        if (keys["KeyW"] || keys["ArrowUp"]) my -= 1;
+        if (keys["KeyS"] || keys["ArrowDown"]) my += 1;
+        if (keys["KeyA"] || keys["ArrowLeft"]) mx -= 1;
+        if (keys["KeyD"] || keys["ArrowRight"]) mx += 1;
+        if (mx !== 0 || my !== 0) {
+          const len = Math.hypot(mx, my);
+          return { x: mx / len, y: my / len };
+        }
+        if (joystick.active) return { x: joystick.dx, y: joystick.dy };
+        return { x: 0, y: 0 };
+      }
+
+      /* =========================================================================
+       * 7. CORE GAMEPLAY SIMULATION LOOP
+       * ========================================================================= */
+      let toastTimer = null;
+      function showToast(msg) {
+        const el = document.getElementById("toast-banner");
+        el.textContent = msg;
+        el.classList.add("show");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove("show"), 3200);
+      }
+
+      function addXP(amount) {
+        state.xp += amount;
+        const needed = () => Math.round(50 * Math.pow(1.25, state.wizLevel - 1));
+        while (state.xp >= needed()) {
+          state.xp -= needed();
+          state.wizLevel++;
+          player.maxHp = 120 + (state.wizLevel - 1) * 20;
+          player.hp = player.maxHp;
+          SoundEngine.playLevelUp();
+          spawnBurst(player.x, player.y, "#ffe474", 20, 150, 5);
+          spawnFloatText(player.x, player.y - 45, `✨ LEVEL UP! Lv.${state.wizLevel}`, "#ffe875", 1.2);
+        }
+      }
+
+      function pushToPlayerBag(resId, count = 1, sourceX = player.x, sourceY = player.y) {
+        const cap = getMaxBackpack();
+        const res = RESOURCES[resId];
+        if (!res) return false;
+        let added = 0;
+        for (let i = 0; i < count; i++) {
+          if (state.inventory.length < cap) {
+            state.inventory.push(resId);
+            added++;
+          }
+        }
+        if (added > 0) {
+          if (res.crystalBonus > 0) state.crystals += res.crystalBonus * added;
+          spawnFlyingArc(sourceX, sourceY, player.x, player.y - 26, res.color, res.topColor, 4.0, 48);
+          return true;
+        }
+        return false;
+      }
+
+      function findNearestMonster(x, y, maxRange) {
+        let best = null;
+        let bestD = maxRange;
+        if (activeBoss) {
+          const d = Math.hypot(activeBoss.x - x, activeBoss.y - y) - activeBoss.radius;
+          if (d <= bestD) { best = activeBoss; bestD = d; }
+        }
+        for (let i = 0; i < monsters.length; i++) {
+          const m = monsters[i];
+          const d = Math.hypot(m.x - x, m.y - y) - m.radius;
+          if (d <= bestD) { best = m; bestD = d; }
+        }
+        return best;
+      }
+
+      function damageEnemy(enemy, dmg, slowAmount = 0) {
+        if (!enemy || enemy.hp <= 0) return;
+        enemy.hp -= dmg;
+        enemy.flash = 0.12;
+        if (slowAmount > 0) {
+          enemy.slowTimer = Math.max(enemy.slowTimer || 0, 2.5);
+          enemy.slowFactor = Math.max(enemy.slowFactor || 0, slowAmount);
+        }
+        spawnSlash(enemy.x, enemy.y, Math.random() * Math.PI * 2);
+        spawnFloatText(enemy.x + (Math.random() - 0.5) * 20, enemy.y - enemy.radius, `-${fmtNum(dmg)}`, slowAmount > 0 ? "#8deeff" : "#ffe082", 0.95);
+
+        if (enemy.hp <= 0) {
+          if (enemy.isBoss) {
+            handleBossDefeated(enemy);
+          } else {
+            const idx = monsters.indexOf(enemy);
+            if (idx >= 0) monsters.splice(idx, 1);
+            addXP(enemy.xp);
+            spawnBurst(enemy.x, enemy.y, "#ff687c", 14, 135, 5);
+            const dropped = pushToPlayerBag(enemy.drop, 1, enemy.x, enemy.y);
+            if (!dropped) {
+              const val = Math.round(getSaleValue(enemy.drop) * 0.6);
+              state.gems += val;
+              state.totalEarnedGems += val;
+              spawnFloatText(enemy.x, enemy.y - 24, `+${fmtNum(val)}`, "#5ce68a");
+            }
+          }
+        }
+      }
+
+      function spawnBossWave() {
+        if (activeBoss) return;
+        const w = state.bossWave;
+        const tpl = BOSS_CATALOG[Math.min(w - 1, BOSS_CATALOG.length - 1)];
+        const hp = getBossHP(w);
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 760;
+        activeBoss = {
+          isBoss: true,
+          wave: w,
+          name: tpl.name,
+          x: Math.cos(angle) * dist,
+          y: Math.sin(angle) * dist,
+          hp,
+          maxHp: hp,
+          radius: tpl.radius,
+          speed: 44 + Math.min(28, w * 3),
+          dmg: Math.round(18 * Math.pow(1.42, w - 1)),
+          color: tpl.color,
+          accent: tpl.accent,
+          drop: tpl.drop,
+          flash: 0,
+          slowTimer: 0,
+          slowFactor: 0,
+          attackTimer: 0
+        };
+
+        const unlockedIndices = state.unlockedZones.map((u, i) => (u ? i : -1)).filter((i) => i >= 0);
+        const maxZone = unlockedIndices[unlockedIndices.length - 1];
+        const minionTpl = MONSTER_TYPES[Math.min(maxZone, MONSTER_TYPES.length - 1)];
+        const escortCount = 4 + Math.min(6, w);
+        for (let i = 0; i < escortCount; i++) {
+          const a = angle + (Math.random() - 0.5) * 0.7;
+          const r = dist + (Math.random() - 0.5) * 90;
+          monsters.push({
+            isBoss: false,
+            zone: maxZone,
+            name: minionTpl.name,
+            x: Math.cos(a) * r,
+            y: Math.sin(a) * r,
+            hp: Math.round(minionTpl.hp * (1 + (w - 1) * 0.35)),
+            maxHp: Math.round(minionTpl.hp * (1 + (w - 1) * 0.35)),
+            speed: minionTpl.speed,
+            dmg: minionTpl.dmg,
+            xp: minionTpl.xp,
+            drop: minionTpl.drop,
+            radius: minionTpl.radius,
+            color: minionTpl.color,
+            flash: 0,
+            slowTimer: 0,
+            slowFactor: 0,
+            attackTimer: 0,
+            aggroVillage: true
+          });
+        }
+
+        SoundEngine.playBossWarning();
+        camera.shake = 12;
+        showToast(`🚨 [Wave ${w}] 거대 보스 '${tpl.name}' 출현!`);
+        updateHUD();
+      }
+
+      function handleBossDefeated(boss) {
+        const w = boss.wave;
+        const shardReward = w === 1 ? 8 : w === 2 ? 15 : w === 3 ? 25 : w === 4 ? 40 : Math.round(40 * Math.pow(1.4, w - 4));
+        const gemReward = w === 1 ? 600 : w === 2 ? 2000 : w === 3 ? 6500 : w === 4 ? 18000 : Math.round(18000 * Math.pow(2.2, w - 4));
+
+        state.starShards += shardReward;
+        state.totalStarShards += shardReward;
+        state.gems += gemReward;
+        state.totalEarnedGems += gemReward;
+        addXP(120 * w);
+        pushToPlayerBag(boss.drop, 5, boss.x, boss.y);
+
+        spawnBurst(boss.x, boss.y, "#ffe066", 36, 220, 8);
+        spawnBurst(boss.x, boss.y, "#ff87c3", 24, 170, 6);
+        spawnFloatText(boss.x, boss.y - 30, `+${shardReward}⭐ +${fmtNum(gemReward)}`, "#ffe875", 1.35);
+        showToast(`🎉 ${boss.name} 토벌! 별조각 +${shardReward}⭐ & 화폐 +${fmtNum(gemReward)}`);
+        SoundEngine.playLevelUp();
+
+        activeBoss = null;
+        state.bossWave++;
+        state.bossTimer = BOSS_INTERVAL;
+        updateHUD();
+        if (drawerOpen) renderDrawer();
+      }
+
+      function update(dt) {
+        state.playTime += dt;
+
+        // 1. Movement & Footstep Trail
+        const mv = getMoveVector();
+        const spd = getPlayerSpeed();
+        player.vx += (mv.x * spd - player.vx) * Math.min(1, dt * 16);
+        player.vy += (mv.y * spd - player.vy) * Math.min(1, dt * 16);
+        player.x = Math.max(-WORLD_HALF_W + 40, Math.min(WORLD_HALF_W - 40, player.x + player.vx * dt));
+        player.y = Math.max(-WORLD_HALF_H + 40, Math.min(WORLD_HALF_H - 40, player.y + player.vy * dt));
+        if (Math.abs(player.vx) > 10) player.facing = player.vx > 0 ? 1 : -1;
+
+        const speedMag = Math.hypot(player.vx, player.vy);
+        if (speedMag > 22) {
+          player.walkPhase += dt * (speedMag * 0.045);
+          player.footstepAccum += speedMag * dt;
+          if (player.footstepAccum >= 40) {
+            player.footstepAccum = 0;
+            spawnFootstep(player.x, player.y + 12);
+          }
+        }
+
+        if (player.invuln > 0) player.invuln -= dt;
+        if (player.cashVisTimer > 0) player.cashVisTimer -= dt;
+        player.maxHp = 120 + (state.wizLevel - 1) * 20;
+        if (player.hp < player.maxHp) player.hp = Math.min(player.maxHp, player.hp + (4 + state.wizLevel * 0.8) * dt);
+
+        // Spring Inertia Physics for Skyscraper Back-Stack
+        const accelX = (player.vx - player.prevVx) / Math.max(dt, 0.001);
+        const accelY = (player.vy - player.prevVy) / Math.max(dt, 0.001);
+        player.prevVx = player.vx;
+        player.prevVy = player.vy;
+
+        player.stackVelX += (-140 * player.stackInertiaX - 11.5 * player.stackVelX - accelX * 0.018 - player.vx * 0.06) * dt;
+        player.stackVelY += (-140 * player.stackInertiaY - 11.5 * player.stackVelY - accelY * 0.014 - player.vy * 0.04) * dt;
+        player.stackInertiaX = Math.max(-42, Math.min(42, player.stackInertiaX + player.stackVelX * dt));
+        player.stackInertiaY = Math.max(-28, Math.min(28, player.stackInertiaY + player.stackVelY * dt));
+
+        // 2. Auto-Harvest Nodes
+        const harvest = getHarvestStats();
+        player.harvestTimer -= dt;
+        if (player.harvestTimer <= 0 && state.inventory.length < getMaxBackpack()) {
+          let hitAny = false;
+          for (let i = 0; i < resourceNodes.length; i++) {
+            const node = resourceNodes[i];
+            if (!state.unlockedZones[node.zone] || node.respawnTimer > 0) continue;
+            if (Math.hypot(node.x - player.x, node.y - player.y) <= harvest.range) {
+              const res = RESOURCES[node.resId];
+              node.hp -= harvest.dmg;
+              node.shake = 0.16;
+              hitAny = true;
+              spawnSlash(node.x, node.y - 6, Math.random() * Math.PI);
+              spawnBurst(node.x, node.y - 10, res.color, 4, 70, 3);
+              if (res.crystalBonus > 0 && node.hp > 0) state.crystals += 4;
+              if (node.hp <= 0) {
+                node.respawnTimer = res.respawn;
+                pushToPlayerBag(node.resId, 3, node.x, node.y);
+                addXP(6 + node.zone * 8);
+                spawnBurst(node.x, node.y - 8, res.color, 10, 115, 4.5);
+              }
+            }
+          }
+          if (hitAny) {
+            SoundEngine.playHarvest(0);
+            player.harvestTimer = 0.24;
+          } else {
+            player.harvestTimer = 0.08;
+          }
+        }
+
+        for (let i = 0; i < resourceNodes.length; i++) {
+          const n = resourceNodes[i];
+          if (n.shake > 0) n.shake = Math.max(0, n.shake - dt);
+          if (n.respawnTimer > 0) {
+            n.respawnTimer -= dt;
+            if (n.respawnTimer <= 0) { n.respawnTimer = 0; n.hp = n.maxHp; }
+          }
+        }
+
+        // 3. Trapped Bubble Fairies
+        for (let i = 0; i < bubbleFairies.length; i++) {
+          if (state.rescuedBubbles[i]) continue;
+          const bf = bubbleFairies[i];
+          if (!state.unlockedZones[bf.zone]) continue;
+          if (Math.hypot(bf.x - player.x, bf.y - player.y) < 55) {
+            state.rescuedBubbles[i] = true;
+            syncWorkersAndCarts();
+            SoundEngine.playBuildPop();
+            spawnBurst(bf.x, bf.y, "#9ff5ff", 24, 150, 5.5);
+            showToast(`🫧 요정 구출! (${getTotalFairies()}/15)`);
+          }
+        }
+
+        // 4. Player Auto-Wand Combat
+        const wand = getWandStats();
+        player.wandTimer -= dt;
+        if (player.wandTimer <= 0) {
+          const target = findNearestMonster(player.x, player.y, wand.range);
+          if (target) {
+            player.wandTimer = 1 / wand.fireRate;
+            const baseAngle = Math.atan2(target.y - player.y, target.x - player.x);
+            for (let b = 0; b < wand.bolts; b++) {
+              const a = baseAngle + (b - (wand.bolts - 1) / 2) * 0.14;
+              const p = allocFromPool(projectilePool);
+              if (p) {
+                p.active = true;
+                p.x = player.x + Math.cos(a) * 18;
+                p.y = player.y - 14 + Math.sin(a) * 18;
+                p.vx = Math.cos(a) * 520;
+                p.vy = Math.sin(a) * 520;
+                p.dmg = wand.dmg;
+                p.color = getWizardVisualTier() >= 4 ? "#ff88e6" : "#ffe074";
+                p.radius = 7;
+                p.life = 0;
+                p.maxLife = 0.95;
+                p.kind = "star";
+                p.slow = 0;
+                p.aoe = 0;
+              }
+            }
+            SoundEngine.playShoot("wand");
+          } else {
+            player.wandTimer = 0.08;
+          }
+        }
+
+        // 5. SELL Pad
+        const onSellPad = Math.hypot(player.x - VILLAGE.sellPad.x, player.y - VILLAGE.sellPad.y) <= VILLAGE.sellPad.r + 14;
+        if (onSellPad && state.inventory.length > 0) {
+          player.sellTimer -= dt;
+          if (player.sellTimer <= 0) {
+            player.sellTimer = 0.048;
+            const item = state.inventory.pop();
+            const res = typeof item === "string" ? RESOURCES[item] : { color: "#ff7ee2", topColor: "#fff4b0" };
+            spawnFlyingArc(
+              player.x, player.y - 38,
+              VILLAGE.sellCounter.x + (Math.random() - 0.5) * 34,
+              VILLAGE.sellCounter.y - 18,
+              res.color, res.topColor, 3.3, 85,
+              () => { state.counterStock.push(item); }
+            );
+            SoundEngine.playHarvest(2);
+          }
+        }
+
+        // 6. Auto Refinery Feed & Processing
+        if (state.refineryBuilt) {
+          const onRefPad = Math.hypot(player.x - VILLAGE.refineryPad.x, player.y - VILLAGE.refineryPad.y) <= VILLAGE.refineryPad.r + 14;
+          if (onRefPad && state.inventory.length > 0 && state.refineryQueue.length < 180) {
+            player.refineFeedTimer -= dt;
+            if (player.refineFeedTimer <= 0) {
+              player.refineFeedTimer = 0.055;
+              let rawIdx = -1;
+              for (let k = state.inventory.length - 1; k >= 0; k--) {
+                if (typeof state.inventory[k] === "string") { rawIdx = k; break; }
+              }
+              if (rawIdx >= 0) {
+                const rawId = state.inventory.splice(rawIdx, 1)[0];
+                const res = RESOURCES[rawId];
+                spawnFlyingArc(
+                  player.x, player.y - 36,
+                  VILLAGE.refinery.x, VILLAGE.refinery.y - 24,
+                  res.color, res.topColor, 3.2, 85,
+                  () => { state.refineryQueue.push(rawId); }
+                );
+                SoundEngine.playHarvest(3);
+              }
+            }
+          }
+
+          if (state.refineryQueue.length > 0) {
+            const speedMult = getCartRefineryMult() * (1 + (state.refineryLevel - 1) * 0.16);
+            state.refineryProgress += dt * speedMult * 0.9;
+            if (state.refineryProgress >= 1) {
+              state.refineryProgress -= 1;
+              const rawId = state.refineryQueue.shift();
+              spawnFlyingArc(
+                VILLAGE.refinery.x, VILLAGE.refinery.y - 35,
+                VILLAGE.sellCounter.x + (Math.random() - 0.5) * 28,
+                VILLAGE.sellCounter.y - 20,
+                "#ff87e8", "#a8fff0", 2.2, 115,
+                () => { state.counterStock.push({ id: "rainbow_potion", source: rawId }); }
+              );
+              spawnBurst(VILLAGE.refinery.x, VILLAGE.refinery.y - 35, "#ff9ef2", 6, 80, 4);
+            }
+          } else {
+            state.refineryProgress = 0;
+          }
+        }
+
+        // 7. Floor Cash / Gem Pillar Vacuuming
+        if (player.gemComboTimer > 0) {
+          player.gemComboTimer -= dt;
+          if (player.gemComboTimer <= 0) player.gemCombo = 0;
+        }
+        const onGemZone = Math.hypot(player.x - VILLAGE.gemZone.x, player.y - VILLAGE.gemZone.y) <= VILLAGE.gemZone.r + 22;
+        if (onGemZone && state.uncollectedGems > 0) {
+          const take = Math.min(state.uncollectedGems, Math.max(1, Math.ceil(state.uncollectedGems * Math.min(0.35, dt * 11))));
+          state.uncollectedGems -= take;
+          state.gems += take;
+          state.totalEarnedGems += take;
+          player.cashVisTimer = 0.8;
+          SoundEngine.playGemCollect(player.gemCombo);
+          player.gemCombo = Math.min(10, player.gemCombo + 1);
+          player.gemComboTimer = 0.65;
+          spawnFlyingArc(
+            VILLAGE.gemZone.x + (Math.random() - 0.5) * 24,
+            VILLAGE.gemZone.y - 20,
+            player.x, player.y - 18,
+            "#3ed973", "#d4ffe3", 4.5, 50
+          );
+          spawnFloatText(player.x, player.y - 48, `+${fmtNum(take)}`, "#48f282", 1.05);
+        }
+
+        // 8. Isometric Diamond Step-to-Pay Pads
+        for (let i = 0; i < stepPads.length; i++) {
+          const pad = stepPads[i];
+          if (pad.cooldown > 0) pad.cooldown -= dt;
+          if (pad.requiresZone !== undefined && !state.unlockedZones[pad.requiresZone]) continue;
+          if (pad.isDone()) continue;
+
+          if (Math.hypot(player.x - pad.x, player.y - pad.y) <= pad.r + 14 && pad.cooldown <= 0) {
+            const totalCost = pad.getCost();
+            const remaining = Math.max(0, totalCost - pad.paid);
+            if (remaining > 0) {
+              const rate = Math.max(18, totalCost * 1.45) * dt;
+              if (pad.currency === "crystals") {
+                let avail = state.crystals;
+                if (avail < 1) {
+                  const bagIdx = state.inventory.indexOf("starlight_crystal");
+                  if (bagIdx >= 0) {
+                    state.inventory.splice(bagIdx, 1);
+                    state.crystals += 15;
+                    avail = state.crystals;
+                  }
+                }
+                const spend = Math.min(avail, remaining, Math.ceil(rate));
+                if (spend > 0) {
+                  state.crystals -= spend;
+                  pad.paid += spend;
+                  SoundEngine.playPadTick(pad.paid / totalCost);
+                  if (Math.random() < 0.45) spawnFlyingArc(player.x, player.y - 20, pad.x, pad.y, "#7be3ff", "#fff", 5.0, 35);
+                }
+              } else {
+                const spend = Math.min(state.gems, remaining, Math.ceil(rate));
+                if (spend > 0) {
+                  state.gems -= spend;
+                  pad.paid += spend;
+                  SoundEngine.playPadTick(pad.paid / totalCost);
+                  if (Math.random() < 0.45) spawnFlyingArc(player.x, player.y - 20, pad.x, pad.y, "#3fd675", "#d9ffe7", 5.0, 35);
+                }
+              }
+            }
+            if (pad.paid >= totalCost && totalCost > 0) {
+              pad.paid = 0;
+              pad.cooldown = 1.1;
+              pad.onComplete();
+              if (drawerOpen) renderDrawer();
+            }
+          }
+        }
+
+        updateCustomers(dt);
+        updateFairies(dt);
+        updateCarts(dt);
+        updateTurrets(dt);
+        updateMonstersAndBoss(dt);
+        updateProjectilesAndPools(dt);
+
+        const camZoom = typeof getWorldZoom === "function" ? getWorldZoom() : 1.44;
+        camera.x += (player.x - (camera.viewW * 0.5) / camZoom - camera.x) * Math.min(1, dt * 8);
+        camera.y += (player.y - 24 - (camera.viewH * 0.5) / camZoom - camera.y) * Math.min(1, dt * 8);
+        if (camera.shake > 0) camera.shake = Math.max(0, camera.shake - dt * 28);
+      }
+
+      function updateCustomers(dt) {
+        const queueLine = customers.filter((c) => c.state === "queue");
+        customerSpawnTimer -= dt;
+        if (customerSpawnTimer <= 0 && queueLine.length < 7) {
+          customerSpawnTimer = Math.max(0.45, getCustomerBuyInterval() * 0.9);
+          const idx = Math.floor(Math.random() * 5);
+          customers.push({
+            hoodColor: ["#8c3d35", "#9c4d3d", "#7a393b", "#6b475c", "#a35b44"][idx],
+            x: VILLAGE.sellCounter.x - 180,
+            y: VILLAGE.sellCounter.y + 220,
+            state: "queue",
+            bob: Math.random() * Math.PI * 2
+          });
+        }
+
+        let slot = 0;
+        for (let i = 0; i < customers.length; i++) {
+          const c = customers[i];
+          c.bob += dt * 7;
+          if (c.state === "queue") {
+            const tx = VILLAGE.sellCounter.x - 18 - slot * 20;
+            const ty = VILLAGE.sellCounter.y + 42 + slot * 25;
+            const dx = tx - c.x;
+            const dy = ty - c.y;
+            const d = Math.hypot(dx, dy);
+            if (d > 4) {
+              const sp = Math.min(155 * dt, d);
+              c.x += (dx / d) * sp;
+              c.y += (dy / d) * sp;
+            }
+            slot++;
+          } else {
+            c.x -= 130 * dt;
+            c.y += 140 * dt;
+            if (c.y > 540 || c.x < -540) { customers.splice(i, 1); i--; }
+          }
+        }
+
+        customerBuyTimer -= dt;
+        if (customerBuyTimer <= 0 && state.counterStock.length > 0) {
+          const front = customers.find((c) => c.state === "queue" && Math.hypot(c.x - (VILLAGE.sellCounter.x - 18), c.y - (VILLAGE.sellCounter.y + 42)) < 28);
+          if (front) {
+            customerBuyTimer = getCustomerBuyInterval();
+            const batch = Math.min(state.counterStock.length, getCustomerBatchCount());
+            let totalVal = 0;
+            for (let b = 0; b < batch; b++) totalVal += getSaleValue(state.counterStock.pop());
+            front.state = "leaving";
+            spawnFlyingArc(
+              VILLAGE.sellCounter.x - 24, VILLAGE.sellCounter.y - 12,
+              VILLAGE.gemZone.x + (Math.random() - 0.5) * 28,
+              VILLAGE.gemZone.y + (Math.random() - 0.5) * 16,
+              "#3fd675", "#d9ffe7", 3.0, 62,
+              () => { state.uncollectedGems += totalVal; }
+            );
+            spawnFloatText(front.x, front.y - 26, `+${fmtNum(totalVal)}`, "#48f282", 0.9);
+          }
+        }
+      }
+
+      function findHarvestableNodeForZone(preferredZone = -1) {
+        let best = null;
+        let bestScore = Infinity;
+        for (let i = 0; i < resourceNodes.length; i++) {
+          const n = resourceNodes[i];
+          if (!state.unlockedZones[n.zone] || n.respawnTimer > 0) continue;
+          if (preferredZone >= 0 && n.zone !== preferredZone) continue;
+          const score = Math.random() * 200 - n.zone * 90;
+          if (score < bestScore) { bestScore = score; best = n; }
+        }
+        return best;
+      }
+
+      function deliverBagItem(item, sx, sy) {
+        if (state.refineryBuilt && typeof item === "string" && state.refineryQueue.length < 180) {
+          const res = RESOURCES[item];
+          spawnFlyingArc(sx, sy - 16, VILLAGE.refinery.x, VILLAGE.refinery.y - 20, res.color, res.topColor, 3.1, 70, () => {
+            state.refineryQueue.push(item);
+          });
+        } else {
+          const res = typeof item === "string" ? RESOURCES[item] : { color: "#ff87e8", topColor: "#fff" };
+          spawnFlyingArc(sx, sy - 16, VILLAGE.sellCounter.x, VILLAGE.sellCounter.y - 18, res.color, res.topColor, 3.1, 70, () => {
+            state.counterStock.push(item);
+          });
+        }
+      }
+
+      function updateFairies(dt) {
+        const fs = getFairyStats();
+        const dropTarget = state.refineryBuilt ? VILLAGE.refinery : VILLAGE.sellCounter;
+        for (let i = 0; i < fairyWorkers.length; i++) {
+          const f = fairyWorkers[i];
+          f.wingPhase += dt * 18;
+          if (f.state === "gather") {
+            if (!f.targetNode || f.targetNode.respawnTimer > 0) f.targetNode = findHarvestableNodeForZone(-1);
+            if (f.targetNode) {
+              const dx = f.targetNode.x - f.x;
+              const dy = f.targetNode.y - f.y;
+              const d = Math.hypot(dx, dy);
+              if (d > 26) {
+                f.x += (dx / d) * fs.speed * dt;
+                f.y += (dy / d) * fs.speed * dt;
+              } else {
+                f.harvestTimer -= dt;
+                if (f.harvestTimer <= 0) {
+                  f.harvestTimer = 0.28;
+                  const n = f.targetNode;
+                  const res = RESOURCES[n.resId];
+                  n.hp -= fs.power;
+                  n.shake = 0.12;
+                  spawnSlash(n.x, n.y - 4, Math.random() * Math.PI);
+                  if (n.hp <= 0) {
+                    n.respawnTimer = res.respawn;
+                    for (let c = 0; c < 2 && f.bag.length < fs.cap; c++) {
+                      f.bag.push(n.resId);
+                      if (res.crystalBonus > 0) state.crystals += 10;
+                    }
+                    f.targetNode = null;
+                    if (f.bag.length >= fs.cap) f.state = "return";
+                  }
+                }
+              }
+            } else if (f.bag.length > 0) f.state = "return";
+          } else {
+            const dx = dropTarget.x - f.x;
+            const dy = dropTarget.y - f.y;
+            const d = Math.hypot(dx, dy);
+            if (d > 34) {
+              f.x += (dx / d) * fs.speed * 1.15 * dt;
+              f.y += (dy / d) * fs.speed * 1.15 * dt;
+            } else {
+              while (f.bag.length > 0) deliverBagItem(f.bag.pop(), f.x, f.y);
+              f.state = "gather";
+            }
+          }
+        }
+      }
+
+      function updateCarts(dt) {
+        const mult = getCartRefineryMult();
+        const cartSpeed = 145 * Math.min(2.3, mult);
+        const cartCap = Math.round(24 * mult);
+        const dropTarget = state.refineryBuilt ? VILLAGE.refinery : VILLAGE.sellCounter;
+        for (let i = 0; i < autoCarts.length; i++) {
+          const cart = autoCarts[i];
+          if (cart.state === "sweep") {
+            if (!cart.targetNode || cart.targetNode.respawnTimer > 0) cart.targetNode = findHarvestableNodeForZone(cart.zone);
+            if (cart.targetNode) {
+              const dx = cart.targetNode.x - cart.x;
+              const dy = cart.targetNode.y - cart.y;
+              const d = Math.hypot(dx, dy);
+              if (d > 10) {
+                cart.angle = Math.atan2(dy, dx);
+                cart.x += (dx / d) * cartSpeed * dt;
+                cart.y += (dy / d) * cartSpeed * dt;
+              }
+              if (d <= 44) {
+                const n = cart.targetNode;
+                const res = RESOURCES[n.resId];
+                n.hp -= 9999;
+                n.respawnTimer = res.respawn;
+                for (let k = 0; k < 4 && cart.bag.length < cartCap; k++) {
+                  cart.bag.push(n.resId);
+                  if (res.crystalBonus > 0) state.crystals += 12;
+                }
+                spawnBurst(n.x, n.y - 10, res.color, 9, 110, 4);
+                cart.targetNode = null;
+                if (cart.bag.length >= cartCap) cart.state = "return";
+              }
+            } else if (cart.bag.length > 0) cart.state = "return";
+          } else {
+            const dx = dropTarget.x - cart.x;
+            const dy = dropTarget.y - cart.y;
+            const d = Math.hypot(dx, dy);
+            if (d > 48) {
+              cart.angle = Math.atan2(dy, dx);
+              cart.x += (dx / d) * cartSpeed * 1.15 * dt;
+              cart.y += (dy / d) * cartSpeed * 1.15 * dt;
+            } else {
+              while (cart.bag.length > 0) deliverBagItem(cart.bag.pop(), cart.x, cart.y);
+              cart.state = "sweep";
+            }
+          }
+        }
+      }
+
+      function updateTurrets(dt) {
+        for (const bp of TURRET_PAD_BLUEPRINTS) {
+          const tur = state.turrets[bp.id];
+          if (!tur) continue;
+          if (tur.pop > 0) tur.pop = Math.max(0, tur.pop - dt * 3);
+          const info = TURRET_TYPES[tur.type];
+          const dmg = Math.round(info.baseDmg * (1 + (tur.level - 1) * 0.42) * (1 + 0.05 * state.totalStarShards));
+          const range = info.range + (tur.level - 1) * 14;
+          tur.timer -= dt;
+          if (tur.timer <= 0) {
+            const target = findNearestMonster(bp.x, bp.y, range);
+            if (target) {
+              tur.timer = 1 / (info.fireRate * (1 + (tur.level - 1) * 0.08));
+              tur.angle = Math.atan2(target.y - bp.y, target.x - bp.x);
+              if (tur.type === "lightning") {
+                const hits = [target];
+                const pool = activeBoss && activeBoss !== target ? [activeBoss, ...monsters] : [...monsters];
+                let curr = target;
+                for (let c = 0; c < 5; c++) {
+                  let next = null, nextD = 230;
+                  for (const cand of pool) {
+                    if (cand === target || hits.includes(cand)) continue;
+                    const d = Math.hypot(cand.x - curr.x, cand.y - curr.y);
+                    if (d < nextD) { nextD = d; next = cand; }
+                  }
+                  if (!next) break;
+                  hits.push(next); curr = next;
+                }
+                const arc = allocFromPool(lightningPool);
+                if (arc) {
+                  arc.active = true; arc.life = 0; arc.maxLife = 0.2; arc.color = "#d6a4ff";
+                  arc.points = [{ x: bp.x, y: bp.y - 22 }, ...hits.map((h) => ({ x: h.x, y: h.y }))];
+                }
+                hits.forEach((h, idx) => damageEnemy(h, Math.round(dmg * Math.pow(0.85, idx)), 0));
+                SoundEngine.playShoot("lightning");
+              } else if (tur.type === "meteor") {
+                const p = allocFromPool(projectilePool);
+                if (p) {
+                  p.active = true; p.kind = "meteor";
+                  p.startX = bp.x; p.startY = bp.y - 26; p.x = bp.x; p.y = bp.y - 26;
+                  p.targetX = target.x; p.targetY = target.y; p.progress = 0;
+                  p.dmg = dmg; p.aoe = 115 + tur.level * 6; p.color = "#ff8547"; p.radius = 12;
+                }
+                SoundEngine.playShoot("meteor");
+              } else {
+                const p = allocFromPool(projectilePool);
+                if (p) {
+                  p.active = true; p.kind = tur.type;
+                  p.x = bp.x + Math.cos(tur.angle) * 18; p.y = bp.y - 18 + Math.sin(tur.angle) * 18;
+                  p.vx = Math.cos(tur.angle) * 560; p.vy = Math.sin(tur.angle) * 560;
+                  p.dmg = dmg; p.color = info.color; p.radius = tur.type === "frost" ? 9 : 6;
+                  p.life = 0; p.maxLife = 1.0; p.slow = tur.type === "frost" ? 0.55 : 0; p.aoe = tur.type === "frost" ? 75 : 0;
+                }
+                SoundEngine.playShoot("wand");
+              }
+            } else tur.timer = 0.1;
+          }
+        }
+      }
+
+      function updateMonstersAndBoss(dt) {
+        if (!activeBoss) {
+          state.bossTimer -= dt;
+          if (state.bossTimer <= 0) { state.bossTimer = 0; spawnBossWave(); }
+        }
+
+        monsterSpawnTimer -= dt;
+        if (monsterSpawnTimer <= 0 && monsters.length < 18) {
+          monsterSpawnTimer = 2.6;
+          const unlocked = state.unlockedZones.map((u, i) => (u ? i : -1)).filter((i) => i >= 0);
+          const zi = unlocked[Math.floor(Math.random() * unlocked.length)];
+          const b = ZONES[zi].bounds;
+          const tpl = MONSTER_TYPES[zi];
+          const mx = b.x1 + 140 + Math.random() * (b.x2 - b.x1 - 280);
+          const my = b.y1 + 140 + Math.random() * (b.y2 - b.y1 - 280);
+          monsters.push({
+            isBoss: false, zone: zi, name: tpl.name, x: mx, y: my, homeX: mx, homeY: my,
+            hp: tpl.hp, maxHp: tpl.hp, speed: tpl.speed, dmg: tpl.dmg, xp: tpl.xp, drop: tpl.drop,
+            radius: tpl.radius, color: tpl.color, flash: 0, slowTimer: 0, slowFactor: 0, attackTimer: 0,
+            aggroVillage: Math.random() < 0.3
+          });
+        }
+
+        const stepEnemy = (e) => {
+          if (e.flash > 0) e.flash -= dt;
+          if (e.slowTimer > 0) e.slowTimer -= dt;
+          if (e.attackTimer > 0) e.attackTimer -= dt;
+          const slowMult = e.slowTimer > 0 ? (1 - e.slowFactor) : 1;
+          const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
+          let tx = e.x, ty = e.y;
+          if (e.isBoss || e.aggroVillage) {
+            tx = distToPlayer < 260 ? player.x : 0;
+            ty = distToPlayer < 260 ? player.y : 0;
+          } else if (distToPlayer < 250) {
+            tx = player.x; ty = player.y;
+          } else {
+            tx = e.homeX + Math.cos(state.playTime + e.homeY) * 60;
+            ty = e.homeY + Math.sin(state.playTime + e.homeX) * 60;
+          }
+          const dx = tx - e.x, dy = ty - e.y, d = Math.hypot(dx, dy);
+          if (d > e.radius + 14) {
+            e.x += (dx / d) * e.speed * slowMult * dt;
+            e.y += (dy / d) * e.speed * slowMult * dt;
+          }
+          if (distToPlayer < e.radius + 18 && e.attackTimer <= 0 && player.invuln <= 0) {
+            e.attackTimer = 0.85;
+            player.hp -= e.dmg;
+            player.invuln = 0.35;
+            spawnFloatText(player.x, player.y - 34, `-${e.dmg}`, "#ff698f", 1.0);
+            if (player.hp <= 0) {
+              player.hp = player.maxHp;
+              player.x = 0; player.y = 35;
+              spawnBurst(player.x, player.y, "#9ff5ff", 22, 160, 5);
+              showToast("🛡️ 보호막 발동! 캠프 광장으로 안전 복귀했습니다.");
+            }
+          }
+        };
+
+        if (activeBoss) stepEnemy(activeBoss);
+        for (let i = 0; i < monsters.length; i++) stepEnemy(monsters[i]);
+      }
+
+      function updateProjectilesAndPools(dt) {
+        for (let i = 0; i < projectilePool.length; i++) {
+          const p = projectilePool[i];
+          if (!p.active) continue;
+          if (p.kind === "meteor") {
+            p.progress += dt * 1.4;
+            const t = Math.min(1, p.progress);
+            p.x = p.startX + (p.targetX - p.startX) * t;
+            p.y = p.startY + (p.targetY - p.startY) * t - Math.sin(t * Math.PI) * 145;
+            if (Math.random() < 0.5) spawnParticle(p.x, p.y, 0, -20, 4, "#ff9e58", 0.25);
+            if (t >= 1) {
+              p.active = false;
+              camera.shake = Math.max(camera.shake, 4.5);
+              spawnBurst(p.targetX, p.targetY, "#ff7c44", 18, 165, 6);
+              if (activeBoss && Math.hypot(activeBoss.x - p.targetX, activeBoss.y - p.targetY) <= p.aoe + activeBoss.radius) damageEnemy(activeBoss, p.dmg, 0);
+              for (let m = monsters.length - 1; m >= 0; m--) {
+                const mon = monsters[m];
+                if (Math.hypot(mon.x - p.targetX, mon.y - p.targetY) <= p.aoe + mon.radius) damageEnemy(mon, p.dmg, 0);
+              }
+            }
+            continue;
+          }
+          p.life += dt;
+          if (p.life >= p.maxLife) { p.active = false; continue; }
+          p.x += p.vx * dt; p.y += p.vy * dt;
+          let hitEnemy = null;
+          if (activeBoss && Math.hypot(activeBoss.x - p.x, activeBoss.y - p.y) <= activeBoss.radius + p.radius) hitEnemy = activeBoss;
+          else {
+            for (let m = 0; m < monsters.length; m++) {
+              if (Math.hypot(monsters[m].x - p.x, monsters[m].y - p.y) <= monsters[m].radius + p.radius) { hitEnemy = monsters[m]; break; }
+            }
+          }
+          if (hitEnemy) {
+            p.active = false;
+            if (p.aoe > 0) {
+              spawnBurst(p.x, p.y, "#84eaff", 12, 110, 4);
+              if (activeBoss && Math.hypot(activeBoss.x - p.x, activeBoss.y - p.y) <= p.aoe + activeBoss.radius) damageEnemy(activeBoss, p.dmg, p.slow);
+              for (let m = monsters.length - 1; m >= 0; m--) {
+                const mon = monsters[m];
+                if (Math.hypot(mon.x - p.x, mon.y - p.y) <= p.aoe + mon.radius) damageEnemy(mon, p.dmg, p.slow);
+              }
+            } else {
+              damageEnemy(hitEnemy, p.dmg, p.slow);
+              spawnBurst(p.x, p.y, p.color, 5, 80, 3);
+            }
+          }
+        }
+
+        for (let i = 0; i < flyingItemPool.length; i++) {
+          const f = flyingItemPool[i];
+          if (!f.active) continue;
+          f.progress += dt * f.speed;
+          if (f.progress >= 1) { f.active = false; if (f.onArrive) f.onArrive(); }
+        }
+        for (let i = 0; i < particlePool.length; i++) {
+          const p = particlePool[i];
+          if (!p.active) continue;
+          p.life += dt;
+          if (p.life >= p.maxLife) { p.active = false; continue; }
+          p.vy += p.gravity * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        }
+        for (let i = 0; i < footstepPool.length; i++) {
+          const f = footstepPool[i];
+          if (!f.active) continue;
+          f.life += dt; if (f.life >= f.maxLife) f.active = false;
+        }
+        for (let i = 0; i < floatTextPool.length; i++) {
+          const t = floatTextPool[i];
+          if (!t.active) continue;
+          t.life += dt; t.y += t.vy * dt; if (t.life >= t.maxLife) t.active = false;
+        }
+        for (let i = 0; i < lightningPool.length; i++) {
+          const l = lightningPool[i];
+          if (!l.active) continue;
+          l.life += dt; if (l.life >= l.maxLife) l.active = false;
+        }
+        for (let i = 0; i < slashPool.length; i++) {
+          const s = slashPool[i];
+          if (!s.active) continue;
+          s.life += dt; if (s.life >= s.maxLife) s.active = false;
+        }
+        for (let i = rainbowWaves.length - 1; i >= 0; i--) {
+          const w = rainbowWaves[i];
+          w.radius += 980 * dt;
+          w.alpha = Math.max(0, 1 - w.radius / w.maxRadius);
+          if (w.radius >= w.maxRadius) rainbowWaves.splice(i, 1);
+        }
+      }
+
+      /* =========================================================================
+       * 8. 2.5D ISOMETRIC RENDERER (Whiteout Playable-Ad Quality)
+       * ========================================================================= */
+      let viewW = window.innerWidth;
+      let viewH = window.innerHeight;
+
+      // True 2:1 Isometric Floor Basis centered at (CAMP_CX, CAMP_CY)
+      const CAMP_CX = 0;
+      const CAMP_CY = 40;
+      const CAMP_U = 260;
+      const CAMP_V = 255;
+      const ISO_UX = 0.86;
+      const ISO_UY = 0.46;
+      const ISO_VX = -0.82;
+      const ISO_VY = 0.48;
+
+      function campToWorld(u, v) {
+        return {
+          x: CAMP_CX + u * ISO_UX + v * ISO_VX,
+          y: CAMP_CY + u * ISO_UY + v * ISO_VY
+        };
+      }
+
+      // Precomputed static perimeter palisade logs, NE gate doors & faceted boulders
+      const PALISADE_LOGS = [];
+      const CAMP_GATE_DOORS = [];
+      (() => {
+        const pushLog = (u, v, seedVal) => {
+          const p = campToWorld(u, v);
+          PALISADE_LOGS.push({ x: p.x, y: p.y, hVar: ((seedVal * 37) % 5) - 2 });
+        };
+        // NW Wall (back-left), gap at v in [-170, -68] for Zone 2
+        for (let v = -CAMP_V, i = 0; v <= CAMP_V; v += 15, i++) {
+          if (v > -170 && v < -68) continue;
+          pushLog(-CAMP_U, v, i);
+        }
+        // NE Wall (back-right), gaps for Zone 3 [-156, -58] and Hero Gate [26, 130]
+        for (let u = -CAMP_U + 15, i = 0; u <= CAMP_U - 12; u += 15, i++) {
+          if (u > -156 && u < -58) continue;
+          if (u > 26 && u < 130) continue;
+          pushLog(u, -CAMP_V, i + 40);
+        }
+        // Hinged Wooden Gate Doors at NE Hero Gate (u=26 and u=130)
+        const g1 = campToWorld(26, -CAMP_V);
+        const g2 = campToWorld(130, -CAMP_V);
+        CAMP_GATE_DOORS.push({ x: g1.x, y: g1.y, side: -1 });
+        CAMP_GATE_DOORS.push({ x: g2.x, y: g2.y, side: 1 });
+
+        // SW Wall (front-left), wide opening for customers & Zone 1 hunting [-125, 45]
+        for (let u = -CAMP_U, i = 0; u <= CAMP_U; u += 15.5, i++) {
+          if (u > -125 && u < 45) continue;
+          pushLog(u, CAMP_V, i + 80);
+        }
+        // SE Wall (front-right), gap [-25, 95] toward Refinery / Zone 4
+        for (let v = -CAMP_V + 15, i = 0; v <= CAMP_V - 15; v += 15.5, i++) {
+          if (v > -25 && v < 95) continue;
+          pushLog(CAMP_U, v, i + 120);
+        }
+      })();
+
+      const CAMP_BOULDERS = [
+        { x: -55, y: -255, s: 1.50 },
+        { x: -345, y: -175, s: 1.12 },
+        { x: 375, y: -195, s: 1.18 },
+        { x: -395, y: 120, s: 1.00 },
+        { x: 400, y: 155, s: 1.10 }
+      ];
+
+      // Ambient drifting snow specks (fixed pool, zero GC)
+      const SNOW_SPECKS = Array.from({ length: 42 }, (_, i) => ({
+        xRatio: ((i * 73) % 100) / 100,
+        yRatio: ((i * 41) % 100) / 100,
+        r: 1.4 + (i % 3) * 0.9,
+        spY: 16 + (i % 5) * 6,
+        spX: -12 + (i % 4) * 4
+      }));
+
+      // Reusable Y-sort render list (zero GC per frame)
+      const SORT_KIND = {
+        LOG: 1,
+        GATE: 2,
+        BOULDER: 3,
+        DECOR: 4,
+        CAULDRON: 5,
+        SELL: 6,
+        GEMPILE: 7,
+        REFINERY: 8,
+        RES: 9,
+        BUBBLE: 10,
+        TURRET: 11,
+        CUSTOMER: 12,
+        FAIRY: 13,
+        CART: 14,
+        MONSTER: 15,
+        PLAYER: 16
+      };
+      const sortList = Array.from({ length: 520 }, () => ({ y: 0, kind: 0, ref: null }));
+      let sortCount = 0;
+      function pushSortItem(y, kind, ref) {
+        if (sortCount >= sortList.length) return;
+        const slot = sortList[sortCount++];
+        slot.y = y;
+        slot.kind = kind;
+        slot.ref = ref;
+      }
+
+      function resizeCanvas() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        viewW = window.innerWidth;
+        viewH = window.innerHeight;
+        camera.viewW = viewW;
+        camera.viewH = viewH;
+        canvas.width = Math.floor(viewW * dpr);
+        canvas.height = Math.floor(viewH * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      function getWorldZoom() {
+        return viewW < 600 ? 1.12 : 1.44;
+      }
+
+      function inView(wx, wy, pad = 120) {
+        const zoom = getWorldZoom();
+        return wx >= camera.x - pad && wx <= camera.x + viewW / zoom + pad && wy >= camera.y - pad && wy <= camera.y + viewH / zoom + pad;
+      }
+
+      function drawRoundedRect(x, y, w, h, r) {
+        const rad = Math.min(r, w * 0.5, h * 0.5);
+        ctx.beginPath();
+        if (typeof ctx.roundRect === "function") { ctx.roundRect(x, y, w, h, rad); return; }
+        ctx.moveTo(x + rad, y);
+        ctx.arcTo(x + w, y, x + w, y + h, rad);
+        ctx.arcTo(x + w, y + h, x, y + h, rad);
+        ctx.arcTo(x, y + h, x, y, rad);
+        ctx.arcTo(x, y, x + w, y, rad);
+        ctx.closePath();
+      }
+
+      function drawBillMini(x, y, isCrystal = false) {
+        ctx.save();
+        ctx.translate(x, y);
+        if (isCrystal) {
+          ctx.fillStyle = "#4ce0ff";
+          ctx.beginPath();
+          ctx.moveTo(0, -8); ctx.lineTo(6.5, 0); ctx.lineTo(0, 8); ctx.lineTo(-6.5, 0); ctx.closePath();
+          ctx.fill();
+          ctx.strokeStyle = "#164e6e"; ctx.lineWidth = 1.4; ctx.stroke();
+          ctx.fillStyle = "#e6fbff";
+          ctx.beginPath(); ctx.moveTo(0, -5); ctx.lineTo(3, 0); ctx.lineTo(0, 2); ctx.lineTo(-3, 0); ctx.closePath(); ctx.fill();
+        } else {
+          ctx.fillStyle = "#1d8540";
+          drawRoundedRect(-10, -5, 20, 12, 2.5); ctx.fill();
+          ctx.fillStyle = "#46e078";
+          drawRoundedRect(-11, -8, 20, 11, 2.5); ctx.fill();
+          ctx.strokeStyle = "#114d24"; ctx.lineWidth = 1.4; ctx.stroke();
+          ctx.fillStyle = "#1d8540";
+          ctx.beginPath(); ctx.arc(-1, -2.5, 3, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawCampParquetFloor() {
+        if (!inView(CAMP_CX, CAMP_CY, 560)) return;
+        ctx.save();
+        ctx.transform(ISO_UX, ISO_UY, ISO_VX, ISO_VY, CAMP_CX, CAMP_CY);
+
+        // Warm wooden plank threshold walkway extending out through the NE Hero Gate (like video!)
+        ctx.fillStyle = "rgba(116, 134, 158, 0.24)";
+        drawRoundedRect(24, -CAMP_V - 44, 108, 46, 6);
+        ctx.fill();
+        ctx.fillStyle = "#b57438";
+        ctx.strokeStyle = "#5c3010";
+        ctx.lineWidth = 2;
+        drawRoundedRect(26, -CAMP_V - 42, 104, 44, 5);
+        ctx.fill();
+        ctx.stroke();
+        for (let p = 0; p < 5; p++) {
+          ctx.fillStyle = p % 2 === 0 ? "#cf8e51" : "#dfa064";
+          ctx.fillRect(28 + p * 20, -CAMP_V - 40, 19, 40);
+          ctx.strokeStyle = "rgba(92, 48, 16, 0.45)";
+          ctx.lineWidth = 1.2;
+          ctx.strokeRect(28 + p * 20, -CAMP_V - 40, 19, 40);
+        }
+
+        // Snow contact shadow under raised wooden floor deck
+        ctx.fillStyle = "rgba(116, 134, 158, 0.28)";
+        drawRoundedRect(-CAMP_U - 14, -CAMP_V - 10, CAMP_U * 2 + 28, CAMP_V * 2 + 28, 18);
+        ctx.fill();
+
+        // Dark outer wood sill frame
+        ctx.fillStyle = "#7a4319";
+        drawRoundedRect(-CAMP_U - 7, -CAMP_V - 7, CAMP_U * 2 + 14, CAMP_V * 2 + 14, 14);
+        ctx.fill();
+
+        // Warm honey amber floor fill
+        ctx.fillStyle = "#d99d62";
+        drawRoundedRect(-CAMP_U, -CAMP_V, CAMP_U * 2, CAMP_V * 2, 10);
+        ctx.fill();
+
+        // Staggered parquet wood planks clipped cleanly to camp diamond
+        ctx.save();
+        ctx.clip();
+        const plankW = 55;
+        const plankH = 27;
+        const shades = ["#db9f65", "#d19358", "#e2ab74", "#c8894f", "#d79a60"];
+        for (let row = -10; row <= 10; row++) {
+          const py = row * plankH;
+          const xOff = (row % 2) * (plankW * 0.5);
+          for (let col = -6; col <= 6; col++) {
+            const px = col * plankW + xOff;
+            ctx.fillStyle = shades[((row + 20) * 3 + (col + 10) * 5) % shades.length];
+            ctx.fillRect(px, py, plankW, plankH);
+          }
+        }
+        // Subtle crisp wood seam grid
+        ctx.strokeStyle = "rgba(96, 52, 18, 0.24)";
+        ctx.lineWidth = 1.2;
+        for (let row = -10; row <= 10; row++) {
+          const py = row * plankH;
+          ctx.beginPath(); ctx.moveTo(-CAMP_U, py); ctx.lineTo(CAMP_U, py); ctx.stroke();
+          const xOff = (row % 2) * (plankW * 0.5);
+          for (let col = -6; col <= 6; col++) {
+            const px = col * plankW + xOff;
+            ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py + plankH); ctx.stroke();
+          }
+        }
+        // Subtle perimeter shadow along NW & NE back walls
+        ctx.fillStyle = "rgba(74, 36, 12, 0.14)";
+        ctx.fillRect(-CAMP_U, -CAMP_V, CAMP_U * 2, 18);
+        ctx.fillRect(-CAMP_U, -CAMP_V, 18, CAMP_V * 2);
+        ctx.restore();
+
+        // Crisp border outline around parquet floor
+        ctx.strokeStyle = "#5c3010";
+        ctx.lineWidth = 2;
+        drawRoundedRect(-CAMP_U, -CAMP_V, CAMP_U * 2, CAMP_V * 2, 10);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawIsoFloorMat(wx, wy, size, activeTint = false) {
+        ctx.save();
+        ctx.transform(ISO_UX, ISO_UY, ISO_VX, ISO_VY, wx, wy);
+        ctx.fillStyle = activeTint ? "rgba(62, 224, 112, 0.34)" : "rgba(255, 255, 255, 0.16)";
+        drawRoundedRect(-size, -size, size * 2, size * 2, 10);
+        ctx.fill();
+        ctx.strokeStyle = activeTint ? "#88ffad" : "rgba(255, 255, 255, 0.94)";
+        ctx.lineWidth = 3.2;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawIsoDiamondPad(pad) {
+        const cost = pad.getCost();
+        const rem = Math.max(0, cost - pad.paid);
+        const pct = cost > 0 ? Math.min(1, pad.paid / cost) : 1;
+        const s = pad.r * 0.86;
+
+        ctx.save();
+        ctx.transform(ISO_UX, ISO_UY, ISO_VX, ISO_VY, pad.x, pad.y);
+
+        // Dark umber translucent base square on parquet floor
+        ctx.save();
+        drawRoundedRect(-s, -s, s * 2, s * 2, 9);
+        ctx.fillStyle = "rgba(48, 32, 20, 0.62)";
+        ctx.fill();
+
+        if (pct > 0) {
+          ctx.save();
+          ctx.clip();
+          ctx.fillStyle = "rgba(56, 224, 106, 0.72)";
+          ctx.fillRect(-s - 2, s - s * 2 * pct, s * 2 + 4, s * 2 * pct + 2);
+          ctx.restore();
+        }
+        ctx.restore();
+
+        // 4 Thick White Corner Brackets (matching video pads!)
+        const k = 14;
+        const drawCorners = (col, lw) => {
+          ctx.strokeStyle = col;
+          ctx.lineWidth = lw;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          // TL
+          ctx.beginPath(); ctx.moveTo(-s, -s + k); ctx.lineTo(-s, -s); ctx.lineTo(-s + k, -s); ctx.stroke();
+          // TR
+          ctx.beginPath(); ctx.moveTo(s - k, -s); ctx.lineTo(s, -s); ctx.lineTo(s, -s + k); ctx.stroke();
+          // BR
+          ctx.beginPath(); ctx.moveTo(s, s - k); ctx.lineTo(s, s); ctx.lineTo(s - k, s); ctx.stroke();
+          // BL
+          ctx.beginPath(); ctx.moveTo(-s + k, s); ctx.lineTo(-s, s); ctx.lineTo(-s, s - k); ctx.stroke();
+          // Subtle side chevrons < >
+          ctx.beginPath(); ctx.moveTo(-s - 3, -5); ctx.lineTo(-s - 7, 0); ctx.lineTo(-s - 3, 5); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(s + 3, -5); ctx.lineTo(s + 7, 0); ctx.lineTo(s + 3, 5); ctx.stroke();
+        };
+        drawCorners("rgba(42, 24, 12, 0.78)", 6.4);
+        drawCorners("#ffffff", 3.5);
+
+        // Clean Icon-Only Upper Half (NO Korean text clutter inside camp pads!)
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#ffffff";
+        const drawPlusBadge = (px, py) => {
+          ctx.strokeStyle = "rgba(24,14,8,0.85)"; ctx.lineWidth = 4.2; ctx.lineCap = "round";
+          ctx.beginPath(); ctx.moveTo(px - 5, py); ctx.lineTo(px + 5, py); ctx.moveTo(px, py - 5); ctx.lineTo(px, py + 5); ctx.stroke();
+          ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2.4;
+          ctx.beginPath(); ctx.moveTo(px - 5, py); ctx.lineTo(px + 5, py); ctx.moveTo(px, py - 5); ctx.lineTo(px, py + 5); ctx.stroke();
+        };
+
+        if (pad.iconType === "person") {
+          // Crisp person bust silhouette + ratio (1/15)
+          ctx.strokeStyle = "rgba(24,14,8,0.75)"; ctx.lineWidth = 2.6;
+          ctx.beginPath(); ctx.arc(-13, -15, 5.2, 0, Math.PI * 2); ctx.stroke(); ctx.fill();
+          ctx.beginPath(); ctx.arc(-13, -2, 8.4, Math.PI, 0); ctx.closePath(); ctx.stroke(); ctx.fill();
+          ctx.textAlign = "left"; ctx.font = "900 13px Pretendard, sans-serif";
+          ctx.strokeStyle = "rgba(24,14,8,0.85)"; ctx.lineWidth = 3.2;
+          ctx.strokeText(pad.getRatio(), -1, -6);
+          ctx.fillText(pad.getRatio(), -1, -6);
+        } else if (pad.iconType === "axe") {
+          // Crisp white axe/pickaxe silhouette + "+" (matching video!)
+          ctx.lineCap = "round";
+          ctx.strokeStyle = "rgba(24,14,8,0.8)"; ctx.lineWidth = 5;
+          ctx.beginPath(); ctx.moveTo(-14, -2); ctx.lineTo(-1, -16); ctx.stroke();
+          ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(-14, -2); ctx.lineTo(-1, -16); ctx.stroke();
+          ctx.fillStyle = "#ffffff"; ctx.strokeStyle = "rgba(24,14,8,0.8)"; ctx.lineWidth = 2.2;
+          ctx.beginPath(); ctx.moveTo(-6, -18); ctx.quadraticCurveTo(5, -20, 4, -10); ctx.lineTo(-2, -13); ctx.closePath();
+          ctx.stroke(); ctx.fill();
+          drawPlusBadge(12, -10);
+        } else if (pad.iconType === "bag") {
+          // Crisp white satchel/pack + "+"
+          ctx.strokeStyle = "rgba(24,14,8,0.8)"; ctx.lineWidth = 2.4;
+          ctx.beginPath(); ctx.arc(-8, -17, 4.2, Math.PI, 0); ctx.stroke();
+          drawRoundedRect(-16, -16, 16, 13, 3.2); ctx.stroke(); ctx.fill();
+          ctx.fillStyle = "rgba(48,32,20,0.6)"; ctx.fillRect(-10, -11, 4, 3);
+          drawPlusBadge(11, -10);
+        } else if (pad.iconType === "cauldron") {
+          // Crisp white stone hearth / bubbling pot silhouette + "+"
+          ctx.strokeStyle = "rgba(24,14,8,0.85)"; ctx.lineWidth = 2.4;
+          drawRoundedRect(-17, -15, 16, 12, 3); ctx.stroke(); ctx.fill();
+          ctx.beginPath(); ctx.arc(-9, -15, 7, Math.PI, 0); ctx.stroke(); ctx.fill();
+          ctx.fillStyle = "#ff9d3b";
+          ctx.beginPath(); ctx.arc(-9, -8, 3.5, 0, Math.PI * 2); ctx.fill();
+          drawPlusBadge(11, -10);
+        } else if (pad.iconType === "refinery") {
+          // Crisp white bubbling alembic flask + "+"
+          ctx.strokeStyle = "rgba(24,14,8,0.85)"; ctx.lineWidth = 2.4;
+          ctx.beginPath(); ctx.arc(-8, -7, 7, 0, Math.PI * 2); ctx.stroke(); ctx.fill();
+          ctx.fillRect(-11, -19, 6, 8);
+          drawPlusBadge(11, -10);
+        } else if (pad.iconType === "turret") {
+          // Star turret cannon silhouette + Lv
+          ctx.strokeStyle = "rgba(24,14,8,0.85)"; ctx.lineWidth = 2.4;
+          drawRoundedRect(-15, -12, 14, 9, 3); ctx.stroke(); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(-6, -12); ctx.lineTo(3, -18); ctx.lineWidth = 4; ctx.stroke();
+          ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2.6;
+          ctx.beginPath(); ctx.moveTo(-6, -12); ctx.lineTo(3, -18); ctx.stroke();
+          drawPlusBadge(12, -10);
+        } else if (pad.iconType === "cart") {
+          // Auto cart silhouette + "+"
+          ctx.strokeStyle = "rgba(24,14,8,0.85)"; ctx.lineWidth = 2.2;
+          drawRoundedRect(-16, -15, 16, 9, 2.5); ctx.stroke(); ctx.fill();
+          ctx.beginPath(); ctx.arc(-13, -5, 3, 0, Math.PI * 2); ctx.arc(-3, -5, 3, 0, Math.PI * 2); ctx.fill();
+          drawPlusBadge(12, -10);
+        } else {
+          // Clean gate arch icon + zone number ("2F", "3F", "4F")
+          ctx.strokeStyle = "rgba(24,14,8,0.85)"; ctx.lineWidth = 2.4;
+          ctx.beginPath(); ctx.arc(-9, -10, 6.5, Math.PI, 0); ctx.lineTo(-2.5, -4); ctx.lineTo(-15.5, -4); ctx.closePath(); ctx.stroke(); ctx.fill();
+          ctx.textAlign = "left"; ctx.font = "900 13px Pretendard, sans-serif";
+          ctx.strokeStyle = "rgba(24,14,8,0.85)"; ctx.lineWidth = 3.2;
+          ctx.strokeText(pad.getRatio(), 2, -6);
+          ctx.fillText(pad.getRatio(), 2, -6);
+        }
+
+        // Bottom Cost + Green Banknote / Crystal Icon
+        if (!pad.isDone()) {
+          ctx.textAlign = "right";
+          ctx.font = "900 15px Pretendard, sans-serif";
+          ctx.strokeStyle = "rgba(20,12,6,0.92)"; ctx.lineWidth = 3.8;
+          ctx.strokeText(fmtNum(rem), 5, 16);
+          ctx.fillStyle = "#ffffff";
+          ctx.fillText(fmtNum(rem), 5, 16);
+          drawBillMini(18, 12, pad.currency === "crystals");
+        } else {
+          ctx.textAlign = "center";
+          ctx.fillStyle = "#88ffb8";
+          ctx.font = "900 12px Pretendard, sans-serif";
+          ctx.fillText("✓ MAX", 0, 14);
+        }
+        ctx.restore();
+      }
+
+      function drawStationPinBadge(x, y, mode = "check", count = 0) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#38261c";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, 16, 0, Math.PI * 2);
+        ctx.fill(); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-6, 13); ctx.lineTo(0, 22); ctx.lineTo(6, 13); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        // Clean interior fill over join seam
+        ctx.beginPath(); ctx.arc(0, 0, 14.2, 0, Math.PI * 2); ctx.fill();
+
+        if (mode === "check") {
+          ctx.fillStyle = "#25d95b";
+          ctx.beginPath(); ctx.arc(0, 0, 11.2, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 3; ctx.lineCap = "round"; ctx.lineJoin = "round";
+          ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(-1, 4.2); ctx.lineTo(5.8, -4.2); ctx.stroke();
+        } else {
+          // Green inner circular ring + miniature crimson brick + bold count (matching video's "2" badge!)
+          ctx.strokeStyle = "#25d95b";
+          ctx.lineWidth = 2.6;
+          ctx.beginPath(); ctx.arc(0, 0, 11.8, 0, Math.PI * 2); ctx.stroke();
+          drawIsoSlabTile(-5.2, 1.5, 9, 4.5, 2.5, "#f24b5c", "#a31e30", "#38121a", null);
+          ctx.fillStyle = "#221a16";
+          ctx.font = "900 11.5px Pretendard, sans-serif";
+          ctx.textAlign = "left"; ctx.textBaseline = "middle";
+          ctx.fillText(String(count), 2.5, 0.5);
+        }
+        ctx.restore();
+      }
+
+      function drawPalisadeLog(x, y, hVar = 0) {
+        const h = 36 + hVar;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.fillStyle = "rgba(42, 24, 10, 0.25)";
+        ctx.beginPath(); ctx.ellipse(-3, 2, 10, 5, 0, 0, Math.PI * 2); ctx.fill();
+
+        // Main vertical wooden shaft (thicker 15px cel-shaded log)
+        ctx.fillStyle = "#cf8b4a";
+        ctx.fillRect(-7.5, -h, 15, h);
+        ctx.fillStyle = "#f0c188";
+        ctx.fillRect(-7.5, -h, 5, h);
+        ctx.fillStyle = "#995c26";
+        ctx.fillRect(2.5, -h, 5, h);
+        ctx.strokeStyle = "#4a280e"; ctx.lineWidth = 1.7;
+        ctx.strokeRect(-7.5, -h, 15, h);
+
+        // Conical pointed wooden top pointing straight UP
+        ctx.fillStyle = "#fbe4c2";
+        ctx.beginPath();
+        ctx.moveTo(-7.5, -h);
+        ctx.lineTo(0, -h - 13);
+        ctx.lineTo(7.5, -h);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = "#d99d64";
+        ctx.beginPath();
+        ctx.moveTo(0, -h - 13);
+        ctx.lineTo(7.5, -h);
+        ctx.lineTo(0, -h);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = "#4a280e"; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(-7.5, -h); ctx.lineTo(0, -h - 13); ctx.lineTo(7.5, -h); ctx.closePath(); ctx.stroke();
+
+        // Soft snowdrift hugging base of palisade logs
+        ctx.fillStyle = "#eef4fa";
+        ctx.beginPath(); ctx.ellipse(-4, 2.5, 8.5, 4.2, -0.15, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#d7e4f2";
+        ctx.beginPath(); ctx.ellipse(4.5, 3, 6.5, 3.4, 0.1, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+
+      function drawCampGateDoor(x, y, side) {
+        ctx.save();
+        ctx.translate(x, y);
+        // Thick square timber gate pillar with snow cap
+        ctx.fillStyle = "#8a4d1e";
+        ctx.strokeStyle = "#3f200a"; ctx.lineWidth = 2;
+        ctx.fillRect(-9, -42, 18, 42); ctx.strokeRect(-9, -42, 18, 42);
+        ctx.fillStyle = "#f2f7fc";
+        drawRoundedRect(-10, -47, 20, 7, 3); ctx.fill(); ctx.stroke();
+
+        // Open cross-braced gate wing swung outward into snowfield
+        const dx = side < 0 ? 20 : -20;
+        const dy = -18;
+        ctx.fillStyle = "#b86d2e";
+        ctx.beginPath();
+        ctx.moveTo(0, -32); ctx.lineTo(dx, dy - 32); ctx.lineTo(dx, dy); ctx.lineTo(0, 0); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        ctx.strokeStyle = "#5c3416"; ctx.lineWidth = 2.2;
+        ctx.beginPath(); ctx.moveTo(0, -21); ctx.lineTo(dx, dy - 21); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(dx, dy - 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, -30); ctx.lineTo(dx, dy - 3); ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawFacetedBoulder(x, y, s = 1) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(s, s);
+        ctx.fillStyle = "rgba(86, 102, 126, 0.28)";
+        ctx.beginPath(); ctx.ellipse(2, 12, 42, 16, 0, 0, Math.PI * 2); ctx.fill();
+
+        // Main faceted rock body
+        ctx.fillStyle = "#918984";
+        ctx.strokeStyle = "#3b3430";
+        ctx.lineWidth = 2.4;
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        ctx.moveTo(-36, 6); ctx.lineTo(-28, -28); ctx.lineTo(-4, -44); ctx.lineTo(26, -30); ctx.lineTo(38, 4); ctx.lineTo(14, 14); ctx.lineTo(-18, 14);
+        ctx.closePath();
+        ctx.fill(); ctx.stroke();
+
+        // Right darker facet plane
+        ctx.fillStyle = "#706864";
+        ctx.beginPath();
+        ctx.moveTo(-4, -44); ctx.lineTo(26, -30); ctx.lineTo(38, 4); ctx.lineTo(14, 14); ctx.lineTo(4, -12);
+        ctx.closePath();
+        ctx.fill();
+
+        // Snow cap along top facets
+        ctx.fillStyle = "#f4f8fc";
+        ctx.beginPath();
+        ctx.moveTo(-29, -22); ctx.lineTo(-28, -28); ctx.lineTo(-4, -44); ctx.lineTo(26, -30); ctx.lineTo(29, -17);
+        ctx.quadraticCurveTo(10, -24, 0, -14);
+        ctx.quadraticCurveTo(-14, -24, -29, -22);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = "#3b3430"; ctx.lineWidth = 2; ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawDecorProp(d) {
+        const unlocked = state.unlockedZones[d.zone];
+        ctx.save();
+        ctx.translate(d.x, d.y);
+        ctx.scale(d.scale, d.scale);
+        if (!unlocked) ctx.globalAlpha = 0.55;
+        if (d.kind === "pine") {
+          ctx.fillStyle = "rgba(88, 106, 130, 0.26)";
+          ctx.beginPath(); ctx.ellipse(-4, 8, 22, 9, 0, 0, Math.PI * 2); ctx.fill();
+          if (d.zone === 0) {
+            // Bare reddish-brown winter tree with snow-dusted spreading branches (matches video!)
+            ctx.fillStyle = "#8c4a2f";
+            ctx.strokeStyle = "#361a10"; ctx.lineWidth = 2; ctx.lineJoin = "round";
+            ctx.beginPath();
+            ctx.moveTo(-7, 6);
+            ctx.lineTo(-4.5, -26);
+            ctx.lineTo(-22, -46); ctx.lineTo(-18, -49); ctx.lineTo(-3, -34);
+            ctx.lineTo(-2, -62); ctx.lineTo(3, -62); ctx.lineTo(3, -38);
+            ctx.lineTo(19, -52); ctx.lineTo(22, -48); ctx.lineTo(5, -28);
+            ctx.lineTo(7, 6);
+            ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            // Snow caps perched on upward branches & crotch
+            ctx.fillStyle = "#f4f8fc";
+            ctx.strokeStyle = "#9eb2c9"; ctx.lineWidth = 1.2;
+            ctx.beginPath(); ctx.ellipse(-18, -49, 7, 3.2, -0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(17, -51, 7.5, 3.2, 0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(0.5, -62, 6.5, 3.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          } else {
+            // Zone 2-4 enchanted frost trees
+            ctx.fillStyle = d.zone === 1 ? "#3e7868" : d.zone === 2 ? "#525894" : "#7d4a7a";
+            ctx.strokeStyle = "#361a10"; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-7, 6); ctx.lineTo(-2, -62); ctx.lineTo(2, -62); ctx.lineTo(7, 6); ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            ctx.fillStyle = d.zone === 1 ? "#59b89c" : d.zone === 2 ? "#7a8cde" : "#ba6ec2";
+            ctx.beginPath(); ctx.moveTo(-19, -20); ctx.lineTo(0, -68); ctx.lineTo(19, -20); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = "#f2f7fc";
+            ctx.beginPath(); ctx.moveTo(-9, -46); ctx.lineTo(0, -68); ctx.lineTo(9, -46); ctx.quadraticCurveTo(0, -40, -9, -46); ctx.fill();
+          }
+        } else if (d.kind === "flower") {
+          ctx.fillStyle = unlocked ? "#ffd4ec" : "#8994a6";
+          ctx.beginPath(); ctx.arc(-4, 0, 3.8, 0, Math.PI * 2); ctx.arc(4, 2, 3.8, 0, Math.PI * 2); ctx.arc(0, -4, 3.8, 0, Math.PI * 2); ctx.fill();
+        } else {
+          ctx.fillStyle = unlocked ? "#9aa6b8" : "#6b7485";
+          ctx.strokeStyle = "#3a404a"; ctx.lineWidth = 1.6;
+          ctx.beginPath(); ctx.ellipse(0, 0, 15, 9, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawWorldBackground() {
+        // Crisp Arctic Snowfield Base (matches video's bright clean snow canvas!)
+        ctx.fillStyle = "#e4ecf5";
+        ctx.fillRect(0, 0, viewW, viewH);
+
+        ctx.save();
+        const zoom = getWorldZoom();
+        const shakeX = camera.shake > 0 ? (Math.random() - 0.5) * camera.shake : 0;
+        const shakeY = camera.shake > 0 ? (Math.random() - 0.5) * camera.shake : 0;
+        ctx.scale(zoom, zoom);
+        ctx.translate(-camera.x + shakeX, -camera.y + shakeY);
+
+        // Organic layered snowdrifts & frosted biome glades (keeping Zone 1 NE gate snowfield crisp white!)
+        const biomeGlades = [
+          { x: -720, y: 560, rx: 640, ry: 480, col: "#dce9e2", lockCol: "#c7d2e0", z: 0 },
+          { x: -780, y: -740, rx: 580, ry: 420, col: "#cfe8e2", lockCol: "#bcc7d8", z: 1 },
+          { x: 820, y: -740, rx: 580, ry: 420, col: "#d7def7", lockCol: "#bec7db", z: 2 },
+          { x: 760, y: 600, rx: 640, ry: 480, col: "#e7d8f2", lockCol: "#c5cbe0", z: 3 }
+        ];
+        for (let i = 0; i < biomeGlades.length; i++) {
+          const g = biomeGlades[i];
+          if (!inView(g.x, g.y, g.rx + 120)) continue;
+          ctx.fillStyle = state.unlockedZones[g.z] ? g.col : g.lockCol;
+          ctx.globalAlpha = state.unlockedZones[g.z] ? 0.45 : 0.35;
+          ctx.beginPath(); ctx.ellipse(g.x, g.y, g.rx, g.ry, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // Camp Isometric Parquet Floor
+        drawCampParquetFloor();
+
+        // White-framed Isometric Drop Mats for SELL & Refinery (no glaring neon box!)
+        if (inView(VILLAGE.sellPad.x, VILLAGE.sellPad.y, 90)) {
+          const onSell = Math.hypot(player.x - VILLAGE.sellPad.x, player.y - VILLAGE.sellPad.y) <= VILLAGE.sellPad.r + 14;
+          drawIsoFloorMat(VILLAGE.sellPad.x, VILLAGE.sellPad.y, 32, onSell && state.inventory.length > 0);
+          ctx.save();
+          ctx.transform(ISO_UX, ISO_UY, ISO_VX, ISO_VY, VILLAGE.sellPad.x, VILLAGE.sellPad.y);
+          ctx.textAlign = "center"; ctx.font = "900 12px Pretendard, sans-serif";
+          ctx.strokeStyle = "rgba(42,24,12,0.8)"; ctx.lineWidth = 3;
+          ctx.strokeText("SELL", 0, 4);
+          ctx.fillStyle = "#ffffff";
+          ctx.fillText("SELL", 0, 4);
+          ctx.restore();
+        }
+        if (state.refineryBuilt && inView(VILLAGE.refineryPad.x, VILLAGE.refineryPad.y, 90)) {
+          const onRef = Math.hypot(player.x - VILLAGE.refineryPad.x, player.y - VILLAGE.refineryPad.y) <= VILLAGE.refineryPad.r + 14;
+          drawIsoFloorMat(VILLAGE.refineryPad.x, VILLAGE.refineryPad.y, 30, onRef && state.inventory.length > 0);
+          ctx.save();
+          ctx.transform(ISO_UX, ISO_UY, ISO_VX, ISO_VY, VILLAGE.refineryPad.x, VILLAGE.refineryPad.y);
+          ctx.textAlign = "center"; ctx.font = "900 11px Pretendard, sans-serif";
+          ctx.strokeStyle = "rgba(42,24,12,0.8)"; ctx.lineWidth = 3;
+          ctx.strokeText(`${getRefineryMultiplier().toFixed(1)}x`, 0, 4);
+          ctx.fillStyle = "#ffffff";
+          ctx.fillText(`${getRefineryMultiplier().toFixed(1)}x`, 0, 4);
+          ctx.restore();
+        }
+
+        // Footstep blooming flowers on floor
+        for (let i = 0; i < footstepPool.length; i++) {
+          const f = footstepPool[i];
+          if (!f.active || !inView(f.x, f.y, 24)) continue;
+          const alpha = 1 - f.life / f.maxLife;
+          const pop = Math.min(1, f.life * 7);
+          ctx.save();
+          ctx.globalAlpha = alpha * 0.9;
+          ctx.translate(f.x, f.y);
+          ctx.rotate(f.rot);
+          ctx.fillStyle = f.color;
+          const s = f.size * pop;
+          for (let p = 0; p < f.petals; p++) {
+            const a = (Math.PI * 2 * p) / f.petals;
+            ctx.beginPath(); ctx.arc(Math.cos(a) * s * 0.7, Math.sin(a) * s * 0.7, s * 0.45, 0, Math.PI * 2); ctx.fill();
+          }
+          ctx.fillStyle = "#fff5a8";
+          ctx.beginPath(); ctx.arc(0, 0, s * 0.38, 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
+        }
+
+        // Isometric Floor Upgrade Pads (with thick white corner brackets!)
+        for (let i = 0; i < stepPads.length; i++) {
+          const pad = stepPads[i];
+          if (pad.requiresZone !== undefined && !state.unlockedZones[pad.requiresZone]) continue;
+          if (pad.isDone() && (pad.turretBp || pad.id.startsWith("zone_") || pad.id.startsWith("cart_"))) continue;
+          if (!inView(pad.x, pad.y, 95)) continue;
+          drawIsoDiamondPad(pad);
+        }
+
+        // Player underfoot aura ring & 3D Lime Ground Guide Arrow (on floor plane)
+        drawPlayerFloorAuraAndArrow();
+
+        // Populate zero-GC Y-sort queue for true 2.5D depth sorting
+        sortCount = 0;
+        for (let i = 0; i < PALISADE_LOGS.length; i++) {
+          const l = PALISADE_LOGS[i];
+          if (inView(l.x, l.y, 70)) pushSortItem(l.y, SORT_KIND.LOG, l);
+        }
+        for (let i = 0; i < CAMP_GATE_DOORS.length; i++) {
+          const g = CAMP_GATE_DOORS[i];
+          if (inView(g.x, g.y, 80)) pushSortItem(g.y, SORT_KIND.GATE, g);
+        }
+        for (let i = 0; i < CAMP_BOULDERS.length; i++) {
+          const b = CAMP_BOULDERS[i];
+          if (inView(b.x, b.y, 90)) pushSortItem(b.y, SORT_KIND.BOULDER, b);
+        }
+        for (let i = 0; i < decorProps.length; i++) {
+          const d = decorProps[i];
+          if (inView(d.x, d.y, 80)) pushSortItem(d.y, SORT_KIND.DECOR, d);
+        }
+        if (inView(VILLAGE.cauldron.x, VILLAGE.cauldron.y, 150)) pushSortItem(VILLAGE.cauldron.y + 8, SORT_KIND.CAULDRON, null);
+        if (inView(VILLAGE.sellCounter.x, VILLAGE.sellCounter.y, 160)) pushSortItem(VILLAGE.sellCounter.y + 8, SORT_KIND.SELL, null);
+        if (inView(VILLAGE.gemZone.x, VILLAGE.gemZone.y, 160)) pushSortItem(VILLAGE.gemZone.y + 12, SORT_KIND.GEMPILE, null);
+        if (inView(VILLAGE.refinery.x, VILLAGE.refinery.y, 150)) pushSortItem(VILLAGE.refinery.y + 8, SORT_KIND.REFINERY, null);
+
+        for (let i = 0; i < resourceNodes.length; i++) {
+          const n = resourceNodes[i];
+          if (state.unlockedZones[n.zone] && n.respawnTimer <= 0 && inView(n.x, n.y, 70)) pushSortItem(n.y, SORT_KIND.RES, n);
+        }
+        for (let i = 0; i < bubbleFairies.length; i++) {
+          if (state.rescuedBubbles[i]) continue;
+          const bf = bubbleFairies[i];
+          if (state.unlockedZones[bf.zone] && inView(bf.x, bf.y, 70)) pushSortItem(bf.y, SORT_KIND.BUBBLE, bf);
+        }
+        for (let i = 0; i < TURRET_PAD_BLUEPRINTS.length; i++) {
+          const bp = TURRET_PAD_BLUEPRINTS[i];
+          if (state.turrets[bp.id] && inView(bp.x, bp.y, 90)) pushSortItem(bp.y, SORT_KIND.TURRET, bp);
+        }
+        for (let i = 0; i < customers.length; i++) {
+          const c = customers[i];
+          if (inView(c.x, c.y, 60)) pushSortItem(c.y, SORT_KIND.CUSTOMER, c);
+        }
+        for (let i = 0; i < fairyWorkers.length; i++) {
+          const f = fairyWorkers[i];
+          if (inView(f.x, f.y, 70)) pushSortItem(f.y, SORT_KIND.FAIRY, f);
+        }
+        for (let i = 0; i < autoCarts.length; i++) {
+          const cart = autoCarts[i];
+          if (inView(cart.x, cart.y, 90)) pushSortItem(cart.y, SORT_KIND.CART, cart);
+        }
+        for (let i = 0; i < monsters.length; i++) {
+          const m = monsters[i];
+          if (inView(m.x, m.y, 110)) pushSortItem(m.y, SORT_KIND.MONSTER, m);
+        }
+        if (activeBoss && inView(activeBoss.x, activeBoss.y, 140)) pushSortItem(activeBoss.y, SORT_KIND.MONSTER, activeBoss);
+        pushSortItem(player.y, SORT_KIND.PLAYER, player);
+
+        // Sort slice cleanly in-place
+        const activeSlice = sortList.slice(0, sortCount).sort((a, b) => a.y - b.y);
+        for (let i = 0; i < activeSlice.length; i++) {
+          const item = activeSlice[i];
+          switch (item.kind) {
+            case SORT_KIND.LOG: drawPalisadeLog(item.ref.x, item.ref.y, item.ref.hVar); break;
+            case SORT_KIND.GATE: drawCampGateDoor(item.ref.x, item.ref.y, item.ref.side); break;
+            case SORT_KIND.BOULDER: drawFacetedBoulder(item.ref.x, item.ref.y, item.ref.s); break;
+            case SORT_KIND.DECOR: drawDecorProp(item.ref); break;
+            case SORT_KIND.CAULDRON: drawCauldronStation(); break;
+            case SORT_KIND.SELL: drawSellStation(); break;
+            case SORT_KIND.GEMPILE: drawCashTowerPile(); break;
+            case SORT_KIND.REFINERY: drawRefineryStation(); break;
+            case SORT_KIND.RES: drawSingleResourceNode(item.ref); break;
+            case SORT_KIND.BUBBLE: drawSingleBubbleFairy(item.ref); break;
+            case SORT_KIND.TURRET: drawSingleTurret(item.ref); break;
+            case SORT_KIND.CUSTOMER: drawSingleCustomer(item.ref); break;
+            case SORT_KIND.FAIRY: drawSingleFairy(item.ref); break;
+            case SORT_KIND.CART: drawSingleCart(item.ref); break;
+            case SORT_KIND.MONSTER: drawSingleMonster(item.ref); break;
+            case SORT_KIND.PLAYER: drawPlayer(); break;
+          }
+        }
+
+        // Floating White Checkmark / Count Pin Badges (above stations!)
+        if (inView(VILLAGE.cauldron.x, VILLAGE.cauldron.y, 160)) {
+          drawStationPinBadge(VILLAGE.cauldron.x, VILLAGE.cauldron.y - 56, "check", 0);
+        }
+        if (inView(VILLAGE.sellCounter.x, VILLAGE.sellCounter.y, 160)) {
+          drawStationPinBadge(VILLAGE.sellCounter.x, VILLAGE.sellCounter.y - 54, state.counterStock.length > 0 ? "count" : "check", state.counterStock.length);
+        }
+        if (state.refineryBuilt && inView(VILLAGE.refinery.x, VILLAGE.refinery.y, 160)) {
+          drawStationPinBadge(VILLAGE.refinery.x, VILLAGE.refinery.y - 60, state.refineryQueue.length > 0 ? "count" : "check", state.refineryQueue.length);
+        }
+
+        drawCombatAndFX();
+        drawFogOfWar();
+
+        for (let i = 0; i < rainbowWaves.length; i++) {
+          const w = rainbowWaves[i];
+          ctx.save();
+          ctx.globalAlpha = w.alpha;
+          ctx.lineWidth = 26;
+          ["#ff7eb9", "#ffbe7b", "#fff580", "#84f5a8", "#78dcff", "#c78cff"].forEach((col, ci) => {
+            ctx.strokeStyle = col;
+            ctx.beginPath(); ctx.arc(w.x, w.y, Math.max(4, w.radius - ci * 14), 0, Math.PI * 2); ctx.stroke();
+          });
+          ctx.restore();
+        }
+
+        ctx.restore();
+
+        // Ambient Drifting Snow Particles (screen space)
+        ctx.save();
+        ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+        for (let i = 0; i < SNOW_SPECKS.length; i++) {
+          const sp = SNOW_SPECKS[i];
+          const sx = ((sp.xRatio * viewW + state.playTime * sp.spX) % viewW + viewW) % viewW;
+          const sy = ((sp.yRatio * viewH + state.playTime * sp.spY) % viewH + viewH) % viewH;
+          ctx.beginPath(); ctx.arc(sx, sy, sp.r, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawIsoSlabTile(x, y, w, d, h, topCol, frontCol, outlineCol = "#2e1812", coreDot = null) {
+        ctx.fillStyle = frontCol;
+        ctx.strokeStyle = outlineCol;
+        ctx.lineWidth = 1.1;
+        drawRoundedRect(x - w * 0.5, y - h, w, d + h, 2.5);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = topCol;
+        drawRoundedRect(x - w * 0.5, y - h - 1, w, d, 2.5);
+        ctx.fill(); ctx.stroke();
+        if (coreDot) {
+          ctx.fillStyle = coreDot;
+          ctx.beginPath(); ctx.ellipse(x, y - h - 1 + d * 0.5, w * 0.24, d * 0.28, 0, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+
+      function drawFurHoodCharacter(opts) {
+        const {
+          x, y, facing = 1, walkPhase = 0,
+          cloakColor = "#1cb2e8", shadeColor = "#117fa8", hoodColor = "#f7f5ef",
+          isPlayer = false, tier = 1, moving = false, facingBack = false
+        } = opts;
+        const bob = moving ? Math.abs(Math.sin(walkPhase)) * 3.0 : 0;
+        const legSwing = moving ? Math.sin(walkPhase) * 3.6 : 0;
+
+        ctx.save();
+        ctx.translate(x, y);
+
+        // Ground shadow
+        ctx.fillStyle = "rgba(38, 22, 12, 0.25)";
+        ctx.beginPath(); ctx.ellipse(0, 11, 13.5, 5.8, 0, 0, Math.PI * 2); ctx.fill();
+
+        ctx.save();
+        ctx.translate(0, -bob);
+
+        // Subtle Celestial wings at Tier 5 endgame evolution
+        if (isPlayer && tier >= 5) {
+          ctx.fillStyle = "rgba(255, 244, 254, 0.9)";
+          ctx.strokeStyle = "#4d2c4a"; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.ellipse(-18, -5, 11, 5.5, -0.45, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.beginPath(); ctx.ellipse(18, -5, 11, 5.5, 0.45, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        }
+
+        // Stubby dark winter boots
+        ctx.fillStyle = "#36241d";
+        ctx.strokeStyle = "#1c120d"; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.ellipse(-5.2, 9 + legSwing, 4.1, 2.9, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(5.2, 9 - legSwing, 4.1, 2.9, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+        // Winter Parka Coat (trapezoid silhouette + cel shade + cream fur lower trim)
+        ctx.fillStyle = cloakColor;
+        ctx.strokeStyle = "#241712"; ctx.lineWidth = 2; ctx.lineJoin = "round";
+        ctx.beginPath();
+        ctx.moveTo(-12.5, 8); ctx.lineTo(-9.5, -10); ctx.lineTo(9.5, -10); ctx.lineTo(12.5, 8);
+        ctx.quadraticCurveTo(0, 11, -12.5, 8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = shadeColor;
+        ctx.beginPath();
+        ctx.moveTo(2, -10); ctx.lineTo(9.5, -10); ctx.lineTo(12.5, 8); ctx.lineTo(2.5, 9.5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Lower Cream Fur Hem Trim
+        ctx.fillStyle = hoodColor;
+        drawRoundedRect(-12, 4.5, 24, 4.4, 2.2);
+        ctx.fill(); ctx.stroke();
+
+        if (facingBack) {
+          // 3/4 Back View: diagonal strap + fluffy white fur collar + rounded parka hood dome (no eyes!)
+          ctx.strokeStyle = "#4d2f20"; ctx.lineWidth = 2.4;
+          ctx.beginPath(); ctx.moveTo(-7, -8); ctx.lineTo(9, 4); ctx.stroke();
+          ctx.fillStyle = hoodColor;
+          ctx.strokeStyle = "#241712"; ctx.lineWidth = 1.8;
+          ctx.beginPath(); ctx.ellipse(0, -6.5, 11.5, 4.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          // Rounded cloth hood back dome
+          ctx.fillStyle = cloakColor;
+          ctx.beginPath(); ctx.arc(0, -16, 12.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = shadeColor;
+          ctx.beginPath(); ctx.arc(3, -15, 9.8, -Math.PI * 0.4, Math.PI * 0.6); ctx.fill();
+        } else {
+          // Front/Side View: White Mittens + Scalloped Cream Fur Hood + Chibi Peach Face
+          ctx.fillStyle = "#ffffff";
+          ctx.strokeStyle = "#241712"; ctx.lineWidth = 1.6;
+          ctx.beginPath(); ctx.arc(facing * -9.5, 0.5, 3.6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.beginPath(); ctx.arc(facing * 10.5, 0.5, 3.6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+          // Fluffy Scalloped Fur Hood Rim
+          ctx.fillStyle = hoodColor;
+          ctx.strokeStyle = "#241712"; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(0, -15, 13.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.beginPath(); ctx.arc(-9.2, -12.5, 5.0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.beginPath(); ctx.arc(9.2, -12.5, 5.0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+          // Parka Hood Crown matching jacket color (rounded winter hood - NO pointy witch cone!)
+          ctx.fillStyle = cloakColor;
+          ctx.beginPath(); ctx.arc(0, -17.5, 12.2, Math.PI * 0.98, Math.PI * 2.02); ctx.closePath(); ctx.fill(); ctx.stroke();
+          if (isPlayer && tier >= 2) {
+            // Tier star emblem stitched onto hood crest
+            ctx.fillStyle = tier >= 4 ? "#ff84e8" : "#ffe66d";
+            ctx.beginPath(); ctx.arc(facing * 4, -22, 3.1, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = "#241712"; ctx.lineWidth = 1.2; ctx.stroke();
+          }
+
+          // Peach Face Opening
+          ctx.fillStyle = "#ffe2c8";
+          ctx.beginPath(); ctx.ellipse(facing * 1.5, -13.5, 9.0, 8.0, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = "#241712"; ctx.lineWidth = 1.6; ctx.stroke();
+
+          // Eyes & Blush
+          ctx.fillStyle = "#24192b";
+          ctx.beginPath();
+          ctx.arc(facing * 3 - 2.5, -13.8, 1.75, 0, Math.PI * 2);
+          ctx.arc(facing * 3 + 3.1, -13.8, 1.75, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "rgba(255, 132, 152, 0.55)";
+          ctx.beginPath();
+          ctx.ellipse(facing * 3 - 4.7, -11.3, 2.1, 1.1, 0, 0, Math.PI * 2);
+          ctx.ellipse(facing * 3 + 5.1, -11.3, 2.1, 1.1, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Player Harvesting Crystal Pickaxe / Magic Staff in hand
+          if (isPlayer) {
+            const wx = facing * 12;
+            ctx.strokeStyle = tier >= 3 ? "#eab844" : "#754624";
+            ctx.lineWidth = 3.2; ctx.lineCap = "round";
+            ctx.beginPath(); ctx.moveTo(wx, 3); ctx.lineTo(wx + facing * 10, -14 - tier * 0.6); ctx.stroke();
+            // Pick / crystal crescent blade head
+            ctx.fillStyle = tier >= 4 ? "#ff82ea" : "#70ecff";
+            ctx.strokeStyle = "#1d2d44"; ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(wx + facing * 5, -17 - tier * 0.6);
+            ctx.quadraticCurveTo(wx + facing * 15, -18 - tier * 0.6, wx + facing * 14, -7 - tier * 0.6);
+            ctx.closePath();
+            ctx.fill(); ctx.stroke();
+          }
+        }
+        ctx.restore();
+        ctx.restore();
+      }
+
+      function drawCauldronStation() {
+        const cx = VILLAGE.cauldron.x, cy = VILLAGE.cauldron.y;
+        ctx.save();
+        ctx.translate(cx, cy);
+
+        // 1. Left Wooden Input Pallet + 9-layer crisp white & cyan slab stack (matching video!)
+        ctx.save();
+        ctx.translate(-62, 6);
+        ctx.transform(ISO_UX, ISO_UY, ISO_VX, ISO_VY, 0, 0);
+        ctx.fillStyle = "#9c602c"; ctx.strokeStyle = "#4d2b10"; ctx.lineWidth = 2;
+        drawRoundedRect(-20, -16, 40, 32, 4); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = "#d99e63";
+        for (let r = -12; r <= 8; r += 9) ctx.fillRect(-17, r, 34, 6);
+        ctx.restore();
+        for (let s = 0; s < 9; s++) {
+          drawIsoSlabTile(-62, 4 - s * 4.2, 22, 8.5, 3.6, "#f4f8fc", "#b4cbe0", "#3a4554", "#63d8ff");
+        }
+
+        // 2. Right White-Bordered Worker Mat + Red Fur-Hooded Camp Assistant + Crimson Stack
+        drawIsoFloorMat(48, 8, 22, false);
+        drawFurHoodCharacter({ x: 46, y: 0, facing: -1, cloakColor: "#df524c", shadeColor: "#a82d28", hoodColor: "#f7f5ef" });
+        for (let c = 0; c < 5; c++) {
+          drawIsoSlabTile(66, 6 - c * 4.0, 15, 7, 3.4, "#f44e5e", "#9c1f2e", "#2d1218", "#ff9ea8");
+        }
+
+        // 3. Blazing Stone-and-Wood Furnace Hearth + Steaming Golden Kettle (matching video!)
+        ctx.fillStyle = "rgba(42, 24, 12, 0.28)";
+        ctx.beginPath(); ctx.ellipse(0, 22, 44, 16, 0, 0, Math.PI * 2); ctx.fill();
+
+        // Main stone hearth body
+        ctx.fillStyle = "#7a7d8a"; ctx.strokeStyle = "#2d2a32"; ctx.lineWidth = 2.2;
+        drawRoundedRect(-30, -12, 60, 32, 7); ctx.fill(); ctx.stroke();
+        // Darker top stone mantle ledge
+        ctx.fillStyle = "#9498a6";
+        drawRoundedRect(-32, -16, 64, 10, 4); ctx.fill(); ctx.stroke();
+        // Warm wood fuel log bundle on right side
+        ctx.fillStyle = "#8f5324"; ctx.strokeStyle = "#3d200a"; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.arc(20, 6, 4.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(25, 11, 4.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+        // Open arched firebox with blazing animated flames & iron grate bars
+        ctx.fillStyle = "#281816";
+        drawRoundedRect(-17, -4, 28, 22, 7); ctx.fill(); ctx.stroke();
+        const flamePulse = Math.sin(state.playTime * 11) * 2.0;
+        ctx.fillStyle = "#ff5a1f";
+        ctx.beginPath();
+        ctx.moveTo(-14, 17); ctx.quadraticCurveTo(-8, -2 - flamePulse, -3, 10);
+        ctx.quadraticCurveTo(3, -3 + flamePulse, 9, 17); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#ffa62b";
+        ctx.beginPath();
+        ctx.moveTo(-11, 17); ctx.quadraticCurveTo(-3, 2 + flamePulse * 0.7, 6, 17); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#fff199";
+        ctx.beginPath(); ctx.arc(-3, 13, 5.2, 0, Math.PI * 2); ctx.fill();
+        // 3 dark iron grate bars in front of flames
+        ctx.strokeStyle = "#1c1416"; ctx.lineWidth = 2.2;
+        for (let gx = -11; gx <= 5; gx += 8) {
+          ctx.beginPath(); ctx.moveTo(gx, -3); ctx.lineTo(gx, 17); ctx.stroke();
+        }
+
+        // Low-profile golden alchemy stewpot / cauldron atop the hearth mantle
+        const grad = ctx.createRadialGradient(-8, -28, 3, 0, -24, 28);
+        grad.addColorStop(0, "#fff099"); grad.addColorStop(0.55, "#e8a430"); grad.addColorStop(1, "#9c5c16");
+        ctx.fillStyle = grad; ctx.strokeStyle = "#3d220a"; ctx.lineWidth = 2.2;
+        ctx.beginPath(); ctx.ellipse(0, -22, 25, 16, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = `hsl(${(state.playTime * 65) % 360}, 88%, 68%)`;
+        ctx.beginPath(); ctx.ellipse(0, -32, 18, 6.5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#ffe99e"; ctx.lineWidth = 1.8; ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawSellStation() {
+        const sx = VILLAGE.sellCounter.x, sy = VILLAGE.sellCounter.y;
+        ctx.save();
+        ctx.translate(sx, sy);
+
+        // White-bordered cashier mat + Red-Hooded Cashier Behind Counter
+        drawIsoFloorMat(-20, -20, 20, false);
+        drawFurHoodCharacter({ x: -20, y: -26, facing: 1, cloakColor: "#df524c", shadeColor: "#a82d28", hoodColor: "#f7f5ef" });
+
+        // 2:1 Isometric Compact Slatted Pine Sales Counter matching video
+        ctx.fillStyle = "rgba(42, 24, 12, 0.24)";
+        ctx.beginPath(); ctx.ellipse(0, 14, 48, 19, 0, 0, Math.PI * 2); ctx.fill();
+
+        ctx.save();
+        ctx.transform(ISO_UX, ISO_UY, ISO_VX, ISO_VY, 0, 0);
+        // 3D front apron & legs
+        ctx.fillStyle = "#b06f32"; ctx.strokeStyle = "#45240c"; ctx.lineWidth = 2.2;
+        drawRoundedRect(-14, -36, 32, 82, 6); ctx.fill(); ctx.stroke();
+        // Top slatted honey-pine counter surface
+        ctx.fillStyle = "#ecc588";
+        drawRoundedRect(-18, -40, 32, 80, 6); ctx.fill(); ctx.stroke();
+        ctx.strokeStyle = "rgba(110, 62, 22, 0.38)"; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(-7, -40); ctx.lineTo(-7, 40); ctx.moveTo(4, -40); ctx.lineTo(4, 40); ctx.stroke();
+        ctx.restore();
+
+        // Stacked 3D crimson/potion display slabs piled neatly on counter (at least 2 crisp items if empty)
+        const showCount = state.counterStock.length > 0 ? Math.min(24, state.counterStock.length) : 2;
+        for (let i = 0; i < showCount; i++) {
+          const item = state.counterStock[i];
+          const stackIdx = i % 2;
+          const tierIdx = Math.floor(i / 2);
+          const res = !item
+            ? { color: "#f24b5c", topColor: "#ffe5ea" }
+            : (typeof item === "string" ? RESOURCES[item] : { color: "#ff87e8", topColor: "#fff4b0" });
+          const px = -11 + stackIdx * 18;
+          const py = 0 - stackIdx * 8 - tierIdx * 4.4;
+          drawIsoSlabTile(px, py, 15, 6.5, 3.8, res.color, res.topColor === "#ffe5ea" ? "#9e2336" : "#3a6ea8", "#2d1419", "#ffffff");
+        }
+        ctx.restore();
+      }
+
+      function drawCashTowerPile() {
+        const gx = VILLAGE.gemZone.x, gy = VILLAGE.gemZone.y;
+        ctx.save();
+        ctx.translate(gx, gy);
+
+        // Dark translucent collection square with crisp white border under banknote towers
+        ctx.save();
+        ctx.transform(ISO_UX, ISO_UY, ISO_VX, ISO_VY, 0, 0);
+        ctx.fillStyle = "rgba(38, 28, 20, 0.42)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.72)"; ctx.lineWidth = 2;
+        drawRoundedRect(-26, -26, 52, 52, 9); ctx.fill(); ctx.stroke();
+        ctx.restore();
+
+        // Render at least 6 stacked green $ bills by default, scaling up to 32 bills tall when uncollectedGems > 0
+        const billCount = state.uncollectedGems > 0
+          ? Math.min(32, Math.max(6, Math.ceil(Math.sqrt(state.uncollectedGems) * 1.4)))
+          : 6;
+        const cols = 4;
+        for (let i = 0; i < billCount; i++) {
+          const col = i % cols;
+          const tier = Math.floor(i / cols);
+          const bx = -16 + (col % 2) * 18 + Math.floor(col / 2) * 8;
+          const by = 8 + Math.floor(col / 2) * 8 - tier * 5.2;
+          const isTopLayer = i >= billCount - cols;
+          ctx.save();
+          ctx.translate(bx, by);
+          if (isTopLayer) ctx.rotate((col % 2 === 0 ? -0.14 : 0.16));
+          drawIsoSlabTile(0, 0, 18, 8.5, 4.0, "#4fe882", "#1c823d", "#0e421f", null);
+          ctx.fillStyle = "#126e32";
+          ctx.font = "900 8px Pretendard, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("$", 0, -1.5);
+          ctx.restore();
+        }
+
+        if (state.uncollectedGems > 0) {
+          const topH = Math.ceil(billCount / cols) * 5.2 + 12;
+          ctx.textAlign = "center"; ctx.font = "900 13px Pretendard, sans-serif";
+          ctx.strokeStyle = "#0b2e16"; ctx.lineWidth = 3.5;
+          ctx.strokeText(`+${fmtNum(state.uncollectedGems)}`, 2, -topH);
+          ctx.fillStyle = "#ffffff";
+          ctx.fillText(`+${fmtNum(state.uncollectedGems)}`, 2, -topH);
+        }
+        ctx.restore();
+      }
+
+        function drawRefineryStation() {
+          const rx = VILLAGE.refinery.x, ry = VILLAGE.refinery.y;
+          ctx.save();
+          ctx.translate(rx, ry);
+          if (!state.refineryBuilt) {
+            // Clean Isometric Blueprint Construction Plot on Parquet Floor
+            ctx.save();
+            ctx.transform(ISO_UX, ISO_UY, ISO_VX, ISO_VY, 0, 0);
+            ctx.fillStyle = "rgba(88, 56, 30, 0.24)";
+            drawRoundedRect(-32, -32, 64, 64, 10);
+            ctx.fill();
+            ctx.setLineDash([7, 5]);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.72)";
+            ctx.lineWidth = 2.4;
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+            // Subtle flask silhouette outline inside blueprint
+            ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+            ctx.strokeStyle = "rgba(62, 34, 18, 0.65)";
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(-4, -14); ctx.lineTo(4, -14); ctx.lineTo(4, -7);
+            ctx.lineTo(11, 5); ctx.quadraticCurveTo(12, 10, 0, 10);
+            ctx.quadraticCurveTo(-12, 10, -11, 5); ctx.lineTo(-4, -7);
+            ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            ctx.restore();
+            return;
+          }
+
+          ctx.fillStyle = "rgba(42, 24, 12, 0.24)";
+          ctx.beginPath(); ctx.ellipse(0, 20, 42, 15, 0, 0, Math.PI * 2); ctx.fill();
+
+          // Red Fur-Hooded Alchemist Assistant tending refinery
+          drawFurHoodCharacter({ x: 42, y: 10, facing: -1, cloakColor: "#d94545", shadeColor: "#a32929", hoodColor: "#f7f5ef" });
+
+          // Copper & Amethyst Alchemist Machine Housing
+          ctx.fillStyle = "#6c59a3"; ctx.strokeStyle = "#292045"; ctx.lineWidth = 2.4;
+          drawRoundedRect(-34, -30, 68, 48, 12); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = "#8a75c4";
+          drawRoundedRect(-30, -28, 60, 18, 8); ctx.fill();
+
+          // Glowing Spinning Vortex Lens + Brass Ring
+          ctx.save();
+          ctx.translate(0, -6);
+          ctx.rotate(state.playTime * 2.6);
+          ctx.strokeStyle = "#ffd66b"; ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI * 2); ctx.stroke();
+          ctx.fillStyle = "#ff8af2";
+          ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
+          ctx.restore();
+        }
+
+      function drawSingleResourceNode(n) {
+        const res = RESOURCES[n.resId];
+        const jx = n.shake > 0 ? (Math.random() - 0.5) * 6 : 0;
+        ctx.save();
+        ctx.translate(n.x + jx, n.y);
+        ctx.fillStyle = "rgba(70, 86, 110, 0.24)";
+        ctx.beginPath(); ctx.ellipse(0, 11, 20, 8, 0, 0, Math.PI * 2); ctx.fill();
+
+        ctx.strokeStyle = "#2b1d24"; ctx.lineWidth = 2.2; ctx.lineJoin = "round";
+        if (res.shape === "crystal") {
+          ctx.fillStyle = res.color;
+          ctx.beginPath(); ctx.moveTo(-14, 10); ctx.lineTo(-8, -17); ctx.lineTo(0, -26); ctx.lineTo(10, -15); ctx.lineTo(15, 10); ctx.closePath();
+          ctx.fill(); ctx.stroke();
+          ctx.fillStyle = res.topColor;
+          ctx.beginPath(); ctx.moveTo(-4, -12); ctx.lineTo(0, -24); ctx.lineTo(5, -10); ctx.lineTo(0, 3); ctx.closePath(); ctx.fill();
+        } else if (res.shape === "mushroom") {
+          ctx.fillStyle = "#f2ebdc";
+          drawRoundedRect(-6, -4, 12, 16, 3); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = res.color;
+          ctx.beginPath(); ctx.arc(0, -7, 18, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = res.topColor;
+          ctx.beginPath(); ctx.arc(-6, -13, 3.5, 0, Math.PI * 2); ctx.arc(5, -11, 2.8, 0, Math.PI * 2); ctx.fill();
+        } else if (res.shape === "star") {
+          ctx.fillStyle = res.color;
+          ctx.beginPath();
+          for (let s = 0; s < 10; s++) {
+            const r = s % 2 === 0 ? 19 : 8.5;
+            const a = (Math.PI * s) / 5 - Math.PI / 2;
+            if (s === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r - 6);
+            else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r - 6);
+          }
+          ctx.closePath(); ctx.fill(); ctx.stroke();
+        } else {
+          // Cel-shaded Pastel Berry/Alchemy Shrub Cluster
+          ctx.fillStyle = "#48ab62";
+          ctx.beginPath(); ctx.arc(0, -2, 17, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = "#76d68c";
+          ctx.beginPath(); ctx.arc(-4, -7, 10, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = res.color;
+          [[-6, -6], [6, -4], [0, 3]].forEach(([bx, by]) => {
+            ctx.beginPath(); ctx.arc(bx, by, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          });
+        }
+
+        if (n.hp < n.maxHp) {
+          ctx.fillStyle = "#1c222b";
+          drawRoundedRect(-18, -34, 36, 7, 3); ctx.fill();
+          ctx.fillStyle = "#3ce868";
+          drawRoundedRect(-17, -33, 34 * Math.max(0, n.hp / n.maxHp), 5, 2.5); ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawSingleBubbleFairy(bf) {
+        const bob = Math.sin(state.playTime * 3 + bf.bobOffset) * 6;
+        ctx.save();
+        ctx.translate(bf.x, bf.y + bob);
+        drawFurHoodCharacter({ x: 0, y: 2, cloakColor: "#ff8fd4", shadeColor: "#c758a0", hoodColor: "#fff" });
+        ctx.fillStyle = "rgba(170, 235, 255, 0.35)"; ctx.beginPath(); ctx.arc(0, -4, 26, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.9)"; ctx.lineWidth = 2.6; ctx.stroke();
+        ctx.textAlign = "center"; ctx.fillStyle = "#1e2e46"; ctx.font = "900 11px Pretendard, sans-serif";
+        ctx.fillText("구출!", 0, -34);
+        ctx.restore();
+      }
+
+      function drawSingleTurret(bp) {
+        const tur = state.turrets[bp.id];
+        if (!tur) return;
+        const info = TURRET_TYPES[tur.type];
+        const s = 1 + (tur.pop || 0) * 0.25;
+        ctx.save();
+        ctx.translate(bp.x, bp.y);
+        ctx.scale(s, s);
+        ctx.fillStyle = "rgba(42, 32, 26, 0.22)"; ctx.beginPath(); ctx.ellipse(0, 14, 22, 9, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#485278"; ctx.strokeStyle = "#22273b"; ctx.lineWidth = 2.2;
+        drawRoundedRect(-17, -15, 34, 28, 7); ctx.fill(); ctx.stroke();
+        ctx.save();
+        ctx.translate(0, -15); ctx.rotate(tur.angle);
+        ctx.fillStyle = info.color; drawRoundedRect(0, -5, 20, 10, 4); ctx.fill(); ctx.stroke();
+        ctx.restore();
+        ctx.fillStyle = info.color; ctx.beginPath(); ctx.arc(0, -17, 11, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.textAlign = "center"; ctx.fillStyle = "#1e2436"; ctx.font = "900 11px Pretendard, sans-serif";
+        ctx.fillText(`Lv.${tur.level}`, 0, -33);
+        ctx.restore();
+      }
+
+      function drawSingleCustomer(c) {
+        const isQueue = c.state === "queue";
+        drawFurHoodCharacter({
+          x: c.x, y: c.y,
+          facing: isQueue ? 1 : -1,
+          facingBack: isQueue,
+          walkPhase: c.bob,
+          moving: true,
+          cloakColor: c.hoodColor,
+          shadeColor: "#542a22",
+          hoodColor: "#f2efe9"
+        });
+      }
+
+      function drawSingleCart(c) {
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.fillStyle = "rgba(42, 24, 12, 0.22)"; ctx.beginPath(); ctx.ellipse(0, 18, 28, 11, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#b5764c"; ctx.strokeStyle = "#452612"; ctx.lineWidth = 2.2;
+        drawRoundedRect(-24, -12, 48, 24, 7); ctx.fill(); ctx.stroke();
+        ctx.save();
+        ctx.translate(Math.cos(c.angle) * 24, Math.sin(c.angle) * 14);
+        ctx.rotate(state.playTime * 10);
+        ctx.strokeStyle = "#39e66d"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(-12, 0); ctx.lineTo(12, 0); ctx.moveTo(0, -12); ctx.lineTo(0, 12); ctx.stroke();
+        ctx.restore();
+        ctx.fillStyle = "#3f2e3d";
+        ctx.beginPath(); ctx.arc(-15, 13, 7, 0, Math.PI * 2); ctx.arc(15, 13, 7, 0, Math.PI * 2); ctx.fill();
+        const vis = Math.min(18, c.bag.length);
+        for (let s = 0; s < vis; s++) {
+          const res = RESOURCES[c.bag[s]] || RESOURCES.starlight_crystal;
+          drawIsoSlabTile(0, -10 - s * 4, 24, 8, 3.5, res.color, res.topColor, "#2d1419");
+        }
+        ctx.restore();
+      }
+
+      function drawSingleFairy(f) {
+        const hover = Math.sin(f.wingPhase * 0.4) * 3.5;
+        const wingScale = 0.65 + Math.sin(f.wingPhase) * 0.35;
+        ctx.save();
+        ctx.translate(f.x, f.y + hover);
+        ctx.fillStyle = "rgba(255,255,255,0.88)"; ctx.strokeStyle = "#6e86a8"; ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.ellipse(-12, -10, 9 * wingScale, 5.5, -0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(12, -10, 9 * wingScale, 5.5, 0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        drawFurHoodCharacter({ x: 0, y: 0, cloakColor: f.color, shadeColor: "#6e4e8c", hoodColor: "#ffffff" });
+        const vis = Math.min(10, f.bag.length);
+        for (let s = 0; s < vis; s++) {
+          const res = RESOURCES[f.bag[s]] || RESOURCES.starlight_crystal;
+          drawIsoSlabTile(0, -26 - s * 3.5, 14, 6, 3, res.color, res.topColor, "#2d1419");
+        }
+        ctx.restore();
+      }
+
+      function drawSingleMonster(e) {
+        ctx.save();
+        ctx.translate(e.x, e.y);
+
+        // Ground shadow
+        ctx.fillStyle = "rgba(56, 72, 96, 0.28)";
+        ctx.beginPath(); ctx.ellipse(0, e.radius * 0.85, e.radius * 0.95, e.radius * 0.4, 0, 0, Math.PI * 2); ctx.fill();
+
+        const flashHit = e.flash > 0;
+        const slowIce = e.slowTimer > 0;
+        ctx.strokeStyle = "#2b2229";
+        ctx.lineWidth = e.isBoss ? 3.2 : 2.2;
+        ctx.lineJoin = "round";
+
+        if (!e.isBoss && e.zone === 0) {
+          // Plump 3/4 Cream-White Polar Bear Quadruped (matching video's bears outside NE gate!)
+          const r = e.radius;
+          const bodyCol = flashHit ? "#ffffff" : (slowIce ? "#8eeeff" : "#faf8f5");
+          const shadeCol = flashHit ? "#ffffff" : (slowIce ? "#58d4f0" : "#d4ccc2");
+          const dir = e.x > player.x ? -1 : 1;
+          ctx.save();
+          ctx.scale(dir, 1);
+
+          // Far legs
+          ctx.fillStyle = shadeCol;
+          ctx.beginPath(); ctx.ellipse(-r * 0.42, r * 0.56, r * 0.24, r * 0.26, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.beginPath(); ctx.ellipse(r * 0.36, r * 0.58, r * 0.24, r * 0.24, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+          // Plump hunched torso + warm grey-beige rear/belly cel shadow
+          ctx.fillStyle = bodyCol;
+          ctx.beginPath();
+          ctx.ellipse(-r * 0.14, r * 0.04, r * 0.78, r * 0.62, -0.1, 0, Math.PI * 2);
+          ctx.fill(); ctx.stroke();
+          ctx.fillStyle = shadeCol;
+          ctx.beginPath();
+          ctx.ellipse(-r * 0.24, r * 0.22, r * 0.64, r * 0.36, -0.1, 0.1, Math.PI * 0.95);
+          ctx.fill();
+          // Fluffy nub tail
+          ctx.fillStyle = bodyCol;
+          ctx.beginPath(); ctx.arc(-r * 0.88, -r * 0.08, r * 0.18, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+          // Near legs
+          ctx.fillStyle = bodyCol;
+          ctx.beginPath(); ctx.ellipse(-r * 0.52, r * 0.64, r * 0.26, r * 0.28, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.beginPath(); ctx.ellipse(r * 0.22, r * 0.66, r * 0.25, r * 0.27, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+          // Round Polar Bear Head + Rounded Ears + Blunt Snout
+          ctx.fillStyle = bodyCol;
+          ctx.beginPath(); ctx.arc(r * 0.36, -r * 0.44, r * 0.18, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.beginPath(); ctx.arc(r * 0.68, -r * 0.42, r * 0.18, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = bodyCol;
+          ctx.beginPath(); ctx.ellipse(r * 0.54, -r * 0.18, r * 0.44, r * 0.38, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          // Muzzle
+          ctx.fillStyle = "#fffefe";
+          ctx.beginPath(); ctx.ellipse(r * 0.86, -r * 0.12, r * 0.22, r * 0.16, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          // Black button nose & angry eye
+          ctx.fillStyle = "#241d21";
+          ctx.beginPath(); ctx.ellipse(r * 1.01, -r * 0.16, r * 0.10, r * 0.075, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(r * 0.68, -r * 0.24, r * 0.08, 0, Math.PI * 2); ctx.fill();
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(r * 0.56, -r * 0.34); ctx.lineTo(r * 0.78, -r * 0.28); ctx.stroke();
+          ctx.restore();
+        } else {
+          // Cel-shaded Monsters (Golems, Bats, Pumpkins & Giant Crowned Bosses)
+          if (!e.isBoss && e.zone === 2) {
+            const flap = Math.sin(state.playTime * 14 + e.x) * 8;
+            ctx.fillStyle = "#9562eb";
+            ctx.beginPath(); ctx.moveTo(-8, 0); ctx.lineTo(-e.radius * 1.4, -10 + flap); ctx.lineTo(-e.radius * 1.1, 10 + flap * 0.5); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(8, 0); ctx.lineTo(e.radius * 1.4, -10 + flap); ctx.lineTo(e.radius * 1.1, 10 + flap * 0.5); ctx.closePath(); ctx.fill(); ctx.stroke();
+          }
+          ctx.fillStyle = flashHit ? "#ffffff" : (slowIce ? "#7de8ff" : e.color);
+          ctx.beginPath(); ctx.arc(0, 0, e.radius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = "rgba(0,0,0,0.14)";
+          ctx.beginPath(); ctx.arc(e.radius * 0.15, e.radius * 0.15, e.radius * 0.72, 0.2, Math.PI * 0.9); ctx.fill();
+
+          ctx.fillStyle = "#22182b";
+          const eyeOff = e.radius * 0.32;
+          ctx.beginPath(); ctx.arc(-eyeOff, -2, e.radius * 0.13, 0, Math.PI * 2); ctx.arc(eyeOff, -2, e.radius * 0.13, 0, Math.PI * 2); ctx.fill();
+
+          if (e.isBoss) {
+            ctx.fillStyle = "#ffe066";
+            ctx.beginPath(); ctx.moveTo(-22, -e.radius + 4); ctx.lineTo(-14, -e.radius - 18); ctx.lineTo(0, -e.radius - 6); ctx.lineTo(14, -e.radius - 18); ctx.lineTo(22, -e.radius + 4); ctx.closePath();
+            ctx.fill(); ctx.stroke();
+          }
+        }
+
+        // Bright Green HP Bar with Dark Border (matching video!)
+        if (e.hp < e.maxHp || e.isBoss) {
+          const bw = e.radius * 2.1;
+          ctx.fillStyle = "#182028";
+          drawRoundedRect(-bw / 2 - 1.5, -e.radius - 19, bw + 3, 8, 3); ctx.fill();
+          ctx.fillStyle = "#3ce868";
+          drawRoundedRect(-bw / 2, -e.radius - 17.5, bw * Math.max(0, e.hp / e.maxHp), 5, 2); ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawPlayerFloorAuraAndArrow() {
+        const tier = getWizardVisualTier();
+        // Double concentric translucent white rings underfoot + subtle tier glow (matching video!)
+        ctx.save();
+        ctx.translate(player.x, player.y + 8);
+        ctx.transform(1, 0, 0, 0.58, 0, 0);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.72)";
+        ctx.lineWidth = 2.6;
+        ctx.beginPath(); ctx.arc(0, 0, 35, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.42)";
+        ctx.lineWidth = 2.0;
+        ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.stroke();
+        if (tier >= 2) {
+          ctx.rotate(state.playTime * 1.1);
+          ctx.strokeStyle = ["#48c8ff", "#3ee8a8", "#ffd86b", "#c58eff", "#ff84d0"][tier - 1];
+          ctx.lineWidth = 2.0;
+          ctx.globalAlpha = 0.5;
+          ctx.beginPath(); ctx.arc(0, 0, 21 + tier * 1.5, 0, Math.PI * 2); ctx.stroke();
+        }
+        ctx.restore();
+
+        // Extruded Lime-Green 3D Floor Arrow on perimeter ring pointing to objective!
+        let tx = 290, ty = -85;
+        if (activeBoss) { tx = activeBoss.x; ty = activeBoss.y; }
+        else if (state.inventory.length >= getMaxBackpack() || (state.inventory.length >= 6 && Math.hypot(player.x, player.y) < 420)) {
+          tx = VILLAGE.sellPad.x; ty = VILLAGE.sellPad.y;
+        } else if (state.uncollectedGems >= 20 && Math.hypot(player.x, player.y) < 420) {
+          tx = VILLAGE.gemZone.x; ty = VILLAGE.gemZone.y;
+        }
+        const dx = tx - player.x, dy = ty - player.y, d = Math.hypot(dx, dy);
+        if (d < 70) return;
+        const ang = Math.atan2(dy, dx);
+        const ax = player.x + Math.cos(ang) * 46;
+        const ay = player.y + Math.sin(ang) * 38;
+
+        ctx.save();
+        ctx.translate(ax, ay);
+        ctx.rotate(ang);
+        ctx.lineJoin = "round";
+        // Dark green 3D extrusion base
+        ctx.fillStyle = "#1c8014";
+        ctx.strokeStyle = "#103d0c"; ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.moveTo(15, 4); ctx.lineTo(-4, -9); ctx.lineTo(-4, -2); ctx.lineTo(-14, -2);
+        ctx.lineTo(-14, 9); ctx.lineTo(-4, 9); ctx.lineTo(-4, 15); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        // Vivid lime top arrow face
+        ctx.fillStyle = "#66f54c";
+        ctx.beginPath();
+        ctx.moveTo(15, 0); ctx.lineTo(-4, -12); ctx.lineTo(-4, -5); ctx.lineTo(-14, -5);
+        ctx.lineTo(-14, 5); ctx.lineTo(-4, 5); ctx.lineTo(-4, 12); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawPlayer() {
+        const tier = getWizardVisualTier();
+        const moving = Math.hypot(player.vx, player.vy) > 20;
+        const cloakColors = ["#1cb2e8", "#4b7bf5", "#e66bb0", "#6945db", "#ff6eb8"];
+        const shadeColors = ["#117fa8", "#2f52bd", "#b34382", "#4727ad", "#cc4189"];
+
+        // 1. Draw Chibi Fur-Hooded Survivalist Protagonist
+        drawFurHoodCharacter({
+          x: player.x, y: player.y,
+          facing: player.facing,
+          walkPhase: player.walkPhase,
+          moving,
+          cloakColor: cloakColors[tier - 1],
+          shadeColor: shadeColors[tier - 1],
+          hoodColor: "#f7f5ef",
+          isPlayer: true,
+          tier
+        });
+
+        // 2. Tall Narrow Skyscraper Ribbed Slab Stack Behind Player (Swaying with Spring Physics!)
+        const totalBag = state.inventory.length;
+        if (totalBag > 0) {
+          ctx.save();
+          ctx.translate(player.x, player.y);
+          const maxBlocks = Math.min(75, totalBag);
+          const sliceH = 3.2;
+          const backX = -player.facing * 14;
+          for (let i = 0; i < maxBlocks; i++) {
+            const idx = Math.floor((i / maxBlocks) * totalBag);
+            const item = state.inventory[idx];
+            const res = typeof item === "string" ? RESOURCES[item] : { color: "#ff87e8", topColor: "#fff4b0" };
+            const ratio = (i + 1) / maxBlocks;
+            const swayX = player.stackInertiaX * Math.pow(ratio, 1.45) + Math.sin(state.playTime * 5.5 - i * 0.18) * (Math.hypot(player.vx, player.vy) * 0.008 * ratio);
+            const swayY = player.stackInertiaY * Math.pow(ratio, 1.3);
+            const bx = backX + swayX;
+            const by = -10 - i * sliceH + swayY;
+            const sideCol = res.shape === "crystal" ? "#267fa6" : "#9c1e32";
+            drawIsoSlabTile(bx, by, 18, 8.5, sliceH - 0.5, res.color, sideCol, "#291016", res.topColor);
+          }
+
+          // Adjacent shorter vertical column of 3D green $ bills when carrying/collecting cash
+          if (state.gems > 0 || player.cashVisTimer > 0) {
+            const bx = backX - player.facing * 16 + player.stackInertiaX * 0.55;
+            const cashCount = player.cashVisTimer > 0 ? 11 : Math.min(8, Math.max(2, Math.floor(Math.log10(state.gems + 1) * 3)));
+            for (let c = 0; c < cashCount; c++) {
+              drawIsoSlabTile(bx, -10 - c * 3.8, 15, 7, 3.2, "#52e882", "#1a7d3a", "#0c3d1c", "#1a7d3a");
+            }
+          }
+
+          const isFull = totalBag >= getMaxBackpack();
+          const topX = backX + player.stackInertiaX;
+          const topY = -20 - maxBlocks * sliceH + player.stackInertiaY;
+          ctx.fillStyle = isFull ? "rgba(204, 38, 68, 0.94)" : "rgba(20, 26, 38, 0.86)";
+          drawRoundedRect(topX - (isFull ? 32 : 20), topY - 12, isFull ? 64 : 40, 16, 8); ctx.fill();
+          ctx.fillStyle = isFull ? "#ffffff" : "#ffe875";
+          ctx.textAlign = "center"; ctx.font = "900 10px Pretendard, sans-serif";
+          ctx.fillText(isFull ? `가득 x${totalBag}` : `x${totalBag}`, topX, topY - 0.5);
+          ctx.restore();
+        }
+      }
+
+      function drawCombatAndFX() {
+        for (let i = 0; i < projectilePool.length; i++) {
+          const p = projectilePool[i];
+          if (!p.active || !inView(p.x, p.y, 40)) continue;
+          ctx.fillStyle = p.color; ctx.strokeStyle = "#2b1c24"; ctx.lineWidth = 1.6;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(p.x, p.y, p.radius * 0.45, 0, Math.PI * 2); ctx.fill();
+        }
+        for (let i = 0; i < lightningPool.length; i++) {
+          const l = lightningPool[i];
+          if (!l.active || l.points.length < 2) continue;
+          ctx.save();
+          ctx.globalAlpha = 1 - l.life / l.maxLife;
+          ctx.strokeStyle = l.color; ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.moveTo(l.points[0].x, l.points[0].y);
+          for (let k = 1; k < l.points.length; k++) {
+            ctx.lineTo((l.points[k - 1].x + l.points[k].x) * 0.5 + (Math.random() - 0.5) * 14, (l.points[k - 1].y + l.points[k].y) * 0.5 + (Math.random() - 0.5) * 14);
+            ctx.lineTo(l.points[k].x, l.points[k].y);
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
+        // Tapered Crimson-Red Crescent Hit Slashes matching video!
+        for (let i = 0; i < slashPool.length; i++) {
+          const s = slashPool[i];
+          if (!s.active || !inView(s.x, s.y, 40)) continue;
+          ctx.save();
+          ctx.globalAlpha = 1 - s.life / s.maxLife;
+          ctx.translate(s.x, s.y);
+          ctx.rotate(s.angle);
+          ctx.strokeStyle = "#ff2b44"; ctx.lineWidth = 5; ctx.lineCap = "round";
+          ctx.beginPath(); ctx.arc(0, 0, 20, -0.85, 0.85); ctx.stroke();
+          ctx.strokeStyle = "#ffeef0"; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(0, 0, 19.5, -0.5, 0.5); ctx.stroke();
+          ctx.restore();
+        }
+        for (let i = 0; i < flyingItemPool.length; i++) {
+          const f = flyingItemPool[i];
+          if (!f.active) continue;
+          const t = f.progress;
+          const x = f.sx + (f.tx - f.sx) * t;
+          const y = f.sy + (f.ty - f.sy) * t - Math.sin(t * Math.PI) * f.arcHeight;
+          if (!inView(x, y, 40)) continue;
+          ctx.fillStyle = f.color; ctx.strokeStyle = "#2b161c"; ctx.lineWidth = 1.4;
+          ctx.beginPath(); ctx.arc(x, y, 6.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = f.topColor; ctx.beginPath(); ctx.arc(x - 1.5, y - 1.5, 2.5, 0, Math.PI * 2); ctx.fill();
+        }
+        for (let i = 0; i < particlePool.length; i++) {
+          const p = particlePool[i];
+          if (!p.active || !inView(p.x, p.y, 30)) continue;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, 1 - p.life / p.maxLife);
+          ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
+        }
+        for (let i = 0; i < floatTextPool.length; i++) {
+          const t = floatTextPool[i];
+          if (!t.active || !inView(t.x, t.y, 80)) continue;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, 1 - t.life / t.maxLife);
+          ctx.textAlign = "center";
+          ctx.font = `900 ${Math.round(12 * t.scale)}px Pretendard, sans-serif`;
+          ctx.strokeStyle = "#161a2e"; ctx.lineWidth = 3;
+          ctx.strokeText(t.text, t.x, t.y);
+          ctx.fillStyle = t.color; ctx.fillText(t.text, t.x, t.y);
+          ctx.restore();
+        }
+      }
+
+      function drawFogOfWar() {
+        for (let i = 0; i < fogPuffs.length; i++) {
+          const fp = fogPuffs[i];
+          if (state.unlockedZones[fp.zone] || !inView(fp.x, fp.y, fp.r)) continue;
+          const drift = Math.sin(state.playTime * 0.6 + fp.phase) * 14;
+          ctx.fillStyle = "rgba(186, 200, 222, 0.58)";
+          ctx.beginPath(); ctx.arc(fp.x + drift, fp.y, fp.r, 0, Math.PI * 2); ctx.fill();
+        }
+        ZONES.forEach((z, zi) => {
+          if (state.unlockedZones[zi]) return;
+          const mc = z.mistCenter;
+          if (!inView(mc.x, mc.y, 240)) return;
+          ctx.save();
+          ctx.textAlign = "center";
+          ctx.fillStyle = "rgba(22, 30, 46, 0.84)";
+          drawRoundedRect(mc.x - 115, mc.y - 30, 230, 56, 14); ctx.fill();
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.45)"; ctx.lineWidth = 1.5; ctx.stroke();
+          ctx.fillStyle = "#ffffff"; ctx.font = "900 15px Pretendard, sans-serif";
+          ctx.fillText(`🔒 ${z.name}`, mc.x, mc.y - 6);
+          ctx.fillStyle = "#ffe285"; ctx.font = "800 12px Pretendard, sans-serif";
+          ctx.fillText(`입구 발판에서 ${fmtNum(z.unlockCost)}으로 개방`, mc.x, mc.y + 15);
+          ctx.restore();
+        });
+      }
+
+      function drawVirtualJoystick() {
+        if (joystick.active) {
+          ctx.save();
+          ctx.fillStyle = "rgba(255, 255, 255, 0.16)";
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
+          ctx.lineWidth = 2.6;
+          ctx.beginPath(); ctx.arc(joystick.originX, joystick.originY, joystick.maxRadius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath(); ctx.arc(joystick.currX, joystick.currY, 22, 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
+        } else {
+          // Idle translucent white glass joystick ring + inner knob centered around hero waist (never covering face!)
+          const zoom = getWorldZoom();
+          const jx = (player.x - camera.x) * zoom;
+          const jy = (player.y - camera.y) * zoom + 14;
+          ctx.save();
+          ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.48)";
+          ctx.lineWidth = 2.2;
+          ctx.beginPath(); ctx.arc(jx, jy, 42, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = "rgba(255, 255, 255, 0.36)";
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.68)";
+          ctx.lineWidth = 1.6;
+          ctx.beginPath(); ctx.arc(jx, jy, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      /* =========================================================================
+       * 9. OVERLAY UPGRADE SHEET MODAL (Cleanly Hidden Until Clicked)
+       * ========================================================================= */
+      let drawerOpen = false;
+      let activeTab = "wizard";
+      const drawerModal = document.getElementById("drawer-modal");
+      const drawerBody = document.getElementById("drawer-body");
+
+      function openDrawer() {
+        SoundEngine.ensure();
+        drawerOpen = true;
+        drawerModal.classList.add("open");
+        renderDrawer();
+      }
+
+      function closeDrawer() {
+        drawerOpen = false;
+        drawerModal.classList.remove("open");
+      }
+
+      document.getElementById("btn-play-drawer").addEventListener("click", () => {
+        if (drawerOpen) closeDrawer(); else openDrawer();
+      });
+      document.getElementById("ad-bottom-right").addEventListener("click", () => {
+        if (drawerOpen) closeDrawer(); else openDrawer();
+      });
+      document.getElementById("btn-close-drawer").addEventListener("click", closeDrawer);
+      drawerModal.addEventListener("click", (e) => { if (e.target === drawerModal) closeDrawer(); });
+
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeTab = btn.dataset.tab;
+          renderDrawer();
+        });
+      });
+
+      function upgradeCardHTML(id, title, lv, maxLv, desc, costText, canBuy, isStar = false) {
+        const isMax = lv >= maxLv;
+        return `
+          <div class="upg-card">
+            <div>
+              <div class="upg-top">
+                <div class="upg-title">${title}</div>
+                <div class="upg-lv">${isMax ? "MAX" : `Lv.${lv}/${maxLv}`}</div>
+              </div>
+              <div class="upg-desc">${desc}</div>
+            </div>
+            <button class="upg-btn ${isStar ? "star" : ""}" data-upg="${id}" ${isMax || !canBuy ? "disabled" : ""}>
+              ${isMax ? "최대 레벨 달성" : costText}
+            </button>
+          </div>
+        `;
+      }
+
+      function renderDrawer() {
+        if (!drawerOpen) return;
+        let html = "";
+        if (activeTab === "wizard") {
+          const mv = state.stats.moveSpeed, bg = state.stats.backpackCap, hv = state.stats.harvestPower, wn = state.stats.wandPower;
+          const wand = getWandStats(), hStat = getHarvestStats();
+          html += `<div class="upgrade-grid">`;
+          html += upgradeCardHTML("stat_moveSpeed", "👢 이동 속도", mv, 25, `현재 ${Math.round(getPlayerSpeed())} px/s`, `💵 ${fmtNum(statUpgradeCost(mv))} 업그레이드`, state.gems >= statUpgradeCost(mv));
+          html += upgradeCardHTML("stat_backpackCap", "🎒 마법 배낭 적재량", bg, 25, `최대 적재 ${getMaxBackpack()}개 (Lv.25 = 560개!)`, `💵 ${fmtNum(statUpgradeCost(bg))} 업그레이드`, state.gems >= statUpgradeCost(bg));
+          html += upgradeCardHTML("stat_harvestPower", "⛏️ 채집 파워·범위", hv, 25, `채집력 ${hStat.dmg} / 범위 ${hStat.range}px`, `💵 ${fmtNum(statUpgradeCost(hv))} 업그레이드`, state.gems >= statUpgradeCost(hv));
+          html += upgradeCardHTML("stat_wandPower", "🪄 지팡이 공격·다중탄", wn, 25, `공격력 ${fmtNum(wand.dmg)} / ${wand.bolts}갈래 / ${wand.fireRate.toFixed(1)}회/초`, `💵 ${fmtNum(statUpgradeCost(wn))} 업그레이드`, state.gems >= statUpgradeCost(wn));
+          html += `</div>`;
+        } else if (activeTab === "automation") {
+          const fs = getFairyStats(), fsLv = state.stats.fairySpeed, fcLv = state.stats.fairyCap, crLv = state.stats.cartRefinery, totalF = getTotalFairies();
+          html += `<div class="upgrade-grid">`;
+          html += upgradeCardHTML("hire_fairy_btn", "🧚 요정 일꾼 고용", totalF, 15, `총 ${totalF}/15마리 (비눗방울 구출 + 길드 고용)`, `💵 ${fmtNum(fairyHireCost(state.hiredFairies))} 고용`, state.gems >= fairyHireCost(state.hiredFairies));
+          html += upgradeCardHTML("stat_fairySpeed", "🪽 요정 일꾼 이동 속도", fsLv, 25, `비행 속도 ${Math.round(fs.speed)} px/s`, `💵 ${fmtNum(statUpgradeCost(fsLv))} 업그레이드`, state.gems >= statUpgradeCost(fsLv));
+          html += upgradeCardHTML("stat_fairyCap", "🧺 요정 적재량·채집력", fcLv, 25, `적재 ${fs.cap}개 / 채집력 ${fs.power}`, `💵 ${fmtNum(statUpgradeCost(fcLv))} 업그레이드`, state.gems >= statUpgradeCost(fcLv));
+          html += upgradeCardHTML("stat_cartRefinery", "🛒 수레·정제소 가속", crLv, 25, `수레·정제소 효율 ${getCartRefineryMult().toFixed(2)}배`, `💵 ${fmtNum(statUpgradeCost(crLv))} 업그레이드`, state.gems >= statUpgradeCost(crLv));
+          html += upgradeCardHTML("refinery_btn", "⚗️ 자동 연금술 정제소", state.refineryBuilt ? state.refineryLevel : 0, 15, `원재료를 ${getRefineryMultiplier().toFixed(2)}배 가격 무지개 포션으로 가공`, state.refineryBuilt ? `💵 ${fmtNum(refineryUpgradeCost(state.refineryLevel))} 승급` : `💵 600 건설`, state.gems >= (state.refineryBuilt ? refineryUpgradeCost(state.refineryLevel) : 600));
+          html += `</div>`;
+        } else if (activeTab === "defense") {
+          html += `<div class="upgrade-grid">`;
+          html += upgradeCardHTML("cauldron_btn", "🍯 거대 황금 가마솥", state.cauldronLevel, 15, `판매 단가 +${(state.cauldronLevel - 1) * 15}% / 손님 구매 ${getCustomerBuyInterval().toFixed(2)}초 (${getCustomerBatchCount()}개씩)`, `💵 ${fmtNum(cauldronUpgradeCost(state.cauldronLevel))} 승급`, state.gems >= cauldronUpgradeCost(state.cauldronLevel));
+          ZONES.forEach((z, zi) => {
+            if (zi === 0) return;
+            const unlocked = state.unlockedZones[zi];
+            html += upgradeCardHTML(`zone_btn_${zi}`, `🌈 ${z.name}`, unlocked ? 1 : 0, 1, unlocked ? "개방 완료!" : `잿빛 안개를 걷어내고 상위 자원을 개방합니다.`, `💵 ${fmtNum(z.unlockCost)} 개방`, state.gems >= z.unlockCost);
+          });
+          TURRET_PAD_BLUEPRINTS.forEach((bp) => {
+            const cur = state.turrets[bp.id], info = TURRET_TYPES[bp.type], lv = cur ? cur.level : 0;
+            const cost = cur ? turretUpgradeCost(bp, cur.level) : bp.cost;
+            const icon = bp.currency === "crystals" ? "✨" : "💵";
+            const can = bp.currency === "crystals" ? state.crystals >= cost : state.gems >= cost;
+            html += upgradeCardHTML(`turret_btn_${bp.id}`, `${info.icon} ${bp.label}`, lv, 10, info.desc, `${icon} ${fmtNum(cost)} ${cur ? "승급" : "건설"}`, can);
+          });
+          html += `</div>`;
+        } else if (activeTab === "relics") {
+          html += `<div class="info-box"><h4>⭐ 누적 마법 별조각 보너스: +${state.totalStarShards * 5}% 판매가 & +${state.totalStarShards * 6}% 공격력</h4></div>`;
+          html += `<div class="upgrade-grid">`;
+          [
+            { k: "goldTouch", name: "✨ 황금의 손길", desc: "모든 판매 가격 +15% 영구 증폭" },
+            { k: "starStorm", name: "🌠 별빛 폭풍", desc: "지팡이 공격력 +18% 영구 증폭" },
+            { k: "swiftBlessing", name: "🍃 신속의 축복", desc: "이동속도 +8% & 채집파워 +12% 영구 증폭" },
+            { k: "fairyGrace", name: "🧚 요정 여왕의 가호", desc: "요정·수레·정제소 효율 +15% 영구 증폭" }
+          ].forEach((rd) => {
+            const lv = state.relics[rd.k], cost = relicUpgradeCost(lv);
+            html += upgradeCardHTML(`relic_${rd.k}`, rd.name, lv, 15, rd.desc, `⭐ ${cost} 별조각 각인`, state.starShards >= cost, true);
+          });
+          html += `</div>`;
+        } else {
+          html += `
+            <div class="info-box">
+              <h4>📖 마법 숲 연금술 & 디펜스 가이드</h4>
+              • <b>바닥 발판(Step-to-Pay):</b> 캠프 안팎의 <b>흰 모서리 다이아몬드 발판</b> 위에 서기만 해도 요정, 스탯, 정제소, 자동 수레, 4종 포탑, 구역 확장이 즉시 건설·강화됩니다.<br/>
+              • <b>수직 적재 & 판매대:</b> 자원을 캐서 캠프의 <b>SELL</b> 발판에 내려놓으면, 손님들이 구매 후 바닥에 초록 지폐/보석 기둥을 쌓아줍니다.<br/>
+              • <b>3분 보스 웨이브:</b> 우측 상단 <b>&gt;&gt;</b> 버튼으로 즉시 소환 가능하며 처치 시 <b>⭐ 마법 별조각</b>을 획득합니다.
+            </div>
+          `;
+        }
+        drawerBody.innerHTML = html;
+      }
+
+      function refreshDrawerAvailability() {
+        if (!drawerOpen) return;
+        drawerBody.querySelectorAll("[data-upg]").forEach((btn) => {
+          const id = btn.dataset.upg;
+          let canBuy = false, isMax = false;
+          if (id.startsWith("stat_")) { const lv = state.stats[id.slice(5)]; isMax = lv >= 25; canBuy = state.gems >= statUpgradeCost(lv); }
+          else if (id === "hire_fairy_btn") { isMax = getTotalFairies() >= 15; canBuy = state.gems >= fairyHireCost(state.hiredFairies); }
+          else if (id === "refinery_btn") { isMax = state.refineryBuilt && state.refineryLevel >= 15; canBuy = state.gems >= (state.refineryBuilt ? refineryUpgradeCost(state.refineryLevel) : 600); }
+          else if (id === "cauldron_btn") { isMax = state.cauldronLevel >= 15; canBuy = state.gems >= cauldronUpgradeCost(state.cauldronLevel); }
+          else if (id.startsWith("zone_btn_")) { const zi = Number(id.slice(9)); isMax = !!state.unlockedZones[zi]; canBuy = state.gems >= ZONES[zi].unlockCost; }
+          else if (id.startsWith("turret_btn_")) {
+            const pad = stepPads.find((p) => p.id === id.slice(11));
+            if (pad) { isMax = pad.isDone(); const cost = pad.getCost(); canBuy = pad.currency === "crystals" ? state.crystals >= cost : state.gems >= cost; }
+          } else if (id.startsWith("relic_")) { const lv = state.relics[id.slice(6)]; isMax = lv >= 15; canBuy = state.starShards >= relicUpgradeCost(lv); }
+          btn.disabled = isMax || !canBuy;
+        });
+      }
+
+      drawerBody.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-upg]");
+        if (!btn) return;
+        const id = btn.dataset.upg;
+        if (id.startsWith("stat_")) {
+          const key = id.slice(5), lv = state.stats[key], cost = statUpgradeCost(lv);
+          if (lv < 25 && state.gems >= cost) { state.gems -= cost; state.stats[key]++; SoundEngine.playBuildPop(); renderDrawer(); }
+        } else if (id === "hire_fairy_btn") {
+          const cost = fairyHireCost(state.hiredFairies);
+          if (getTotalFairies() < 15 && state.gems >= cost) { state.gems -= cost; state.hiredFairies++; syncWorkersAndCarts(); SoundEngine.playBuildPop(); renderDrawer(); }
+        } else if (id === "refinery_btn") {
+          const cost = state.refineryBuilt ? refineryUpgradeCost(state.refineryLevel) : 600;
+          if (state.gems >= cost) { state.gems -= cost; if (!state.refineryBuilt) state.refineryBuilt = true; else if (state.refineryLevel < 15) state.refineryLevel++; SoundEngine.playBuildPop(); renderDrawer(); }
+        } else if (id === "cauldron_btn") {
+          const cost = cauldronUpgradeCost(state.cauldronLevel);
+          if (state.cauldronLevel < 15 && state.gems >= cost) { state.gems -= cost; state.cauldronLevel++; SoundEngine.playBuildPop(); renderDrawer(); }
+        } else if (id.startsWith("zone_btn_")) {
+          const zi = Number(id.slice(9)), cost = ZONES[zi].unlockCost;
+          if (!state.unlockedZones[zi] && state.gems >= cost) { state.gems -= cost; const pad = stepPads.find((p) => p.id === `zone_${zi}`); if (pad) pad.onComplete(); renderDrawer(); }
+        } else if (id.startsWith("turret_btn_")) {
+          const pad = stepPads.find((p) => p.id === id.slice(11));
+          if (!pad || pad.isDone()) return;
+          const cost = pad.getCost();
+          if ((pad.currency === "crystals" && state.crystals >= cost) || (pad.currency === "gems" && state.gems >= cost)) {
+            if (pad.currency === "crystals") state.crystals -= cost; else state.gems -= cost;
+            pad.onComplete(); renderDrawer();
+          }
+        } else if (id.startsWith("relic_")) {
+          const rk = id.slice(6), lv = state.relics[rk], cost = relicUpgradeCost(lv);
+          if (lv < 15 && state.starShards >= cost) { state.starShards -= cost; state.relics[rk]++; SoundEngine.playLevelUp(); renderDrawer(); }
+        }
+      });
+
+      /* =========================================================================
+       * 10. HUD SYNC, SAVE / LOAD & MAIN LOOP
+       * ========================================================================= */
+      const elGems = document.getElementById("ui-gems");
+      const elCrystals = document.getElementById("ui-crystals");
+      const elShards = document.getElementById("ui-shards");
+      const elBag = document.getElementById("ui-bag");
+      const elBossTimer = document.getElementById("ui-boss-timer");
+      const elWizLv = document.getElementById("ui-wiz-lv");
+      const elSheetTitle = document.getElementById("ui-sheet-title");
+      const bossBarWrap = document.getElementById("boss-bar-wrap");
+      const elBossName = document.getElementById("ui-boss-name");
+      const elBossHp = document.getElementById("ui-boss-hp");
+      const elBossFill = document.getElementById("ui-boss-fill");
+      let currentFps = 60;
+
+      function updateHUD() {
+        elGems.textContent = fmtNum(state.gems);
+        elCrystals.textContent = fmtNum(state.crystals);
+        elShards.textContent = fmtNum(state.starShards);
+        elBag.textContent = `${state.inventory.length}/${getMaxBackpack()}`;
+        elWizLv.textContent = `Lv.${state.wizLevel}`;
+
+        const sec = Math.max(0, Math.ceil(state.bossTimer));
+        const mm = String(Math.floor(sec / 60)).padStart(2, "0");
+        const ss = String(sec % 60).padStart(2, "0");
+        elBossTimer.textContent = activeBoss ? "보스!" : `${mm}:${ss}`;
+
+        const tier = getWizardVisualTier();
+        elSheetTitle.textContent = `✨ Lv.${state.wizLevel} ${WIZARD_TITLES[tier - 1]} · 🧚${getTotalFairies()}/15 (${currentFps} FPS)`;
+
+        if (activeBoss) {
+          bossBarWrap.classList.add("active");
+          elBossName.textContent = `👑 Wave ${activeBoss.wave}: ${activeBoss.name}`;
+          elBossHp.textContent = `${fmtNum(Math.max(0, activeBoss.hp))} / ${fmtNum(activeBoss.maxHp)}`;
+          elBossFill.style.width = `${Math.max(0, (activeBoss.hp / activeBoss.maxHp) * 100)}%`;
+        } else {
+          bossBarWrap.classList.remove("active");
+        }
+      }
+
+      function updateMuteIcon() {
+        const btn = document.getElementById("btn-mute");
+        btn.innerHTML = state.muted
+          ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>'
+          : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+      }
+
+      document.getElementById("btn-mute").addEventListener("click", () => {
+        state.muted = !state.muted;
+        SoundEngine.muted = state.muted;
+        updateMuteIcon();
+      });
+
+      document.getElementById("btn-summon-boss").addEventListener("click", () => {
+        SoundEngine.ensure();
+        if (activeBoss) { showToast("⚔️ 이미 보스 웨이브가 진행 중입니다!"); return; }
+        spawnBossWave();
+      });
+
+      document.getElementById("btn-home").addEventListener("click", () => {
+        player.x = 0; player.y = 35;
+        spawnBurst(player.x, player.y, "#a5f0ff", 16, 120, 4);
+      });
+
+      function saveGame(silent = true) {
+        try {
+          localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+          if (!silent) showToast("💾 게임 진행 상태가 저장되었습니다!");
+        } catch (_) {}
+      }
+
+      function loadGame() {
+        try {
+          const raw = localStorage.getItem(SAVE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          const fresh = createInitialState();
+          state = {
+            ...fresh,
+            ...parsed,
+            stats: { ...fresh.stats, ...(parsed.stats || {}) },
+            relics: { ...fresh.relics, ...(parsed.relics || {}) },
+            turrets: parsed.turrets || {}
+          };
+          SoundEngine.muted = !!state.muted;
+          updateMuteIcon();
+        } catch (_) {}
+      }
+
+      document.getElementById("btn-save").addEventListener("click", () => saveGame(false));
+
+      const resetModal = document.getElementById("reset-modal");
+      document.getElementById("btn-reset").addEventListener("click", () => resetModal.classList.add("open"));
+      document.getElementById("btn-cancel-reset").addEventListener("click", () => resetModal.classList.remove("open"));
+      document.getElementById("btn-confirm-reset").addEventListener("click", () => {
+        localStorage.removeItem(SAVE_KEY);
+        state = createInitialState();
+        activeBoss = null; monsters.length = 0; customers.length = 0;
+        player.x = 0; player.y = 35; player.hp = 120;
+        const rz = getWorldZoom();
+        camera.x = player.x - (viewW * 0.5) / rz;
+        camera.y = player.y - 24 - (viewH * 0.5) / rz;
+        seedWorld(); syncWorkersAndCarts();
+        resetModal.classList.remove("open");
+        updateHUD();
+        if (drawerOpen) renderDrawer();
+        showToast("✨ 새로운 모험이 초기화되었습니다!");
+      });
+
+      loadGame();
+      seedWorld();
+      syncWorkersAndCarts();
+      const bootZoom = getWorldZoom();
+      camera.x = player.x - (viewW * 0.5) / bootZoom;
+      camera.y = player.y - 24 - (viewH * 0.5) / bootZoom;
+      setInterval(() => saveGame(true), 10000);
+
+      let lastTime = performance.now(), fpsFrames = 0, fpsTimer = 0, hudTick = 0;
+      function frame(now) {
+        const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000));
+        lastTime = now;
+        update(dt);
+        drawWorldBackground();
+        drawVirtualJoystick();
+        fpsFrames++; fpsTimer += dt;
+        if (fpsTimer >= 0.5) { currentFps = Math.round(fpsFrames / fpsTimer); fpsFrames = 0; fpsTimer = 0; }
+        hudTick += dt;
+        if (hudTick >= 0.12) { hudTick = 0; updateHUD(); if (drawerOpen) refreshDrawerAvailability(); }
+        requestAnimationFrame(frame);
+      }
+
+      updateHUD();
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>
