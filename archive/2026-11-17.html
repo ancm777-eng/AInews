@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily AI &amp; Semiconductor Engineering Briefing — November 17, 2026</title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NEQ3MVRM28"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NEQ3MVRM28');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        :root {
+            /* 1. Warm Editorial 4-Pastel Key Colors */
+            --pastel-peach: #f6c4a6;
+            --pastel-peach-soft: #fef0e7;
+            --pastel-peach-text: #c45e2a;
+            --pastel-peach-border: #f8cdb4;
+
+            --pastel-yellow: #fed78a;
+            --pastel-yellow-soft: #fef8e7;
+            --pastel-yellow-text: #a16c14;
+            --pastel-yellow-border: #fde3a7;
+
+            --pastel-green: #b5d6a7;
+            --pastel-green-soft: #eef6ed;
+            --pastel-green-text: #417539;
+            --pastel-green-border: #cae8c2;
+
+            --pastel-blue: #a9c9e8;
+            --pastel-blue-soft: #edf5fc;
+            --pastel-blue-text: #316d9e;
+            --pastel-blue-border: #c8e0f7;
+
+            /* 2. Warm Cream / Off-White Surfaces */
+            --bg-main: #fbfbfa;
+            --bg-card: #ffffff;
+            --bg-surface: #f4f4f2;
+            --bg-surface-subtle: #f8f8f6;
+
+            /* 3. Deep Charcoal & Warm Slate Ink */
+            --text-main: #1f2937;
+            --text-body: #4b5563;
+            --text-muted: #6b7280;
+            --text-faint: #9ca3af;
+
+            /* 4. Borders */
+            --border-light: #e5e7eb;
+            --border-medium: #d1d5db;
+
+            /* 5. Soft Elevation */
+            --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.03);
+            --shadow-card: 0 2px 5px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(229, 231, 235, 0.85);
+            --shadow-card-hover: 0 12px 24px -6px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(209, 213, 219, 0.9);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --nav-height: 62px;
+            --reading-measure: 72ch;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-body);
+            line-height: 1.72;
+            font-size: 15px;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'tnum';
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            color: var(--text-main);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+            vertical-align: middle;
+        }
+
+        code, .code-term {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.84em;
+            font-weight: 500;
+            color: var(--text-main);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            padding: 1px 6px;
+            border-radius: 5px;
+            white-space: nowrap;
+        }
+
+        a:focus-visible, button:focus-visible, select:focus-visible {
+            outline: 2px solid var(--pastel-blue-text);
+            outline-offset: 2px;
+        }
+
+        /* ===== Top Nav & Integrated Reading Progress Bar ===== */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-light);
+            height: var(--nav-height);
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        #scroll-progress {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            height: 2.5px;
+            background: linear-gradient(90deg, var(--pastel-peach-text) 0%, var(--pastel-yellow) 35%, var(--pastel-green-text) 70%, var(--pastel-blue-text) 100%);
+            z-index: 60;
+            width: 0%;
+            transition: width 0.08s linear;
+            pointer-events: none;
+        }
+        .top-nav-inner {
+            width: 100%;
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .top-nav-brand {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.02rem;
+            color: var(--text-main);
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            text-decoration: none;
+            min-width: 0;
+        }
+        .top-nav-brand-tag {
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2.5px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+        .top-nav-brand span.brand-dot {
+            color: var(--pastel-peach-text);
+        }
+        .top-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            flex-shrink: 0;
+        }
+
+        /* ===== Daily Archive Switcher ===== */
+        .archive-nav {
+            display: inline-flex;
+            align-items: center;
+            background: var(--pastel-blue-soft);
+            border: 1px solid var(--pastel-blue-border);
+            border-radius: 20px;
+            padding: 2px 4px;
+            gap: 2px;
+        }
+        .archive-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 26px;
+            padding: 0 8px;
+            border-radius: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--pastel-blue-text);
+            text-decoration: none;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            user-select: none;
+        }
+        .archive-nav-btn:hover:not(.is-disabled) {
+            background: rgba(255, 255, 255, 0.85);
+            color: var(--text-main);
+        }
+        .archive-nav-btn.is-disabled {
+            opacity: 0.38;
+            pointer-events: none;
+            cursor: default;
+        }
+        .archive-date-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 6px;
+        }
+        .archive-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--pastel-green-text);
+            flex-shrink: 0;
+        }
+        .archive-date-select {
+            appearance: none;
+            -webkit-appearance: none;
+            border: none;
+            background: transparent;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            padding: 3px 16px 3px 2px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 2px center;
+        }
+        .archive-date-select:focus {
+            outline: none;
+        }
+        .archive-latest-pill {
+            display: inline-flex;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--pastel-peach-text);
+            background: var(--pastel-peach-soft);
+            border: 1px solid var(--pastel-peach-border);
+            padding: 4px 10px;
+            border-radius: 16px;
+            text-decoration: none;
+        }
+        .archive-latest-pill:hover {
+            background: #fde4d4;
+        }
+
+        /* ===== Mobile Sticky Jump Bar (< 1024px) ===== */
+        .mobile-toc-bar {
+            display: none;
+        }
+        @media (max-width: 1023px) {
+            .mobile-toc-bar {
+                display: block;
+                position: sticky;
+                top: var(--nav-height);
+                z-index: 45;
+                background: rgba(251, 251, 250, 0.94);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border-bottom: 1px solid var(--border-light);
+            }
+            .mobile-toc-inner {
+                max-width: 1160px;
+                margin: 0 auto;
+                padding: 0.55rem 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.65rem;
+            }
+            .mobile-toc-select {
+                flex: 1;
+                min-width: 0;
+                font-family: 'Inter', sans-serif;
+                font-size: 0.81rem;
+                font-weight: 600;
+                color: var(--text-main);
+                background: var(--bg-card);
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius-sm);
+                padding: 0.38rem 0.6rem;
+                text-overflow: ellipsis;
+            }
+            .mobile-toc-pills {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+                flex-shrink: 0;
+            }
+            .mobile-pill {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 28px;
+                height: 28px;
+                padding: 0 7px;
+                border-radius: 7px;
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 0.72rem;
+                font-weight: 600;
+                color: var(--text-muted);
+                background: var(--bg-surface);
+                border: 1px solid transparent;
+                text-decoration: none;
+                transition: all 0.15s ease;
+            }
+            .mobile-pill.active {
+                color: var(--pastel-peach-text);
+                background: var(--pastel-peach-soft);
+                border-color: var(--pastel-peach-border);
+            }
+        }
+
+        /* ===== Layout Shell ===== */
+        .layout-shell {
+            display: flex;
+            max-width: 1160px;
+            margin: 0 auto;
+            align-items: flex-start;
+        }
+        .side-nav {
+            width: 264px;
+            flex-shrink: 0;
+            position: sticky;
+            top: var(--nav-height);
+            height: calc(100vh - var(--nav-height));
+            overflow-y: auto;
+            padding: 2.5rem 1.5rem 2rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .side-nav-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-faint);
+            margin-bottom: 0.35rem;
+        }
+        .side-nav-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            opacity: 0.9;
+            margin-bottom: 1.35rem;
+        }
+        .side-nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .side-nav-link {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.55rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 450;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.52rem 0.7rem 0.52rem 0.85rem;
+            border-left: 2.5px solid transparent;
+            line-height: 1.42;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .side-nav-link .nav-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-faint);
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+        .side-nav-link:hover {
+            color: var(--text-main);
+            border-left-color: var(--border-medium);
+            background: rgba(0, 0, 0, 0.02);
+        }
+        .side-nav-link.active {
+            color: var(--text-main);
+            border-left-color: var(--pastel-peach-text);
+            background: linear-gradient(90deg, var(--pastel-peach-soft) 0%, rgba(255, 255, 255, 0.15) 100%);
+            font-weight: 600;
+        }
+        .side-nav-link.active .nav-num {
+            color: var(--pastel-peach-text);
+        }
+
+        .side-nav-progress {
+            margin-top: 1.75rem;
+            padding-top: 1.1rem;
+            border-top: 1px solid var(--border-light);
+        }
+        .side-nav-progress-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.69rem;
+            color: var(--text-faint);
+            margin-bottom: 0.45rem;
+        }
+        .side-nav-progress-track {
+            width: 100%;
+            height: 4px;
+            background: var(--bg-surface);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .side-nav-progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--pastel-peach-text), var(--pastel-blue-text));
+            transition: width 0.1s linear;
+        }
+
+        @media (max-width: 1023px) { .side-nav { display: none; } }
+
+        .content-wrap {
+            flex: 1;
+            min-width: 0;
+            padding: 0 1.8rem 0 1.2rem;
+        }
+
+        header.masthead {
+            padding: 2.9rem 0 2.2rem 0;
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 2.6rem;
+        }
+        .doc-category {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.73rem;
+            font-weight: 700;
+            color: var(--pastel-peach-text);
+            background: var(--pastel-peach-soft);
+            border: 1px solid var(--pastel-peach-border);
+            padding: 3px 11px;
+            border-radius: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.9rem;
+            display: inline-block;
+        }
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            line-height: 1.22;
+            margin-bottom: 0.8rem;
+            letter-spacing: -0.03em;
+            color: var(--text-main);
+            max-width: 24ch;
+        }
+        .meta-info {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.55rem 0.9rem;
+        }
+
+        main { max-width: 100%; }
+
+        /* ===== Article Cards ===== */
+        .paper-section {
+            background: var(--bg-card);
+            padding: 2.6rem 2.8rem;
+            margin-bottom: 2.6rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            scroll-margin-top: calc(var(--nav-height) + 3.4rem);
+            transition: box-shadow 0.22s ease;
+            position: relative;
+        }
+        .paper-section:hover {
+            box-shadow: var(--shadow-card-hover);
+        }
+        .paper-section h2 {
+            font-size: 1.62rem;
+            font-weight: 750;
+            color: var(--text-main);
+            margin-bottom: 1.7rem;
+            padding-bottom: 1.15rem;
+            border-bottom: 1px solid var(--border-light);
+            line-height: 1.34;
+            letter-spacing: -0.025em;
+            max-width: 44ch;
+        }
+
+        .section-title {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin: 2.1rem 0 1.05rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+        }
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 14px;
+            background: var(--pastel-peach);
+            border-radius: 2px;
+        }
+
+        /* Constrain long-form prose measure to ~72ch for optimal eye tracking */
+        .paper-section > p,
+        .abstract-quote,
+        .abstract-box,
+        .inline-callout,
+        .concept-box,
+        .outlook-lead,
+        .outlook-list {
+            max-width: var(--reading-measure);
+        }
+
+        p {
+            margin-bottom: 1.15rem;
+            color: var(--text-body);
+            text-align: left;
+            font-size: 0.96rem;
+            line-height: 1.72;
+        }
+        p strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* ===== Executive Summary ===== */
+        .abstract-quote,
+        .abstract-box {
+            position: relative;
+            background: linear-gradient(135deg, var(--pastel-peach-soft) 0%, #fffcf9 100%);
+            border: 1px solid var(--pastel-peach-border);
+            border-left: 4px solid var(--pastel-peach);
+            border-radius: var(--radius-md);
+            padding: 1.4rem 1.7rem;
+            margin: 0 0 2rem 0;
+            box-shadow: 0 2px 4px rgba(246, 196, 166, 0.14);
+        }
+        .abstract-quote::before,
+        .abstract-box::before {
+            content: 'EXECUTIVE SUMMARY';
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--pastel-peach-text);
+            background: #fff;
+            border: 1px solid var(--pastel-peach-border);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 0.85rem;
+        }
+        .abstract-quote p,
+        .abstract-box p {
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-size: 0.955rem;
+            font-weight: 400;
+            line-height: 1.7;
+            color: var(--text-main);
+            margin-bottom: 0;
+            text-align: left;
+        }
+        .abstract-quote p + p,
+        .abstract-box p + p {
+            margin-top: 0.9rem;
+        }
+        .abstract-quote p strong,
+        .abstract-box p strong {
+            color: #111827;
+            font-weight: 600;
+            background: rgba(246, 196, 166, 0.25);
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+
+        /* ===== Hardware & Packaging Key Concepts Box ===== */
+        .concept-box {
+            background: linear-gradient(135deg, var(--pastel-yellow-soft) 0%, #fffdf8 100%);
+            border: 1px solid var(--pastel-yellow-border);
+            border-left: 4px solid var(--pastel-yellow);
+            border-radius: var(--radius-md);
+            padding: 1.35rem 1.65rem;
+            margin: 0 0 2rem 0;
+        }
+        .concept-box h4 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--pastel-yellow-text);
+            background: #ffffff;
+            border: 1px solid var(--pastel-yellow-border);
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 4px;
+            margin-bottom: 0.9rem;
+        }
+        .concept-box ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+        .concept-box li {
+            position: relative;
+            padding-left: 1.1rem;
+            font-size: 0.9rem;
+            line-height: 1.62;
+            color: var(--text-body);
+        }
+        .concept-box li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.62em;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--pastel-yellow-text);
+            opacity: 0.78;
+        }
+        .concept-box li strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+        .concept-box p {
+            font-size: 0.9rem;
+            line-height: 1.62;
+            margin-bottom: 0;
+        }
+        .concept-box p + p {
+            margin-top: 0.65rem;
+        }
+
+        /* ===== Strategic Outlook Bullets ===== */
+        .outlook-lead {
+            margin-bottom: 1rem;
+            color: var(--text-body);
+        }
+        .outlook-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin: 0.35rem 0 0.25rem 0;
+        }
+        .outlook-list li {
+            position: relative;
+            padding: 0.85rem 1.1rem 0.85rem 1.85rem;
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            font-size: 0.925rem;
+            line-height: 1.65;
+            color: var(--text-body);
+        }
+        .outlook-list li::before {
+            content: '';
+            position: absolute;
+            left: 0.85rem;
+            top: 1.32rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--pastel-peach-text);
+        }
+        .outlook-list li strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* ===== Inline Callout Box ===== */
+        .inline-callout {
+            background: var(--pastel-blue-soft);
+            border: 1px solid var(--pastel-blue-border);
+            border-left: 4px solid var(--pastel-blue);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem 1.5rem;
+            margin: 1.8rem 0;
+        }
+        .inline-callout p {
+            font-size: 0.91rem;
+            color: var(--text-body);
+            line-height: 1.65;
+            margin-bottom: 0;
+        }
+
+        /* ===== Stat Card Grid ===== */
+        .stat-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.1rem;
+            margin: 2rem 0;
+        }
+        .stat-card {
+            flex: 1 1 175px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.35rem 1.4rem;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -2px rgba(0, 0, 0, 0.05);
+        }
+        .stat-card:nth-child(4n+1) { border-top: 3px solid var(--pastel-peach); }
+        .stat-card:nth-child(4n+1) .stat-rank {
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
+        }
+        .stat-card:nth-child(4n+2) { border-top: 3px solid var(--pastel-blue); }
+        .stat-card:nth-child(4n+2) .stat-rank {
+            background: var(--pastel-blue-soft);
+            color: var(--pastel-blue-text);
+            border: 1px solid var(--pastel-blue-border);
+        }
+        .stat-card:nth-child(4n+3) { border-top: 3px solid var(--pastel-green); }
+        .stat-card:nth-child(4n+3) .stat-rank {
+            background: var(--pastel-green-soft);
+            color: var(--pastel-green-text);
+            border: 1px solid var(--pastel-green-border);
+        }
+        .stat-card:nth-child(4n+4) { border-top: 3px solid var(--pastel-yellow); }
+        .stat-card:nth-child(4n+4) .stat-rank {
+            background: var(--pastel-yellow-soft);
+            color: var(--pastel-yellow-text);
+            border: 1px solid var(--pastel-yellow-border);
+        }
+        .stat-rank {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.67rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 2.5px 8px;
+            border-radius: 5px;
+            margin-bottom: 0.7rem;
+            text-transform: uppercase;
+        }
+        .stat-number {
+            font-family: 'JetBrains Mono', 'Plus Jakarta Sans', sans-serif;
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.12;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.035em;
+        }
+        .stat-number .stat-unit {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-left: 3px;
+        }
+        .stat-label {
+            font-size: 0.83rem;
+            color: var(--text-muted);
+            line-height: 1.46;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ===== Inline SVG Architecture / System Flow Diagram ===== */
+        .arch-diagram-wrap {
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border-light);
+            border-top: 3px solid var(--pastel-green);
+            border-radius: var(--radius-md);
+            padding: 1.35rem 1.45rem;
+            margin: 2rem 0;
+        }
+        .arch-diagram-title {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .arch-diagram-title::before {
+            content: '';
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--pastel-green-text);
+        }
+        .arch-diagram-stage {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 0.85rem;
+            overflow-x: auto;
+        }
+        .arch-diagram-stage svg {
+            width: 100%;
+            min-width: 520px;
+            height: auto;
+            display: block;
+        }
+        .arch-diagram-caption {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.52;
+            margin: 0.75rem 0 0 0;
+            max-width: var(--reading-measure);
+        }
+
+        /* ===== Infographic Block ===== */
+        .infographic-block {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            align-items: stretch;
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            margin: 2rem 0;
+            padding: 1.35rem;
+        }
+        .infographic-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.2s ease;
+        }
+        .infographic-item:hover {
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.04);
+            transform: translateY(-1.5px);
+        }
+        .infographic-item:nth-child(4n+1) .infographic-icon,
+        .infographic-item:nth-child(4n+1) svg {
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
+        }
+        .infographic-item:nth-child(4n+2) .infographic-icon,
+        .infographic-item:nth-child(4n+2) svg {
+            background: var(--pastel-blue-soft);
+            color: var(--pastel-blue-text);
+            border: 1px solid var(--pastel-blue-border);
+        }
+        .infographic-item:nth-child(4n+3) .infographic-icon,
+        .infographic-item:nth-child(4n+3) svg {
+            background: var(--pastel-green-soft);
+            color: var(--pastel-green-text);
+            border: 1px solid var(--pastel-green-border);
+        }
+        .infographic-item:nth-child(4n+4) .infographic-icon,
+        .infographic-item:nth-child(4n+4) svg {
+            background: var(--pastel-yellow-soft);
+            color: var(--pastel-yellow-text);
+            border: 1px solid var(--pastel-yellow-border);
+        }
+        .infographic-icon,
+        .infographic-item svg,
+        .infographic-hero-icon {
+            width: 42px !important;
+            height: 42px !important;
+            min-width: 42px !important;
+            min-height: 42px !important;
+            padding: 9px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+        .infographic-item strong {
+            display: block;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 0.94rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.4rem;
+            line-height: 1.38;
+        }
+        .infographic-item p {
+            font-size: 0.87rem;
+            color: var(--text-muted);
+            line-height: 1.58;
+            margin-bottom: 0;
+            text-align: left;
+        }
+
+        /* ===== Charts & Static Fallback ===== */
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin: 2.1rem 0;
+        }
+        .chart-row .chart-container {
+            margin: 0;
+        }
+        .chart-label {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.85rem;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .chart-label::before {
+            content: '';
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--pastel-blue-text);
+            flex-shrink: 0;
+        }
+        .chart-container {
+            width: 100%;
+            min-height: 330px;
+            margin: 2.1rem 0;
+            border: 1px solid var(--border-light);
+            background: var(--bg-card);
+            padding: 1.35rem 1.4rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-subtle);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-top: 3px solid var(--pastel-blue);
+        }
+        .chart-container > div[id^="chart-"] {
+            width: 100%;
+            height: 280px !important;
+            flex: none;
+        }
+        .chart-fallback {
+            display: none;
+            margin-top: 0.25rem;
+        }
+        .chart-container.chart-fallback-active > div[id^="chart-"] {
+            display: none !important;
+        }
+        .chart-container.chart-fallback-active .chart-fallback {
+            display: block;
+        }
+        .chart-fallback-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+        .chart-fallback-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .chart-fallback-table th,
+        .chart-fallback-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border-light);
+            text-align: left;
+        }
+        .chart-fallback-table th {
+            color: var(--text-muted);
+            background: var(--bg-surface-subtle);
+            font-weight: 600;
+        }
+
+        /* ===== Bento Grid (Takeaways) ===== */
+        .bento-grid-wrap {
+            margin: 3.2rem 0 2.2rem 0;
+            padding-top: 2.6rem;
+            border-top: 1px solid var(--border-light);
+            scroll-margin-top: calc(var(--nav-height) + 3.4rem);
+        }
+        .bento-grid-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: -0.025em;
+            color: var(--text-main);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+        }
+        .bento-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.6rem;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.22s ease;
+        }
+        .bento-card:hover {
+            box-shadow: 0 10px 20px -4px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+        .bento-card:nth-child(4n+1) { border-top: 3.5px solid var(--pastel-peach); }
+        .bento-card:nth-child(4n+1) .bento-card-icon {
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+            border: 1px solid var(--pastel-peach-border);
+        }
+        .bento-card:nth-child(4n+2) { border-top: 3.5px solid var(--pastel-blue); }
+        .bento-card:nth-child(4n+2) .bento-card-icon {
+            background: var(--pastel-blue-soft);
+            color: var(--pastel-blue-text);
+            border: 1px solid var(--pastel-blue-border);
+        }
+        .bento-card:nth-child(4n+3) { border-top: 3.5px solid var(--pastel-green); }
+        .bento-card:nth-child(4n+3) .bento-card-icon {
+            background: var(--pastel-green-soft);
+            color: var(--pastel-green-text);
+            border: 1px solid var(--pastel-green-border);
+        }
+        .bento-card:nth-child(4n+4) { border-top: 3.5px solid var(--pastel-yellow); }
+        .bento-card:nth-child(4n+4) .bento-card-icon {
+            background: var(--pastel-yellow-soft);
+            color: var(--pastel-yellow-text);
+            border: 1px solid var(--pastel-yellow-border);
+        }
+        .bento-card-icon {
+            width: 40px !important;
+            height: 40px !important;
+            padding: 9px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: inline-flex;
+            box-sizing: border-box;
+        }
+        .bento-card-title {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 1.02rem;
+            color: var(--text-main);
+            margin-bottom: 0.6rem;
+            line-height: 1.35;
+        }
+        .bento-card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        /* ===== Modern Academic Table ===== */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1.9rem 0;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+        }
+        .academic-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+            table-layout: fixed;
+        }
+        .academic-table th,
+        .academic-table td {
+            padding: 11px 15px;
+            vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+        .academic-table th {
+            font-weight: 600;
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-light);
+        }
+        .academic-table td {
+            border-bottom: 1px solid var(--bg-surface);
+            color: var(--text-body);
+        }
+        .academic-table tr:last-child td {
+            border-bottom: none;
+        }
+        .academic-table tr:hover td {
+            background: rgba(0, 0, 0, 0.015);
+        }
+
+        /* ===== Site Footer & Back to Top ===== */
+        .site-footer {
+            border-top: 1px solid var(--border-light);
+            padding: 2.4rem 0 3.4rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.5rem;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .site-footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        .site-footer a:hover {
+            color: var(--pastel-peach-text);
+        }
+
+        .back-to-top {
+            position: fixed;
+            right: 1.4rem;
+            bottom: 1.4rem;
+            z-index: 40;
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid var(--border-light);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            color: var(--text-main);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(8px);
+            transition: all 0.2s ease;
+        }
+        .back-to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        .back-to-top:hover {
+            border-color: var(--pastel-peach-border);
+            background: var(--pastel-peach-soft);
+            color: var(--pastel-peach-text);
+        }
+
+        @media (max-width: 768px) {
+            .top-nav-inner { padding: 0 1rem; }
+            .top-nav-brand-label { display: none; }
+            .top-nav-brand-short { display: inline !important; }
+            .paper-section { padding: 1.55rem 1.25rem; margin-bottom: 1.9rem; }
+            .paper-section h2 { font-size: 1.38rem; }
+            h1 { font-size: 1.75rem; }
+            .content-wrap { padding: 0 1rem; }
+            .infographic-block { grid-template-columns: 1fr; padding: 1rem; }
+            .chart-row { grid-template-columns: 1fr; }
+            .archive-nav-btn span.nav-btn-label { display: none; }
+        }
+        .top-nav-brand-short { display: none; }
+
+        @media print {
+            .top-nav, .mobile-toc-bar, .side-nav, .back-to-top { display: none !important; }
+            .paper-section { box-shadow: none; border: 1px solid var(--border-light); break-inside: avoid; }
+            body { background: #ffffff; }
+        }
+    </style>
+    <noscript>
+        <style>
+            .chart-container > div[id^="chart-"] { display: none !important; }
+            .chart-fallback { display: block !important; }
+        </style>
+    </noscript>
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+            <symbol id="icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+            <symbol id="icon-network" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2.5"/><circle cx="4" cy="20" r="2.5"/><circle cx="20" cy="20" r="2.5"/><path d="M12 6.5v5.5M12 12l-6 5.5M12 12l6 5.5"/></symbol>
+            <symbol id="icon-deal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l4-4 4 4 6-6 4 4"/><path d="M13 6h4v4"/></symbol>
+            <symbol id="icon-security" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+            <symbol id="icon-regulation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 8l4.5 4 4.5-4M3 8h9M12 8h9m-4.5 4l4.5-4M7 21h10"/></symbol>
+            <symbol id="icon-packaging" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
+            <symbol id="icon-robot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 2v6M9 2h6"/><circle cx="9" cy="13" r="1.5"/><circle cx="15" cy="13" r="1.5"/><line x1="9" y1="17" x2="15" y2="17"/></symbol>
+            <symbol id="icon-datacenter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><line x1="6" y1="7" x2="6.01" y2="7"/><line x1="6" y1="17" x2="6.01" y2="17"/></symbol>
+            <symbol id="icon-research" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v5.5l-5 8.5a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-8.5V3"/></symbol>
+            <symbol id="icon-media" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
+            <symbol id="icon-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+        </defs>
+    </svg>
+
+    <nav class="top-nav" aria-label="Primary Header">
+        <div class="top-nav-inner">
+            <a class="top-nav-brand" href="../index.html">
+                <span class="top-nav-brand-tag">DAILY</span>
+                <span class="top-nav-brand-label">AI<span class="brand-dot">·</span>Hardware Briefing</span>
+                <span class="top-nav-brand-short">AI<span class="brand-dot">·</span>HW</span>
+            </a>
+            <div class="top-nav-actions">
+                <div class="archive-nav" aria-label="Daily archive navigation"><a class="archive-nav-btn" href="../archive/2026-11-16.html" title="Previous briefing" aria-label="Previous briefing">‹ <span class="nav-btn-label">Prev</span></a><div class="archive-date-wrap"><span class="archive-status-dot" aria-hidden="true"></span><select id="archive-date-select" class="archive-date-select" data-current-date="2026-11-17" aria-label="Select briefing date"><option value="../index.html" data-date="2026-11-17" selected>November 17, 2026</option><option value="../archive/2026-11-16.html" data-date="2026-11-16">November 16, 2026</option><option value="../archive/2026-11-15.html" data-date="2026-11-15">November 15, 2026</option><option value="../archive/2026-11-14.html" data-date="2026-11-14">November 14, 2026</option><option value="../archive/2026-11-13.html" data-date="2026-11-13">November 13, 2026</option><option value="../archive.html?date=2026-11-12" data-date="2026-11-12">November 12, 2026</option><option value="../archive.html?date=2026-11-11" data-date="2026-11-11">November 11, 2026</option><option value="../archive.html?date=2026-11-10" data-date="2026-11-10">November 10, 2026</option><option value="../archive.html?date=2026-11-09" data-date="2026-11-09">November 09, 2026</option><option value="../archive.html?date=2026-11-08" data-date="2026-11-08">November 08, 2026</option><option value="../archive.html?date=2026-11-07" data-date="2026-11-07">November 07, 2026</option><option value="../archive.html?date=2026-11-06" data-date="2026-11-06">November 06, 2026</option><option value="../archive.html?date=2026-11-05" data-date="2026-11-05">November 05, 2026</option><option value="../archive.html?date=2026-11-04" data-date="2026-11-04">November 04, 2026</option><option value="../archive.html?date=2026-11-03" data-date="2026-11-03">November 03, 2026</option></select></div><a class="archive-nav-btn is-disabled" href="#" title="Next briefing" aria-label="Next briefing"><span class="nav-btn-label">Next</span> ›</a></div>
+            </div>
+        </div>
+        <div id="scroll-progress" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+    </nav>
+
+    <div class="mobile-toc-bar" aria-label="Article Quick Jump">
+        <div class="mobile-toc-inner">
+            <select id="mobile-toc-select" class="mobile-toc-select" aria-label="Jump to article section">
+                <option value="#art1">01 · Alibaba Launches Qwen4-Max With 2.4T Sparse …</option>
+                <option value="#art2">02 · U.S. Commerce Department Issues Interim Fina…</option>
+                <option value="#art3">03 · MLPerf Training v6.1 &amp; SC26: Vera Rubin NVL7…</option>
+                <option value="#art4">04 · Lambda &amp; NVIDIA Deploy World&#x27;s First Large-S…</option>
+                <option value="#takeaways">05 · Key Strategic Takeaways</option>
+            </select>
+            <div class="mobile-toc-pills" id="mobile-toc-pills">
+                <a href="#art1" class="mobile-pill active" data-target="art1">01</a>
+                <a href="#art2" class="mobile-pill" data-target="art2">02</a>
+                <a href="#art3" class="mobile-pill" data-target="art3">03</a>
+                <a href="#art4" class="mobile-pill" data-target="art4">04</a>
+                <a href="#takeaways" class="mobile-pill" data-target="takeaways">Sum</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="layout-shell">
+        <aside class="side-nav" aria-label="Intelligence Briefing Contents">
+            <div class="side-nav-title">Intelligence Briefing</div>
+            <div class="side-nav-sub">November 17, 2026</div>
+            <ul class="side-nav-list" id="side-nav-list">
+                <li><a href="#art1" class="side-nav-link active" data-target="art1" aria-current="location"><span class="nav-num">01</span><span class="nav-text">Alibaba Launches Qwen4-Max With 2.4T Sparse …</span></a></li>
+                <li><a href="#art2" class="side-nav-link" data-target="art2"><span class="nav-num">02</span><span class="nav-text">U.S. Commerce Department Issues Interim Fina…</span></a></li>
+                <li><a href="#art3" class="side-nav-link" data-target="art3"><span class="nav-num">03</span><span class="nav-text">MLPerf Training v6.1 &amp; SC26: Vera Rubin NVL7…</span></a></li>
+                <li><a href="#art4" class="side-nav-link" data-target="art4"><span class="nav-num">04</span><span class="nav-text">Lambda &amp; NVIDIA Deploy World&#x27;s First Large-S…</span></a></li>
+                <li><a href="#takeaways" class="side-nav-link" data-target="takeaways"><span class="nav-num">05</span><span class="nav-text">Key Strategic Takeaways</span></a></li>
+            </ul>
+            <div class="side-nav-progress">
+                <div class="side-nav-progress-meta">
+                    <span>PROGRESS</span>
+                    <span id="side-nav-progress-pct">0%</span>
+                </div>
+                <div class="side-nav-progress-track">
+                    <div class="side-nav-progress-fill" id="side-nav-progress-fill"></div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="content-wrap">
+            <header class="masthead" id="top">
+                <span class="doc-category">AI Ecosystem &amp; Hardware Architecture</span>
+                <h1>Daily AI &amp; Semiconductor Engineering Briefing</h1>
+                <div class="meta-info">
+                    <span id="report-date">November 17, 2026</span>
+                    <span>•</span>
+                    <span>Technical Intelligence Report</span>
+                </div>
+            </header>
+
+            <main>
+                <article class="paper-section" id="art1">
+  <h2>Alibaba Launches Qwen4-Max With 2.4T Sparse MoE Backbone, Native Vision, and Private Weights</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>Over the past two years, Alibaba's Qwen family became the world's most downloaded open-weight ecosystem, offering enterprises a transparent alternative to closed U.S. frontier models. On November 16, 2026, Alibaba Cloud broke with that playbook by launching <strong>Qwen4-Max</strong> (<code>qwen4-max</code>) exclusively behind a proprietary API—pairing a <strong>2.4-trillion-parameter sparse Mixture-of-Experts (MoE)</strong> backbone with <strong>71 billion active parameters</strong> per token, <strong>328 billion N-gram embedding parameters</strong>, native image/video input, and a <strong>1-million-token</strong> context window.</p>
+    <p>Priced at <strong>$1.50 per million input tokens</strong> and <strong>$4.50 per million output tokens</strong>—a 25% cut below <code>Qwen3.8-Max</code>—the flagship targets autonomous enterprise agents and lowers Alibaba's internal Work360 task costs by <strong>62.3%</strong> (<strong>$4.43 to $1.67</strong>). However, independent benchmarks published the same day reveal a sharp gap between aggressive token rates and general reasoning performance, scoring <strong>43</strong> on the Artificial Analysis Intelligence Index v5.0.1 (38th overall) while emitting high output volumes that raise real-world task bills.</p>
+  </div>
+
+  <h3 class="section-title">2. Architecture &amp; Performance</h3>
+  <p><code>Qwen4-Max</code> combines roughly <strong>2.73 trillion total parameters</strong> by pairing its 2.4T sparse MoE backbone with a 328B N-gram embedding lookup layer for recurring text patterns. Thinking mode is enabled by default up to <strong>262,144 combined thinking and response tokens</strong>, enabling multi-hour runs across frontend web design (<strong>1,750 Elo</strong> on CodeArena / WebDev Arena), 3D modeling, finance, and law.</p>
+  <p>On vendor evaluations, <code>Qwen4-Max</code> reduces Work360 token consumption by <strong>24% (Xhigh)</strong> to <strong>35% (High)</strong> and Terminal-Bench 4.0 token usage by <strong>48%–49%</strong>, while jumping from 27.9 to <strong>46.7</strong> on Agents' Last Exam v1.1 and from 65.3 to <strong>68.5</strong> on JobBench. Yet hosting the full 2.73T parameter footprint requires high-density clusters such as an <strong>8-GPU NVIDIA B300</strong> node under reference vLLM configs, reinforcing centralized cloud serving via Alibaba Cloud Model Studio, QwenCloud, OpenRouter, and Vercel AI Gateway.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total / Active Params</div>
+      <div class="stat-value">~2.73T / 71B</div>
+      <div class="stat-sub">2.4T MoE + 328B N-gram</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">API Pricing (In / Out)</div>
+      <div class="stat-value">$1.50 / $4.50</div>
+      <div class="stat-sub">$0.075 cached input / 1M</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Work360 Task Cost</div>
+      <div class="stat-value">-62.3%</div>
+      <div class="stat-sub">$4.43 down to $1.67 avg</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Enterprise Open-Weight</div>
+      <div class="stat-value">30.9%</div>
+      <div class="stat-sub">Up from 7.3% in July 2026</div>
+    </div>
+  </div>
+
+  <div class="arch-diagram-wrap">
+    <div class="arch-diagram-title">System Architecture: Qwen4-Max Hybrid Sparse MoE &amp; N-Gram Pipeline</div>
+    <div class="arch-diagram-stage">
+      <svg viewBox="0 0 720 190" role="img" aria-label="Qwen4-Max sparse MoE and N-gram architecture flow diagram">
+        <rect x="14" y="42" width="142" height="106" rx="8" fill="#edf5fc" stroke="#c8e0f7" stroke-width="1.5"/>
+        <text x="85" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">Multimodal Input</text>
+        <text x="85" y="94" text-anchor="middle" font-size="11" fill="#4b5563">Text, Image, Video</text>
+        <text x="85" y="114" text-anchor="middle" font-size="11" fill="#4b5563">Up to 1M Context</text>
+        <text x="85" y="134" text-anchor="middle" font-size="11" fill="#4b5563">($1.50 / 1M tokens)</text>
+
+        <line x1="156" y1="95" x2="188" y2="95" stroke="#64748b" stroke-width="1.8"/>
+        <polygon points="188,90 198,95 188,100" fill="#64748b"/>
+
+        <rect x="198" y="42" width="146" height="106" rx="8" fill="#fef8e7" stroke="#fde3a7" stroke-width="1.5"/>
+        <text x="271" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">N-Gram Lookup</text>
+        <text x="271" y="94" text-anchor="middle" font-size="11" fill="#4b5563">328B Embeddings</text>
+        <text x="271" y="114" text-anchor="middle" font-size="11" fill="#4b5563">Fast Pattern Cache</text>
+        <text x="271" y="134" text-anchor="middle" font-size="11" fill="#4b5563">Reduces Compute Load</text>
+
+        <line x1="344" y1="95" x2="376" y2="95" stroke="#64748b" stroke-width="1.8"/>
+        <polygon points="376,90 386,95 376,100" fill="#64748b"/>
+
+        <rect x="386" y="42" width="152" height="106" rx="8" fill="#fef0e7" stroke="#f8cdb4" stroke-width="1.5"/>
+        <text x="462" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">Sparse MoE Core</text>
+        <text x="462" y="94" text-anchor="middle" font-size="11" fill="#4b5563">2.4T Total Backbone</text>
+        <text x="462" y="114" text-anchor="middle" font-size="11" fill="#4b5563">71B Active / Token</text>
+        <text x="462" y="134" text-anchor="middle" font-size="11" fill="#4b5563">8x NVIDIA B300 Node</text>
+
+        <line x1="538" y1="95" x2="570" y2="95" stroke="#64748b" stroke-width="1.8"/>
+        <polygon points="570,90 580,95 570,100" fill="#64748b"/>
+
+        <rect x="580" y="42" width="126" height="106" rx="8" fill="#eef6ed" stroke="#cae8c2" stroke-width="1.5"/>
+        <text x="643" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">Agent Output</text>
+        <text x="643" y="94" text-anchor="middle" font-size="11" fill="#4b5563">Default Thinking</text>
+        <text x="643" y="114" text-anchor="middle" font-size="11" fill="#4b5563">262,144 Max Tokens</text>
+        <text x="643" y="134" text-anchor="middle" font-size="11" fill="#4b5563">($4.50 / 1M tokens)</text>
+      </svg>
+    </div>
+    <p class="arch-diagram-caption">Qwen4-Max pairs a 328B N-gram embedding cache with 71B active parameters per token inside a 2.4T MoE backbone, hosted exclusively behind proprietary APIs.</p>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-container">
+      <div class="chart-label">Frontier API List Pricing Comparison</div>
+      <div id="chart-art1-a" style="width:100%;height:100%"></div>
+      <div class="chart-fallback"><svg class="chart-fallback-svg" viewBox="0 0 560 175" role="img" aria-label="Static chart data fallback"><line x1="34" y1="131" x2="544" y2="131" stroke="#d1d5db" stroke-width="1"/><rect x="83.0" y="128.1" width="34.0" height="2.9" rx="3" fill="#5b7c99"/><text x="100.0" y="124.1" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">1.5</text><rect x="121.0" y="122.3" width="34.0" height="8.7" rx="3" fill="#6b9080"/><text x="138.0" y="118.3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">4.5</text><text x="119.0" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Qwen4-Max</text><rect x="253.0" y="115.5" width="34.0" height="15.5" rx="3" fill="#5b7c99"/><text x="270.0" y="111.5" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">8</text><rect x="291.0" y="53.4" width="34.0" height="77.6" rx="3" fill="#6b9080"/><text x="308.0" y="49.4" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">40</text><text x="289.0" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Claude Fable 5.2</text><rect x="423.0" y="111.6" width="34.0" height="19.4" rx="3" fill="#5b7c99"/><text x="440.0" y="107.6" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">10</text><rect x="461.0" y="34.0" width="34.0" height="97.0" rx="3" fill="#6b9080"/><text x="478.0" y="30.0" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">50</text><text x="459.0" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">GPT-6 Astra</text></svg><table class="chart-fallback-table"><thead><tr><th>Category</th><th>Input</th><th>Output</th></tr></thead><tbody><tr><td>Qwen4-Max</td><td>1.5</td><td>4.5</td></tr><tr><td>Claude Fable 5.2</td><td>8</td><td>40</td></tr><tr><td>GPT-6 Astra</td><td>10</td><td>50</td></tr></tbody></table></div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-label">Independent Evaluation Scores</div>
+      <div id="chart-art1-b" style="width:100%;height:100%"></div>
+      <div class="chart-fallback"><svg class="chart-fallback-svg" viewBox="0 0 560 175" role="img" aria-label="Static chart data fallback"><line x1="34" y1="131" x2="544" y2="131" stroke="#d1d5db" stroke-width="1"/><rect x="80.8" y="66.8" width="34.0" height="64.2" rx="3" fill="#5b7c99"/><text x="97.8" y="62.8" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">43</text><text x="97.8" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Qwen4-Max</text><rect x="208.2" y="45.9" width="34.0" height="85.1" rx="3" fill="#5b7c99"/><text x="225.2" y="41.9" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">57</text><text x="225.2" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">GPT-6 Astra</text><rect x="335.8" y="41.5" width="34.0" height="89.5" rx="3" fill="#5b7c99"/><text x="352.8" y="37.5" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">60</text><text x="352.8" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Gemini 4 Carbon</text><rect x="463.2" y="34.0" width="34.0" height="97.0" rx="3" fill="#5b7c99"/><text x="480.2" y="30.0" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">65</text><text x="480.2" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Claude Fable 5.2</text></svg><table class="chart-fallback-table"><thead><tr><th>Category</th><th>AA Index v5.0.1</th></tr></thead><tbody><tr><td>Qwen4-Max</td><td>43</td></tr><tr><td>GPT-6 Astra</td><td>57</td></tr><tr><td>Gemini 4 Carbon</td><td>60</td></tr><tr><td>Claude Fable 5.2</td><td>65</td></tr></tbody></table></div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var elA = document.getElementById('chart-art1-a');
+    if (elA && window.echarts) {
+      var chartA = echarts.init(elA, null, {renderer: 'svg'});
+      chartA.setOption({
+        backgroundColor: 'transparent',
+        title: { text: 'API Pricing ($ / 1M Tokens)', left: 'center', top: 6, textStyle: { fontSize: 13, color: '#1f2937' } },
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        legend: { top: 28, textStyle: { fontSize: 11, color: '#4b5563' } },
+        grid: { top: 60, left: 48, right: 20, bottom: 48, containLabel: true },
+        xAxis: { type: 'category', data: ['Qwen4-Max', 'Claude Fable 5.2', 'GPT-6 Astra'], axisLabel: { color: '#4b5563', fontSize: 11 } },
+        yAxis: { type: 'value', name: 'USD / 1M Tokens', nameTextStyle: { color: '#4b5563', fontSize: 11 }, axisLabel: { color: '#4b5563' } },
+        series: [
+          { name: 'Input', type: 'bar', data: [1.5, 8.0, 10.0], itemStyle: { color: '#5b7c99', borderRadius: [4,4,0,0] }, label: { show: true, position: 'top', formatter: '${c}' } },
+          { name: 'Output', type: 'bar', data: [4.5, 40.0, 50.0], itemStyle: { color: '#d98a6c', borderRadius: [4,4,0,0] }, label: { show: true, position: 'top', formatter: '${c}' } }
+        ]
+      });
+      window.addEventListener('resize', function(){ chartA.resize(); });
+    }
+    var elB = document.getElementById('chart-art1-b');
+    if (elB && window.echarts) {
+      var chartB = echarts.init(elB, null, {renderer: 'svg'});
+      chartB.setOption({
+        backgroundColor: 'transparent',
+        title: { text: 'AA Intelligence Index v5.0.1', left: 'center', top: 6, textStyle: { fontSize: 13, color: '#1f2937' } },
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { top: 48, left: 48, right: 20, bottom: 48, containLabel: true },
+        xAxis: { type: 'category', data: ['Qwen4-Max', 'GPT-6 Astra', 'Gemini 4\nCarbon', 'Claude\nFable 5.2'], axisLabel: { color: '#4b5563', fontSize: 11, interval: 0 } },
+        yAxis: { type: 'value', name: 'Index Score', max: 75, nameTextStyle: { color: '#4b5563', fontSize: 11 }, axisLabel: { color: '#4b5563' } },
+        series: [
+          { name: 'AA Index v5.0.1', type: 'bar', barWidth: '46%', data: [
+            { value: 43, itemStyle: { color: '#d98a6c', borderRadius: [4,4,0,0] } },
+            { value: 57, itemStyle: { color: '#5b7c99', borderRadius: [4,4,0,0] } },
+            { value: 60, itemStyle: { color: '#6b9080', borderRadius: [4,4,0,0] } },
+            { value: 65, itemStyle: { color: '#d4a373', borderRadius: [4,4,0,0] } }
+          ], label: { show: true, position: 'top' } }
+        ]
+      });
+      window.addEventListener('resize', function(){ chartB.resize(); });
+    }
+  })();
+  </script>
+
+  <h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>
+  <p class="outlook-lead">Alibaba is betting that massive token discounts can offset proprietary lock-in, even as enterprise telemetry shows accelerating migration toward open weights and multi-provider routing.</p>
+  <ul class="outlook-list">
+    <li><strong>Token Verbosity Offsets Cheap Rates:</strong> Across Artificial Analysis's benchmark suite, <code>Qwen4-Max</code> emitted <strong>127 million output tokens</strong> versus a <strong>78.6 million</strong> median—driving average task costs to <strong>$3.27</strong> compared with <strong>$1.27</strong> for <code>GPT-6.1 Sol</code> (63.94% vs. 63.20% on Vals Index v2.2 at $3.61 vs. $9.33/test).</li>
+    <li><strong>Coding &amp; Reasoning Gaps:</strong> Independent testing places <code>Qwen4-Max</code> at <strong>48.5</strong> on Terminal-Bench 4.0 (behind Moonshot <code>Kimi K3.1</code> at <strong>67.2</strong>) and <strong>31.5</strong> on ProgramBench (trailing <code>Claude Opus 5.5</code> at <strong>65.0</strong>), limiting its viability for complex software engineering.</li>
+    <li><strong>Open-Weight Strategic Tension:</strong> Databricks AI Index data across 10,000+ Unity Gateway enterprises shows open-weight traffic surging from <strong>7.3% to 30.9%</strong> in four months while single-provider reliance fell from <strong>64% to 28%</strong>; delaying smaller open-weight Qwen 4 releases risks ceding developer mindshare.</li>
+  </ul>
+</article>
+
+<article class="paper-section" id="art2">
+  <h2>U.S. Commerce Department Issues Interim Final Rule Closing Remote Cloud Compute Loopholes</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>For three years, U.S. export rules restricted physical AI chip shipments to China and embargoed states, leaving an obvious loophole: restricted buyers could rent identical compute remotely via third-country data centers. On November 16, 2026, the U.S. Bureau of Industry and Security (BIS) issued an Interim Final Rule (<strong>RIN 0694-AK50</strong>; FR Doc. <strong>2026-23529</strong>) creating a new end-use control (<strong>15 CFR § 744.24</strong>) that requires hardware licenses whenever advanced chips feed overseas clusters supplying over <strong>12 million aggregate Total Processing Performance (TPP)</strong>—roughly <strong>750 NVIDIA H100/H200 GPUs</strong>—to Macau or Country Group D:5 entities.</p>
+    <p>Simultaneously, BIS imposed case-by-case destination licensing across <strong>Singapore, Malaysia, Indonesia, Thailand, and Brazil</strong>, formally rescinded the January 2025 AI Diffusion Rule (<code>90 FR 4544</code>), and tightened foundry and OSAT packaging presumptions. Arriving four days after Jensen Huang's resignation as NVIDIA CEO amid scrutiny over Singapore buyer Megaspeed, the rule triggered an immediate sell-off across semiconductor and neocloud stocks at Monday's open, knocking <strong>Nebius down over 9%</strong> and <strong>CoreWeave over 8%</strong>.</p>
+  </div>
+
+  <h3 class="section-title">2. Architecture &amp; Performance</h3>
+  <p>Rather than directly outlawing foreign software APIs, BIS leverages physical hardware export, re-export, and transfer jurisdiction over ECCNs <strong>3A090, 4A090, and <code>.z</code> variants</strong>. Because linked data centers share the <strong>12,000,000 aggregate TPP</strong> cap, multi-site cloud providers must track beneficial ownership across global regions to avoid triggering licensing violations.</p>
+  <div class="inline-callout">
+    <p><strong>Hyperscaler Carve-Out &amp; Compliance Clock:</strong> U.S.-headquartered firms and subsidiaries with a U.S. ultimate parent—including AWS, Microsoft Azure, Google Cloud, and Oracle—receive reporting-based exemptions in the five newly restricted countries, while non-U.S. GPU clouds already serving D:5 or Macau clients face a strict <strong>90-day compliance window</strong> following the November 19 Federal Register publication.</p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Aggregate TPP Cap</div>
+      <div class="stat-value">12,000,000</div>
+      <div class="stat-sub">~750 H100/H200 GPUs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Newly Licensed Hubs</div>
+      <div class="stat-value">5 Nations</div>
+      <div class="stat-sub">SG, MY, ID, TH, BR</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Existing Cloud Window</div>
+      <div class="stat-value">90 Days</div>
+      <div class="stat-sub">From Nov 19 FR notice</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Public Comment Period</div>
+      <div class="stat-value">60 Days</div>
+      <div class="stat-sub">Interim Final Rule</div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-label">Monday Nov 16 Market Open Equity Impact (Intraday Lows)</div>
+    <div id="chart-art2-a" style="width:100%;height:100%"></div>
+      <div class="chart-fallback"><svg class="chart-fallback-svg" viewBox="0 0 560 175" role="img" aria-label="Static chart data fallback"><line x1="34" y1="131" x2="544" y2="131" stroke="#d1d5db" stroke-width="1"/><rect x="53.4" y="34.0" width="34.0" height="97.0" rx="3" fill="#5b7c99"/><text x="70.4" y="30.0" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">9</text><text x="70.4" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Nebius</text><rect x="126.3" y="44.8" width="34.0" height="86.2" rx="3" fill="#5b7c99"/><text x="143.3" y="40.8" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">8</text><text x="143.3" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">CoreWeave</text><rect x="199.1" y="66.3" width="34.0" height="64.7" rx="3" fill="#5b7c99"/><text x="216.1" y="62.3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">6</text><text x="216.1" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Micron</text><rect x="272.0" y="77.1" width="34.0" height="53.9" rx="3" fill="#5b7c99"/><text x="289.0" y="73.1" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">5</text><text x="289.0" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">AMD</text><rect x="344.9" y="77.1" width="34.0" height="53.9" rx="3" fill="#5b7c99"/><text x="361.9" y="73.1" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">5</text><text x="361.9" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Supermicro</text><rect x="417.7" y="87.9" width="34.0" height="43.1" rx="3" fill="#5b7c99"/><text x="434.7" y="83.9" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">4</text><text x="434.7" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Broadcom</text><rect x="490.6" y="87.9" width="34.0" height="43.1" rx="3" fill="#5b7c99"/><text x="507.6" y="83.9" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">4</text><text x="507.6" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">PHLX Semi</text></svg><table class="chart-fallback-table"><thead><tr><th>Category</th><th>Intraday Drop</th></tr></thead><tbody><tr><td>Nebius</td><td>9</td></tr><tr><td>CoreWeave</td><td>8</td></tr><tr><td>Micron</td><td>6</td></tr><tr><td>AMD</td><td>5</td></tr><tr><td>Supermicro</td><td>5</td></tr><tr><td>Broadcom</td><td>4</td></tr><tr><td>PHLX Semi</td><td>4</td></tr></tbody></table></div>
+  </div>
+  <script>
+  (function(){
+    var el = document.getElementById('chart-art2-a');
+    if (el && window.echarts) {
+      var chart = echarts.init(el, null, {renderer: 'svg'});
+      chart.setOption({
+        backgroundColor: 'transparent',
+        title: { text: 'Nov 16 Intraday Sell-Off Following BIS Rule', left: 'center', top: 6, textStyle: { fontSize: 13, color: '#1f2937' } },
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: '{b}: -{c}%+' },
+        grid: { top: 48, left: 48, right: 20, bottom: 48, containLabel: true },
+        xAxis: { type: 'category', data: ['Nebius', 'CoreWeave', 'Micron', 'AMD', 'Supermicro', 'Broadcom', 'PHLX Semi'], axisLabel: { color: '#4b5563', fontSize: 11, interval: 0 } },
+        yAxis: { type: 'value', name: 'Decline (%)', max: 11, nameTextStyle: { color: '#4b5563', fontSize: 11 }, axisLabel: { color: '#4b5563', formatter: '-{value}%' } },
+        series: [
+          { name: 'Intraday Drop', type: 'bar', barWidth: '48%', data: [
+            { value: 9.0, itemStyle: { color: '#d98a6c', borderRadius: [4,4,0,0] } },
+            { value: 8.0, itemStyle: { color: '#d98a6c', borderRadius: [4,4,0,0] } },
+            { value: 6.0, itemStyle: { color: '#5b7c99', borderRadius: [4,4,0,0] } },
+            { value: 5.0, itemStyle: { color: '#5b7c99', borderRadius: [4,4,0,0] } },
+            { value: 5.0, itemStyle: { color: '#d4a373', borderRadius: [4,4,0,0] } },
+            { value: 4.0, itemStyle: { color: '#5b7c99', borderRadius: [4,4,0,0] } },
+            { value: 4.0, itemStyle: { color: '#6b9080', borderRadius: [4,4,0,0] } }
+          ], label: { show: true, position: 'top', formatter: '-{c}%' } }
+        ]
+      });
+      window.addEventListener('resize', function(){ chart.resize(); });
+    }
+  })();
+  </script>
+
+  <div class="infographic-block">
+    <svg class="infographic-icon" viewBox="0 0 24 24"><use href="#icon-regulation"/></svg>
+    <div class="infographic-content">
+      <h4>15 CFR § 744.24 Scope, Exemptions &amp; Foundry Rules</h4>
+      <p>Commercial recommender systems without generative text, image, audio, video, or code capabilities are carved out. Meanwhile, tightened foundry and OSAT licensing presumptions plus third-party 3A090/4A090 incorporation notices introduce vetting friction across newly built liquid-cooled AI campuses in Malaysia and Singapore.</p>
+    </div>
+  </div>
+
+  <h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>
+  <p class="outlook-lead">Extending hardware controls into cloud tenancy telemetry concentrates global AI capital inside U.S.-parented hyperscalers while exposing non-U.S. neoclouds to severe permitting and utilization risks.</p>
+  <ul class="outlook-list">
+    <li><strong>KYC &amp; Multi-Hop Evasion Gaps:</strong> Enforcing remote compute bans relies on "knowledge" of end users via ownership audits and workload telemetry—mechanisms vulnerable to shell companies, nested API resellers, and multi-hop proxy routing.</li>
+    <li><strong>Paperwork vs. Deterrence Disconnect:</strong> BIS estimates only <strong>~100 additional license applications</strong> annually, signaling either heavy reliance on broad industry deterrence or sharp uncertainty over real-world compliance volume.</li>
+    <li><strong>Geopolitical &amp; Domestic-Silicon Acceleration:</strong> Granting carve-outs to U.S. hyperscalers while licensing regional ASEAN and Brazilian operators risks diplomatic friction and accelerates Chinese labs' migration toward domestic accelerators and distilled open-weight models.</li>
+  </ul>
+</article>
+
+<article class="paper-section" id="art3">
+  <h2>MLPerf Training v6.1 &amp; SC26: Vera Rubin NVL72 Doubles GB300 Speed as Ironwood Proves RL Efficiency</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>Frontier AI development has pivoted from static pre-training to agentic reinforcement-learning (RL) post-training, where alternating between sandboxed code rollouts and synchronous weight updates exposes interconnect bottlenecks. On November 16, 2026, MLCommons published <strong>MLPerf Training v6.1</strong>—introducing the industry's first standardized agentic RL test (<code>Qwen3.5-397B</code> using GRPO)—alongside provisional agentic inference scores in <strong>MLPerf Endpoints v1.0</strong>.</p>
+    <p>Making its benchmark debut, NVIDIA's <strong>Vera Rubin NVL72</strong> swept all seven training workloads, running up to <strong>2x faster per GPU</strong> than Blackwell Ultra (<code>GB300 NVL72</code>) and claiming a provisional <strong>&gt;10x throughput-per-kilowatt</strong> advantage on agentic inference. Meanwhile, Google Cloud trained the 397B RL workload across <strong>640 Ironwood TPUs</strong> in <strong>18.02 minutes</strong> with <strong>&lt;3% chip idle time</strong>, Crusoe scaled <strong>128 AMD MI355X GPUs</strong> over Ethernet, and NVIDIA unveiled its 2028 <strong>Rubin HPC</strong> chip packing <strong>&gt;50,000 CUDA cores</strong> at SC26.</p>
+  </div>
+
+  <h3 class="section-title">2. Architecture &amp; Performance</h3>
+  <p>Preserving a uniform 72-GPU liquid-cooled NVLink domain across <code>GB200</code>, <code>GB300</code>, and <strong>Vera Rubin NVL72</strong> enabled near-linear cluster scaling—achieving <strong>~97% scaling efficiency</strong> from 256 to 1,024 GPUs (16 min down to <strong>4.14 min</strong> on <code>DeepSeek-V3 671B</code>). Neoclouds demonstrated immediate multi-rack readiness: CoreWeave ran 256 Vera Rubin GPUs over Spectrum-X Ethernet in <strong>17.65 min</strong> (<strong>2.7x</strong> faster than 256-GPU GB200 at 48.40 min), while Nebius cut 64-GPU <code>Qwen3.5-397B</code> GRPO time by <strong>33%</strong> (~1.5x faster than GB300).</p>
+  <p>On agentic RL orchestration, NVIDIA paired <code>NeMo RL</code> with both <code>TensorRT-LLM</code> (<strong>10.44 min</strong>) and <code>vLLM</code> (<strong>10.94 min</strong>) on 1,024 Vera Rubin GPUs, outpacing GB300's <strong>13.78 min</strong>. Google Cloud simultaneously validated asynchronous code rollouts and gradient updates on 640 Ironwood TPUs (<strong>0.765 pass@4</strong> vs. 0.69 target), while Crusoe Cloud proved AMD MI355X clusters scale to 16 nodes via RoCE on 8× 400G NICs without InfiniBand.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">DeepSeek-V3 (1,024 GPUs)</div>
+      <div class="stat-value">4.14 min</div>
+      <div class="stat-sub">1.94x faster than GB300</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Qwen3.5-397B GRPO</div>
+      <div class="stat-value">10.44 min</div>
+      <div class="stat-sub">Vera Rubin vs 13.78m GB300</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ironwood TPU Idle Time</div>
+      <div class="stat-value">&lt;3%</div>
+      <div class="stat-sub">18.02 min on 640 TPUs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">2028 Rubin HPC Roadmap</div>
+      <div class="stat-value">&gt;50K Cores</div>
+      <div class="stat-sub">CUDA + 7th-gen NVLink</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-container">
+      <div class="chart-label">DeepSeek-V3 671B (1,024-GPU Scale)</div>
+      <div id="chart-art3-a" style="width:100%;height:100%"></div>
+      <div class="chart-fallback"><svg class="chart-fallback-svg" viewBox="0 0 560 175" role="img" aria-label="Static chart data fallback"><line x1="34" y1="131" x2="544" y2="131" stroke="#d1d5db" stroke-width="1"/><rect x="80.8" y="98.5" width="34.0" height="32.5" rx="3" fill="#5b7c99"/><text x="97.8" y="94.5" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">4.14</text><text x="97.8" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Vera Rubin NVL72…</text><rect x="208.2" y="68.0" width="34.0" height="63.0" rx="3" fill="#5b7c99"/><text x="225.2" y="64.0" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">8.03</text><text x="225.2" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">GB300 NVL72 (1,0…</text><rect x="335.8" y="34.0" width="34.0" height="97.0" rx="3" fill="#5b7c99"/><text x="352.8" y="30.0" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">12.36</text><text x="352.8" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">GB200 NVL72 (1,0…</text><rect x="463.2" y="91.5" width="34.0" height="39.5" rx="3" fill="#5b7c99"/><text x="480.2" y="87.5" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">5.03</text><text x="480.2" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Ironwood TPU (2,…</text></svg><table class="chart-fallback-table"><thead><tr><th>Category</th><th>Training Time</th></tr></thead><tbody><tr><td>Vera Rubin NVL72 (1,024 GPUs)</td><td>4.14</td></tr><tr><td>GB300 NVL72 (1,024 GPUs)</td><td>8.03</td></tr><tr><td>GB200 NVL72 (1,024 GPUs)</td><td>12.36</td></tr><tr><td>Ironwood TPU (2,048 TPUs)</td><td>5.03</td></tr></tbody></table></div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-label">Qwen3.5-397B GRPO Agentic RL Time</div>
+      <div id="chart-art3-b" style="width:100%;height:100%"></div>
+      <div class="chart-fallback"><svg class="chart-fallback-svg" viewBox="0 0 560 175" role="img" aria-label="Static chart data fallback"><line x1="34" y1="131" x2="544" y2="131" stroke="#d1d5db" stroke-width="1"/><rect x="80.8" y="74.8" width="34.0" height="56.2" rx="3" fill="#5b7c99"/><text x="97.8" y="70.8" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">10.44</text><text x="97.8" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Vera Rubin (TRT-…</text><rect x="208.2" y="72.1" width="34.0" height="58.9" rx="3" fill="#5b7c99"/><text x="225.2" y="68.1" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">10.94</text><text x="225.2" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Vera Rubin (vLLM…</text><rect x="335.8" y="56.8" width="34.0" height="74.2" rx="3" fill="#5b7c99"/><text x="352.8" y="52.8" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">13.78</text><text x="352.8" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">GB300 NVL72 (1,0…</text><rect x="463.2" y="34.0" width="34.0" height="97.0" rx="3" fill="#5b7c99"/><text x="480.2" y="30.0" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#1f2937">18.02</text><text x="480.2" y="147" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4b5563">Ironwood (640 TP…</text></svg><table class="chart-fallback-table"><thead><tr><th>Category</th><th>GRPO RL Time</th></tr></thead><tbody><tr><td>Vera Rubin (TRT-LLM, 1024)</td><td>10.44</td></tr><tr><td>Vera Rubin (vLLM, 1024)</td><td>10.94</td></tr><tr><td>GB300 NVL72 (1,024 GPUs)</td><td>13.78</td></tr><tr><td>Ironwood (640 TPUs)</td><td>18.02</td></tr></tbody></table></div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var elA = document.getElementById('chart-art3-a');
+    if (elA && window.echarts) {
+      var chartA = echarts.init(elA, null, {renderer: 'svg'});
+      chartA.setOption({
+        backgroundColor: 'transparent',
+        title: { text: 'DeepSeek-V3 Time to Train (Lower = Better)', left: 'center', top: 6, textStyle: { fontSize: 13, color: '#1f2937' } },
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: '{b}: {c} min' },
+        grid: { top: 48, left: 48, right: 20, bottom: 54, containLabel: true },
+        xAxis: { type: 'category', data: ['Vera Rubin NVL72\n(1,024 GPUs)', 'GB300 NVL72\n(1,024 GPUs)', 'GB200 NVL72\n(1,024 GPUs)', 'Ironwood TPU\n(2,048 TPUs)'], axisLabel: { color: '#4b5563', fontSize: 10.5, interval: 0 } },
+        yAxis: { type: 'value', name: 'Minutes', max: 15, nameTextStyle: { color: '#4b5563', fontSize: 11 }, axisLabel: { color: '#4b5563' } },
+        series: [
+          { name: 'Training Time', type: 'bar', barWidth: '46%', data: [
+            { value: 4.14, itemStyle: { color: '#6b9080', borderRadius: [4,4,0,0] } },
+            { value: 8.03, itemStyle: { color: '#5b7c99', borderRadius: [4,4,0,0] } },
+            { value: 12.36, itemStyle: { color: '#d4a373', borderRadius: [4,4,0,0] } },
+            { value: 5.03, itemStyle: { color: '#d98a6c', borderRadius: [4,4,0,0] } }
+          ], label: { show: true, position: 'top', formatter: '{c}m' } }
+        ]
+      });
+      window.addEventListener('resize', function(){ chartA.resize(); });
+    }
+    var elB = document.getElementById('chart-art3-b');
+    if (elB && window.echarts) {
+      var chartB = echarts.init(elB, null, {renderer: 'svg'});
+      chartB.setOption({
+        backgroundColor: 'transparent',
+        title: { text: 'Agentic RL Time to Target (Lower = Better)', left: 'center', top: 6, textStyle: { fontSize: 13, color: '#1f2937' } },
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: '{b}: {c} min' },
+        grid: { top: 48, left: 48, right: 20, bottom: 54, containLabel: true },
+        xAxis: { type: 'category', data: ['Vera Rubin\n(TRT-LLM, 1024)', 'Vera Rubin\n(vLLM, 1024)', 'GB300 NVL72\n(1,024 GPUs)', 'Ironwood\n(640 TPUs)'], axisLabel: { color: '#4b5563', fontSize: 10.5, interval: 0 } },
+        yAxis: { type: 'value', name: 'Minutes', max: 22, nameTextStyle: { color: '#4b5563', fontSize: 11 }, axisLabel: { color: '#4b5563' } },
+        series: [
+          { name: 'GRPO RL Time', type: 'bar', barWidth: '46%', data: [
+            { value: 10.44, itemStyle: { color: '#6b9080', borderRadius: [4,4,0,0] } },
+            { value: 10.94, itemStyle: { color: '#5b7c99', borderRadius: [4,4,0,0] } },
+            { value: 13.78, itemStyle: { color: '#d4a373', borderRadius: [4,4,0,0] } },
+            { value: 18.02, itemStyle: { color: '#d98a6c', borderRadius: [4,4,0,0] } }
+          ], label: { show: true, position: 'top', formatter: '{c}m' } }
+        ]
+      });
+      window.addEventListener('resize', function(){ chartB.resize(); });
+    }
+  })();
+  </script>
+
+  <h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>
+  <p class="outlook-lead">Power-constrained AI factories are shifting unit-economics tracking toward tokens-per-second per kilowatt, yet asymmetric test parameters and missing pricing disclosures temper headline claims.</p>
+  <ul class="outlook-list">
+    <li><strong>Provisional Inference &amp; Latency Trade-Off:</strong> On <code>MLPerf Endpoints v1.0</code> (<code>Kimi K3</code>), Vera Rubin's provisional <strong>410.5 tok/s/kW</strong> (41,414.2 tok/s at 100.89 kW, 1,024 concurrent queries on 32 GPUs) outpaced verified GB300's <strong>36.8 tok/s/kW</strong> (2,210.4 tok/s at 60 kW, 48 queries on 48 GPUs)—but incurred <strong>2.03x higher TTFT P90 latency</strong> (<strong>4,673.9 ms</strong> vs. <strong>2,305.1 ms</strong>).</li>
+    <li><strong>Total Compute vs. Wall-Clock Speed:</strong> Although 10,240 GB300 GPUs set the fastest DeepSeek-V3 wall-clock run at <strong>1.38 min</strong> (vs. 1.70 min on 8,192 Ironwood TPUs), doing so burned <strong>~14,130 GPU-minutes</strong> of total compute time versus <strong>~4,240 GPU-minutes</strong> on 1,024 Vera Rubin GPUs (~3.3x more compute).</li>
+    <li><strong>Unproven Multi-Thousand AMD Scale &amp; 2028 Unknowns:</strong> AMD's MI355X appeared only up to 128 GPUs and omitted DeepSeek-V3 and Qwen3.5-397B, leaving multi-thousand-GPU MoE competitiveness unverified; meanwhile, <code>Rubin HPC</code> (due 2028) and early-2027 192-CPU Vera racks still lack disclosed memory bandwidth, FP64 FLOPs, and TDP figures.</li>
+  </ul>
+</article>
+
+<article class="paper-section" id="art4">
+  <h2>Lambda &amp; NVIDIA Deploy World's First Large-Scale Co-Packaged Optics Fabric Across 10,000+ GPUs</h2>
+
+  <h3 class="section-title">1. Executive Summary</h3>
+  <div class="abstract-quote">
+    <p>As AI cluster switches scale to 800 Gb/s per port over <strong>200G SerDes</strong> electrical lanes, conventional copper printed circuit boards (PCBs) suffer severe high-frequency attenuation—forcing front-panel pluggable transceivers to rely on power-hungry digital signal processing (DSP) retiming while creating severe faceplate thermal hotspots. On November 16, 2026 at SC26, Lambda and NVIDIA disclosed the industry's first large-scale production deployment of <strong>Co-Packaged Optics (CPO)</strong>, linking <strong>more than 10,000 NVIDIA GB300 NVL72 GPUs</strong> at Lambda's Quebec campus.</p>
+    <p>Built on liquid-cooled <strong>NVIDIA Quantum-X Photonics (<code>Q3450-LD</code>)</strong> InfiniBand switches (<strong>144 × 800 Gb/s ports</strong>, <strong>115.2 Tb/s</strong> non-blocking capacity, and <strong>18 field-replaceable External Light Sources</strong>), the CPO fabric matched pluggable throughput while cutting <strong>rack latency by 3.8%</strong>, <strong>pod latency by 10.1%</strong>, and <strong>median optics temperature by 15°C (36°C vs. 51°C)</strong>—validating up to <strong>5x optical power efficiency</strong> and <strong>15x higher resiliency</strong> ratings.</p>
+  </div>
+
+  <div class="concept-box">
+    <h4>Key Hardware &amp; Packaging Concepts</h4>
+    <ul>
+      <li><strong>200G SerDes:</strong> High-speed serializer/deserializer electrical lanes operating at 200 gigabits per second; four lanes combine to drive a single 800 Gb/s switch port, suffering steep attenuation across inches of copper PCB traces.</li>
+      <li><strong>Co-Packaged Optics (CPO):</strong> Hybrid-bonding silicon photonics engines directly onto the switch package substrate millimeters from the ASIC, shrinking electrical SerDes reach and removing optical-transceiver DSP retiming stages.</li>
+      <li><strong>External Light Sources (ELS):</strong> 18 hot-swappable front-panel laser modules feeding continuous-wave light via polarization-maintaining fibers, keeping thermally sensitive lasers outside the hot switch package for easier maintenance.</li>
+    </ul>
+  </div>
+
+  <h3 class="section-title">2. Architecture &amp; Performance</h3>
+  <p>By integrating <span class="code-term">Co-Packaged Optics (CPO)</span> onto the switch substrate adjacent to the ASIC, NVIDIA collapses the <span class="code-term">200G SerDes</span> electrical channel from inches of lossy PCB trace to millimeter-scale package interconnects. Eliminating <span class="code-term">DSP retiming</span> inside optical modules improves signal integrity margin while easing ultra-low-loss PCB routing constraints across the switch motherboard.</p>
+  <p>Thermally, direct liquid cooling cools both the switch ASIC and co-packaged optical engines simultaneously, holding median optics temperature at <strong>36°C</strong> versus <strong>51°C</strong> for air-cooled pluggables and eliminating high-velocity faceplate airflow demands. Deployed across a non-blocking two-level fat-tree topology at Lambda's <strong>142 MW</strong> renewable Quebec facility (guaranteed <strong>1.2 PUE</strong>, up to <strong>80%</strong> free cooling, zero server water), the architecture pairs with <strong>4x fewer lasers</strong> and <span class="code-term">External Light Sources (ELS)</span> to prevent link-flap GPU stalls.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Production Cluster</div>
+      <div class="stat-value">10,000+ GPUs</div>
+      <div class="stat-sub">Blackwell Ultra GB300 NVL72</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Switch Bandwidth</div>
+      <div class="stat-value">115.2 Tb/s</div>
+      <div class="stat-sub">144 × 800 Gb/s InfiniBand</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Optics Operating Temp</div>
+      <div class="stat-value">36°C vs 51°C</div>
+      <div class="stat-sub">-15°C via direct liquid cooling</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pod Latency Gain</div>
+      <div class="stat-value">-10.1%</div>
+      <div class="stat-sub">-3.8% at rack scale</div>
+    </div>
+  </div>
+
+  <div class="arch-diagram-wrap">
+    <div class="arch-diagram-title">System Architecture: Quantum-X Photonics (Q3450-LD) Physical &amp; Thermal Stack</div>
+    <div class="arch-diagram-stage">
+      <svg viewBox="0 0 720 190" role="img" aria-label="NVIDIA Quantum-X Photonics CPO physical and thermal stack diagram">
+        <rect x="14" y="34" width="150" height="122" rx="8" fill="#fef8e7" stroke="#fde3a7" stroke-width="1.5"/>
+        <text x="89" y="64" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">18x External Lasers</text>
+        <text x="89" y="86" text-anchor="middle" font-size="11" fill="#4b5563">Hot-Swappable ELS</text>
+        <text x="89" y="106" text-anchor="middle" font-size="11" fill="#4b5563">CW Laser Feed via</text>
+        <text x="89" y="126" text-anchor="middle" font-size="11" fill="#4b5563">PM Fiber (4x Fewer)</text>
+
+        <line x1="164" y1="95" x2="196" y2="95" stroke="#64748b" stroke-width="1.8"/>
+        <polygon points="196,90 206,95 196,100" fill="#64748b"/>
+
+        <rect x="206" y="20" width="290" height="150" rx="8" fill="#edf5fc" stroke="#c8e0f7" stroke-width="1.5"/>
+        <text x="351" y="42" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">Direct Liquid Cooling Plate (36°C Median)</text>
+
+        <rect x="220" y="56" width="124" height="98" rx="6" fill="#fef0e7" stroke="#f8cdb4" stroke-width="1.5"/>
+        <text x="282" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">Switch ASIC</text>
+        <text x="282" y="106" text-anchor="middle" font-size="11" fill="#4b5563">115.2 Tb/s Fabric</text>
+        <text x="282" y="126" text-anchor="middle" font-size="11" fill="#4b5563">mm-Scale 200G I/O</text>
+
+        <line x1="344" y1="105" x2="362" y2="105" stroke="#64748b" stroke-width="1.8"/>
+
+        <rect x="362" y="56" width="120" height="98" rx="6" fill="#eef6ed" stroke="#cae8c2" stroke-width="1.5"/>
+        <text x="422" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">Silicon Photonics</text>
+        <text x="422" y="106" text-anchor="middle" font-size="11" fill="#4b5563">3D Co-Packaged</text>
+        <text x="422" y="126" text-anchor="middle" font-size="11" fill="#4b5563">No Transceiver DSP</text>
+
+        <line x1="496" y1="95" x2="528" y2="95" stroke="#64748b" stroke-width="1.8"/>
+        <polygon points="528,90 538,95 528,100" fill="#64748b"/>
+
+        <rect x="538" y="34" width="168" height="122" rx="8" fill="#eef6ed" stroke="#cae8c2" stroke-width="1.5"/>
+        <text x="622" y="64" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">10,000+ GPU Pod</text>
+        <text x="622" y="86" text-anchor="middle" font-size="11" fill="#4b5563">144 × 800 Gb/s Ports</text>
+        <text x="622" y="106" text-anchor="middle" font-size="11" fill="#4b5563">2-Level Fat-Tree</text>
+        <text x="622" y="126" text-anchor="middle" font-size="11" fill="#4b5563">-10.1% Pod Latency</text>
+      </svg>
+    </div>
+    <p class="arch-diagram-caption">Keeping 18 laser sources external while hybrid-bonding silicon photonics engines beside the switch ASIC under a 36°C liquid-cooled plate eliminates pluggable DSP overhead.</p>
+  </div>
+
+  <div class="infographic-block">
+    <svg class="infographic-icon" viewBox="0 0 24 24"><use href="#icon-packaging"/></svg>
+    <div class="infographic-content">
+      <h4>Supply-Chain Inflection: Advanced Photonic Packaging &amp; Liquid Power</h4>
+      <p>CPO deployment accelerates demand for 3D optical integration (such as TSMC COUPE), continuous-wave external lasers, and direct liquid-cooled switch enclosures—alongside emerging 800 VDC facility hardware like Delta Electronics' SC26 2.5 MW liquid-to-liquid CDUs and 3,000 W cold plates.</p>
+    </div>
+  </div>
+
+  <h3 class="section-title">3. Strategic Outlook &amp; Limitations</h3>
+  <p class="outlook-lead">While Lambda's Quebec fabric proves CPO readiness at 10,000+ GPU scale, proprietary lock-in and substrate-level repair constraints complicate near-term multi-vendor adoption.</p>
+  <ul class="outlook-list">
+    <li><strong>Thermal &amp; Latency Gains Without Bandwidth Lift:</strong> End-to-end workload throughput only matched pluggable optics; CPO's immediate production payoff lies in thermal headroom (-15°C), lower optical power, and link stability rather than higher raw bandwidth.</li>
+    <li><strong>Board-Level Repair Risk &amp; Retimer Scope:</strong> Removable ELS modules cover laser wear-out only—if an on-substrate optical engine fails, technicians must replace the board or switch rather than a single port—and CPO eliminates transceiver DSPs, not standalone server PCIe/backplane retimers.</li>
+    <li><strong>Proprietary Pre-Standard Fabrics:</strong> Until OIF (<code>CEI-224G</code>/<code>448G</code>, <code>EEI/ELSFP</code>) and IEEE 802.3 multi-vendor specifications mature in 2027–2028, NVIDIA Quantum-X Photonics and competing Broadcom CPO fabrics remain non-interoperable.</li>
+  </ul>
+</article>
+
+<section class="bento-grid-wrap" id="takeaways">
+  <h2 class="bento-grid-title">Key Strategic Takeaways</h2>
+  <div class="bento-grid">
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-code"/></svg>
+      <div class="bento-card-title">Closed MoE vs. Multi-Routing</div>
+      <p>Alibaba withheld <code>Qwen4-Max</code> (2.4T MoE) weights while slashing API prices 25%, clashing with Databricks data showing 30.9% open-weight share and 71.1% multi-provider adoption.</p>
+    </div>
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-regulation"/></svg>
+      <div class="bento-card-title">Remote Compute Export Rules</div>
+      <p>BIS RIN 0694-AK50 caps overseas D:5/Macau cloud access at 12M TPP (~750 H100s) and licenses 5 nations, giving U.S. hyperscalers an edge under a 90-day compliance clock.</p>
+    </div>
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-datacenter"/></svg>
+      <div class="bento-card-title">Agentic RL &amp; Watts-Per-Token</div>
+      <p>MLPerf v6.1 validates Vera Rubin's 2x speed and Ironwood's &lt;3% RL idle time, yet provisional 410.5 tok/s/kW gains come with a 2.03x higher initial token latency penalty.</p>
+    </div>
+    <div class="bento-card">
+      <svg class="bento-card-icon"><use href="#icon-packaging"/></svg>
+      <div class="bento-card-title">Production CPO &amp; 800 VDC Limits</div>
+      <p>Lambda's 10,000+ GPU Quantum-X CPO deployment cuts optics temps by 15°C and pod latency by 10.1%, heralding 3D photonic packaging and liquid-cooled 800 VDC infrastructure.</p>
+    </div>
+  </div>
+</section>
+            </main>
+
+            <footer class="site-footer">
+                <span>Generated daily via automated intelligence pipeline.</span>
+                <a href="https://github.com/ancm777-eng/AInews" target="_blank" rel="noopener">github.com/ancm777-eng/AInews</a>
+            </footer>
+        </div>
+    </div>
+
+    <button type="button" class="back-to-top" id="back-to-top" aria-label="Back to top" title="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+
+    <script src="../archive/manifest.js"></script>
+
+    <script>
+        // ECharts readiness check, resize safety net, and static SVG/table fallback activation
+        (function () {
+            function syncChartContainers() {
+                var containers = document.querySelectorAll('.chart-container');
+                containers.forEach(function (container) {
+                    var el = container.querySelector('[id^="chart-"]');
+                    if (!el) return;
+                    var instance = (window.echarts && echarts.getInstanceByDom) ? echarts.getInstanceByDom(el) : null;
+                    if (instance) {
+                        container.classList.remove('chart-fallback-active');
+                        instance.resize();
+                    } else if (container.querySelector('.chart-fallback')) {
+                        container.classList.add('chart-fallback-active');
+                    }
+                });
+            }
+            window.addEventListener('load', syncChartContainers);
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(syncChartContainers);
+            }
+            window.addEventListener('resize', syncChartContainers);
+            setTimeout(syncChartContainers, 350);
+        })();
+    </script>
+
+    <script>
+        // ScrollSpy (static-TOC compatible), Mobile Jump Bar, and Reading Progress
+        (function () {
+            var list = document.getElementById('side-nav-list');
+            var mobileSelect = document.getElementById('mobile-toc-select');
+            var mobilePills = document.getElementById('mobile-toc-pills');
+            var sections = Array.prototype.slice.call(document.querySelectorAll('main .paper-section, main .bento-grid-wrap'));
+            var items = [];
+
+            // Progressive enhancement fallback if static TOC items were not pre-rendered
+            if (list && !list.querySelector('.side-nav-link')) {
+                sections.forEach(function (sec, idx) {
+                    var heading = sec.querySelector('h2');
+                    if (!heading) return;
+                    if (!sec.id) sec.id = sec.classList.contains('bento-grid-wrap') ? 'takeaways' : ('art' + (idx + 1));
+                    var num = (idx + 1 < 10 ? '0' : '') + (idx + 1);
+                    var titleText = heading.textContent.trim();
+                    var shortTitle = titleText.length > 44 ? titleText.slice(0, 44) + '…' : titleText;
+
+                    var li = document.createElement('li');
+                    var a = document.createElement('a');
+                    a.href = '#' + sec.id;
+                    a.className = 'side-nav-link' + (idx === 0 ? ' active' : '');
+                    a.setAttribute('data-target', sec.id);
+                    a.innerHTML = '<span class="nav-num">' + num + '</span><span class="nav-text"></span>';
+                    a.querySelector('.nav-text').textContent = shortTitle;
+                    li.appendChild(a);
+                    list.appendChild(li);
+
+                    if (mobileSelect) {
+                        var opt = document.createElement('option');
+                        opt.value = '#' + sec.id;
+                        opt.textContent = num + ' · ' + shortTitle;
+                        mobileSelect.appendChild(opt);
+                    }
+                    if (mobilePills) {
+                        var pill = document.createElement('a');
+                        pill.href = '#' + sec.id;
+                        pill.className = 'mobile-pill' + (idx === 0 ? ' active' : '');
+                        pill.setAttribute('data-target', sec.id);
+                        pill.textContent = sec.id === 'takeaways' ? 'Sum' : num;
+                        mobilePills.appendChild(pill);
+                    }
+                });
+            }
+
+            sections.forEach(function (sec) {
+                if (!sec.id) return;
+                items.push({
+                    id: sec.id,
+                    el: sec,
+                    sideLink: list ? list.querySelector('.side-nav-link[data-target="' + sec.id + '"]') : null,
+                    pillLink: mobilePills ? mobilePills.querySelector('.mobile-pill[data-target="' + sec.id + '"]') : null
+                });
+            });
+
+            if (mobileSelect) {
+                mobileSelect.addEventListener('change', function () {
+                    var target = document.querySelector(mobileSelect.value);
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
+
+            function setActive(activeId) {
+                items.forEach(function (item) {
+                    var isActive = item.id === activeId;
+                    if (item.sideLink) {
+                        item.sideLink.classList.toggle('active', isActive);
+                        if (isActive) item.sideLink.setAttribute('aria-current', 'location');
+                        else item.sideLink.removeAttribute('aria-current');
+                    }
+                    if (item.pillLink) {
+                        item.pillLink.classList.toggle('active', isActive);
+                    }
+                });
+                if (mobileSelect && activeId) {
+                    var targetVal = '#' + activeId;
+                    if (mobileSelect.value !== targetVal) {
+                        mobileSelect.value = targetVal;
+                    }
+                }
+            }
+
+            var bar = document.getElementById('scroll-progress');
+            var sidePct = document.getElementById('side-nav-progress-pct');
+            var sideFill = document.getElementById('side-nav-progress-fill');
+            var backTop = document.getElementById('back-to-top');
+
+            function onScroll() {
+                var winScroll = window.scrollY || document.documentElement.scrollTop || 0;
+                var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                var pct = docHeight > 0 ? Math.min(100, Math.max(0, (winScroll / docHeight) * 100)) : 0;
+                var pctRound = Math.round(pct);
+
+                if (bar) {
+                    bar.style.width = pct.toFixed(1) + '%';
+                    bar.setAttribute('aria-valuenow', String(pctRound));
+                }
+                if (sidePct) sidePct.textContent = pctRound + '%';
+                if (sideFill) sideFill.style.width = pct.toFixed(1) + '%';
+                if (backTop) backTop.classList.toggle('visible', winScroll > 420);
+
+                if (!items.length) return;
+                var activeId = items[0].id;
+                var offset = 150;
+                if (docHeight > 0 && winScroll >= docHeight - 40) {
+                    activeId = items[items.length - 1].id;
+                } else {
+                    for (var i = 0; i < items.length; i++) {
+                        var rect = items[i].el.getBoundingClientRect();
+                        if (rect.top <= offset) {
+                            activeId = items[i].id;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                setActive(activeId);
+            }
+
+            window.addEventListener('scroll', onScroll, { passive: true });
+            window.addEventListener('resize', onScroll, { passive: true });
+            onScroll();
+
+            if (backTop) {
+                backTop.addEventListener('click', function () {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+        })();
+    </script>
+
+    <script>
+        // Daily Archive Selector enhancement (works on GitHub Pages and local file://)
+        (function () {
+            var select = document.getElementById('archive-date-select');
+            if (!select) return;
+            var prefix = '../';
+            var currentIso = select.getAttribute('data-current-date') || '';
+            var manifest = window.AINEWS_ARCHIVE;
+
+            function resolveHref(entry) {
+                if (!entry) return '';
+                if (manifest && manifest.latest && entry.date === manifest.latest) {
+                    return prefix + 'index.html';
+                }
+                if (entry.html) {
+                    return prefix + entry.html;
+                }
+                return prefix + 'archive.html?date=' + encodeURIComponent(entry.date);
+            }
+
+            if (manifest && Array.isArray(manifest.dates) && manifest.dates.length) {
+                var existing = {};
+                Array.prototype.slice.call(select.options).forEach(function (o) { existing[o.value] = true; });
+                var ordered = manifest.dates.slice().sort(function (a, b) {
+                    return a.date < b.date ? 1 : (a.date > b.date ? -1 : 0);
+                });
+                select.innerHTML = '';
+                ordered.forEach(function (entry) {
+                    var opt = document.createElement('option');
+                    opt.value = resolveHref(entry);
+                    opt.setAttribute('data-date', entry.date);
+                    opt.textContent = entry.label || entry.date;
+                    if (entry.date === currentIso) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            }
+
+            select.addEventListener('change', function () {
+                if (select.value) {
+                    window.location.href = select.value;
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>
