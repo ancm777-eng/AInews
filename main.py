@@ -863,19 +863,19 @@ def main():
         print(f"✅ Phase 1 complete. Saved to {p1_cache_file} (Time: {time.time() - p1_start:.2f}s)")
 
     # ---------------------------------------------------------
-    # Phase 2: GPT-6.1 Sol Validation (초고도화 팩트체크)
+    # Phase 2: GPT-6.2 Sol Validation (초고도화 팩트체크)
     # ---------------------------------------------------------
     p2_cache_file = "trial/feedback.txt"
     feedback = None
 
     if o_client:
-        print("\n--- Phase 2: GPT-6.1 Validation ---")
+        print("\n--- Phase 2: GPT-6.2 Validation ---")
         if os.path.exists(p2_cache_file):
             print("✅ Phase 2: 오늘 이미 생성된 로컬 캐시(feedback.txt)에서 피드백을 불러옵니다.")
             with open(p2_cache_file, "r", encoding="utf-8") as f:
                 feedback = f.read()
         else:
-            print("Starting GPT-6.1 action (Model: gpt-6.1-sol)...")
+            print("Starting GPT-6.2 action (Model: gpt-6.2-sol)...")
             p2_start = time.time()
             current_dt = now_kst()
             current_kst = current_dt.strftime("%Y-%m-%d %H:%M KST")
@@ -914,9 +914,9 @@ def main():
             )
             gpt_messages = [{"role": "user", "content": p2_user_prompt}]
 
-            feedback = run_gpt_chat(o_client, "gpt-6.1-sol", gpt_messages, system=p2_system)
+            feedback = run_gpt_chat(o_client, "gpt-6.2-sol", gpt_messages, system=p2_system)
             if not feedback:
-                print("⚠️ Phase 2 (GPT-6.1 Sol) 호출 실패: Graceful Fallback 발동. Phase 1 초안을 유지하고 후속 단계로 진행합니다.")
+                print("⚠️ Phase 2 (GPT-6.2 Sol) 호출 실패: Graceful Fallback 발동. Phase 1 초안을 유지하고 후속 단계로 진행합니다.")
                 feedback = None
             else:
                 with open(p2_cache_file, "w", encoding="utf-8") as f:
